@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FF59AEEA-C133-4BF8-8A0B-620A3C99022B}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>StorybrewEditor</RootNamespace>
+    <AssemblyName>StorybrewEditor</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>StorybrewEditor.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Audio\AudioManager.cs" />
+    <Compile Include="Audio\AudioStream.cs" />
+    <Compile Include="Editor.cs" />
+    <Compile Include="Graphics\Cameras\Camera.cs" />
+    <Compile Include="Graphics\Cameras\CameraBase.cs" />
+    <Compile Include="Graphics\Cameras\CameraIso.cs" />
+    <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
+    <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
+    <None Include="Resources\scripttemplate.csx" />
+    <Compile Include="UserInterface\Drawables\CompositeDrawable.cs" />
+    <Compile Include="UserInterface\Drawables\Drawable.cs" />
+    <Compile Include="UserInterface\Drawables\NinePatch.cs" />
+    <Compile Include="UserInterface\Drawables\Sprite.cs" />
+    <Compile Include="UserInterface\Drawables\NullDrawable.cs" />
+    <Compile Include="UserInterface\Drawables\StoryboardDrawable.cs" />
+    <Compile Include="UserInterface\Drawables\TextDrawable.cs" />
+    <Compile Include="Graphics\DrawContext.cs" />
+    <Compile Include="Graphics\DrawState.cs" />
+    <Compile Include="Graphics\GpuCommandSync.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamer.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerBufferData.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerFpImmediate.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerFpVbo.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerNull.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerPersistentMap.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerVao.cs" />
+    <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerVbo.cs" />
+    <Compile Include="Graphics\Renderers\Renderer.cs" />
+    <Compile Include="Graphics\Renderers\SpriteRenderer.cs" />
+    <Compile Include="Graphics\Renderers\SpriteRendererBuffered.cs" />
+    <Compile Include="Graphics\RenderTargets\MultiRenderTarget.cs" />
+    <Compile Include="Graphics\RenderTargets\RenderTarget.cs" />
+    <Compile Include="Graphics\RenderTargets\RenderTexture.cs" />
+    <Compile Include="Graphics\Shader.cs" />
+    <Compile Include="Graphics\Textures\Texture.cs" />
+    <Compile Include="Graphics\Textures\Texture2d.cs" />
+    <Compile Include="Graphics\Textures\Texture3d.cs" />
+    <Compile Include="Graphics\Textures\TextureContainer.cs" />
+    <Compile Include="Graphics\Textures\TextureContainerSeparate.cs" />
+    <Compile Include="Graphics\Text\FontManager.cs" />
+    <Compile Include="Graphics\VertexAttribute.cs" />
+    <Compile Include="Graphics\VertexDeclaration.cs" />
+    <Compile Include="Input\InputAdapter.cs" />
+    <Compile Include="Input\InputDispatcher.cs" />
+    <Compile Include="Input\InputHandler.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Librairies\ManagedBass\BitHelper.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\DownloadProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\DSPProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileCloseProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileLengthProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileReadProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileSeekProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\IOSNotifyProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\RecordProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\StreamProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\SyncProcedure.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\Algorithm3D.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\BassFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\BassInfoFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\ChannelAttribute.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\ChannelType.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\Configuration.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DataFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DeviceInfoFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DeviceInitFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DeviceType.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DSInterface.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DXPhase.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DXWaveform.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\EAXEnvironment.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\EffectType.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\FileStreamPosition.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\InputFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\InputTypeFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\IOSNotify.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\LevelRetrievalFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\Mode3D.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\PlaybackState.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\PositionFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\RecordFormatFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\RecordInfoFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\StreamProcedureType.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\StreamSystem.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\SyncFlags.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\TagType.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\VAMMode.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\3D.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Bass.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Channels.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Config.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Devices.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Record.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Samples.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Streams.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\BassInfo.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\ChannelInfo.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\DeviceInfo.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\FileProcedures.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\PluginFormat.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\PluginInfo.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\RecordInfo.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\SampleInfo.cs" />
+    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\Vector3D.cs" />
+    <Compile Include="Librairies\ManagedBass\Errors.cs" />
+    <Compile Include="Librairies\ManagedBass\Extensions.cs" />
+    <Compile Include="Librairies\ManagedBass\Resolution.cs" />
+    <Compile Include="Librairies\ManagedBass\Return.cs" />
+    <Compile Include="Librairies\ManagedBass\WindowsNative.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ScreenLayers\EffectNameSelector.cs" />
+    <Compile Include="ScreenLayers\Util\LoadingScreen.cs" />
+    <Compile Include="ScreenLayers\NewProjectMenu.cs" />
+    <Compile Include="ScreenLayers\StartMenu.cs" />
+    <Compile Include="ScreenLayers\ProjectMenu.cs" />
+    <Compile Include="ScreenLayers\Util\NameBox.cs" />
+    <Compile Include="ScreenLayers\Util\MessageBox.cs" />
+    <Compile Include="ScreenLayers\ScreenLayer.cs" />
+    <Compile Include="ScreenLayers\ScreenLayerManager.cs" />
+    <Compile Include="ScreenLayers\UiScreenLayer.cs" />
+    <Compile Include="Storyboarding\EditorGeneratorContext.cs" />
+    <Compile Include="Scripting\ScriptCompilationException.cs" />
+    <Compile Include="Scripting\ScriptLoadingException.cs" />
+    <Compile Include="Scripting\ScriptContainer.cs" />
+    <Compile Include="Scripting\ScriptCompiler.cs" />
+    <Compile Include="Scripting\ScriptManager.cs" />
+    <Compile Include="Storyboarding\DisplayableObject.cs" />
+    <Compile Include="Storyboarding\EditorOsbSprite.cs" />
+    <Compile Include="Storyboarding\EditorStoryboardLayer.cs" />
+    <Compile Include="Storyboarding\Effect.cs" />
+    <Compile Include="Storyboarding\Project.cs" />
+    <Compile Include="Storyboarding\ScriptedEffect.cs" />
+    <Compile Include="UserInterface\Components\EffectConfigUi.cs" />
+    <Compile Include="UserInterface\Selectbox.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\SelectboxStyle.cs" />
+    <Compile Include="UserInterface\Slider.cs" />
+    <Compile Include="UserInterface\ProgressBar.cs" />
+    <Compile Include="UserInterface\Components\LayerList.cs" />
+    <Compile Include="UserInterface\Components\EffectList.cs" />
+    <Compile Include="UserInterface\PathSelector.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\PathSelectorStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\ProgressBarStyle.cs" />
+    <Compile Include="Util\AsyncActionQueue.cs" />
+    <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
+    <Compile Include="Util\IconFont.cs" />
+    <Compile Include="Util\OsuHelper.cs" />
+    <Compile Include="Util\SafeWriteStream.cs" />
+    <Compile Include="UserInterface\Button.cs" />
+    <Compile Include="UserInterface\ClickBehavior.cs" />
+    <Compile Include="UserInterface\DrawableContainer.cs" />
+    <Compile Include="UserInterface\Image.cs" />
+    <Compile Include="UserInterface\Label.cs" />
+    <Compile Include="UserInterface\LinearLayout.cs" />
+    <Compile Include="UserInterface\Skinning\Skin.cs" />
+    <Compile Include="UserInterface\Skinning\Skinnable.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\ButtonStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\ImageStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\LabelStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\LinearLayoutStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\StackLayoutStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\TextboxStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\WidgetStyle.cs" />
+    <Compile Include="UserInterface\StackLayout.cs" />
+    <Compile Include="UserInterface\Textbox.cs" />
+    <Compile Include="UserInterface\Widget.cs" />
+    <Compile Include="UserInterface\WidgetEvent.cs" />
+    <Compile Include="UserInterface\WidgetManager.cs" />
+    <Compile Include="Util\ColorExtensions.cs" />
+    <Compile Include="Util\DateTimeExtensions.cs" />
+    <Compile Include="Util\TraceLogger.cs" />
+    <Compile Include="Util\FourSide.cs" />
+    <Compile Include="Util\HashHelper.cs" />
+    <Compile Include="Util\JObjectExtensions.cs" />
+    <Compile Include="Util\Native.cs" />
+    <Compile Include="Util\ScaleMode.cs" />
+    <Compile Include="Util\StringExtensions.cs" />
+    <Compile Include="Util\NetHelper.cs" />
+    <None Include="Resources\vscode\settings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Librairies\ManagedBass\LICENSE.md" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+    <None Include="Resources\FontAwesome.ttf" />
+    <None Include="Resources\Roboto-Light.ttf" />
+    <None Include="Resources\Roboto-Regular.ttf" />
+    <None Include="Resources\skin.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common.csproj">
+      <Project>{f0edccec-4b64-4ce8-801f-1377e3384dc4}</Project>
+      <Name>common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bass.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="bass_fx.dll" />
+    <EmbeddedResource Include="icon.ico" />
+    <Content Include="Librairies\ManagedBass\VERSION.txt" />
+    <Content Include="Resources\ui-line.png" />
+    <Content Include="Resources\ui-rounded-borders.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

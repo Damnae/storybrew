@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F0EDCCEC-4B64-4CE8-801F-1377E3384DC4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>StorybrewCommon</RootNamespace>
+    <AssemblyName>StorybrewCommon</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animations\EasingFunctions.cs" />
+    <Compile Include="Animations\InterpolatingFunctions.cs" />
+    <Compile Include="Animations\Keyframe.cs" />
+    <Compile Include="Animations\KeyframedValue.cs" />
+    <Compile Include="Storyboarding\ConfigurableAttribute.cs" />
+    <Compile Include="Storyboarding\EffectConfig.cs" />
+    <Compile Include="Storyboarding\GeneratorContext.cs" />
+    <Compile Include="Storyboarding\Display\IAnimatedValueBuilder.cs" />
+    <Compile Include="Storyboarding\Display\AnimatedValueBuilder.cs" />
+    <Compile Include="Storyboarding\Display\AnimatedValue.cs" />
+    <Compile Include="Storyboarding\Display\CompositeCommand.cs" />
+    <Compile Include="Storyboarding\Commands\ColorCommand.cs" />
+    <Compile Include="Storyboarding\Commands\Command.cs" />
+    <Compile Include="Storyboarding\Commands\ITypedCommand.cs" />
+    <Compile Include="Storyboarding\Commands\CommandGroup.cs" />
+    <Compile Include="Storyboarding\Commands\FadeCommand.cs" />
+    <Compile Include="Storyboarding\Commands\ICommand.cs" />
+    <Compile Include="Storyboarding\Commands\LoopCommand.cs" />
+    <Compile Include="Storyboarding\Commands\MoveCommand.cs" />
+    <Compile Include="Storyboarding\Commands\MoveXCommand.cs" />
+    <Compile Include="Storyboarding\Commands\MoveYCommand.cs" />
+    <Compile Include="Storyboarding\Commands\ParameterCommand.cs" />
+    <Compile Include="Storyboarding\Commands\RotateCommand.cs" />
+    <Compile Include="Storyboarding\Commands\ScaleCommand.cs" />
+    <Compile Include="Storyboarding\Commands\TriggerCommand.cs" />
+    <Compile Include="Storyboarding\Commands\VScaleCommand.cs" />
+    <Compile Include="Storyboarding\Display\LoopDecorator.cs" />
+    <Compile Include="Storyboarding\Display\TriggerDecorator.cs" />
+    <Compile Include="Storyboarding\ExportSettings.cs" />
+    <Compile Include="Storyboarding\CommandValues\CommandValue.cs" />
+    <Compile Include="Storyboarding\CommandValues\CommandColor.cs" />
+    <Compile Include="Storyboarding\CommandValues\CommandDecimal.cs" />
+    <Compile Include="Storyboarding\CommandValues\CommandParameter.cs" />
+    <Compile Include="Storyboarding\CommandValues\CommandPosition.cs" />
+    <Compile Include="Storyboarding\CommandValues\CommandScale.cs" />
+    <Compile Include="Storyboarding\OsbSprite.cs" />
+    <Compile Include="Storyboarding\StoryboardObject.cs" />
+    <Compile Include="Storyboarding\StoryboardLayer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripting\StoryboardObjectGenerator.cs" />
+    <Compile Include="Scripting\Script.cs" />
+    <Compile Include="Storyboarding\Util\OsbSpritePool.cs" />
+    <Compile Include="Storyboarding\Util\OsbSpritePools.cs" />
+    <Compile Include="Util\NamedValue.cs" />
+    <Compile Include="Util\VectorHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

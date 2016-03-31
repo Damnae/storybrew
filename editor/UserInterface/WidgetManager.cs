@@ -1,0 +1,333 @@
+﻿using OpenTK;
+using OpenTK.Input;
+using StorybrewEditor.Graphics;
+using StorybrewEditor.Graphics.Cameras;
+using StorybrewEditor.Input;
+using StorybrewEditor.ScreenLayers;
+using StorybrewEditor.UserInterface.Skinning;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace StorybrewEditor.UserInterface
+{
+    public class WidgetManager : InputHandler, IDisposable
+    {
+        private InputManager inputManager;
+
+        private ScreenLayerManager screenLayerManager;
+        public ScreenLayerManager ScreenLayerManager => screenLayerManager;
+
+        private bool needsAnchorUpdate;
+        private bool refreshingAnchors;
+        private int anchoringIteration;
+
+        private Widget root;
+        public Vector2 Size
+        {
+            get { return root.Size; }
+            set { root.Size = value; }
+        }
+        public float Opacity
+        {
+            get { return root.Opacity; }
+            set { root.Opacity = value; }
+        }
+        private Widget publicRoot;
+        public Widget Root => publicRoot;
+        private Widget tooltipOverlay;
+
+        private Widget dragTarget;
+
+        private Widget hoveredWidget;
+        public Widget HoveredWidget => hoveredWidget;
+
+        private Widget keyboardFocus;
+        public Widget KeyboardFocus
+        {
+            get { return keyboardFocus; }
+            set
+            {
+                if (keyboardFocus == value) return;
+
+                if (keyboardFocus != null)
+                {
+                    var e = new WidgetFocusEventArgs(false);
+                    fire((w, evt) => w.NotifyFocusChange(evt, e), keyboardFocus, value);
+                }
+
+                var previousFocus = keyboardFocus;
+                keyboardFocus = value;
+
+                if (keyboardFocus != null)
+                {
+                    var e = new WidgetFocusEventArgs(true);
+                    fire((w, evt) => w.NotifyFocusChange(evt, e), keyboardFocus, previousFocus);
+                }
+            }
+        }
+
+        private Vector2 mousePosition;
+        public Vector2 MousePosition => mousePosition;
+
+        private Camera camera;
+        public Camera Camera
+        {
+            get { return camera; }
+            set
+            {
+                if (camera == value) return;
+                if (camera != null) camera.Changed -= camera_Changed;
+                camera = value;
+                if (camera != null) camera.Changed += camera_Changed;
+                RefreshHover();
+            }
+        }
+
+        public readonly Skin Skin;
+
+        public WidgetManager(ScreenLayerManager screenLayerManager)
+            : this(screenLayerManager, screenLayerManager.Editor.InputManager, screenLayerManager.Editor.Skin)
+        {
+        }
+
+        public WidgetManager(ScreenLayerManager screenLayerManager, InputManager inputManager, Skin skin)
+        {
+            this.screenLayerManager = screenLayerManager;
+            this.inputManager = inputManager;
+            Skin = skin;
+
+            root = new StackLayout(this) { FitChildren = true, };
+            root.Add(publicRoot = new StackLayout(this) { FitChildren = true, });
+            root.Add(tooltipOverlay = new Widget(this) { Hoverable = false, });
+        }
+
+        public void RefreshHover()
+        {
+            if (camera != null && inputManager.HasMouseFocus)
+            {
+                mousePosition = camera.FromScreen(inputManager.MousePosition).Xy;
+                changeHoveredWidget(root.GetWidgetAt(mousePosition.X, mousePosition.Y));
+            }
+            else changeHoveredWidget(null);
+        }
+
+        public void NotifyWidgetDisposed(Widget widget)
+        {
+            if (hoveredWidget == widget)
+                RefreshHover();
+            if (keyboardFocus == widget)
+                keyboardFocus = null;
+            if (dragTarget == widget)
+                dragTarget = null;
+        }
+
+        public void Draw(DrawContext drawContext)
+        {
+            if (root.Visible)
+                root.Draw(drawContext, 1);
+        }
+
+        #region Tooltip
+
+        private Dictionary<Widget, Widget> tooltips = new Dictionary<Widget, Widget>();
+
+        public void RegisterTooltip(Widget widget, string text)
+        {
+            RegisterTooltip(widget, new Label(this)
+            {
+                StyleName = "tooltip",
+                AnchorTarget = widget,
+                Text = text,
+            });
+        }
+
+        /// <summary>
+        /// Note: The tooltip widget will be disposed when unregistered.
+        /// </summary>
+        public void RegisterTooltip(Widget widget, Widget tooltip)
+        {
+            UnregisterTooltip(widget);
+
+            tooltip.Displayed = false;
+
+            tooltips.Add(widget, tooltip);
+            tooltipOverlay.Add(tooltip);
+            widget.OnHovered += TooltipWidget_OnHovered;
+        }
+
+        public void UnregisterTooltip(Widget widget)
+        {
+            Widget tooltip;
+            if (tooltips.TryGetValue(widget, out tooltip))
+            {
+                tooltips.Remove(widget);
+                tooltip.Dispose();
+                widget.OnHovered -= TooltipWidget_OnHovered;
+            }
+        }
+
+        private void TooltipWidget_OnHovered(WidgetEvent evt, WidgetHoveredEventArgs e)
+        {
+            var tooltip = tooltips[evt.Listener];
+            if (tooltip.Displayed = e.Hovered)
+            {
+                tooltip.Offset = Vector2.Zero;
+                tooltip.AnchorFrom = UiAlignment.Bottom;
+                tooltip.AnchorTo = UiAlignment.Top;
+                tooltip.Pack(0, 0, 400);
+
+                var bounds = tooltip.Bounds;
+                var rootBounds = root.Bounds;
+                if (bounds.Top < rootBounds.Top + 16)
+                {
+                    tooltip.AnchorFrom = UiAlignment.Top;
+                    tooltip.AnchorTo = UiAlignment.Bottom;
+                }
+                if (bounds.Right > rootBounds.Right - 16)
+                    tooltip.Offset = new Vector2(rootBounds.Right - 16 - bounds.Right, 0);
+                else if (bounds.Left < rootBounds.Left + 16)
+                    tooltip.Offset = new Vector2(rootBounds.Left + 16 - bounds.Left, 0);
+            }
+        }
+
+        #endregion
+
+        #region Placement
+
+        public void InvalidateAnchors()
+        {
+            needsAnchorUpdate = true;
+
+            if (!keyboardFocus?.Visible ?? false)
+                KeyboardFocus = null;
+        }
+
+        public void RefreshAnchors()
+        {
+            if (!needsAnchorUpdate || refreshingAnchors) return;
+
+            try
+            {
+                refreshingAnchors = true;
+                var iterationBefore = anchoringIteration;
+
+                root.PreLayout();
+                while (needsAnchorUpdate)
+                {
+                    needsAnchorUpdate = false;
+                    if (anchoringIteration - iterationBefore > 8)
+                    {
+                        Debug.Print("Could not resolve ui layout");
+                        break;
+                    }
+                    root.UpdateAnchoring(++anchoringIteration);
+                }
+                RefreshHover();
+            }
+            finally
+            {
+                refreshingAnchors = false;
+            }
+        }
+
+        #endregion
+
+        #region Input events
+
+        public void OnFocusChanged(FocusChangedEventArgs e) => RefreshHover();
+        public bool OnClickDown(MouseButtonEventArgs e)
+        {
+            var target = hoveredWidget ?? root;
+            if (keyboardFocus != null && target != keyboardFocus && !target.HasAncestor(keyboardFocus))
+                KeyboardFocus = null;
+
+            var widgetEvent = fire((w, evt) => w.NotifyClickDown(evt, e), target);
+            if (widgetEvent.Handled)
+                dragTarget = widgetEvent.Listener;
+
+            return widgetEvent.Handled;
+        }
+        public bool OnClickUp(MouseButtonEventArgs e)
+        {
+            var target = dragTarget ?? hoveredWidget ?? root;
+            dragTarget = null;
+            return fire((w, evt) => w.NotifyClickUp(evt, e), target).Handled;
+        }
+        public void OnMouseMove(MouseMoveEventArgs e)
+        {
+            RefreshHover();
+            if (dragTarget != null) fire((w, evt) => w.NotifyDrag(evt, e), dragTarget);
+        }
+        public bool OnMouseWheel(MouseWheelEventArgs e) => fire((w, evt) => w.NotifyMouseWheel(evt, e), dragTarget ?? hoveredWidget ?? root).Handled;
+        public bool OnKeyDown(KeyboardKeyEventArgs e) => fire((w, evt) => w.NotifyKeyDown(evt, e), dragTarget ?? keyboardFocus ?? hoveredWidget ?? root).Handled;
+        public bool OnKeyUp(KeyboardKeyEventArgs e) => fire((w, evt) => w.NotifyKeyUp(evt, e), dragTarget ?? keyboardFocus ?? hoveredWidget ?? root).Handled;
+        public bool OnKeyPress(KeyPressEventArgs e) => fire((w, evt) => w.NotifyKeyPress(evt, e), dragTarget ?? keyboardFocus ?? hoveredWidget ?? root).Handled;
+
+        private void changeHoveredWidget(Widget widget)
+        {
+            if (widget == hoveredWidget) return;
+
+            if (hoveredWidget != null)
+            {
+                var e = new WidgetHoveredEventArgs(false);
+                fire((w, evt) => w.NotifyHoveredWidgetChange(evt, e), hoveredWidget, widget);
+            }
+
+            var previousWidget = hoveredWidget;
+            hoveredWidget = widget;
+
+            if (hoveredWidget != null)
+            {
+                var e = new WidgetHoveredEventArgs(true);
+                fire((w, evt) => w.NotifyHoveredWidgetChange(evt, e), hoveredWidget, previousWidget);
+            }
+        }
+
+        private static WidgetEvent fire(Func<Widget, WidgetEvent, bool> notify, Widget target, Widget relatedTarget = null, bool bubbles = true)
+        {
+            if (target.IsDisposed) throw new ObjectDisposedException(nameof(target));
+
+            var widgetEvent = new WidgetEvent(target, relatedTarget);
+            var ancestors = bubbles ? target.GetAncestors() : null;
+
+            widgetEvent.Listener = target;
+            if (notify(target, widgetEvent))
+                return widgetEvent;
+
+            if (ancestors != null)
+                foreach (var ancestor in ancestors)
+                {
+                    widgetEvent.Listener = ancestor;
+                    if (notify(ancestor, widgetEvent))
+                        return widgetEvent;
+                }
+
+            return widgetEvent;
+        }
+
+        #endregion
+
+        private void camera_Changed(object sender, EventArgs e) => InvalidateAnchors();
+
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (camera != null) camera.Changed -= camera_Changed;
+                root.Dispose();
+            }
+            camera = null;
+            root = null;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
+    }
+}

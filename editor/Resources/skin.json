@@ -1,0 +1,501 @@
+﻿{
+	constants:
+	{
+		mainFont: "Roboto-Regular.ttf",
+		lightFont: "Roboto-Light.ttf",
+		iconFont: "FontAwesome.ttf",
+		fontSizeLarge: 16,
+		fontSizeNormal: 14,
+		fontSizeMedium: 12,
+		fontSizeSmall: 10,
+		fontSizeVerySmall: 8,
+		
+		padding: 16,
+		paddingHalf: 8,
+		paddingQuarter: 4,
+		spacing: 10,
+		spacingHalf: 5,
+
+		colorBg: [0.12, 0.12, 0.12],
+		colorBgElement: [0.067, 0.067, 0.067],
+		colorBgElementHover: [0.02, 0.02, 0.02],
+		colorText: [0.7, 0.7, 0.7],
+		colorTextSecondary: [0.5, 0.5, 0.5],
+		colorTextHover: "White",
+		colorTextDisabled: [0.3, 0.3, 0.3],
+		colorTooltip: [0, 0, 0, 0.8],
+	},
+	drawables:
+	{
+		"_debug":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [1, 0, 1],
+		},
+		"blueLine":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			Color: [0.2, 0.3, 0.5],
+			Outset: [-1],
+			BordersOnly: true,
+		},
+		"plainBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBg",
+		},
+		"tooltipBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorTooltip",
+			Outset: [2, 4],
+		},
+
+		"button":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+		},
+		"buttonDisabled":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+		},
+		"buttonHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+		},
+		"buttonDown":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+		},
+		"buttonOpen":
+		[
+			"button",
+			{
+				_type: "NinePatch",
+				Texture: "ui-rounded-borders.png",
+				Borders: [3, 5, 5, 3],
+				Color: "@colorBgElementHover",
+				BordersOnly: true,
+				Outset: [2],
+			},
+		],
+		
+		"progressBar":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorTextDisabled",
+			Outset: [-17, 0],
+		},
+		"progressBarHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorText",
+			Outset: [-16, 0],
+		},
+		"progressBarBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+			Outset: [-18, 0],
+		},
+		"progressBarBgHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+			Outset: [-14, 2],
+		},
+
+		"previewBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "Black",
+		},
+		"previewFg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			Color: [0.2, 0.3, 0.5, 0.2],
+			Outset: [-1],
+		},
+	},
+	styles:
+	{
+		Widget:
+		{
+			"default":
+			{
+			},
+			"storyboardPreview":
+			{
+				Background: "previewBg",
+				Foreground: "previewFg",
+			},
+		},
+		Label:
+		{
+			"default":
+			{
+				FontName: "@mainFont",
+				FontSize: "@fontSizeNormal",
+				TextAlignment: "TopLeft",
+				Trimming: "None",
+				Color: "@colorText",
+			},
+			"listItem":
+			{
+				FontSize: "@fontSizeSmall",
+				TextAlignment: "Left",
+			},
+			"listItemSecondary":
+			{
+				_parent: "listItem",
+				FontSize: "@fontSizeVerySmall",
+				Color: "@colorTextSecondary",
+			},
+			"icon":
+			{
+				FontName: "@iconFont",
+			},
+			"hint":
+			{
+				FontSize: "@fontSizeSmall",
+			},
+			"light":
+			{
+				FontName: "@lightFont",
+			},
+			"tooltip":
+			{
+				FontSize: "@fontSizeSmall",
+				Background: "tooltipBg",
+			},
+			"statusMessage":
+			{
+				Background: "tooltipBg",
+			},
+
+			"buttonLabel":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeNormal",
+				TextAlignment: "Centre",
+			},
+			"buttonLabel #disabled":
+			{
+				Color: "@colorTextDisabled",
+			},
+			"buttonLabel #hover":
+			{
+				Color: "@colorTextHover",
+			},
+
+			"buttonLabelSmall":
+			{
+				_parent: "buttonLabel",
+				FontSize: "@fontSizeSmall",
+			},
+			"buttonLabelSmall #disabled":
+			{
+				_parent: "buttonLabel #disabled",
+				FontSize: "@fontSizeSmall",
+			},
+			"buttonLabelSmall #hover":
+			{
+				_parent: "buttonLabel #hover",
+				FontSize: "@fontSizeSmall",
+			},
+			
+			"buttonLabelIcon":
+			{
+				_parent: "buttonLabel",
+				FontName: "@iconFont",
+			},
+			"buttonLabelIcon #disabled":
+			{
+				_parent: "buttonLabel #disabled",
+				FontName: "@iconFont",
+			},
+			"buttonLabelIcon #hover":
+			{
+				_parent: "buttonLabel #hover",
+				FontName: "@iconFont",
+			},
+
+			"textboxLabel":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeSmall",
+			},
+
+			"textboxContent":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeNormal",
+				Trimming: "EllipsisCharacter",
+				Background: "button",
+			},
+			"textboxContent #hover":
+			{
+				Background: "buttonHover",
+				Color: "@colorTextHover",
+			},
+			"textboxContent #hover #focus":
+			{
+				Background: "buttonOpen",
+			},
+			"textboxContent #focus":
+			{
+				Background: "buttonOpen",
+				Color: "@colorTextHover",
+			},
+			
+			"textboxContentPath":
+			{
+				_parent: "textboxContent",
+				Trimming: "EllipsisPath",
+			},
+			"textboxContentPath #hover":
+			{
+				_parent: "textboxContent #hover",
+				Trimming: "EllipsisPath",
+			},
+			"textboxContentPath #hover #focus":
+			{
+				_parent: "textboxContent #hover #focus",
+				Trimming: "EllipsisPath",
+			},
+			"textboxContentPath #focus":
+			{
+				_parent: "textboxContent #focus",
+				Trimming: "EllipsisPath",
+			},
+		},
+		Button:
+		{
+			"default":
+			{
+				Padding: ["@paddingQuarter", "@padding"],
+				LabelStyle: "buttonLabel",
+				LabelOffset: [0, 0],
+				Background: "button",
+			},
+			"default #disabled":
+			{
+				LabelStyle: "buttonLabel #disabled",
+				Background: "buttonDisabled",
+			},
+			"default #hover":
+			{
+				LabelStyle: "buttonLabel #hover",
+				Background: "buttonHover",
+			},
+			"default #hover #pressed":
+			{
+				LabelStyle: "buttonLabel #hover #pressed",
+				LabelOffset: [0, 1],
+				Background: "buttonDown",
+			},
+			"default #pressed":
+			{
+				LabelStyle: "buttonLabel #pressed",
+				LabelOffset: [0, 1],
+				Background: "buttonDown",
+			},
+
+			"small":
+			{
+				_parent: "default",
+				LabelStyle: "buttonLabelSmall",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #disabled":
+			{
+				_parent: "default #disabled",
+				LabelStyle: "buttonLabelSmall #disabled",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #hover":
+			{
+				_parent: "default #hover",
+				LabelStyle: "buttonLabelSmall #hover",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #hover #pressed":
+			{
+				_parent: "default #hover #pressed",
+				LabelStyle: "buttonLabelSmall #hover #pressed",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #pressed":
+			{
+				_parent: "default #pressed",
+				LabelStyle: "buttonLabelSmall #pressed",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+
+			"icon":
+			{
+				LabelStyle: "buttonLabelIcon",
+				LabelOffset: [0, 0],
+				Background: "",
+				Padding: [0],
+			},
+			"icon #disabled":
+			{
+				LabelStyle: "buttonLabelIcon #disabled",
+			},
+			"icon #hover":
+			{
+				LabelStyle: "buttonLabelIcon #hover",
+			},
+			"icon #hover #pressed":
+			{
+				LabelStyle: "buttonLabelIcon #hover #pressed",
+				LabelOffset: [0, 1],
+			},
+			"icon #pressed":
+			{
+				LabelStyle: "buttonLabelIcon #pressed",
+				LabelOffset: [0, 1],
+			},
+		},
+		Textbox:
+		{
+			"default":
+			{
+				LabelStyle: "textboxLabel",
+				ContentStyle: "textboxContent",
+			},
+			"default #hover":
+			{
+				LabelStyle: "textboxLabel #hover",
+				ContentStyle: "textboxContent #hover",
+			},
+			"default #hover #focus":
+			{
+				LabelStyle: "textboxLabel #hover #focus",
+				ContentStyle: "textboxContent #hover #focus",
+			},
+			"default #focus":
+			{
+				LabelStyle: "textboxLabel #focus",
+				ContentStyle: "textboxContent #focus",
+			},
+
+			"path":
+			{
+				_parent: "default",
+				ContentStyle: "textboxContentPath",
+			},
+			"path #hover":
+			{
+				_parent: "default #hover",
+				ContentStyle: "textboxContentPath #hover",
+			},
+			"path #hover #focus":
+			{
+				_parent: "default #focus",
+				ContentStyle: "textboxContentPath #hover #focus",
+			},
+			"path #focus":
+			{
+				_parent: "default #focus",
+				ContentStyle: "textboxContentPath #focus",
+			},
+		},
+		SelectBox:
+		{
+			"default":
+			{
+				ButtonStyle: "small",
+			},
+		},
+		ProgressBar:
+		{	
+			"default":
+			{
+				Bar: "progressBar",
+				Background: "progressBarBg",
+			},
+			"default #hover":
+			{
+				Bar: "progressBarHover",
+				Background: "progressBarBgHover",
+			},
+		},
+		LinearLayout:
+		{
+			"default":
+			{
+				Spacing: "@spacing",
+			},
+			"condensed":
+			{
+				Spacing: 0,
+			},
+			"pathSelectorPanel":
+			{
+				Spacing: "@spacing",
+			},
+			"panel":
+			{
+				Background: "plainBg",
+			},
+			"tooltip":
+			{
+				Background: "tooltipBg",
+			},
+		},
+		StackLayout:
+		{
+			"default":
+			{
+			},
+			"panel":
+			{
+				Background: "plainBg",
+			},
+		},
+		PathSelector:
+		{
+			"default":
+			{
+				LinearLayoutStyle: "pathSelectorPanel",
+				TextboxStyle: "path",
+				ButtonStyle: "icon",
+			},
+		},
+	}
+}
