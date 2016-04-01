@@ -68,7 +68,8 @@ namespace StorybrewEditor
             if (windowHeight >= displayDevice.Height)
             {
                 windowWidth = 1024;
-                windowHeight = 640;
+                windowHeight = 600;
+                if (windowWidth >= displayDevice.Width) windowWidth = 800;
             }
             return new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags);
         }
