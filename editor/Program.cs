@@ -40,7 +40,15 @@ namespace StorybrewEditor
             var contextFlags = GraphicsContextFlags.ForwardCompatible;
 #endif
 
-            using (var window = new GameWindow(1366, 768, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags))
+            int windowWidth = 1366, windowHeight = 768;
+            var defaultDisplay = DisplayDevice.GetDisplay(DisplayIndex.Default);
+            if (windowHeight >= defaultDisplay.Height)
+            {
+                windowWidth = 1024;
+                windowHeight = 640;
+            }
+
+            using (var window = new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags))
             using (AudioManager = new AudioManager(window.WindowInfo.Handle) { Volume = 0.1f, })
             using (var editor = new Editor(window))
             {
