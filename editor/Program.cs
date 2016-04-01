@@ -33,22 +33,9 @@ namespace StorybrewEditor
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             setupLogging();
 
-            var graphicsMode = new GraphicsMode(new ColorFormat(32), 24, 8, 4, ColorFormat.Empty, 2, false);
-#if DEBUG
-            var contextFlags = GraphicsContextFlags.Debug | GraphicsContextFlags.ForwardCompatible;
-#else
-            var contextFlags = GraphicsContextFlags.ForwardCompatible;
-#endif
+            var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
-            int windowWidth = 1366, windowHeight = 768;
-            var defaultDisplay = DisplayDevice.GetDisplay(DisplayIndex.Default);
-            if (windowHeight >= defaultDisplay.Height)
-            {
-                windowWidth = 1024;
-                windowHeight = 640;
-            }
-
-            using (var window = new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags))
+            using (var window = createWindow(displayDevice))
             using (AudioManager = new AudioManager(window.WindowInfo.Handle) { Volume = 0.1f, })
             using (var editor = new Editor(window))
             {
@@ -65,8 +52,25 @@ namespace StorybrewEditor
                 };
 
                 editor.Initialize();
-                runMainLoop(window, editor, 1 / 60.0, 1 / defaultDisplay.RefreshRate);
+                runMainLoop(window, editor, 1 / 60.0, 1 / displayDevice.RefreshRate);
             }
+        }
+
+        private static GameWindow createWindow(DisplayDevice displayDevice)
+        {
+            var graphicsMode = new GraphicsMode(new ColorFormat(32), 24, 8, 4, ColorFormat.Empty, 2, false);
+#if DEBUG
+            var contextFlags = GraphicsContextFlags.Debug | GraphicsContextFlags.ForwardCompatible;
+#else
+            var contextFlags = GraphicsContextFlags.ForwardCompatible;
+#endif
+            int windowWidth = 1366, windowHeight = 768;
+            if (windowHeight >= displayDevice.Height)
+            {
+                windowWidth = 1024;
+                windowHeight = 640;
+            }
+            return new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags);
         }
 
         private static void runMainLoop(GameWindow window, Editor editor, double fixedRateUpdateDuration, double targetFrameDuration)
