@@ -1,8 +1,10 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using StorybrewEditor.Graphics;
+using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Input;
 using StorybrewEditor.ScreenLayers;
+using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Skinning;
 using StorybrewEditor.Util;
 using System;
@@ -54,8 +56,13 @@ namespace StorybrewEditor
                 Trace.WriteLine($"Failed to load skin: {e}");
                 Skin = new Skin(drawContext.TextureContainer);
             }
+
+            var inputDispatcher = new InputDispatcher();
+            InputManager = new InputManager(window, inputDispatcher);
+
             ScreenLayerManager = new ScreenLayerManager(this);
-            InputManager = new InputManager(window, ScreenLayerManager.InputHandler);
+            inputDispatcher.Add(createOverlay(ScreenLayerManager));
+            inputDispatcher.Add(ScreenLayerManager.InputHandler);
 
             initializeVsCode();
             Restart(initialLayer);
@@ -66,9 +73,31 @@ namespace StorybrewEditor
 
         public void Restart(ScreenLayer initialLayer = null, string message = null)
         {
+            initializeOverlay();
             ScreenLayerManager.Set(initialLayer ?? new StartMenu());
             if (message != null) ScreenLayerManager.ShowMessage(message);
         }
+
+        #region Overlay
+
+        private WidgetManager overlay;
+        private CameraOrtho overlayCamera;
+
+        private WidgetManager createOverlay(ScreenLayerManager screenLayerManager)
+        {
+            return overlay = new WidgetManager(screenLayerManager)
+            {
+                Camera = overlayCamera = new CameraOrtho(),
+            };
+        }
+
+        private void initializeOverlay()
+        {
+            overlay.Root.ClearWidgets();
+
+        }
+
+        #endregion
 
         public void Dispose()
         {
@@ -76,6 +105,9 @@ namespace StorybrewEditor
             window.Closing -= window_Closing;
 
             ScreenLayerManager.Dispose();
+            overlay.Dispose();
+            overlayCamera.Dispose();
+
             InputManager.Dispose();
             drawContext.Dispose();
 
@@ -99,6 +131,7 @@ namespace StorybrewEditor
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             ScreenLayerManager.Draw(drawContext);
+            overlay.Draw(drawContext);
             DrawState.CompleteFrame();
         }
 
@@ -112,7 +145,15 @@ namespace StorybrewEditor
 
         private void window_Resize(object sender, EventArgs e)
         {
-            DrawState.Viewport = new Rectangle(0, 0, window.Width, window.Height);
+            var width = window.Width;
+            var height = window.Height;
+
+            DrawState.Viewport = new Rectangle(0, 0, width, height);
+            if (width == 0 || height == 0) return;
+
+            overlayCamera.VirtualHeight = (int)(height * Math.Max(1024f / width, 768f / height));
+            overlayCamera.VirtualWidth = width * overlayCamera.VirtualHeight / height;
+            overlay.Size = new Vector2(overlayCamera.VirtualWidth, overlayCamera.VirtualHeight);
         }
 
         private void window_Closing(object sender, CancelEventArgs e)
