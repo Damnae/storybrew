@@ -6,6 +6,7 @@ using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.Util;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -20,7 +21,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private DrawableContainer previewContainer;
         private StoryboardDrawable previewDrawable;
-        
+
         private LinearLayout statusLayout;
         private Label statusIcon;
         private Label statusMessage;
@@ -283,6 +284,13 @@ namespace StorybrewEditor.ScreenLayers
                         if (e.Control)
                         {
                             saveProject();
+                            return true;
+                        }
+                        break;
+                    case Key.C:
+                        if (e.Control)
+                        {
+                            System.Windows.Forms.Clipboard.SetText(Math.Round(audio.Time * 1000).ToString());
                             return true;
                         }
                         break;
