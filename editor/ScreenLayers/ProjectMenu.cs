@@ -32,6 +32,7 @@ namespace StorybrewEditor.ScreenLayers
         private Slider timeSlider;
         private Button playPauseButton;
         private Button fitButton;
+        private Button divisorButton;
         private Button mapsetFolderButton;
         private Button saveButton;
         private Button exportButton;
@@ -45,6 +46,8 @@ namespace StorybrewEditor.ScreenLayers
         private LayerList layersList;
 
         private AudioStream audio;
+
+        private int snapDivisor = 4;
 
         public ProjectMenu(Project project)
         {
@@ -83,6 +86,14 @@ namespace StorybrewEditor.ScreenLayers
                     timeSlider = new Slider(WidgetManager)
                     {
                         AnchorTo = UiAlignment.Centre,
+                    },
+                    divisorButton = new Button(WidgetManager)
+                    {
+                        StyleName = "small",
+                        Text = $"1/{snapDivisor}",
+                        Tooltip = "Snap divisor",
+                        AnchorTo = UiAlignment.Centre,
+                        CanGrow = false,
                     },
                     playPauseButton = new Button(WidgetManager)
                     {
@@ -221,9 +232,18 @@ namespace StorybrewEditor.ScreenLayers
 
             timeSlider.MaxValue = (float)audio.Duration;
             timeSlider.OnValueChanged += (sender, e) => audio.Time = timeSlider.Value;
+            timeSlider.OnValueCommited += (sender, e) => snapTimeSlider();
             timeSlider.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
             playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
             fitButton.OnClick += (sender, e) => resizeStoryboard();
+            divisorButton.OnClick += (sender, e) =>
+            {
+                snapDivisor++;
+                if (snapDivisor == 5 || snapDivisor == 7) snapDivisor++;
+                if (snapDivisor == 9) snapDivisor = 16;
+                if (snapDivisor > 16) snapDivisor = 1;
+                divisorButton.Text = $"1/{snapDivisor}";
+            };
 
             helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
             MakeTabs(
@@ -266,10 +286,10 @@ namespace StorybrewEditor.ScreenLayers
             switch (e.Key)
             {
                 case Key.Right:
-                    timeSlider.Value += 0.1f;
+                    scroll(1);
                     return true;
                 case Key.Left:
-                    timeSlider.Value -= 0.1f;
+                    scroll(-1);
                     return true;
             }
 
@@ -301,8 +321,50 @@ namespace StorybrewEditor.ScreenLayers
 
         public override bool OnMouseWheel(MouseWheelEventArgs e)
         {
-            timeSlider.Value -= e.DeltaPrecise * 0.1f;
+            scroll(-e.DeltaPrecise);
             return true;
+        }
+
+        private void scroll(float direction)
+        {
+            var mapsetManager = project.MapsetManager;
+            if (mapsetManager.BeatmapCount > 0)
+                foreach (var beatmap in mapsetManager.Beatmaps)
+                {
+                    var time = timeSlider.Value * 1000.0;
+                    var timingPoint = beatmap.GetTimingPointAt((int)time);
+                    if (timingPoint == null) continue;
+
+                    var stepDuration = timingPoint.BeatDuration / snapDivisor;
+                    time += stepDuration * direction;
+
+                    var steps = (time - timingPoint.Offset) / stepDuration;
+                    time = timingPoint.Offset + Math.Round(steps) * stepDuration;
+
+                    timeSlider.Value = (float)(time * 0.001);
+                    return;
+                }
+            // Default scrolling when there's nothing to snap to
+            timeSlider.Value += 0.1f * direction;
+        }
+
+        private void snapTimeSlider()
+        {
+            var mapsetManager = project.MapsetManager;
+            if (mapsetManager.BeatmapCount > 0)
+                foreach (var beatmap in mapsetManager.Beatmaps)
+                {
+                    var time = timeSlider.Value * 1000.0;
+                    var timingPoint = beatmap.GetTimingPointAt((int)time);
+                    if (timingPoint == null) continue;
+
+                    var stepDuration = timingPoint.BeatDuration / snapDivisor;
+                    var steps = (time - timingPoint.Offset) / stepDuration;
+                    time = timingPoint.Offset + Math.Round(steps) * stepDuration;
+
+                    timeSlider.Value = (float)(time * 0.001);
+                    return;
+                }
         }
 
         private void saveProject()

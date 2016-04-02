@@ -11,6 +11,7 @@ namespace StorybrewEditor.Mapset
 
         private List<Beatmap> beatmaps = new List<Beatmap>();
         public IEnumerable<Beatmap> Beatmaps => beatmaps;
+        public int BeatmapCount => beatmaps.Count;
 
         public MapsetManager(string path)
         {

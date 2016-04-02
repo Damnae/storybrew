@@ -9,6 +9,15 @@ namespace StorybrewCommon.Mapset
     {
         public readonly string Path;
 
+        public Beatmap(string path)
+        {
+            Path = path;
+        }
+
+        #region Timing
+
+        public const int ControlPointLeniency = 5; //ms
+
         private List<ControlPoint> controlPoints = new List<ControlPoint>();
         public IEnumerable<ControlPoint> ControlPoints => controlPoints;
         public IEnumerable<ControlPoint> TimingPoints
@@ -21,12 +30,23 @@ namespace StorybrewCommon.Mapset
             }
         }
 
-        public Beatmap(string path)
+        public void Add(ControlPoint timingPoint) => controlPoints.Add(timingPoint);
+
+        public ControlPoint GetTimingPointAt(int time)
         {
-            Path = path;
+            if (controlPoints == null) return null;
+            var closestTimingPoint = (ControlPoint)null;
+            foreach (var controlPoint in controlPoints)
+            {
+                if (controlPoint.IsInherited) continue;
+                if (closestTimingPoint == null || controlPoint.Offset - time <= ControlPointLeniency)
+                    closestTimingPoint = controlPoint;
+                else break;
+            }
+            return closestTimingPoint;
         }
 
-        public void Add(ControlPoint timingPoint) => controlPoints.Add(timingPoint);
+        #endregion
 
         #region .osu parsing
 

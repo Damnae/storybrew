@@ -24,6 +24,8 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
+        public event EventHandler OnValueCommited;
+
         public Slider(WidgetManager manager) : base(manager)
         {
             OnHovered += (sender, e) =>
@@ -43,6 +45,7 @@ namespace StorybrewEditor.UserInterface
                 if (disabled || !dragged) return false;
                 dragged = false;
                 RefreshStyle();
+                OnValueCommited?.Invoke(this, e);
                 return true;
             };
             OnDrag += (sender, e) =>
