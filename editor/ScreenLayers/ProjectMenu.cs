@@ -83,10 +83,6 @@ namespace StorybrewEditor.ScreenLayers
                         Text = "--:--:---",
                         CanGrow = false,
                     },
-                    timeSlider = new Slider(WidgetManager)
-                    {
-                        AnchorTo = UiAlignment.Centre,
-                    },
                     divisorButton = new Button(WidgetManager)
                     {
                         StyleName = "small",
@@ -94,6 +90,10 @@ namespace StorybrewEditor.ScreenLayers
                         Tooltip = "Snap divisor",
                         AnchorTo = UiAlignment.Centre,
                         CanGrow = false,
+                    },
+                    timeSlider = new Slider(WidgetManager)
+                    {
+                        AnchorTo = UiAlignment.Centre,
                     },
                     playPauseButton = new Button(WidgetManager)
                     {
