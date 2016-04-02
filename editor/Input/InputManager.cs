@@ -80,11 +80,17 @@ namespace StorybrewEditor.Input
 
         private void window_MouseDown(object sender, MouseButtonEventArgs e) => handler.OnClickDown(e);
         private void window_MouseUp(object sender, MouseButtonEventArgs e) => handler.OnClickUp(e);
-        private void window_MouseWheel(object sender, MouseWheelEventArgs e) => handler.OnMouseWheel(e);
         private void window_MouseMove(object sender, MouseMoveEventArgs e) => handler.OnMouseMove(e);
         private void window_KeyDown(object sender, KeyboardKeyEventArgs e) => handler.OnKeyDown(e);
         private void window_KeyUp(object sender, KeyboardKeyEventArgs e) => handler.OnKeyUp(e);
         private void window_KeyPress(object sender, KeyPressEventArgs e) => handler.OnKeyPress(e);
+
+        private bool dedupeMouseWheel;
+        private void window_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (dedupeMouseWheel = !dedupeMouseWheel)
+                handler.OnMouseWheel(e);
+        }
     }
 
     public class FocusChangedEventArgs : EventArgs
