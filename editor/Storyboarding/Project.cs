@@ -2,6 +2,7 @@
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
+using StorybrewEditor.Mapset;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Textures;
@@ -32,18 +33,6 @@ namespace StorybrewEditor.Storyboarding
         public TextureContainer TextureContainer => textureContainer;
 
         private static BinaryFormatter formatter = new BinaryFormatter();
-
-        private string mapsetPath;
-        public string MapsetPath
-        {
-            get { return mapsetPath; }
-            set
-            {
-                if (mapsetPath == value) return;
-                mapsetPath = value;
-                refreshMapsetWatcher();
-            }
-        }
 
         public string AudioPath
         {
@@ -94,8 +83,6 @@ namespace StorybrewEditor.Storyboarding
 
         #region Display
 
-        private FileSystemWatcher mapsetTextureWatcher;
-
         public double DisplayTime;
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
@@ -109,26 +96,6 @@ namespace StorybrewEditor.Storyboarding
         {
             textureContainer?.Dispose();
             textureContainer = new TextureContainerSeparate(false);
-        }
-
-        private void refreshMapsetWatcher()
-        {
-            mapsetTextureWatcher?.Dispose();
-            mapsetTextureWatcher = new FileSystemWatcher()
-            {
-                Path = mapsetPath,
-                IncludeSubdirectories = true,
-            };
-            mapsetTextureWatcher.Changed += mapsetTextureWatcher_Changed;
-            mapsetTextureWatcher.Renamed += mapsetTextureWatcher_Changed;
-            mapsetTextureWatcher.EnableRaisingEvents = true;
-        }
-
-        private void mapsetTextureWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            var extension = Path.GetExtension(e.Name);
-            if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
-                Program.Schedule(() => reloadTextures());
         }
 
         #endregion
@@ -342,6 +309,39 @@ namespace StorybrewEditor.Storyboarding
 
         #endregion
 
+        #region Mapset
+
+        private string mapsetPath;
+        public string MapsetPath
+        {
+            get { return mapsetPath; }
+            set
+            {
+                if (mapsetPath == value) return;
+                mapsetPath = value;
+                refreshMapset();
+            }
+        }
+
+        private MapsetManager mapsetManager;
+        public MapsetManager MapsetManager => mapsetManager;
+
+        private void refreshMapset()
+        {
+            mapsetManager?.Dispose();
+            mapsetManager = new MapsetManager(mapsetPath);
+            mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
+        }
+
+        private void mapsetManager_OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            var extension = Path.GetExtension(e.Name);
+            if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+                reloadTextures();
+        }
+
+        #endregion
+
         #region Save / Load / Export
 
         public const int Version = 0;
@@ -535,20 +535,20 @@ namespace StorybrewEditor.Storyboarding
         #region IDisposable Support
 
         public bool IsDisposed => disposedValue;
-
         private bool disposedValue = false;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    mapsetTextureWatcher?.Dispose();
+                    mapsetManager?.Dispose();
                     effectUpdateQueue.Dispose();
                     scriptManager.Dispose();
                     textureContainer.Dispose();
                 }
-                mapsetTextureWatcher = null;
+                mapsetManager = null;
                 effectUpdateQueue = null;
                 scriptManager = null;
                 textureContainer = null;
