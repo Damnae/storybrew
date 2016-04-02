@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StorybrewCommon.Mapset;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace StorybrewEditor.Mapset
@@ -6,15 +8,31 @@ namespace StorybrewEditor.Mapset
     public class MapsetManager : IDisposable
     {
         private string path;
-        private FileSystemWatcher fileWatcher;
 
-        public event FileSystemEventHandler OnFileChanged;
+        private List<Beatmap> beatmaps = new List<Beatmap>();
+        public IEnumerable<Beatmap> Beatmaps => beatmaps;
 
         public MapsetManager(string path)
         {
             this.path = path;
+            loadBeatmaps();
             initializeMapsetWatcher();
         }
+
+        #region Beatmaps
+
+        private void loadBeatmaps()
+        {
+            foreach (var beatmapPath in Directory.GetFiles(path, "*.osu", SearchOption.TopDirectoryOnly))
+                beatmaps.Add(Beatmap.Load(beatmapPath));
+        }
+
+        #endregion
+
+        #region Events
+
+        private FileSystemWatcher fileWatcher;
+        public event FileSystemEventHandler OnFileChanged;
 
         private void initializeMapsetWatcher()
         {
@@ -34,6 +52,8 @@ namespace StorybrewEditor.Mapset
                 if (disposedValue) return;
                 OnFileChanged?.Invoke(sender, e);
             });
+
+        #endregion
 
         #region IDisposable Support
 
