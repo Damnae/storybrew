@@ -6,7 +6,7 @@ namespace StorybrewCommon.Mapset
     [Serializable]
     public class ControlPoint
     {
-        public int Offset;
+        public double Offset;
         public double BeatDuration;
         public int BeatPerMeasure;
         public int SampleType;
@@ -27,7 +27,7 @@ namespace StorybrewCommon.Mapset
 
             return new ControlPoint()
             {
-                Offset = int.Parse(values[0]),
+                Offset = double.Parse(values[0], CultureInfo.InvariantCulture),
                 BeatDuration = double.Parse(values[1], CultureInfo.InvariantCulture),
                 BeatPerMeasure = values.Length > 2 ? int.Parse(values[2]) : 4,
                 SampleType = values.Length > 3 ? int.Parse(values[3]) : 1,
