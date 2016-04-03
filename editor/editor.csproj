@@ -210,6 +210,7 @@
     <Compile Include="UserInterface\PathSelector.cs" />
     <Compile Include="UserInterface\Skinning\Styles\PathSelectorStyle.cs" />
     <Compile Include="UserInterface\Skinning\Styles\ProgressBarStyle.cs" />
+    <Compile Include="UserInterface\TimelineSlider.cs" />
     <Compile Include="Util\AsyncActionQueue.cs" />
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
     <Compile Include="Util\IconFont.cs" />

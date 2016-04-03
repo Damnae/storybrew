@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
+using StorybrewCommon.Mapset;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -333,8 +334,25 @@ namespace StorybrewEditor.Storyboarding
         private MapsetManager mapsetManager;
         public MapsetManager MapsetManager => mapsetManager;
 
+        private Beatmap mainBeatmap;
+        public Beatmap MainBeatmap
+        {
+            get
+            {
+                if (mainBeatmap != null)
+                    return mainBeatmap;
+                foreach (var beatmap in mapsetManager.Beatmaps)
+                {
+                    mainBeatmap = beatmap;
+                    break;
+                }
+                return mainBeatmap;
+            }
+        }
+
         private void refreshMapset()
         {
+            mainBeatmap = null;
             mapsetManager?.Dispose();
             mapsetManager = new MapsetManager(mapsetPath);
             mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;

@@ -29,7 +29,7 @@ namespace StorybrewEditor.ScreenLayers
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
         private Label timeLabel;
-        private Slider timeSlider;
+        private TimelineSlider timeline;
         private Button playPauseButton;
         private Button fitButton;
         private Button divisorButton;
@@ -91,9 +91,10 @@ namespace StorybrewEditor.ScreenLayers
                         AnchorTo = UiAlignment.Centre,
                         CanGrow = false,
                     },
-                    timeSlider = new Slider(WidgetManager)
+                    timeline = new TimelineSlider(WidgetManager, project)
                     {
                         AnchorTo = UiAlignment.Centre,
+                        SnapDivisor = snapDivisor,
                     },
                     playPauseButton = new Button(WidgetManager)
                     {
@@ -220,7 +221,7 @@ namespace StorybrewEditor.ScreenLayers
             {
                 StyleName = "storyboardPreview",
                 Drawable = previewDrawable = new StoryboardDrawable(project),
-                AnchorTarget = timeSlider,
+                AnchorTarget = timeline,
                 AnchorFrom = UiAlignment.Bottom,
                 AnchorTo = UiAlignment.Top,
                 Hoverable = false,
@@ -230,10 +231,10 @@ namespace StorybrewEditor.ScreenLayers
 
             audio = Program.AudioManager.LoadStream(project.AudioPath);
 
-            timeSlider.MaxValue = (float)audio.Duration;
-            timeSlider.OnValueChanged += (sender, e) => audio.Time = timeSlider.Value;
-            timeSlider.OnValueCommited += (sender, e) => snapTimeSlider();
-            timeSlider.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
+            timeline.MaxValue = (float)audio.Duration;
+            timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
+            timeline.OnValueCommited += (sender, e) => timeline.Snap();
+            timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
             playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
             fitButton.OnClick += (sender, e) => resizeStoryboard();
             divisorButton.OnClick += (sender, e) =>
@@ -242,6 +243,7 @@ namespace StorybrewEditor.ScreenLayers
                 if (snapDivisor == 5 || snapDivisor == 7) snapDivisor++;
                 if (snapDivisor == 9) snapDivisor = 16;
                 if (snapDivisor > 16) snapDivisor = 1;
+                timeline.SnapDivisor = snapDivisor;
                 divisorButton.Text = $"1/{snapDivisor}";
             };
 
@@ -286,10 +288,10 @@ namespace StorybrewEditor.ScreenLayers
             switch (e.Key)
             {
                 case Key.Right:
-                    scroll(1);
+                    timeline.Scroll(1);
                     return true;
                 case Key.Left:
-                    scroll(-1);
+                    timeline.Scroll(-1);
                     return true;
             }
 
@@ -321,50 +323,8 @@ namespace StorybrewEditor.ScreenLayers
 
         public override bool OnMouseWheel(MouseWheelEventArgs e)
         {
-            scroll(-e.DeltaPrecise);
+            timeline.Scroll(-e.DeltaPrecise);
             return true;
-        }
-
-        private void scroll(float direction)
-        {
-            var mapsetManager = project.MapsetManager;
-            if (mapsetManager.BeatmapCount > 0)
-                foreach (var beatmap in mapsetManager.Beatmaps)
-                {
-                    var time = timeSlider.Value * 1000.0;
-                    var timingPoint = beatmap.GetTimingPointAt((int)time);
-                    if (timingPoint == null) continue;
-
-                    var stepDuration = timingPoint.BeatDuration / snapDivisor;
-                    time += stepDuration * direction;
-
-                    var steps = (time - timingPoint.Offset) / stepDuration;
-                    time = timingPoint.Offset + Math.Round(steps) * stepDuration;
-
-                    timeSlider.Value = (float)(time * 0.001);
-                    return;
-                }
-            // Default scrolling when there's nothing to snap to
-            timeSlider.Value += 0.1f * direction;
-        }
-
-        private void snapTimeSlider()
-        {
-            var mapsetManager = project.MapsetManager;
-            if (mapsetManager.BeatmapCount > 0)
-                foreach (var beatmap in mapsetManager.Beatmaps)
-                {
-                    var time = timeSlider.Value * 1000.0;
-                    var timingPoint = beatmap.GetTimingPointAt((int)time);
-                    if (timingPoint == null) continue;
-
-                    var stepDuration = timingPoint.BeatDuration / snapDivisor;
-                    var steps = (time - timingPoint.Offset) / stepDuration;
-                    time = timingPoint.Offset + Math.Round(steps) * stepDuration;
-
-                    timeSlider.Value = (float)(time * 0.001);
-                    return;
-                }
         }
 
         private void saveProject()
@@ -381,13 +341,13 @@ namespace StorybrewEditor.ScreenLayers
             audio.Volume = WidgetManager.Root.Opacity;
 
             var time = (float)audio.Time;
-            timeSlider.SetValueSilent(time);
+            timeline.SetValueSilent(time);
             if (Manager.Editor.IsFixedRateUpdate)
                 timeLabel.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
             mainStoryboardDrawable.Time = time;
             if (previewContainer.Visible)
-                previewDrawable.Time = timeSlider.GetValueForPosition(Manager.Editor.InputManager.MousePosition);
+                previewDrawable.Time = timeline.GetValueForPosition(Manager.Editor.InputManager.MousePosition);
         }
 
         public override void Resize(int width, int height)
