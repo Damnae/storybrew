@@ -9,6 +9,8 @@ namespace StorybrewCommon.Mapset
     {
         public readonly string Path;
 
+        public string AudioFilename { get; set; }
+
         public Beatmap(string path)
         {
             Path = path;
@@ -78,7 +80,23 @@ namespace StorybrewCommon.Mapset
             return beatmap;
         }
 
-        private static void parseGeneralSection(Beatmap beatmap, StreamReader reader) { }
+        private static void parseGeneralSection(Beatmap beatmap, StreamReader reader)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                line = line.Trim();
+                if (line.Length == 0) break;
+
+                string key, value;
+                parseKeyValue(line, out key, out value);
+
+                switch (key)
+                {
+                    case "AudioFilename": beatmap.AudioFilename = value; break;
+                }
+            }
+        }
         private static void parseMetadataSection(Beatmap beatmap, StreamReader reader) { }
         private static void parseDifficultySection(Beatmap beatmap, StreamReader reader) { }
         private static void parseTimingPointsSection(Beatmap beatmap, StreamReader reader)
@@ -93,6 +111,15 @@ namespace StorybrewCommon.Mapset
         }
         private static void parseEventsSection(Beatmap beatmap, StreamReader reader) { }
         private static void parseHitObjectsSection(Beatmap beatmap, StreamReader reader) { }
+
+        private static void parseKeyValue(string line, out string key, out string value)
+        {
+            var separatorIndex = line.IndexOf(":");
+            if (separatorIndex == -1) throw new InvalidDataException($"{line} is not a key/value");
+
+            key = line.Substring(0, separatorIndex).Trim();
+            value = line.Substring(separatorIndex + 1, line.Length - 1 - separatorIndex).Trim();
+        }
 
         #endregion
     }

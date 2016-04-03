@@ -39,6 +39,13 @@ namespace StorybrewEditor.Storyboarding
             get
             {
                 checkMapsetPath();
+                foreach (var beatmap in mapsetManager.Beatmaps)
+                {
+                    var path = Path.Combine(MapsetPath, beatmap.AudioFilename);
+                    if (!File.Exists(path)) continue;
+                    return path;
+                }
+
                 foreach (var mp3Path in Directory.GetFiles(MapsetPath, "*.mp3", SearchOption.TopDirectoryOnly))
                     return mp3Path;
 
