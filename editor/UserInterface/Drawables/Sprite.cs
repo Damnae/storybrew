@@ -14,7 +14,7 @@ namespace StorybrewEditor.UserInterface.Drawables
         public BlendingMode BlendingMode = BlendingMode.Default;
         public float Rotation;
         public Color4 Color = Color4.White;
-        public ScaleMode ScaleMode;
+        public ScaleMode ScaleMode = ScaleMode.None;
 
         public Vector2 MinSize => Vector2.Zero;
         public Vector2 PreferredSize => Texture?.Size ?? Vector2.Zero;

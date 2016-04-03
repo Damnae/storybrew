@@ -4,6 +4,7 @@ using OpenTK.Input;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
+using StorybrewEditor.Util;
 using System;
 
 namespace StorybrewEditor.UserInterface
@@ -52,6 +53,7 @@ namespace StorybrewEditor.UserInterface
             cursorLine = new Sprite()
             {
                 Texture = DrawState.WhitePixel,
+                ScaleMode = ScaleMode.Fill,
             };
 
             Add(content = new Label(manager)
