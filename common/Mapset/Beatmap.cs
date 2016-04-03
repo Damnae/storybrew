@@ -10,6 +10,7 @@ namespace StorybrewCommon.Mapset
         public readonly string Path;
 
         public string AudioFilename { get; set; }
+        public readonly List<int> Bookmarks = new List<int>();
 
         public Beatmap(string path)
         {
@@ -69,6 +70,7 @@ namespace StorybrewCommon.Mapset
                         switch (sectionName)
                         {
                             case "General": parseGeneralSection(beatmap, reader); break;
+                            case "Editor": parseEditorSection(beatmap, reader); break;
                             case "Metadata": parseMetadataSection(beatmap, reader); break;
                             case "Difficulty": parseDifficultySection(beatmap, reader); break;
                             case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
@@ -82,20 +84,26 @@ namespace StorybrewCommon.Mapset
 
         private static void parseGeneralSection(Beatmap beatmap, StreamReader reader)
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            parseKeyValueSection(reader, (key, value) =>
             {
-                line = line.Trim();
-                if (line.Length == 0) break;
-
-                string key, value;
-                parseKeyValue(line, out key, out value);
-
                 switch (key)
                 {
                     case "AudioFilename": beatmap.AudioFilename = value; break;
                 }
-            }
+            });
+        }
+        private static void parseEditorSection(Beatmap beatmap, StreamReader reader)
+        {
+            parseKeyValueSection(reader, (key, value) =>
+            {
+                switch (key)
+                {
+                    case "Bookmarks":
+                        foreach (var bookmark in value.Split(','))
+                            beatmap.Bookmarks.Add(int.Parse(bookmark));
+                        break;
+                }
+            });
         }
         private static void parseMetadataSection(Beatmap beatmap, StreamReader reader) { }
         private static void parseDifficultySection(Beatmap beatmap, StreamReader reader) { }
@@ -111,6 +119,20 @@ namespace StorybrewCommon.Mapset
         }
         private static void parseEventsSection(Beatmap beatmap, StreamReader reader) { }
         private static void parseHitObjectsSection(Beatmap beatmap, StreamReader reader) { }
+
+        private static void parseKeyValueSection(StreamReader reader, Action<string, string> action)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                line = line.Trim();
+                if (line.Length == 0) break;
+
+                string key, value;
+                parseKeyValue(line, out key, out value);
+                action(key, value);
+            }
+        }
 
         private static void parseKeyValue(string line, out string key, out string value)
         {

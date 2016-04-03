@@ -18,6 +18,10 @@ namespace StorybrewEditor.UserInterface
         private static readonly Color4 tickMagenta = new Color4(144, 64, 144, 225);
         private static readonly Color4 tickGrey = new Color4(160, 160, 160, 225);
 
+        private static readonly Color4 kiaiColor = new Color4(255, 146, 18, 140);
+        private static readonly Color4 breakColor = new Color4(255, 255, 255, 140);
+        private static readonly Color4 bookmarkColor = new Color4(58, 110, 170, 240);
+
         private Project project;
         private Sprite line;
 
@@ -41,10 +45,34 @@ namespace StorybrewEditor.UserInterface
             var offset = new Vector2(bounds.Left, bounds.Top);
             var lineBottomY = bounds.Height * 0.6f;
 
-            var timeSpan = SnapDivisor >= 2 ? SnapDivisor >= 8 ? 1 : 2 : 4;
+            var timeSpan = (SnapDivisor >= 2 ? SnapDivisor >= 8 ? 1 : 2 : 4);
             var leftTime = (int)((Value - timeSpan) * 1000);
             var rightTime = (int)((Value + timeSpan) * 1000);
             var timeScale = bounds.Width / (rightTime - leftTime);
+            var valueLength = MaxValue - MinValue;
+
+            // Kiai
+            var inKiai = false;
+            var kiaiStartTime = 0.0;
+            foreach (var controlPoint in project.MainBeatmap.ControlPoints)
+            {
+                if (controlPoint.IsKiai == inKiai)
+                    continue;
+
+                if (inKiai)
+                {
+                    var startProgress = kiaiStartTime / valueLength;
+                    var endProgress = (controlPoint.Offset * 0.001f) / valueLength;
+
+                    line.Color = kiaiColor;
+                    line.Draw(drawContext, Manager.Camera, new Box2(
+                            (int)(offset.X + startProgress * bounds.Width), offset.Y + bounds.Height * 0.3f,
+                            (int)(offset.X + endProgress * bounds.Width), offset.Y + bounds.Height * 0.4f),
+                        actualOpacity);
+                }
+                else kiaiStartTime = controlPoint.Offset * 0.001;
+                inKiai = controlPoint.IsKiai;
+            }
 
             // Ticks
             var leftTimingPoint = project.MainBeatmap.GetTimingPointAt(leftTime);
@@ -81,7 +109,7 @@ namespace StorybrewEditor.UserInterface
                         if (leftTime < time)
                         {
                             var tickColor = tickGrey;
-                            var lineSize = new Vector2(1, bounds.Height * 0.4f);
+                            var lineSize = new Vector2(1, bounds.Height * 0.3f);
 
                             var snap = tickCount % SnapDivisor;
                             if (snap == 0) tickColor = tickWhite;
@@ -95,7 +123,7 @@ namespace StorybrewEditor.UserInterface
                             if (snap != 0 || beatCount % timingPoint.BeatPerMeasure != 0)
                                 lineSize.Y *= 0.5f;
 
-                            drawLine(drawContext, offset + new Vector2((int)Math.Floor((time - leftTime) * timeScale), lineBottomY), lineSize, tickColor, actualOpacity);
+                            drawLine(drawContext, offset + new Vector2((int)Math.Round((time - leftTime) * timeScale), lineBottomY), lineSize, tickColor, actualOpacity);
                         }
                         if (tickCount % SnapDivisor == 0)
                             beatCount++;
@@ -105,10 +133,32 @@ namespace StorybrewEditor.UserInterface
                 }
             }
 
-            // Current time
+            // Bookmarks
+            foreach (var bookmark in project.MainBeatmap.Bookmarks)
+            {
+                var progress = (bookmark * 0.001f) / (MaxValue - MinValue);
+                var topLineSize = new Vector2(1, bounds.Height * 0.3f);
+                drawLine(drawContext, offset + new Vector2((int)(progress * bounds.Width), bounds.Height * 0.1f), topLineSize, bookmarkColor, actualOpacity);
+
+                if (leftTime < bookmark && bookmark < rightTime)
+                {
+                    var bottomLineSize = new Vector2(1, bounds.Height * 0.5f);
+                    drawLine(drawContext, offset + new Vector2((int)Math.Round((bookmark - leftTime) * timeScale), lineBottomY), bottomLineSize, bookmarkColor, actualOpacity);
+                }
+            }
+
+            // Current time (top)
+            {
+                var x = (float)Math.Round(Value / (MaxValue - MinValue) * bounds.Width);
+                var lineSize = new Vector2(1, bounds.Height * 0.4f);
+                drawLine(drawContext, offset + new Vector2(x - 1, 0), lineSize, Color4.White, actualOpacity);
+                drawLine(drawContext, offset + new Vector2(x + 1, 0), lineSize, Color4.White, actualOpacity);
+            }
+
+            // Current time (bottom)
             {
                 var centerX = (float)Math.Round(bounds.Width * 0.5);
-                var lineSize = new Vector2(1, bounds.Height * 0.2f);
+                var lineSize = new Vector2(1, bounds.Height * 0.4f);
                 drawLine(drawContext, offset + new Vector2(centerX - 1, lineBottomY), lineSize, Color4.White, actualOpacity);
                 drawLine(drawContext, offset + new Vector2(centerX + 1, lineBottomY), lineSize, Color4.White, actualOpacity);
             }
