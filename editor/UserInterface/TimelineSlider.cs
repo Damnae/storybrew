@@ -1,11 +1,10 @@
-﻿using System;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.Util;
-using StorybrewCommon.Mapset;
+using System;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -62,7 +61,7 @@ namespace StorybrewEditor.UserInterface
                         timingPoint = nextTimingPoint;
                         continue;
                     }
-                    if (rightTime < timingPoint.Offset) break;
+                    if (timingPoint != leftTimingPoint && rightTime < timingPoint.Offset) break;
 
                     int tickCount = 0, beatCount = 0;
                     var step = timingPoint.BeatDuration / SnapDivisor;
