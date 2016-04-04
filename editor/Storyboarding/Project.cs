@@ -339,14 +339,30 @@ namespace StorybrewEditor.Storyboarding
         {
             get
             {
-                if (mainBeatmap != null)
-                    return mainBeatmap;
-                foreach (var beatmap in mapsetManager.Beatmaps)
+                if (mainBeatmap == null)
+                    SwitchMainBeatmap();
+
+                return mainBeatmap;
+            }
+        }
+
+        public void SwitchMainBeatmap()
+        {
+            var takeNextBeatmap = false;
+            foreach (var beatmap in mapsetManager.Beatmaps)
+            {
+                if (takeNextBeatmap)
                 {
                     mainBeatmap = beatmap;
-                    break;
+                    return;
                 }
-                return mainBeatmap;
+                else if (beatmap == mainBeatmap)
+                    takeNextBeatmap = true;
+            }
+            foreach (var beatmap in mapsetManager.Beatmaps)
+            {
+                mainBeatmap = beatmap;
+                break;
             }
         }
 

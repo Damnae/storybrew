@@ -235,6 +235,12 @@ namespace StorybrewEditor.ScreenLayers
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
+            timeline.OnClickDown += (sender, e) =>
+            {
+                if (e.Button != MouseButton.Right) return false;
+                project.SwitchMainBeatmap();
+                return true;
+            };
             playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
             fitButton.OnClick += (sender, e) => resizeStoryboard();
             divisorButton.OnClick += (sender, e) =>
