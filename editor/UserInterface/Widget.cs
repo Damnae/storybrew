@@ -467,8 +467,12 @@ namespace StorybrewEditor.UserInterface
         public event HandleableWidgetEventHandler<MouseButtonEventArgs> OnClickDown;
         public bool NotifyClickDown(WidgetEvent evt, MouseButtonEventArgs e) => Raise(OnClickDown, evt, e);
 
-        public event HandleableWidgetEventHandler<MouseButtonEventArgs> OnClickUp;
-        public bool NotifyClickUp(WidgetEvent evt, MouseButtonEventArgs e) => Raise(OnClickUp, evt, e);
+        public event WidgetEventHandler<MouseButtonEventArgs> OnClickUp;
+        public bool NotifyClickUp(WidgetEvent evt, MouseButtonEventArgs e)
+        {
+            Raise(OnClickUp, evt, e);
+            return false;
+        }
 
         public event WidgetEventHandler<MouseMoveEventArgs> OnDrag;
         public bool NotifyDrag(WidgetEvent evt, MouseMoveEventArgs e)

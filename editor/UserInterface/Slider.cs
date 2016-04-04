@@ -44,11 +44,11 @@ namespace StorybrewEditor.UserInterface
             };
             OnClickUp += (sender, e) =>
             {
-                if (disabled || !dragged) return false;
+                if (disabled || !dragged) return;
+                if (e.Button != MouseButton.Left) return;
                 dragged = false;
                 RefreshStyle();
                 OnValueCommited?.Invoke(this, e);
-                return true;
             };
             OnDrag += (sender, e) =>
             {

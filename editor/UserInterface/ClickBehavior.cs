@@ -57,15 +57,14 @@ namespace StorybrewEditor.UserInterface
             return true;
         }
 
-        private bool widget_OnClickUp(WidgetEvent evt, MouseButtonEventArgs e)
+        private void widget_OnClickUp(WidgetEvent evt, MouseButtonEventArgs e)
         {
-            if (!pressed || disabled) return false;
-            if (e.Button != pressedButton) return false;
+            if (!pressed || disabled) return;
+            if (e.Button != pressedButton) return;
 
             pressed = false;
             if (hovered) OnClick?.Invoke(this, e);
             OnStateChanged?.Invoke(this, EventArgs.Empty);
-            return true;
         }
 
         #region IDisposable Support
