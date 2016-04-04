@@ -37,7 +37,7 @@ namespace StorybrewEditor.UserInterface
         public Widget Root => publicRoot;
         private Widget tooltipOverlay;
 
-        private Widget dragTarget;
+        private Dictionary<MouseButton, Widget> dragTargets = new Dictionary<MouseButton, Widget>();
 
         private Widget hoveredWidget;
         public Widget HoveredWidget => hoveredWidget;
@@ -118,8 +118,9 @@ namespace StorybrewEditor.UserInterface
                 RefreshHover();
             if (keyboardFocus == widget)
                 keyboardFocus = null;
-            if (dragTarget == widget)
-                dragTarget = null;
+            foreach (var entry in dragTargets)
+                if (entry.Value == widget)
+                    dragTargets[entry.Key] = null;
         }
 
         public void Draw(DrawContext drawContext)
@@ -258,25 +259,30 @@ namespace StorybrewEditor.UserInterface
 
             var widgetEvent = fire((w, evt) => w.NotifyClickDown(evt, e), target);
             if (widgetEvent.Handled)
-                dragTarget = widgetEvent.Listener;
+                dragTargets[e.Button] = widgetEvent.Listener;
 
             return widgetEvent.Handled;
         }
         public bool OnClickUp(MouseButtonEventArgs e)
         {
+            Widget dragTarget;
+            if (dragTargets.TryGetValue(e.Button, out dragTarget))
+                dragTargets[e.Button] = null;
+
             var target = dragTarget ?? hoveredWidget ?? root;
-            dragTarget = null;
             return fire((w, evt) => w.NotifyClickUp(evt, e), target).Handled;
         }
         public void OnMouseMove(MouseMoveEventArgs e)
         {
             RefreshHover();
-            if (dragTarget != null) fire((w, evt) => w.NotifyDrag(evt, e), dragTarget);
+            foreach (var dragTarget in dragTargets.Values)
+                if (dragTarget != null)
+                    fire((w, evt) => w.NotifyDrag(evt, e), dragTarget);
         }
-        public bool OnMouseWheel(MouseWheelEventArgs e) => fire((w, evt) => w.NotifyMouseWheel(evt, e), dragTarget ?? hoveredWidget ?? root).Handled;
-        public bool OnKeyDown(KeyboardKeyEventArgs e) => fire((w, evt) => w.NotifyKeyDown(evt, e), dragTarget ?? keyboardFocus ?? hoveredWidget ?? root).Handled;
-        public bool OnKeyUp(KeyboardKeyEventArgs e) => fire((w, evt) => w.NotifyKeyUp(evt, e), dragTarget ?? keyboardFocus ?? hoveredWidget ?? root).Handled;
-        public bool OnKeyPress(KeyPressEventArgs e) => fire((w, evt) => w.NotifyKeyPress(evt, e), dragTarget ?? keyboardFocus ?? hoveredWidget ?? root).Handled;
+        public bool OnMouseWheel(MouseWheelEventArgs e) => fire((w, evt) => w.NotifyMouseWheel(evt, e), hoveredWidget ?? root).Handled;
+        public bool OnKeyDown(KeyboardKeyEventArgs e) => fire((w, evt) => w.NotifyKeyDown(evt, e), keyboardFocus ?? hoveredWidget ?? root).Handled;
+        public bool OnKeyUp(KeyboardKeyEventArgs e) => fire((w, evt) => w.NotifyKeyUp(evt, e), keyboardFocus ?? hoveredWidget ?? root).Handled;
+        public bool OnKeyPress(KeyPressEventArgs e) => fire((w, evt) => w.NotifyKeyPress(evt, e), keyboardFocus ?? hoveredWidget ?? root).Handled;
 
         private void changeHoveredWidget(Widget widget)
         {
