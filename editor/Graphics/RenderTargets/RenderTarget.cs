@@ -108,7 +108,7 @@ namespace StorybrewEditor.Graphics.RenderTargets
             Height = height;
 
             textureId = GL.GenTexture();
-            Texture = new Texture2d(textureId, width, height);
+            Texture = new Texture2d(textureId, width, height, "rendertarget");
 
             DrawState.BindPrimaryTexture(textureId);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);

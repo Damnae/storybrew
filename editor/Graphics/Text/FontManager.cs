@@ -89,7 +89,7 @@ namespace StorybrewEditor.Graphics.Text
         public Texture2d CreateTexture(string text, string fontName, float fontSize, Vector2 maxSize, Vector2 padding, UiAlignment alignment, StringTrimming trimming, out Vector2 textureSize)
         {
             using (var bitmap = CreateBitmap(text, fontName, fontSize, maxSize, padding, alignment, trimming, out textureSize, false))
-                return Texture2d.Load(bitmap);
+                return Texture2d.Load(bitmap, $"text:{text}@{fontName}:{fontSize}");
         }
 
         private Font getFont(string name, float emSize, FontStyle style)

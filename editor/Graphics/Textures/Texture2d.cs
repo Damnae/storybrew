@@ -27,17 +27,20 @@ namespace StorybrewEditor.Graphics.Textures
         public readonly int Width, Height;
         public Vector2 Size => new Vector2(Width, Height);
 
-        public Texture2d(int textureId, int width, int height)
+        private string description;
+        public string Description => description;
+
+        public Texture2d(int textureId, int width, int height, string description)
         {
             this.textureId = textureId;
+            this.description = description;
+
             Width = width;
             Height = height;
         }
 
         public override string ToString()
-        {
-            return string.Format("Texture2d#{0} ({1}x{2})", textureId, Width, Height);
-        }
+            => $"Texture2d#{textureId} {Description} ({Width}x{Height})";
 
         #region IDisposable Support
 
@@ -72,13 +75,13 @@ namespace StorybrewEditor.Graphics.Textures
         {
             if (File.Exists(filename))
                 using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    return Load(stream, sRgb);
+                    return Load(stream, filename, sRgb);
 
             if (!allowResources) return null;
             var resourceName = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
 
             using (var bitmap = Resources.ResourceManager.GetObject(resourceName) as Bitmap)
-                if (bitmap != null) return Load(bitmap, sRgb);
+                if (bitmap != null) return Load(bitmap, $"file:{filename}", sRgb);
                 else
                 {
                     Trace.WriteLine($"Texture not found: {filename} / {resourceName}");
@@ -86,13 +89,13 @@ namespace StorybrewEditor.Graphics.Textures
                 }
         }
 
-        public static Texture2d Load(Stream stream, bool sRgb = false)
+        public static Texture2d Load(Stream stream, string filename, bool sRgb = false)
         {
             using (var bitmap = (Bitmap)Image.FromStream(stream, false, false))
-                return Load(bitmap, sRgb);
+                return Load(bitmap, $"file:{filename}", sRgb);
         }
 
-        public static Texture2d Create(Color4 color, int width = 1, int height = 1)
+        public static Texture2d Create(Color4 color, string description, int width = 1, int height = 1)
         {
             var textureId = GL.GenTexture();
             try
@@ -124,10 +127,10 @@ namespace StorybrewEditor.Graphics.Textures
                 throw e;
             }
 
-            return new Texture2d(textureId, width, height);
+            return new Texture2d(textureId, width, height, description);
         }
 
-        public static Texture2d Load(Bitmap bitmap, bool sRgb = false)
+        public static Texture2d Load(Bitmap bitmap, string description, bool sRgb = false)
         {
             if (bitmap == null) throw new ArgumentNullException(nameof(bitmap));
 
@@ -186,7 +189,7 @@ namespace StorybrewEditor.Graphics.Textures
                 return null;
             }
 
-            return new Texture2d(textureId, bitmap.Width, bitmap.Height);
+            return new Texture2d(textureId, bitmap.Width, bitmap.Height, description);
         }
     }
 }

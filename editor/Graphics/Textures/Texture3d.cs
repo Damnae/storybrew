@@ -19,9 +19,13 @@ namespace StorybrewEditor.Graphics.Textures
 
         public readonly int Width, Height, Depth;
 
-        public Texture3d(int textureId, int width, int height, int depth)
+        private string description;
+        public string Description => description;
+
+        public Texture3d(int textureId, int width, int height, int depth, string description)
         {
             this.textureId = textureId;
+            this.description = description;
 
             Width = width;
             Height = height;
@@ -45,9 +49,7 @@ namespace StorybrewEditor.Graphics.Textures
         }
 
         public override string ToString()
-        {
-            return string.Format("Texture3d#{0} ({1}x{2}x{3})", textureId, Width, Height, Depth);
-        }
+            => $"Texture3d#{textureId} {Description} ({Width}x{Height}x{Depth})";
 
         #region IDisposable Support
 
@@ -78,7 +80,7 @@ namespace StorybrewEditor.Graphics.Textures
 
         #endregion
 
-        public static Texture3d Create(int width, int height, int depth,
+        public static Texture3d Create(int width, int height, int depth, string description,
             PixelInternalFormat pixelInternalFormat = PixelInternalFormat.Rgba,
             PixelFormat pixelFormat = PixelFormat.Bgra,
             PixelType pixelType = PixelType.UnsignedByte)
@@ -108,7 +110,7 @@ namespace StorybrewEditor.Graphics.Textures
                 DrawState.UnbindTexture(textureId);
             }
 
-            return new Texture3d(textureId, width, height, depth);
+            return new Texture3d(textureId, width, height, depth, description);
         }
     }
 }

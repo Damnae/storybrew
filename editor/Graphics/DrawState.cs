@@ -64,8 +64,8 @@ namespace StorybrewEditor.Graphics
             samplerTextureIds = new int[maxTextureImageUnits];
             samplerTexturingModes = new TexturingModes[maxTextureImageUnits];
 
-            whitePixel = Texture2d.Create(Color4.White);
-            normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1));
+            whitePixel = Texture2d.Create(Color4.White, "whitepixel");
+            normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel");
             fontManager = new FontManager();
 
             Viewport = new Rectangle(0, 0, width, height);

@@ -5,5 +5,6 @@ namespace StorybrewEditor.Graphics.Textures
     {
         int TextureId { get; }
         TexturingModes TexturingMode { get; }
+        string Description { get; }
     }
 }
