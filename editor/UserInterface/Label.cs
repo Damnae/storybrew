@@ -34,8 +34,7 @@ namespace StorybrewEditor.UserInterface
                 else if (!alignment.HasFlag(UiAlignment.Top))
                     position.Y += Size.Y * 0.5f - textDrawable.Size.Y * 0.5f;
 
-                position.X = (float)Math.Round(position.X);
-                position.Y = (float)Math.Round(position.Y);
+                position = Manager.SnapToPixel(position);
                 return new Box2(position, position + textDrawable.Size);
             }
         }
@@ -76,7 +75,7 @@ namespace StorybrewEditor.UserInterface
             var scalingChanged = false;
 
             var camera = Manager.Camera as CameraOrtho;
-            var scaling = camera != null && camera.VirtualHeight != 0 ? (float)camera.Viewport.Height / camera.VirtualHeight : 1;
+            var scaling = camera?.HeightScaling ?? 1;
             if (scaling != 0 && textDrawable.Scaling != scaling)
             {
                 textDrawable.Scaling = scaling;

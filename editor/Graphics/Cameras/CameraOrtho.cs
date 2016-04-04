@@ -46,6 +46,8 @@ namespace StorybrewEditor.Graphics.Cameras
             }
         }
 
+        public float HeightScaling => VirtualHeight != 0 ? (float)Viewport.Height / VirtualHeight : 1;
+
         public CameraOrtho(bool yDown = true)
             : this(0, 0, yDown)
         {

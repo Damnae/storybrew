@@ -45,6 +45,8 @@ namespace StorybrewEditor.UserInterface
             var offset = new Vector2(bounds.Left, bounds.Top);
             var lineBottomY = bounds.Height * 0.6f;
 
+            var pixelSize = Manager.PixelSize;
+
             var timeSpan = (SnapDivisor >= 2 ? SnapDivisor >= 8 ? 1 : 2 : 4);
             var leftTime = (int)((Value - timeSpan) * 1000);
             var rightTime = (int)((Value + timeSpan) * 1000);
@@ -54,6 +56,8 @@ namespace StorybrewEditor.UserInterface
             // Kiai
             var inKiai = false;
             var kiaiStartTime = 0.0;
+
+            line.Color = kiaiColor;
             foreach (var controlPoint in project.MainBeatmap.ControlPoints)
             {
                 if (controlPoint.IsKiai == inKiai)
@@ -64,11 +68,12 @@ namespace StorybrewEditor.UserInterface
                     var startProgress = kiaiStartTime / valueLength;
                     var endProgress = (controlPoint.Offset * 0.001f) / valueLength;
 
-                    line.Color = kiaiColor;
-                    line.Draw(drawContext, Manager.Camera, new Box2(
-                            (int)(offset.X + startProgress * bounds.Width), offset.Y + bounds.Height * 0.3f,
-                            (int)(offset.X + endProgress * bounds.Width), offset.Y + bounds.Height * 0.4f),
-                        actualOpacity);
+                    var kiaiLeft = (float)Manager.SnapToPixel(offset.X + startProgress * bounds.Width);
+                    var kiaiRight = (float)Manager.SnapToPixel(offset.X + endProgress * bounds.Width);
+
+                    if (kiaiRight < kiaiLeft + pixelSize)
+                        kiaiRight = kiaiLeft + pixelSize;
+                    line.Draw(drawContext, Manager.Camera, new Box2(kiaiLeft, offset.Y + bounds.Height * 0.3f, kiaiRight, offset.Y + bounds.Height * 0.4f), actualOpacity);
                 }
                 else kiaiStartTime = controlPoint.Offset * 0.001;
                 inKiai = controlPoint.IsKiai;
@@ -109,7 +114,7 @@ namespace StorybrewEditor.UserInterface
                         if (leftTime < time)
                         {
                             var tickColor = tickGrey;
-                            var lineSize = new Vector2(1, bounds.Height * 0.3f);
+                            var lineSize = new Vector2(pixelSize, bounds.Height * 0.3f);
 
                             var snap = tickCount % SnapDivisor;
                             if (snap == 0) tickColor = tickWhite;
@@ -123,7 +128,7 @@ namespace StorybrewEditor.UserInterface
                             if (snap != 0 || beatCount % timingPoint.BeatPerMeasure != 0)
                                 lineSize.Y *= 0.5f;
 
-                            drawLine(drawContext, offset + new Vector2((int)Math.Round((time - leftTime) * timeScale), lineBottomY), lineSize, tickColor, actualOpacity);
+                            drawLine(drawContext, offset + new Vector2((float)Manager.SnapToPixel((time - leftTime) * timeScale), lineBottomY), lineSize, tickColor, actualOpacity);
                         }
                         if (tickCount % SnapDivisor == 0)
                             beatCount++;
@@ -137,30 +142,30 @@ namespace StorybrewEditor.UserInterface
             foreach (var bookmark in project.MainBeatmap.Bookmarks)
             {
                 var progress = (bookmark * 0.001f) / (MaxValue - MinValue);
-                var topLineSize = new Vector2(1, bounds.Height * 0.3f);
-                drawLine(drawContext, offset + new Vector2((int)(progress * bounds.Width), bounds.Height * 0.1f), topLineSize, bookmarkColor, actualOpacity);
+                var topLineSize = new Vector2(pixelSize, bounds.Height * 0.3f);
+                drawLine(drawContext, offset + new Vector2((float)Manager.SnapToPixel(progress * bounds.Width), bounds.Height * 0.1f), topLineSize, bookmarkColor, actualOpacity);
 
                 if (leftTime < bookmark && bookmark < rightTime)
                 {
-                    var bottomLineSize = new Vector2(1, bounds.Height * 0.5f);
-                    drawLine(drawContext, offset + new Vector2((int)Math.Round((bookmark - leftTime) * timeScale), lineBottomY), bottomLineSize, bookmarkColor, actualOpacity);
+                    var bottomLineSize = new Vector2(pixelSize, bounds.Height * 0.5f);
+                    drawLine(drawContext, offset + new Vector2((float)Manager.SnapToPixel((bookmark - leftTime) * timeScale), lineBottomY), bottomLineSize, bookmarkColor, actualOpacity);
                 }
             }
 
             // Current time (top)
             {
-                var x = (float)Math.Round(Value / (MaxValue - MinValue) * bounds.Width);
-                var lineSize = new Vector2(1, bounds.Height * 0.4f);
-                drawLine(drawContext, offset + new Vector2(x - 1, 0), lineSize, Color4.White, actualOpacity);
-                drawLine(drawContext, offset + new Vector2(x + 1, 0), lineSize, Color4.White, actualOpacity);
+                var x = (float)Manager.SnapToPixel(Value / (MaxValue - MinValue) * bounds.Width);
+                var lineSize = new Vector2(pixelSize, bounds.Height * 0.4f);
+                drawLine(drawContext, offset + new Vector2(x - pixelSize, 0), lineSize, Color4.White, actualOpacity);
+                drawLine(drawContext, offset + new Vector2(x + pixelSize, 0), lineSize, Color4.White, actualOpacity);
             }
 
             // Current time (bottom)
             {
                 var centerX = (float)Math.Round(bounds.Width * 0.5);
-                var lineSize = new Vector2(1, bounds.Height * 0.4f);
-                drawLine(drawContext, offset + new Vector2(centerX - 1, lineBottomY), lineSize, Color4.White, actualOpacity);
-                drawLine(drawContext, offset + new Vector2(centerX + 1, lineBottomY), lineSize, Color4.White, actualOpacity);
+                var lineSize = new Vector2(pixelSize, bounds.Height * 0.4f);
+                drawLine(drawContext, offset + new Vector2(centerX - pixelSize, lineBottomY), lineSize, Color4.White, actualOpacity);
+                drawLine(drawContext, offset + new Vector2(centerX + pixelSize, lineBottomY), lineSize, Color4.White, actualOpacity);
             }
         }
 

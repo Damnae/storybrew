@@ -231,6 +231,20 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
+        public float PixelSize => 1 / ((camera as CameraOrtho)?.HeightScaling ?? 1);
+
+        public double SnapToPixel(double value)
+        {
+            var scaling = (camera as CameraOrtho)?.HeightScaling ?? 1;
+            return Math.Round(value * scaling) / scaling;
+        }
+
+        public Vector2 SnapToPixel(Vector2 value)
+        {
+            var scaling = (camera as CameraOrtho)?.HeightScaling ?? 1;
+            return new Vector2((float)Math.Round(value.X * scaling) / scaling, (float)Math.Round(value.Y * scaling) / scaling);
+        }
+
         #endregion
 
         #region Input events

@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Input;
 using StorybrewEditor.Graphics;
+using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
@@ -448,9 +449,7 @@ namespace StorybrewEditor.UserInterface
                         screenPosition.Y += actualAnchorTarget.Size.Y * 0.5f;
                 }
                 else screenPosition = offset;
-
-                screenPosition.X = (float)Math.Round(screenPosition.X);
-                screenPosition.Y = (float)Math.Round(screenPosition.Y);
+                screenPosition = manager.SnapToPixel(screenPosition);
             }
 
             if (includeChildren)
