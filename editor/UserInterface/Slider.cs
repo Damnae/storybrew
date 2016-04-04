@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Input;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 
@@ -36,6 +37,7 @@ namespace StorybrewEditor.UserInterface
             OnClickDown += (sender, e) =>
             {
                 if (disabled) return false;
+                if (e.Button != MouseButton.Left) return false;
                 dragged = true;
                 Value = GetValueForPosition(new Vector2(e.X, e.Y));
                 return true;
