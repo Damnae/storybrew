@@ -52,7 +52,7 @@ namespace StorybrewEditor.UserInterface
             };
             OnDrag += (sender, e) =>
             {
-                if (disabled) return;
+                if (disabled || !dragged) return;
                 Value = GetValueForPosition(new Vector2(e.X, e.Y));
             };
         }
