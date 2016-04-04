@@ -24,6 +24,7 @@ namespace StorybrewEditor.UserInterface
 
         private Project project;
         private Sprite line;
+        private float timeSpan;
 
         public int SnapDivisor = 4;
 
@@ -45,10 +46,12 @@ namespace StorybrewEditor.UserInterface
             var bounds = Bounds;
             var offset = new Vector2(bounds.Left, bounds.Top);
             var lineBottomY = bounds.Height * 0.6f;
-
             var pixelSize = Manager.PixelSize;
 
-            var timeSpan = (SnapDivisor >= 2 ? SnapDivisor >= 8 ? 1 : 2 : 4);
+            var currentTimingPoint = project.MainBeatmap.GetTimingPointAt((int)(Value * 1000));
+            var targetTimeSpan = (SnapDivisor >= 2 ? SnapDivisor >= 8 ? 1 : 2 : 4) * (170 / (float)currentTimingPoint.Bpm);
+            timeSpan = timeSpan + (targetTimeSpan - timeSpan) * 0.01f;
+
             var leftTime = (int)((Value - timeSpan) * 1000);
             var rightTime = (int)((Value + timeSpan) * 1000);
             var timeScale = bounds.Width / (rightTime - leftTime);
