@@ -115,7 +115,7 @@
 			Texture: "ui-rounded-borders.png",
 			Borders: [3, 5, 5, 3],
 			Color: "@colorText",
-			Outset: [-16, 0],
+			Outset: [-17, 0],
 		},
 		"progressBarBg":
 		{
@@ -131,7 +131,7 @@
 			Texture: "ui-rounded-borders.png",
 			Borders: [3, 5, 5, 3],
 			Color: "@colorBgElementHover",
-			Outset: [-14, 2],
+			Outset: [-18, 0],
 		},
 
 		"previewBg":
@@ -453,6 +453,17 @@
 			{
 				Bar: "progressBarHover",
 				Background: "progressBarBgHover",
+			},
+
+			"timeline":
+			{
+				Bar: "progressBar",
+				Background: "tooltipBg",
+			},
+			"timeline #hover":
+			{
+				Bar: "progressBarHover",
+				Background: "tooltipBg",
 			},
 		},
 		LinearLayout:

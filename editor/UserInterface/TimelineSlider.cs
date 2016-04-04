@@ -35,6 +35,7 @@ namespace StorybrewEditor.UserInterface
                 Texture = DrawState.WhitePixel,
                 ScaleMode = ScaleMode.Fill,
             };
+            StyleName = "timeline";
         }
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
