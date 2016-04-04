@@ -137,7 +137,7 @@ namespace StorybrewEditor.ScreenLayers
                         var latestVersion = new Version(name);
                         if (Program.Version < latestVersion)
                         {
-                            var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                            var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
                             if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
                             body += $"\n\nPublished {date.ToTimeAgo()} ({date.ToShortDateString()}) by {authorName}.";
 
