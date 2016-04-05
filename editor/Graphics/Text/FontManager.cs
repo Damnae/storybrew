@@ -18,7 +18,7 @@ namespace StorybrewEditor.Graphics.Text
         private SolidBrush shadowBrush = new SolidBrush(Color.FromArgb(220, 0, 0, 0));
         private Dictionary<string, Font> fonts = new Dictionary<string, Font>();
         private Dictionary<string, FontFamily> fontFamilies = new Dictionary<string, FontFamily>();
-        private PrivateFontCollection fontCollection = new PrivateFontCollection();
+        private Dictionary<string, PrivateFontCollection> fontCollections = new Dictionary<string, PrivateFontCollection>();
         private LinkedList<string> recentlyUsedFonts = new LinkedList<string>();
 
         public Bitmap CreateBitmap(string text, string fontName, float fontSize, Vector2 maxSize, Vector2 padding, UiAlignment alignment, StringTrimming trimming, out Vector2 textureSize, bool measureOnly)
@@ -128,17 +128,21 @@ namespace StorybrewEditor.Graphics.Text
                     GCHandle pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                     try
                     {
-                        var familyCount = fontCollection.Families.Length;
+                        PrivateFontCollection fontCollection;
+                        if (!fontCollections.TryGetValue(resourceName, out fontCollection))
+                            fontCollections.Add(resourceName, fontCollection = new PrivateFontCollection());
 
                         IntPtr ptr = pinnedArray.AddrOfPinnedObject();
                         fontCollection.AddMemoryFont(ptr, bytes.Length);
 
-                        if (fontCollection.Families.Length == familyCount + 1)
+                        if (fontCollection.Families.Length == 1)
                         {
                             fontFamily = fontCollection.Families[0];
                             Trace.WriteLine($"Loaded font {fontFamily.Name} for {name}/{resourceName}");
+                            foreach (var ff in fontCollection.Families)
+                                Trace.WriteLine($"Available {ff.Name}");
                         }
-                        else Trace.WriteLine($"Failed to load font {name}/{resourceName}: Expected one family, got {fontCollection.Families.Length - familyCount}");
+                        else Trace.WriteLine($"Failed to load font {name}/{resourceName}: Expected one family, got {fontCollection.Families.Length}");
                     }
                     catch (Exception e)
                     {
@@ -177,13 +181,13 @@ namespace StorybrewEditor.Graphics.Text
                     shadowBrush.Dispose();
                     foreach (var entry in fonts)
                         entry.Value.Dispose();
-                    fontCollection.Dispose();
+                    foreach (var fontCollection in fontCollections.Values)
+                        fontCollection.Dispose();
                 }
-
                 textBrush = null;
                 shadowBrush = null;
                 fonts = null;
-                fontCollection = null;
+                fontCollections = null;
                 fontFamilies = null;
 
                 disposedValue = true;
