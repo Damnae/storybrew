@@ -20,6 +20,18 @@ namespace StorybrewEditor.Input
         // Helpers
         public Vector2 MousePosition => new Vector2(Mouse.X, Mouse.Y);
 
+        public bool Control { get; private set; }
+        public bool Shift { get; private set; }
+        public bool Alt { get; private set; }
+
+        public bool ControlOnly => Control && !Shift && !Alt;
+        public bool ShiftOnly => !Control && Shift && !Alt;
+        public bool AltOnly => !Control && !Shift && Alt;
+
+        public bool ControlShiftOnly => Control && Shift && !Alt;
+        public bool ControlAltOnly => Control && !Shift && Alt;
+        public bool ShiftAltOnly => !Control && Shift && Alt;
+
         public InputManager(GameWindow window, InputHandler handler)
         {
             this.window = window;
@@ -60,13 +72,11 @@ namespace StorybrewEditor.Input
 
             handler.OnFocusChanged(new FocusChangedEventArgs(HasMouseFocus));
         }
-
         private void window_MouseEnter(object sender, EventArgs e)
         {
             hasMouseHover = true;
             updateMouseFocus();
         }
-
         private void window_MouseLeave(object sender, EventArgs e)
         {
             // https://github.com/opentk/opentk/issues/301
@@ -75,14 +85,20 @@ namespace StorybrewEditor.Input
             hasMouseHover = false;
             updateMouseFocus();
         }
-
         private void window_FocusedChanged(object sender, EventArgs e) => updateMouseFocus();
 
         private void window_MouseDown(object sender, MouseButtonEventArgs e) => handler.OnClickDown(e);
         private void window_MouseUp(object sender, MouseButtonEventArgs e) => handler.OnClickUp(e);
         private void window_MouseMove(object sender, MouseMoveEventArgs e) => handler.OnMouseMove(e);
-        private void window_KeyDown(object sender, KeyboardKeyEventArgs e) => handler.OnKeyDown(e);
-        private void window_KeyUp(object sender, KeyboardKeyEventArgs e) => handler.OnKeyUp(e);
+
+        private void updateModifierState(KeyboardKeyEventArgs e)
+        {
+            Control = e.Modifiers.HasFlag(KeyModifiers.Control);
+            Shift = e.Modifiers.HasFlag(KeyModifiers.Shift);
+            Alt = e.Modifiers.HasFlag(KeyModifiers.Alt);
+        }
+        private void window_KeyDown(object sender, KeyboardKeyEventArgs e) { updateModifierState(e); handler.OnKeyDown(e); }
+        private void window_KeyUp(object sender, KeyboardKeyEventArgs e) { updateModifierState(e); handler.OnKeyUp(e); }
         private void window_KeyPress(object sender, KeyPressEventArgs e) => handler.OnKeyPress(e);
 
         private bool dedupeMouseWheel;

@@ -69,6 +69,8 @@ namespace StorybrewEditor
 
             window.Resize += window_Resize;
             window.Closing += window_Closing;
+
+            resizeToWindow();
         }
 
         public void Restart(ScreenLayer initialLayer = null, string message = null)
@@ -82,6 +84,8 @@ namespace StorybrewEditor
 
         private WidgetManager overlay;
         private CameraOrtho overlayCamera;
+        private LinearLayout overlayTop;
+        private Slider volumeSlider;
 
         private WidgetManager createOverlay(ScreenLayerManager screenLayerManager)
         {
@@ -95,6 +99,67 @@ namespace StorybrewEditor
         {
             overlay.Root.ClearWidgets();
 
+            overlay.Root.Add(overlayTop = new LinearLayout(overlay)
+            {
+                AnchorTarget = overlay.Root,
+                AnchorFrom = UiAlignment.Top,
+                AnchorTo = UiAlignment.Top,
+                Horizontal = true,
+                Opacity = 0,
+                Displayed = false,
+                Children = new Widget[]
+                {
+                    new Label(overlay)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.VolumeUp,
+                        AnchorTo = UiAlignment.Centre,
+                    },
+                    volumeSlider = new Slider(overlay)
+                    {
+                        MinValue = 0,
+                        MaxValue = 1,
+                        Step = 0.01f,
+                        Value = Program.AudioManager.Volume,
+                        Tooltip = $"Volume: {Program.AudioManager.Volume:P0}",
+                        AnchorTo = UiAlignment.Centre,
+                    }
+                }
+            });
+            overlayTop.Pack(0, 0, 1024);
+
+            overlay.Root.OnMouseWheel += (sender, e) =>
+            {
+                if (!InputManager.AltOnly)
+                    return false;
+
+                volumeSlider.Value += e.DeltaPrecise * 0.1f;
+                return true;
+            };
+            volumeSlider.OnValueChanged += (sender, e) =>
+            {
+                Program.AudioManager.Volume = volumeSlider.Value;
+                volumeSlider.Tooltip = $"Volume: {volumeSlider.Value:P0}";
+            };
+        }
+
+        private void updateOverlay()
+        {
+            if (IsFixedRateUpdate)
+            {
+                var mousePosition = overlay.MousePosition;
+                var bounds = overlayTop.Bounds;
+
+                var showOverlayTop = InputManager.AltOnly || (overlayTop.Displayed && bounds.Top < mousePosition.Y && mousePosition.Y < bounds.Bottom);
+
+                var opacity = overlayTop.Opacity;
+                var targetOpacity = showOverlayTop ? 1f : 0f;
+                if (Math.Abs(opacity - targetOpacity) <= 0.07f) opacity = targetOpacity;
+                else opacity = MathHelper.Clamp(opacity + (opacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
+
+                overlayTop.Opacity = opacity;
+                overlayTop.Displayed = opacity > 0;
+            }
         }
 
         #endregion
@@ -122,6 +187,7 @@ namespace StorybrewEditor
             this.time = time;
             this.isFixedRateUpdate = isFixedRateUpdate;
 
+            updateOverlay();
             ScreenLayerManager.Update();
         }
 
@@ -144,6 +210,21 @@ namespace StorybrewEditor
         }
 
         private void window_Resize(object sender, EventArgs e)
+            => resizeToWindow();
+
+        private void window_Closing(object sender, CancelEventArgs e)
+            => e.Cancel = ScreenLayerManager.Close();
+
+        private void initializeVsCode()
+        {
+            var vscodePath = Path.GetFullPath(".vscode");
+            if (!Directory.Exists(vscodePath))
+                Directory.CreateDirectory(vscodePath);
+
+            File.WriteAllText(Path.Combine(vscodePath, "settings.json"), Encoding.UTF8.GetString(Resources.vscode_settings_json).StripUtf8Bom());
+        }
+
+        private void resizeToWindow()
         {
             var width = window.Width;
             var height = window.Height;
@@ -154,20 +235,6 @@ namespace StorybrewEditor
             overlayCamera.VirtualHeight = (int)(height * Math.Max(1024f / width, 768f / height));
             overlayCamera.VirtualWidth = width * overlayCamera.VirtualHeight / height;
             overlay.Size = new Vector2(overlayCamera.VirtualWidth, overlayCamera.VirtualHeight);
-        }
-
-        private void window_Closing(object sender, CancelEventArgs e)
-        {
-            e.Cancel = ScreenLayerManager.Close();
-        }
-
-        private void initializeVsCode()
-        {
-            var vscodePath = Path.GetFullPath(".vscode");
-            if (!Directory.Exists(vscodePath))
-                Directory.CreateDirectory(vscodePath);
-
-            File.WriteAllText(Path.Combine(vscodePath, "settings.json"), Encoding.UTF8.GetString(Resources.vscode_settings_json).StripUtf8Bom());
         }
     }
 
