@@ -131,7 +131,7 @@ namespace StorybrewEditor
                 if (!InputManager.AltOnly)
                     return false;
 
-                volumeSlider.Value += e.DeltaPrecise * 0.1f;
+                volumeSlider.Value += e.DeltaPrecise * 0.05f;
                 return true;
             };
             volumeSlider.OnValueChanged += (sender, e) =>
