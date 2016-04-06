@@ -117,8 +117,6 @@ namespace StorybrewEditor
                     },
                     volumeSlider = new Slider(overlay)
                     {
-                        MinValue = 0,
-                        MaxValue = 1,
                         Step = 0.01f,
                         Value = Program.AudioManager.Volume,
                         Tooltip = $"Volume: {Program.AudioManager.Volume:P0}",

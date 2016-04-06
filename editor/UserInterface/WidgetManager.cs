@@ -155,6 +155,9 @@ namespace StorybrewEditor.UserInterface
             tooltips.Add(widget, tooltip);
             tooltipOverlay.Add(tooltip);
             widget.OnHovered += TooltipWidget_OnHovered;
+
+            if (widget == hoveredWidget)
+                displayTooltip(tooltip);
         }
 
         public void UnregisterTooltip(Widget widget)
@@ -171,25 +174,29 @@ namespace StorybrewEditor.UserInterface
         private void TooltipWidget_OnHovered(WidgetEvent evt, WidgetHoveredEventArgs e)
         {
             var tooltip = tooltips[evt.Listener];
-            if (tooltip.Displayed = e.Hovered)
-            {
-                tooltip.Offset = Vector2.Zero;
-                tooltip.AnchorFrom = UiAlignment.Bottom;
-                tooltip.AnchorTo = UiAlignment.Top;
-                tooltip.Pack(0, 0, 400);
+            if (e.Hovered) displayTooltip(tooltip);
+            else tooltip.Displayed = false;
+        }
 
-                var bounds = tooltip.Bounds;
-                var rootBounds = root.Bounds;
-                if (bounds.Top < rootBounds.Top + 16)
-                {
-                    tooltip.AnchorFrom = UiAlignment.Top;
-                    tooltip.AnchorTo = UiAlignment.Bottom;
-                }
-                if (bounds.Right > rootBounds.Right - 16)
-                    tooltip.Offset = new Vector2(rootBounds.Right - 16 - bounds.Right, 0);
-                else if (bounds.Left < rootBounds.Left + 16)
-                    tooltip.Offset = new Vector2(rootBounds.Left + 16 - bounds.Left, 0);
+        private void displayTooltip(Widget tooltip)
+        {
+            tooltip.Displayed = true;
+            tooltip.Offset = Vector2.Zero;
+            tooltip.AnchorFrom = UiAlignment.Bottom;
+            tooltip.AnchorTo = UiAlignment.Top;
+            tooltip.Pack(0, 0, 400);
+
+            var bounds = tooltip.Bounds;
+            var rootBounds = root.Bounds;
+            if (bounds.Top < rootBounds.Top + 16)
+            {
+                tooltip.AnchorFrom = UiAlignment.Top;
+                tooltip.AnchorTo = UiAlignment.Bottom;
             }
+            if (bounds.Right > rootBounds.Right - 16)
+                tooltip.Offset = new Vector2(rootBounds.Right - 16 - bounds.Right, 0);
+            else if (bounds.Left < rootBounds.Left + 16)
+                tooltip.Offset = new Vector2(rootBounds.Left + 16 - bounds.Left, 0);
         }
 
         #endregion
