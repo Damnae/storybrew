@@ -139,8 +139,6 @@ namespace StorybrewEditor.Graphics.Text
                         {
                             fontFamily = fontCollection.Families[0];
                             Trace.WriteLine($"Loaded font {fontFamily.Name} for {name}/{resourceName}");
-                            foreach (var ff in fontCollection.Families)
-                                Trace.WriteLine($"Available {ff.Name}");
                         }
                         else Trace.WriteLine($"Failed to load font {name}/{resourceName}: Expected one family, got {fontCollection.Families.Length}");
                     }
