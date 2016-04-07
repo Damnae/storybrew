@@ -71,6 +71,7 @@
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
     <None Include="Resources\scripttemplate.csx" />
+    <Compile Include="Settings.cs" />
     <Compile Include="UserInterface\Drawables\CompositeDrawable.cs" />
     <Compile Include="UserInterface\Drawables\Drawable.cs" />
     <Compile Include="UserInterface\Drawables\NinePatch.cs" />

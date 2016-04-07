@@ -118,14 +118,13 @@ namespace StorybrewEditor
                     volumeSlider = new Slider(overlay)
                     {
                         Step = 0.01f,
-                        Value = Program.AudioManager.Volume,
-                        Tooltip = $"Volume: {Program.AudioManager.Volume:P0}",
                         AnchorTo = UiAlignment.Centre,
                     }
                 }
             });
             overlayTop.Pack(0, 0, 1024);
 
+            volumeSlider.BindToSetting(Program.Settings.Volume, () => volumeSlider.Tooltip = $"Volume: {volumeSlider.Value:P0}");
             overlay.Root.OnMouseWheel += (sender, e) =>
             {
                 if (!InputManager.AltOnly)
@@ -133,11 +132,6 @@ namespace StorybrewEditor
 
                 volumeSlider.Value += e.DeltaPrecise * 0.05f;
                 return true;
-            };
-            volumeSlider.OnValueChanged += (sender, e) =>
-            {
-                Program.AudioManager.Volume = volumeSlider.Value;
-                volumeSlider.Tooltip = $"Volume: {volumeSlider.Value:P0}";
             };
         }
 

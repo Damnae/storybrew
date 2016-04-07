@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StorybrewCommon.Util;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -84,7 +85,7 @@ namespace StorybrewCommon.Mapset
 
         private static void parseGeneralSection(Beatmap beatmap, StreamReader reader)
         {
-            parseKeyValueSection(reader, (key, value) =>
+            reader.ParseKeyValueSection((key, value) =>
             {
                 switch (key)
                 {
@@ -94,7 +95,7 @@ namespace StorybrewCommon.Mapset
         }
         private static void parseEditorSection(Beatmap beatmap, StreamReader reader)
         {
-            parseKeyValueSection(reader, (key, value) =>
+            reader.ParseKeyValueSection((key, value) =>
             {
                 switch (key)
                 {
@@ -119,29 +120,6 @@ namespace StorybrewCommon.Mapset
         }
         private static void parseEventsSection(Beatmap beatmap, StreamReader reader) { }
         private static void parseHitObjectsSection(Beatmap beatmap, StreamReader reader) { }
-
-        private static void parseKeyValueSection(StreamReader reader, Action<string, string> action)
-        {
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                line = line.Trim();
-                if (line.Length == 0) break;
-
-                string key, value;
-                parseKeyValue(line, out key, out value);
-                action(key, value);
-            }
-        }
-
-        private static void parseKeyValue(string line, out string key, out string value)
-        {
-            var separatorIndex = line.IndexOf(":");
-            if (separatorIndex == -1) throw new InvalidDataException($"{line} is not a key/value");
-
-            key = line.Substring(0, separatorIndex).Trim();
-            value = line.Substring(separatorIndex + 1, line.Length - 1 - separatorIndex).Trim();
-        }
 
         #endregion
     }

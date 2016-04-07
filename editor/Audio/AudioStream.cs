@@ -66,7 +66,7 @@ namespace StorybrewEditor.Audio
 
         internal void UpdateVolume()
         {
-            Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Manager.Volume);
+            Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Program.Settings.Volume);
         }
 
         #region IDisposable Support

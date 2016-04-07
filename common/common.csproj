@@ -97,6 +97,7 @@
     <Compile Include="Storyboarding\Util\OsbSpritePool.cs" />
     <Compile Include="Storyboarding\Util\OsbSpritePools.cs" />
     <Compile Include="Util\NamedValue.cs" />
+    <Compile Include="Util\StreamReaderExtensions.cs" />
     <Compile Include="Util\VectorHelper.cs" />
   </ItemGroup>
   <ItemGroup>

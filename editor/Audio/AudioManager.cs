@@ -9,17 +9,6 @@ namespace StorybrewEditor.Audio
         private List<AudioStream> audioStreams = new List<AudioStream>();
 
         private float volume = 1;
-        public float Volume
-        {
-            get { return volume; }
-            set
-            {
-                if (volume == value) return;
-                volume = value;
-                foreach (var audio in audioStreams)
-                    audio.UpdateVolume();
-            }
-        }
 
         public AudioManager(IntPtr windowHandle)
         {
@@ -28,6 +17,9 @@ namespace StorybrewEditor.Audio
             Bass.Configure(Configuration.PlaybackBufferLength, 100);
             Bass.Configure(Configuration.NetBufferLength, 500);
             Bass.Configure(Configuration.UpdatePeriod, 10);
+
+            updateVolume();
+            Program.Settings.Volume.OnValueChanged += (sender, e) => updateVolume();
         }
 
         public AudioStream LoadStream(string path)
@@ -37,9 +29,19 @@ namespace StorybrewEditor.Audio
             return audio;
         }
 
-        internal void NotifyDisposed(AudioStream audio)
+        public void NotifyDisposed(AudioStream audio)
         {
             audioStreams.Remove(audio);
+        }
+
+        private void updateVolume()
+        {
+            var newVolume = Program.Settings.Volume;
+            if (volume == newVolume) return;
+
+            volume = newVolume;
+            foreach (var audio in audioStreams)
+                audio.UpdateVolume();
         }
 
         #region IDisposable Support

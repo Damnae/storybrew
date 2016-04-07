@@ -23,9 +23,12 @@ namespace StorybrewEditor
         public static string FullName => $"{Name} {Version} ({Repository})";
 
         private static int mainThreadId;
-        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == mainThreadId;
+        public static AudioManager audioManager;
+        public static Settings settings;
 
-        public static AudioManager AudioManager;
+        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == mainThreadId;
+        public static AudioManager AudioManager => audioManager;
+        public static Settings Settings => settings;
 
         [STAThread]
         public static void Main()
@@ -33,10 +36,11 @@ namespace StorybrewEditor
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             setupLogging();
 
+            settings = new Settings();
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
             using (var window = createWindow(displayDevice))
-            using (AudioManager = new AudioManager(window.WindowInfo.Handle) { Volume = 0.1f, })
+            using (audioManager = new AudioManager(window.WindowInfo.Handle))
             using (var editor = new Editor(window))
             {
                 DrawState.CheckError("initializing openGL context");
@@ -53,6 +57,8 @@ namespace StorybrewEditor
 
                 editor.Initialize();
                 runMainLoop(window, editor, 1 / 60.0, 1 / displayDevice.RefreshRate);
+
+                settings.Save();
             }
         }
 

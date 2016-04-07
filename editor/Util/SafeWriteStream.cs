@@ -34,7 +34,7 @@ namespace StorybrewEditor.Util
         private static string prepare(string path)
         {
             var folder = Path.GetDirectoryName(path);
-            if (!Directory.Exists(folder))
+            if (!string.IsNullOrWhiteSpace(folder) && !Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
             return path + ".tmp";
         }

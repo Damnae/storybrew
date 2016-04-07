@@ -4,7 +4,6 @@ using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using StorybrewEditor.Util;
-using System;
 
 namespace StorybrewEditor.UserInterface
 {
