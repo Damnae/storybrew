@@ -77,7 +77,8 @@ namespace StorybrewCommon.Storyboarding.Display
                 candidateCommand = command;
             }
             if (candidateCommand != null) return candidateCommand.ValueAtTime(time);
-            return previousCommand.EndValue;
+            if (previousCommand != null) return previousCommand.EndValue;
+            return DefaultValue;
         }
 
         private void triggerable_OnTimeChanged(object sender, EventArgs e)
