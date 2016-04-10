@@ -38,12 +38,8 @@ namespace StorybrewScripts
 
         #endregion
 
-        [Configurable(DisplayName = "Random seed")]
-        public int Seed = 666;
-
         public double BgScaling = 480.0 / 768;
         public double DegToRad = Math.PI / 180;
-        public Random random;
 
         private StoryboardLayer bgLayer;
         private StoryboardLayer mainLayer;
@@ -51,8 +47,6 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
-            random = new Random(Seed);
-
             bgLayer = GetLayer("Background");
             mainLayer = GetLayer("Main");
             spritePools = new OsbSpritePools(mainLayer);
@@ -160,7 +154,7 @@ namespace StorybrewScripts
             distance = 0;
             for (var i = 0; i < 4; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(13480 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(13480 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -177,7 +171,7 @@ namespace StorybrewScripts
             distance = 0;
             for (var i = 0; i < 4; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(16304 + Offset + BeatDuration * i * 3 / 4, 140, 340, angle, distance, 400, 2000);
                 MakeNote(16304 + Offset + BeatDuration * i * 3 / 4, 140, 340, angle + Math.PI, distance, 400, 2000);
             }
@@ -194,19 +188,19 @@ namespace StorybrewScripts
             distance = 0;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(17715 + Offset + BeatDuration * i * 3 / 4, 140, 340, angle, distance, 400, 2000);
                 MakeNote(17715 + Offset + BeatDuration * i * 3 / 4, 140, 340, angle + Math.PI, distance, 400, 2000);
             }
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(18421 + Offset + BeatDuration * i * 3 / 4, 255, 240, angle, distance, 400, 2000);
                 MakeNote(18421 + Offset + BeatDuration * i * 3 / 4, 255, 240, angle + Math.PI, distance, 400, 2000);
             }
             for (var i = 0; i < 4; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(19127 + Offset + BeatDuration * i * 3 / 4, 120, 120, angle, distance, 400, 2000);
                 MakeNote(19127 + Offset + BeatDuration * i * 3 / 4, 120, 120, angle + Math.PI, distance, 400, 2000);
             }
@@ -304,7 +298,7 @@ namespace StorybrewScripts
             distance = 0;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(47362 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(47362 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -410,7 +404,7 @@ namespace StorybrewScripts
             distance = 0;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(53010 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(53010 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -418,7 +412,7 @@ namespace StorybrewScripts
             y -= 140;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(53715 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(53715 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -426,7 +420,7 @@ namespace StorybrewScripts
             y += 280;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(54421 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(54421 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -434,7 +428,7 @@ namespace StorybrewScripts
             y -= 140;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(55127 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(55127 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -442,35 +436,35 @@ namespace StorybrewScripts
             y -= 140;
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(55833 + Offset + BeatDuration * i * 3 / 4, x, y, angle, distance, 400, 2000);
                 MakeNote(55833 + Offset + BeatDuration * i * 3 / 4, x, y, angle + Math.PI, distance, 400, 2000);
             }
             x += 200;
             y += 60;
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(56010 + Offset, x, y, angle, distance, 400, 2000);
                 MakeNote(56010 + Offset, x, y, angle + Math.PI, distance, 400, 1000);
             }
             x -= 100;
             y += 180;
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(56186 + Offset, x, y, angle, distance, 400, 2000);
                 MakeNote(56186 + Offset, x, y, angle + Math.PI, distance, 400, 1000);
             }
             x += 300;
             y -= 140;
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(56362 + Offset, x, y, angle, distance, 400, 1000);
                 MakeNote(56362 + Offset, x, y, angle + Math.PI, distance, 400, 1000);
             }
             x += 200;
             y += 140;
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(56539 + Offset, x, y, angle, distance, 400, 2000);
                 MakeNote(56539 + Offset, x, y, angle + Math.PI, distance, 400, 2000);
             }
@@ -501,19 +495,19 @@ namespace StorybrewScripts
             // Drums
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(91127 + Offset + BeatDuration * i * 3 / 4, 140, 340, angle, distance, 400, 2000);
                 MakeNote(91127 + Offset + BeatDuration * i * 3 / 4, 140, 340, angle + Math.PI, distance, 400, 2000);
             }
             for (var i = 0; i < 3; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(91833 + Offset + BeatDuration * i * 3 / 4, 255, 240, angle, distance, 400, 2000);
                 MakeNote(91833 + Offset + BeatDuration * i * 3 / 4, 255, 240, angle + Math.PI, distance, 400, 2000);
             }
             for (var i = 0; i < 4; ++i)
             {
-                var angle = random.NextDouble() * -Math.PI;
+                var angle = Random(-Math.PI);
                 MakeNote(92539 + Offset + BeatDuration * i * 3 / 4, 120, 120, angle, distance, 400, 2000);
                 MakeNote(92539 + Offset + BeatDuration * i * 3 / 4, 120, 120, angle + Math.PI, distance, 400, 2000);
             }
@@ -591,8 +585,8 @@ namespace StorybrewScripts
             var lightX = x + Math.Cos(angle) * (distance - 70);
             var lightY = y + Math.Sin(angle) * (distance - 70);
 
-            var hue1 = 340 + random.Next(20);
-            var hue2 = 240 + random.Next(20);
+            var hue1 = Random(340, 360);
+            var hue2 = Random(240, 260);
 
             var note = spritePools.Get(t0, t3, "sb/pl.png", OsbLayer.Background, OsbOrigin.Centre, true);
             note.Move(OsbEasing.In, t0, t2, x0, y0, x1, y1);
@@ -624,54 +618,54 @@ namespace StorybrewScripts
 
         private void MakeNoteParticles(int t, double x, double y, double angle, double effectStrengh)
         {
-            int particleCount = 3 + (int)((4 + random.Next(8)) * (effectStrengh * 0.8));
+            int particleCount = 3 + (int)(Random(4, 12) * (effectStrengh * 0.8));
             for (var i = 0; i < particleCount; ++i)
             {
                 var pt0 = t;
-                var pt1 = pt0 + BeatDuration / 8 + random.Next(BeatDuration / 4);
-                var pt2 = pt1 + BeatDuration / 6 + random.Next(BeatDuration / 3);
-                var pt3 = pt2 + BeatDuration / 4 + random.Next(BeatDuration / 2);
+                var pt1 = pt0 + BeatDuration / 8 + Random(BeatDuration / 4);
+                var pt2 = pt1 + BeatDuration / 6 + Random(BeatDuration / 3);
+                var pt3 = pt2 + BeatDuration / 4 + Random(BeatDuration / 2);
 
-                var pscale = 0.2 + random.NextDouble() * 0.2;
+                var pscale = Random(0.2, 0.4);
 
-                var pStartAngle = angle + Math.PI / 2 + Math.PI / 8 - (Math.PI / 4) * random.NextDouble();
-                var pStartDistance = -15 + random.NextDouble() * 30;
+                var pStartAngle = angle + Math.PI / 2 + Math.PI / 8 - Random(Math.PI / 4);
+                var pStartDistance = Random(-15.0, 15.0);
                 var px0 = x + Math.Cos(pStartAngle) * pStartDistance;
                 var py0 = y + Math.Sin(pStartAngle) * pStartDistance;
 
-                var pangle0 = angle - Math.PI / 16 + Math.PI / 8 * random.NextDouble();
-                var pdistance = (5 + random.NextDouble() * random.NextDouble() * random.NextDouble() * 250) * (effectStrengh * 0.84);
+                var pangle0 = angle - Math.PI / 16 + Random(Math.PI / 8);
+                var pdistance = (5 + Random(1.0) * Random(1.0) * Random(1.0) * 250) * (effectStrengh * 0.84);
 
                 var px1 = px0 + Math.Cos(pangle0) * pdistance;
                 var py1 = py0 + Math.Sin(pangle0) * pdistance;
 
-                var pangle1 = pangle0 - Math.PI / 8 + Math.PI / 4 * random.NextDouble();
+                var pangle1 = pangle0 - Math.PI / 8 + Random(Math.PI / 4);
                 pdistance *= 0.8;
 
                 var px2 = px1 + Math.Cos(pangle1) * pdistance;
                 var py2 = py1 + Math.Sin(pangle1) * pdistance;
 
-                var pangle2 = pangle1 - Math.PI / 8 + Math.PI / 4 * random.NextDouble();
+                var pangle2 = pangle1 - Math.PI / 8 + Random(Math.PI / 4);
                 pdistance *= 0.6;
 
                 var px3 = px2 + Math.Cos(pangle2) * pdistance;
                 var py3 = py2 + Math.Sin(pangle2) * pdistance;
 
-                var squish = 1.2 + random.NextDouble();
+                var squish = Random(1.2, 2.2);
 
                 var particle = spritePools.Get(pt0, pt3, "sb/pl.png", OsbLayer.Background, OsbOrigin.Centre, true, 1);
-                particle.MoveX((OsbEasing)random.Next(3), pt0, pt1, px0, px1);
-                particle.MoveY((OsbEasing)random.Next(3), pt0, pt1, py0, py1);
-                particle.MoveX((OsbEasing)random.Next(3), pt1, pt2, px1, px2);
-                particle.MoveY((OsbEasing)random.Next(3), pt1, pt2, py1, py2);
-                particle.MoveX((OsbEasing)random.Next(3), pt2, pt3, px2, px3);
-                particle.MoveY((OsbEasing)random.Next(3), pt2, pt3, py2, py3);
+                particle.MoveX((OsbEasing)Random(3), pt0, pt1, px0, px1);
+                particle.MoveY((OsbEasing)Random(3), pt0, pt1, py0, py1);
+                particle.MoveX((OsbEasing)Random(3), pt1, pt2, px1, px2);
+                particle.MoveY((OsbEasing)Random(3), pt1, pt2, py1, py2);
+                particle.MoveX((OsbEasing)Random(3), pt2, pt3, px2, px3);
+                particle.MoveY((OsbEasing)Random(3), pt2, pt3, py2, py3);
                 particle.Rotate(OsbEasing.In, pt0, pt1, pangle0, pangle1);
                 particle.Rotate(OsbEasing.In, pt1, pt2, pangle1, pangle2);
                 particle.Fade(pt0, 1);
                 particle.Fade(pt3, 0);
                 particle.ScaleVec(OsbEasing.In, pt0, pt3, pscale * squish, pscale / squish, 0, 0);
-                particle.ColorHsb(pt0, 240 + random.Next(20), 0.4 + random.NextDouble() * 0.4, 0.8 + random.NextDouble() * 0.2);
+                particle.ColorHsb(pt0, Random(240, 260), Random(0.4, 0.8), Random(0.8, 1));
             }
         }
 

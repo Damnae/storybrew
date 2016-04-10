@@ -13,6 +13,15 @@ namespace StorybrewCommon.Scripting
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
+        [Configurable(DisplayName = "Random seed")]
+        public int RandomSeed;
+
+        private Random random;
+        public int Random(int minValue, int maxValue) => random.Next(minValue, maxValue);
+        public int Random(int maxValue) => random.Next(maxValue);
+        public double Random(double minValue, double maxValue) => minValue + random.NextDouble() * (maxValue - minValue);
+        public double Random(double maxValue) => random.NextDouble() * maxValue;
+
         /// <summary>
         /// Creates or retrieves a layer. 
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
@@ -101,6 +110,8 @@ namespace StorybrewCommon.Scripting
             try
             {
                 this.context = context;
+
+                random = new Random(RandomSeed);
                 Generate();
             }
             finally
