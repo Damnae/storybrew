@@ -8,13 +8,13 @@ namespace StorybrewCommon.Storyboarding.CommandValues
     [Serializable]
     public struct CommandColor : CommandValue, IEquatable<CommandColor>
     {
-        private readonly double b;
-        private readonly double g;
         private readonly double r;
+        private readonly double g;
+        private readonly double b;
 
-        public int B => clamp((int)(b * 255));
-        public int G => clamp((int)(g * 255));
-        public int R => clamp((int)(r * 255));
+        public byte R => toByte(r);
+        public byte G => toByte(g);
+        public byte B => toByte(b);
 
         public CommandColor(double r, double g, double b)
         {
@@ -86,7 +86,7 @@ namespace StorybrewCommon.Storyboarding.CommandValues
             => new CommandColor(left.r / right, left.g / right, left.b / right);
 
         public static implicit operator Color4(CommandColor obj)
-            => new Color4((float)obj.r, (float)obj.g, (float)obj.b, 1f);
+            => new Color4(obj.R, obj.G, obj.B, 255);
 
         public static CommandColor FromRgb(byte r, byte g, byte b)
             => new CommandColor(r / 255.0, g / 255.0, b / 255.0);
@@ -115,11 +115,12 @@ namespace StorybrewCommon.Storyboarding.CommandValues
             return new CommandColor(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
         }
 
-        private static int clamp(int x)
+        private static byte toByte(double x)
         {
+            x *= 255;
             if (x > 255) return 255;
             if (x < 0) return 0;
-            return x;
+            return (byte)x;
         }
     }
 }
