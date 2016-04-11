@@ -43,7 +43,7 @@ namespace StorybrewCommon.Storyboarding.Display
 
         public void EndDisplayComposite()
         {
-            if (composite == null) throw new InvalidOperationException("Cannot start loop or trigger: Not inside one");
+            if (composite == null) throw new InvalidOperationException("Cannot complete loop or trigger: Not inside one");
 
             if (composite.HasCommands)
                 value.Add(decorate(composite));
