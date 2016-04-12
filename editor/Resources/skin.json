@@ -205,6 +205,13 @@
 			{
 				Background: "tooltipBg",
 			},
+			"timelineBeatmapName":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeSmall",
+				TextAlignment: "BottomRight",
+				Trimming: "EllipsisCharacter",
+			},
 
 			"buttonLabel":
 			{

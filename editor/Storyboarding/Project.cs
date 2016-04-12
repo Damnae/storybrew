@@ -87,6 +87,12 @@ namespace StorybrewEditor.Storyboarding
             };
             scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, compiledScriptsPath, referencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
+
+            OnMainBeatmapChanged += (sender, e) =>
+            {
+                foreach (var effect in effects)
+                    QueueEffectUpdate(effect);
+            };
         }
 
         #region Display
@@ -348,9 +354,11 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mainBeatmap == value) return;
                 mainBeatmap = value;
-                mainBeatmapChanged();
+                OnMainBeatmapChanged?.Invoke(this, EventArgs.Empty);
             }
         }
+
+        public event EventHandler OnMainBeatmapChanged;
 
         public void SwitchMainBeatmap()
         {
@@ -370,12 +378,6 @@ namespace StorybrewEditor.Storyboarding
                 MainBeatmap = beatmap;
                 return;
             }
-        }
-
-        private void mainBeatmapChanged()
-        {
-            foreach (var effect in effects)
-                QueueEffectUpdate(effect);
         }
 
         private void refreshMapset()

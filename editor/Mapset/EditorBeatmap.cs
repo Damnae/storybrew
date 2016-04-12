@@ -13,6 +13,9 @@ namespace StorybrewEditor.Mapset
 
         public string AudioFilename { get; set; }
 
+        private string name;
+        public override string Name => name;
+
         private List<int> bookmarks = new List<int>();
         public override IEnumerable<int> Bookmarks => bookmarks;
 
@@ -113,7 +116,16 @@ namespace StorybrewEditor.Mapset
                 }
             });
         }
-        private static void parseMetadataSection(EditorBeatmap beatmap, StreamReader reader) { }
+        private static void parseMetadataSection(EditorBeatmap beatmap, StreamReader reader)
+        {
+            reader.ParseKeyValueSection((key, value) =>
+            {
+                switch (key)
+                {
+                    case "Version": beatmap.name = value; break;
+                }
+            });
+        }
         private static void parseDifficultySection(EditorBeatmap beatmap, StreamReader reader) { }
         private static void parseTimingPointsSection(EditorBeatmap beatmap, StreamReader reader)
         {

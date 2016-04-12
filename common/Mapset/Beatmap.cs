@@ -11,6 +11,11 @@ namespace StorybrewCommon.Mapset
         public const int ControlPointLeniency = 5;
 
         /// <summary>
+        /// This beatmap diff name, also called version.
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <summary>
         /// Timestamps in milliseconds of bookmarks
         /// </summary>
         public abstract IEnumerable<int> Bookmarks { get; }

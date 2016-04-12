@@ -22,8 +22,10 @@ namespace StorybrewEditor.UserInterface
         private static readonly Color4 breakColor = new Color4(255, 255, 255, 140);
         private static readonly Color4 bookmarkColor = new Color4(58, 110, 170, 240);
 
-        private Project project;
         private Sprite line;
+        private Label beatmapLabel;
+
+        private Project project;
         private float timeSpan;
 
         public int SnapDivisor = 4;
@@ -36,7 +38,21 @@ namespace StorybrewEditor.UserInterface
                 Texture = DrawState.WhitePixel,
                 ScaleMode = ScaleMode.Fill,
             };
+            Add(beatmapLabel = new Label(manager)
+            {
+                StyleName = "timelineBeatmapName",
+                Text = project.MainBeatmap.Name,
+                AnchorFrom = UiAlignment.BottomRight,
+                AnchorTo = UiAlignment.BottomRight,
+            });
             StyleName = "timeline";
+
+            project.OnMainBeatmapChanged += project_OnMainBeatmapChanged;
+        }
+
+        private void project_OnMainBeatmapChanged(object sender, EventArgs e)
+        {
+            beatmapLabel.Text = project.MainBeatmap.Name;
         }
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
@@ -132,7 +148,10 @@ namespace StorybrewEditor.UserInterface
                             if (snap != 0 || beatCount % timingPoint.BeatPerMeasure != 0)
                                 lineSize.Y *= 0.5f;
 
-                            drawLine(drawContext, offset + new Vector2((float)Manager.SnapToPixel((time - leftTime) * timeScale), lineBottomY), lineSize, tickColor, actualOpacity);
+                            var tickX = offset.X + (float)Manager.SnapToPixel((time - leftTime) * timeScale);
+                            var tickOpacity = tickX > beatmapLabel.TextBounds.Left - 8 ? actualOpacity * 0.2f : actualOpacity;
+
+                            drawLine(drawContext, new Vector2(tickX, offset.Y + lineBottomY), lineSize, tickColor, tickOpacity);
                         }
                         if (tickCount % SnapDivisor == 0)
                             beatCount++;
@@ -195,10 +214,17 @@ namespace StorybrewEditor.UserInterface
 
         public void Snap() => Scroll(0);
 
+        protected override void Layout()
+        {
+            base.Layout();
+            beatmapLabel.Size = new Vector2(Size.X * 0.25f, Size.Y * 0.4f);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
+                project.OnMainBeatmapChanged -= project_OnMainBeatmapChanged;
                 line.Dispose();
             }
             line = null;
