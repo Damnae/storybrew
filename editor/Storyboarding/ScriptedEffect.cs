@@ -74,7 +74,9 @@ namespace StorybrewEditor.Storyboarding
         /// </summary>
         public override void Update()
         {
-            var context = new EditorGeneratorContext(this);
+            if (!scriptContainer.HasScript) return;
+
+            var context = new EditorGeneratorContext(this, Project.MainBeatmap);
             try
             {
                 changeStatus(EffectStatus.Loading);

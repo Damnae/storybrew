@@ -28,6 +28,11 @@ namespace StorybrewEditor.Scripting
         private volatile int currentVersion = 0;
         private volatile int targetVersion = 1;
 
+        /// <summary>
+        /// Returns false when Script would return null.
+        /// </summary>
+        public bool HasScript => script != null || currentVersion != targetVersion;
+
         public string Name
         {
             get
