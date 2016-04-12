@@ -9,8 +9,8 @@ namespace StorybrewEditor.Mapset
     {
         private string path;
 
-        private List<Beatmap> beatmaps = new List<Beatmap>();
-        public IEnumerable<Beatmap> Beatmaps => beatmaps;
+        private List<EditorBeatmap> beatmaps = new List<EditorBeatmap>();
+        public IEnumerable<EditorBeatmap> Beatmaps => beatmaps;
         public int BeatmapCount => beatmaps.Count;
 
         public MapsetManager(string path)
@@ -25,7 +25,7 @@ namespace StorybrewEditor.Mapset
         private void loadBeatmaps()
         {
             foreach (var beatmapPath in Directory.GetFiles(path, "*.osu", SearchOption.TopDirectoryOnly))
-                beatmaps.Add(Beatmap.Load(beatmapPath));
+                beatmaps.Add(EditorBeatmap.Load(beatmapPath));
         }
 
         #endregion

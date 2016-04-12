@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioStream.cs" />
+    <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Graphics\Cameras\Camera.cs" />

@@ -1,4 +1,6 @@
-﻿using StorybrewCommon.Storyboarding;
+﻿using StorybrewCommon.Mapset;
+using StorybrewCommon.Storyboarding;
+using StorybrewEditor.Mapset;
 using System.Collections.Generic;
 
 namespace StorybrewEditor.Storyboarding
@@ -6,6 +8,9 @@ namespace StorybrewEditor.Storyboarding
     public class EditorGeneratorContext : GeneratorContext
     {
         private Effect effect;
+        private EditorBeatmap beatmap;
+
+        public override Beatmap Beatmap => beatmap;
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
@@ -16,9 +21,10 @@ namespace StorybrewEditor.Storyboarding
             return layer;
         }
 
-        public EditorGeneratorContext(Effect effect)
+        public EditorGeneratorContext(Effect effect, EditorBeatmap beatmap)
         {
             this.effect = effect;
+            this.beatmap = beatmap;
         }
     }
 }

@@ -334,8 +334,8 @@ namespace StorybrewEditor.Storyboarding
         private MapsetManager mapsetManager;
         public MapsetManager MapsetManager => mapsetManager;
 
-        private Beatmap mainBeatmap;
-        public Beatmap MainBeatmap
+        private EditorBeatmap mainBeatmap;
+        public EditorBeatmap MainBeatmap
         {
             get
             {
@@ -343,6 +343,12 @@ namespace StorybrewEditor.Storyboarding
                     SwitchMainBeatmap();
 
                 return mainBeatmap;
+            }
+            set
+            {
+                if (mainBeatmap == value) return;
+                mainBeatmap = value;
+                mainBeatmapChanged();
             }
         }
 
@@ -353,7 +359,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (takeNextBeatmap)
                 {
-                    mainBeatmap = beatmap;
+                    MainBeatmap = beatmap;
                     return;
                 }
                 else if (beatmap == mainBeatmap)
@@ -361,9 +367,15 @@ namespace StorybrewEditor.Storyboarding
             }
             foreach (var beatmap in mapsetManager.Beatmaps)
             {
-                mainBeatmap = beatmap;
-                break;
+                MainBeatmap = beatmap;
+                return;
             }
+        }
+
+        private void mainBeatmapChanged()
+        {
+            foreach (var effect in effects)
+                QueueEffectUpdate(effect);
         }
 
         private void refreshMapset()

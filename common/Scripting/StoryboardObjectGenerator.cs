@@ -1,4 +1,5 @@
-﻿using StorybrewCommon.Storyboarding;
+﻿using StorybrewCommon.Mapset;
+using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,8 @@ namespace StorybrewCommon.Scripting
         /// Layers will be sorted by the order in which they are first retrieved.
         /// </summary>
         protected StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
+
+        protected Beatmap Beatmap => context.Beatmap;
 
         public StoryboardObjectGenerator()
         {

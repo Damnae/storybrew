@@ -7,7 +7,7 @@ namespace StorybrewCommon.Mapset
     public class ControlPoint
     {
         public double Offset;
-        public double BeatDuration;
+        private double beatDurationSV;
         public int BeatPerMeasure;
         public int SampleType;
         public int SampleSet;
@@ -15,8 +15,17 @@ namespace StorybrewCommon.Mapset
         public bool IsInherited;
         public bool IsKiai;
 
+        public double BeatDuration
+        {
+            get
+            {
+                if (IsInherited) throw new InvalidOperationException("Control points don't have a beat duration, use timing points");
+                return beatDurationSV;
+            }
+        }
         public double Bpm => BeatDuration == 0 ? 0 : 60000 / BeatDuration;
-        public double SliderMultiplier => BeatDuration > 0 ? 1.0 : -(BeatDuration / 100.0);
+
+        public double SliderMultiplier => beatDurationSV > 0 ? 1.0 : -(beatDurationSV / 100.0);
 
         public override string ToString() => IsInherited ? $"{Offset}ms, {SliderMultiplier}x, {BeatPerMeasure}/4" : $"{Offset}ms, {Bpm}bpm, {BeatPerMeasure}/4";
 
@@ -28,7 +37,7 @@ namespace StorybrewCommon.Mapset
             return new ControlPoint()
             {
                 Offset = double.Parse(values[0], CultureInfo.InvariantCulture),
-                BeatDuration = double.Parse(values[1], CultureInfo.InvariantCulture),
+                beatDurationSV = double.Parse(values[1], CultureInfo.InvariantCulture),
                 BeatPerMeasure = values.Length > 2 ? int.Parse(values[2]) : 4,
                 SampleType = values.Length > 3 ? int.Parse(values[3]) : 1,
                 SampleSet = values.Length > 4 ? int.Parse(values[4]) : 1,
