@@ -266,27 +266,7 @@ namespace StorybrewEditor.ScreenLayers
             saveButton.OnClick += (sender, e) => saveProject();
             exportButton.OnClick += (sender, e) => exportProject();
 
-            project.OnEffectsStatusChanged += (sender, e) =>
-            {
-                switch (project.EffectsStatus)
-                {
-                    case EffectStatus.ExecutionFailed:
-                        statusIcon.Icon = IconFont.Bug;
-                        statusMessage.Text = "An effect failed to execute.\nClick the Effects tabs, then the bug icon to see its error message.";
-                        statusLayout.Pack(bottomLeftLayout.Width - 24);
-                        statusLayout.Displayed = true;
-                        break;
-                    case EffectStatus.Updating:
-                        statusIcon.Icon = IconFont.Spinner;
-                        statusMessage.Text = "Updating effects...";
-                        statusLayout.Pack(bottomLeftLayout.Width - 24);
-                        statusLayout.Displayed = true;
-                        break;
-                    default:
-                        statusLayout.Displayed = false;
-                        break;
-                }
-            };
+            project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
         }
 
         public override bool OnKeyDown(KeyboardKeyEventArgs e)
@@ -380,6 +360,28 @@ namespace StorybrewEditor.ScreenLayers
         public override void Close()
             => Manager.ShowMessage("Quit to desktop?", () => Exit(), () => Manager.Editor.Restart(), true);
 
+        private void project_OnEffectsStatusChanged(object sender, EventArgs e)
+        {
+            switch (project.EffectsStatus)
+            {
+                case EffectStatus.ExecutionFailed:
+                    statusIcon.Icon = IconFont.Bug;
+                    statusMessage.Text = "An effect failed to execute.\nClick the Effects tabs, then the bug icon to see its error message.";
+                    statusLayout.Pack(bottomLeftLayout.Width - 24);
+                    statusLayout.Displayed = true;
+                    break;
+                case EffectStatus.Updating:
+                    statusIcon.Icon = IconFont.Spinner;
+                    statusMessage.Text = "Updating effects...";
+                    statusLayout.Pack(bottomLeftLayout.Width - 24);
+                    statusLayout.Displayed = true;
+                    break;
+                default:
+                    statusLayout.Displayed = false;
+                    break;
+            }
+        }
+
         #region IDisposable Support
 
         private bool disposedValue = false;
@@ -390,6 +392,7 @@ namespace StorybrewEditor.ScreenLayers
             {
                 if (disposing)
                 {
+                    project.OnEffectsStatusChanged -= project_OnEffectsStatusChanged;
                     project.Dispose();
                     audio.Dispose();
                 }
