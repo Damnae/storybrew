@@ -92,20 +92,18 @@ namespace StorybrewEditor.UserInterface
                 {
                     case Key.Escape:
                         if (hasFocus)
-                        {
                             manager.KeyboardFocus = null;
-                            return true;
-                        }
                         break;
                     case Key.BackSpace:
                         if (Value.Length > 0)
-                        {
                             Value = Value.Substring(0, Value.Length - 1);
-                            return true;
-                        }
                         break;
                 }
-                return false;
+                return true;
+            };
+            OnKeyUp += (sender, e) =>
+            {
+                return hasFocus;
             };
             OnKeyPress += (sender, e) =>
             {
