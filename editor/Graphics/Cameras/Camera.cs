@@ -26,7 +26,9 @@ namespace StorybrewEditor.Graphics.Cameras
 
         Vector3 FromScreen(Vector2 screenCoords);
         Vector3 ToScreen(Vector3 worldCoords);
-        
+        Vector3 ToScreen(Vector2 worldCoords);
+        Box2 ToScreen(Box2 worldBox2);
+
         event EventHandler Changed;
     }
 }

@@ -22,7 +22,8 @@ namespace StorybrewEditor.UserInterface.Drawables
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity = 1)
         {
             storyboard.DisplayTime = Time;
-            storyboard.Draw(drawContext, camera, bounds, opacity);
+            using (DrawState.Clip(bounds, camera))
+                storyboard.Draw(drawContext, camera, bounds, opacity);
         }
 
         #region IDisposable Support

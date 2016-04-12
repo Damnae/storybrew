@@ -5,6 +5,7 @@ using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Renderers;
 using StorybrewEditor.Graphics.Text;
 using StorybrewEditor.Graphics.Textures;
+using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -319,6 +320,45 @@ namespace StorybrewEditor.Graphics
         }
         public delegate void ViewportChangedEventHandler();
         public static event ViewportChangedEventHandler ViewportChanged;
+
+        private static Rectangle? clipRegion;
+        public static Rectangle? ClipRegion
+        {
+            get { return clipRegion; }
+            private set
+            {
+                if (clipRegion == value)
+                    return;
+
+                FlushRenderer();
+
+                clipRegion = value;
+                if (clipRegion.HasValue)
+                {
+                    GL.Enable(EnableCap.ScissorTest);
+                    GL.Scissor(clipRegion.Value.X, clipRegion.Value.Y, clipRegion.Value.Width, clipRegion.Value.Height);
+                }
+                else GL.Disable(EnableCap.ScissorTest);
+            }
+        }
+
+        public static IDisposable Clip(Rectangle? newRegion)
+        {
+            var previousClipRegion = clipRegion;
+            ClipRegion = clipRegion.HasValue && newRegion.HasValue ? Rectangle.Intersect(clipRegion.Value, newRegion.Value) : newRegion;
+            return new ActionDisposable(() => ClipRegion = previousClipRegion);
+        }
+
+        public static IDisposable Clip(Box2 bounds, Camera camera)
+        {
+            var screenBounds = camera.ToScreen(bounds);
+            var clipRectangle = new Rectangle(
+                (int)Math.Round(screenBounds.Left),
+                viewport.Height - (int)Math.Round(screenBounds.Top + screenBounds.Height),
+                (int)Math.Round(screenBounds.Width),
+                (int)Math.Round(screenBounds.Height));
+            return Clip(clipRectangle);
+        }
 
         private static Matrix4 projViewMatrix;
         public static Matrix4 ProjViewMatrix

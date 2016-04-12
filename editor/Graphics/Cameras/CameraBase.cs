@@ -123,17 +123,23 @@ namespace StorybrewEditor.Graphics.Cameras
             return near - direction * (near.Z / direction.Z);
         }
 
-        public Vector3 ToScreen(Vector3 viewCoords)
+        public Vector3 ToScreen(Vector3 worldCoords)
         {
             CheckDirty();
 
-            var devicePosition = Vector3.Transform(viewCoords, projectionView);
+            var devicePosition = Vector3.Transform(worldCoords, projectionView);
             return new Vector3(
                 (devicePosition.X + 1) * 0.5f * viewport.Width,
                 (-devicePosition.Y + 1) * 0.5f * viewport.Height,
                 devicePosition.Z
             );
         }
+
+        public Vector3 ToScreen(Vector2 worldCoords)
+            => ToScreen(new Vector3(worldCoords));
+
+        public Box2 ToScreen(Box2 worldBox2)
+            => new Box2(ToScreen(new Vector2(worldBox2.Left, worldBox2.Top)).Xy, ToScreen(new Vector2(worldBox2.Right, worldBox2.Bottom)).Xy);
 
         public void LookAt(Vector3 target)
         {
