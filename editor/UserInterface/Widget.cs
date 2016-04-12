@@ -158,6 +158,18 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
+        private bool clipChildren;
+        public bool ClipChildren
+        {
+            get { return clipChildren; }
+            set
+            {
+                if (clipChildren == value) return;
+                clipChildren = value;
+                if (Visible && hoverable) manager.RefreshHover();
+            }
+        }
+
         public float Opacity = 1;
 
         private string styleName;
@@ -224,34 +236,41 @@ namespace StorybrewEditor.UserInterface
             if (!displayed || !hoverable)
                 return null;
 
+            var position = ScreenPosition;
+            var overThis = x >= position.X && x < position.X + size.X
+                        && y >= position.Y && y < position.Y + size.Y;
+
+            if (ClipChildren && !overThis)
+                return null;
+
             for (var i = children.Count - 1; i >= 0; i--)
             {
                 var child = children[i];
                 var result = child.GetWidgetAt(x, y);
                 if (result != null) return result;
             }
-
-            var position = ScreenPosition;
-            if (x >= position.X && x < position.X + size.X &&
-                y >= position.Y && y < position.Y + size.Y)
-                return this;
-
-            return null;
+            return overThis ? this : null;
         }
 
         public void Draw(DrawContext drawContext, float parentOpacity)
         {
             var actualOpacity = Opacity * parentOpacity;
             DrawBackground(drawContext, actualOpacity);
-            foreach (var child in children)
-                if (child.displayed)
-                    child.Draw(drawContext, actualOpacity);
+            DrawChildren(drawContext, actualOpacity);
             DrawForeground(drawContext, actualOpacity);
         }
 
         protected virtual void DrawBackground(DrawContext drawContext, float actualOpacity)
         {
             background?.Draw(drawContext, manager.Camera, Bounds, actualOpacity);
+        }
+
+        protected virtual void DrawChildren(DrawContext drawContext, float actualOpacity)
+        {
+            using (ClipChildren ? DrawState.Clip(Bounds, Manager.Camera) : null)
+                foreach (var child in children)
+                    if (child.displayed)
+                        child.Draw(drawContext, actualOpacity);
         }
 
         protected virtual void DrawForeground(DrawContext drawContext, float actualOpacity)

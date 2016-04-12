@@ -24,16 +24,18 @@ namespace StorybrewEditor.UserInterface.Components
                 StyleName = "panel",
                 Padding = new FourSide(16),
                 FitChildren = true,
+                Fill = true,
                 Children = new Widget[]
                 {
                     new Label(manager)
                     {
                         Text = "Layers",
+                        CanGrow = false,
                     },
-                    layersLayout = new LinearLayout(manager)
+                    new ScrollArea(manager, layersLayout = new LinearLayout(manager)
                     {
                         FitChildren = true,
-                    },
+                    }),
                 },
             });
 

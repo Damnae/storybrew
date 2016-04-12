@@ -41,10 +41,10 @@ namespace StorybrewEditor.UserInterface.Components
                         Text = "Effects",
                         CanGrow = false,
                     },
-                    effectsLayout = new LinearLayout(manager)
+                    new ScrollArea(manager, effectsLayout = new LinearLayout(manager)
                     {
                         FitChildren = true,
-                    },
+                    }),
                     new LinearLayout(manager)
                     {
                         Fill = true,

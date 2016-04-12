@@ -50,6 +50,7 @@ namespace StorybrewEditor.UserInterface.Components
                 StyleName = "panel",
                 Padding = new FourSide(16),
                 FitChildren = true,
+                Fill = true,
                 Children = new Widget[]
                 {
                     new LinearLayout(manager)
@@ -57,6 +58,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Fill = true,
                         FitChildren = true,
                         Horizontal = true,
+                        CanGrow = false,
                         Children = new Widget[]
                         {
                             titleLabel = new Label(manager)
@@ -73,10 +75,10 @@ namespace StorybrewEditor.UserInterface.Components
                             },
                         },
                     },
-                    configFieldsLayout = new LinearLayout(manager)
+                    new ScrollArea(manager, configFieldsLayout = new LinearLayout(manager)
                     {
                         FitChildren = true,
-                    },
+                    }),
                 },
             });
 
