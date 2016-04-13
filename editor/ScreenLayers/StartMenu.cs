@@ -17,8 +17,8 @@ namespace StorybrewEditor.ScreenLayers
         private Button closeButton;
 
         private LinearLayout bottomLayout;
-        private Label updateDescriptionLabel;
         private Button updateButton;
+        private Label versionLabel;
 
         public override void Load()
         {
@@ -68,17 +68,10 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     updateButton = new Button(WidgetManager)
                     {
-                        StyleName = "small",
                         AnchorTo = UiAlignment.Centre,
                         Displayed = false,
                     },
-                    updateDescriptionLabel = new Label(WidgetManager)
-                    {
-                        StyleName = "hint",
-                        AnchorTo = UiAlignment.Centre,
-                        Displayed = false,
-                    },
-                    new Label(WidgetManager)
+                    versionLabel = new Label(WidgetManager)
                     {
                         StyleName = "hint",
                         Text = Program.FullName,
@@ -130,20 +123,33 @@ namespace StorybrewEditor.ScreenLayers
                         var jsonResponse = JObject.Parse(response);
 
                         var name = jsonResponse.Value<string>("name");
-                        var body = jsonResponse.Value<string>("body");
-                        var publishedAt = jsonResponse.Value<string>("published_at");
+                        var latestVersion = new Version(name);
+
                         var authorName = jsonResponse.GetValue("author").Value<string>("login");
 
-                        var latestVersion = new Version(name);
-                        if (Program.Version < latestVersion)
+                        var body = jsonResponse.Value<string>("body");
+                        if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
+
+                        var publishedAt = jsonResponse.Value<string>("published_at");
+                        var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+
+                        if (true || Program.Version < latestVersion)
                         {
-                            var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-                            if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
-                            body += $"\n\nPublished {date.ToTimeAgo()} ({date.ToShortDateString()}) by {authorName}.";
+                            string downloadUrl = null;
+                            var assets = jsonResponse.GetValue("assets");
+                            foreach (var asset in assets)
+                            {
+                                var downloadName = asset.Value<string>("name");
+                                if (downloadName.EndsWith(".zip"))
+                                {
+                                    downloadUrl = asset.Value<string>("browser_download_url");
+                                    break;
+                                }
+                            }
 
                             updateButton.Text = $"Version {latestVersion} available!";
-                            updateDescriptionLabel.Text = body;
-                            updateButton.Displayed = updateDescriptionLabel.Displayed = true;
+                            updateButton.Tooltip = $"What's new:\n\n{body}\n\nPublished {date.ToTimeAgo()} by {authorName}.";
+                            updateButton.Displayed = true;
                             bottomLayout.Pack(600);
                         }
                     }
@@ -159,9 +165,11 @@ namespace StorybrewEditor.ScreenLayers
         {
             Trace.WriteLine($"Error while retrieving latest release information: {exception.Message}");
 
+            versionLabel.Text = $"Could not retrieve latest release information:\n{exception.Message}\n\n{versionLabel.Text}";
+
             updateButton.Text = "See latest release";
-            updateDescriptionLabel.Text = $"Could not retrieve latest release information:\n{exception.Message}";
-            updateButton.Displayed = updateDescriptionLabel.Displayed = true;
+            updateButton.StyleName = "small";
+            updateButton.Displayed = true;
             bottomLayout.Pack(600);
         }
     }
