@@ -100,10 +100,10 @@ namespace StorybrewEditor.Graphics.Textures
 
                 DrawState.CheckError("setting texture parameters");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 GL.DeleteTexture(textureId);
-                throw e;
+                throw;
             }
             finally
             {

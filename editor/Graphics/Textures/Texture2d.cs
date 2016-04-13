@@ -120,11 +120,11 @@ namespace StorybrewEditor.Graphics.Textures
 
                 DrawState.CheckError("setting texture parameters");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 GL.DeleteTexture(textureId);
                 DrawState.UnbindTexture(textureId);
-                throw e;
+                throw;
             }
 
             return new Texture2d(textureId, width, height, description);
@@ -186,7 +186,7 @@ namespace StorybrewEditor.Graphics.Textures
             {
                 GL.DeleteTexture(textureId);
                 DrawState.UnbindTexture(textureId);
-                return null;
+                throw;
             }
 
             return new Texture2d(textureId, bitmap.Width, bitmap.Height, description);
