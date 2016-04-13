@@ -57,7 +57,11 @@
     <Compile Include="Animations\KeyframedValue.cs" />
     <Compile Include="Mapset\ControlPoint.cs" />
     <Compile Include="Mapset\Beatmap.cs" />
+    <Compile Include="Mapset\OsuCircle.cs" />
     <Compile Include="Mapset\OsuHitObject.cs" />
+    <Compile Include="Mapset\OsuHold.cs" />
+    <Compile Include="Mapset\OsuSlider.cs" />
+    <Compile Include="Mapset\OsuSpinner.cs" />
     <Compile Include="Storyboarding\ConfigurableAttribute.cs" />
     <Compile Include="Storyboarding\EffectConfig.cs" />
     <Compile Include="Storyboarding\GeneratorContext.cs" />

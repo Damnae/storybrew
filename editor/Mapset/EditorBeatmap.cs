@@ -162,7 +162,7 @@ namespace StorybrewEditor.Mapset
             {
                 line = line.Trim();
                 if (line.Length == 0) break;
-                beatmap.hitObjects.Add(OsuHitObject.Parse(line, beatmap));
+                beatmap.hitObjects.Add(OsuHitObject.Parse(beatmap, line));
             }
         }
 

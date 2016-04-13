@@ -9,7 +9,7 @@ namespace StorybrewCommon.Mapset
         public double Offset;
         public int BeatPerMeasure;
         public int SampleType;
-        public int SampleSet;
+        public SampleSet SampleSet;
         public float Volume;
         public bool IsInherited;
         public bool IsKiai;
@@ -46,7 +46,7 @@ namespace StorybrewCommon.Mapset
                 beatDurationSV = double.Parse(values[1], CultureInfo.InvariantCulture),
                 BeatPerMeasure = values.Length > 2 ? int.Parse(values[2]) : 4,
                 SampleType = values.Length > 3 ? int.Parse(values[3]) : 1,
-                SampleSet = values.Length > 4 ? int.Parse(values[4]) : 1,
+                SampleSet = values.Length > 4 ? (SampleSet)int.Parse(values[4]) : SampleSet.Normal,
                 Volume = values.Length > 5 ? int.Parse(values[5]) : 100,
                 IsInherited = values.Length > 6 ? int.Parse(values[6]) == 0 : false,
                 IsKiai = values.Length > 7 ? int.Parse(values[7]) != 0 : false,
