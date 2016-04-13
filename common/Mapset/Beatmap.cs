@@ -15,6 +15,10 @@ namespace StorybrewCommon.Mapset
         /// </summary>
         public abstract string Name { get; }
 
+        public abstract double SliderMultiplier { get; }
+
+        public abstract IEnumerable<OsuHitObject> HitObjects { get; }
+
         /// <summary>
         /// Timestamps in milliseconds of bookmarks
         /// </summary>
@@ -29,12 +33,12 @@ namespace StorybrewCommon.Mapset
         /// Returns all timing points (red lines).
         /// </summary>
         public abstract IEnumerable<ControlPoint> TimingPoints { get; }
-        
+
         /// <summary>
         /// Finds the control point (red or green line) active at a specific time.
         /// </summary>
         public abstract ControlPoint GetControlPointAt(int time);
-        
+
         /// <summary>
         /// Finds the timing point (red line) active at a specific time.
         /// </summary>

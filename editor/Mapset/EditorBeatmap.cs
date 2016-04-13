@@ -3,6 +3,7 @@ using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 namespace StorybrewEditor.Mapset
@@ -18,6 +19,12 @@ namespace StorybrewEditor.Mapset
 
         private List<int> bookmarks = new List<int>();
         public override IEnumerable<int> Bookmarks => bookmarks;
+
+        private double sliderMultiplier;
+        public override double SliderMultiplier => sliderMultiplier;
+
+        private List<OsuHitObject> hitObjects = new List<OsuHitObject>();
+        public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
 
         public EditorBeatmap(string path)
         {
@@ -126,7 +133,16 @@ namespace StorybrewEditor.Mapset
                 }
             });
         }
-        private static void parseDifficultySection(EditorBeatmap beatmap, StreamReader reader) { }
+        private static void parseDifficultySection(EditorBeatmap beatmap, StreamReader reader)
+        {
+            reader.ParseKeyValueSection((key, value) =>
+            {
+                switch (key)
+                {
+                    case "SliderMultiplier": beatmap.sliderMultiplier = double.Parse(value, CultureInfo.InvariantCulture); break;
+                }
+            });
+        }
         private static void parseTimingPointsSection(EditorBeatmap beatmap, StreamReader reader)
         {
             string line;
@@ -139,7 +155,16 @@ namespace StorybrewEditor.Mapset
             beatmap.controlPoints.Sort();
         }
         private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader) { }
-        private static void parseHitObjectsSection(EditorBeatmap beatmap, StreamReader reader) { }
+        private static void parseHitObjectsSection(EditorBeatmap beatmap, StreamReader reader)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                line = line.Trim();
+                if (line.Length == 0) break;
+                beatmap.hitObjects.Add(OsuHitObject.Parse(line, beatmap));
+            }
+        }
 
         #endregion
     }

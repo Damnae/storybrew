@@ -7,7 +7,6 @@ namespace StorybrewCommon.Mapset
     public class ControlPoint : IComparable<ControlPoint>
     {
         public double Offset;
-        private double beatDurationSV;
         public int BeatPerMeasure;
         public int SampleType;
         public int SampleSet;
@@ -15,6 +14,7 @@ namespace StorybrewCommon.Mapset
         public bool IsInherited;
         public bool IsKiai;
 
+        private double beatDurationSV;
         public double BeatDuration
         {
             get
@@ -24,10 +24,16 @@ namespace StorybrewCommon.Mapset
             }
         }
         public double Bpm => BeatDuration == 0 ? 0 : 60000 / BeatDuration;
-
         public double SliderMultiplier => beatDurationSV > 0 ? 1.0 : -(beatDurationSV / 100.0);
 
-        public override string ToString() => IsInherited ? $"{Offset}ms, {SliderMultiplier}x, {BeatPerMeasure}/4" : $"{Offset}ms, {Bpm}bpm, {BeatPerMeasure}/4";
+        public int CompareTo(ControlPoint other)
+        {
+            var value = (int)(Offset - other.Offset);
+            return value != 0 ? value : (other.IsInherited ? 0 : 1) - (IsInherited ? 0 : 1);
+        }
+
+        public override string ToString()
+            => IsInherited ? $"{Offset}ms, {SliderMultiplier}x, {BeatPerMeasure}/4" : $"{Offset}ms, {Bpm}bpm, {BeatPerMeasure}/4";
 
         public static ControlPoint Parse(string line)
         {
@@ -45,12 +51,6 @@ namespace StorybrewCommon.Mapset
                 IsInherited = values.Length > 6 ? int.Parse(values[6]) == 0 : false,
                 IsKiai = values.Length > 7 ? int.Parse(values[7]) != 0 : false,
             };
-        }
-
-        public int CompareTo(ControlPoint other)
-        {
-            var value = (int)(Offset - other.Offset);
-            return value != 0 ? value : (other.IsInherited ? 0 : 1) - (IsInherited ? 0 : 1);
         }
     }
 }

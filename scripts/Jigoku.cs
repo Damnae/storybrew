@@ -67,6 +67,15 @@ namespace StorybrewScripts
             bg.Fade(OsbEasing.Out, TimePart6, TimePart7, 0, 1);
             bg.Fade(OsbEasing.In, TimePart10 - BeatDuration * 4, TimePart10, 1, 0);
 
+            var hitobjectLayer = GetLayer("HitObjects");
+            foreach (var hitobject in Beatmap.HitObjects)
+            {
+                var hSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbLayer.Background, OsbOrigin.Centre);
+                hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.StartTime + 1600, 1, 0.2);
+                hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.StartTime + 1600, 1, 0);
+                hSprite.Move(hitobject.StartTime, hitobject.Position);
+            }
+
             Part1(TimePart1, TimePart2);
             Part2(TimePart2, TimePart3);
             Part3(TimePart3, TimePart4);
