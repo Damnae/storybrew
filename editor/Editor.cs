@@ -220,9 +220,9 @@ namespace StorybrewEditor
         {
             var width = window.Width;
             var height = window.Height;
+            if (width == 0 || height == 0) return;
 
             DrawState.Viewport = new Rectangle(0, 0, width, height);
-            if (width == 0 || height == 0) return;
 
             overlayCamera.VirtualHeight = (int)(height * Math.Max(1024f / width, 768f / height));
             overlayCamera.VirtualWidth = width * overlayCamera.VirtualHeight / height;

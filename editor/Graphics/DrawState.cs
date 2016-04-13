@@ -335,8 +335,10 @@ namespace StorybrewEditor.Graphics
                 clipRegion = value;
                 if (clipRegion.HasValue)
                 {
+                    var actualClipRegion = Rectangle.Intersect(clipRegion.Value, viewport);
+
                     GL.Enable(EnableCap.ScissorTest);
-                    GL.Scissor(clipRegion.Value.X, clipRegion.Value.Y, clipRegion.Value.Width, clipRegion.Value.Height);
+                    GL.Scissor(actualClipRegion.X, actualClipRegion.Y, actualClipRegion.Width, actualClipRegion.Height);
                 }
                 else GL.Disable(EnableCap.ScissorTest);
             }
