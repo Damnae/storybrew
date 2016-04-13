@@ -8,9 +8,13 @@ namespace StorybrewCommon.Mapset
     [Serializable]
     public class OsuHitObject
     {
-        public static readonly Vector2 PlayfieldToStoryboard = new Vector2(640 / 512.0f, 480 / 384.0f);
+        public static readonly Vector2 PlayfieldSize = new Vector2(512, 384);
+        public static readonly Vector2 StoryboardSize = new Vector2(640, 480);
+        public static readonly Vector2 PlayfieldToStoryboardOffset = (StoryboardSize - PlayfieldSize) * 0.5f;
 
         public Vector2 PlayfieldPosition;
+        public Vector2 Position => PlayfieldPosition + PlayfieldToStoryboardOffset;
+
         public double StartTime;
         public HitObjectFlag Flags;
         public HitSoundAddition Additions;
@@ -19,8 +23,6 @@ namespace StorybrewCommon.Mapset
         public int SampleSet;
         public float Volume;
         public string SamplePath;
-
-        public Vector2 Position => PlayfieldPosition * PlayfieldToStoryboard;
 
         public static OsuHitObject Parse(string line, Beatmap beatmap)
         {
