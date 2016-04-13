@@ -136,6 +136,7 @@ namespace StorybrewEditor.Mapset
                 if (line.Length == 0) break;
                 beatmap.controlPoints.Add(ControlPoint.Parse(line));
             }
+            beatmap.controlPoints.Sort();
         }
         private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader) { }
         private static void parseHitObjectsSection(EditorBeatmap beatmap, StreamReader reader) { }

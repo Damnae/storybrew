@@ -4,7 +4,7 @@ using System.Globalization;
 namespace StorybrewCommon.Mapset
 {
     [Serializable]
-    public class ControlPoint
+    public class ControlPoint : IComparable<ControlPoint>
     {
         public double Offset;
         private double beatDurationSV;
@@ -45,6 +45,12 @@ namespace StorybrewCommon.Mapset
                 IsInherited = values.Length > 6 ? int.Parse(values[6]) == 0 : false,
                 IsKiai = values.Length > 7 ? int.Parse(values[7]) != 0 : false,
             };
+        }
+
+        public int CompareTo(ControlPoint other)
+        {
+            var value = (int)(Offset - other.Offset);
+            return value != 0 ? value : (other.IsInherited ? 0 : 1) - (IsInherited ? 0 : 1);
         }
     }
 }
