@@ -519,14 +519,23 @@ namespace StorybrewEditor.Storyboarding
             return project;
         }
 
+        /// <summary>
+        /// Doesn't run in the main thread
+        /// </summary>
         public void ExportToOsb()
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
-            var exportSettings = new ExportSettings();
+            string osbPath = null;
+            List<EditorStoryboardLayer> localLayers = null;
+            Program.RunMainThread(() =>
+            {
+                osbPath = getOsbPath();
+                localLayers = new List<EditorStoryboardLayer>(layers);
+            });
 
-            var osbPath = getOsbPath();
             Debug.Print($"Exporting osb to {osbPath}");
+            var exportSettings = new ExportSettings();
 
             var sb = new StringBuilder();
             sb.AppendLine("[Events]");
@@ -534,7 +543,7 @@ namespace StorybrewEditor.Storyboarding
             foreach (var osbLayer in new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, })
             {
                 sb.AppendLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
-                foreach (var layer in layers)
+                foreach (var layer in localLayers)
                     sb.Append(layer.ToOsbString(exportSettings, osbLayer));
             }
             sb.AppendLine("//Storyboard Sound Samples");
