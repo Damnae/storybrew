@@ -71,6 +71,19 @@ namespace StorybrewEditor.ScreenLayers
             return false;
         }
 
+        public void Exit()
+        {
+            var snapshot = new List<ScreenLayer>(layers);
+            for (int i = snapshot.Count - 1; i >= 0; --i)
+            {
+                var layer = snapshot[i];
+                if (layer.IsExiting)
+                    continue;
+
+                layer.Exit();
+            }
+        }
+
         public void Update()
         {
             var active = editor.Window.Focused;

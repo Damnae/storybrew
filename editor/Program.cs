@@ -12,6 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace StorybrewEditor
 {
@@ -31,11 +32,34 @@ namespace StorybrewEditor
         public static Settings Settings => settings;
 
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
-            setupLogging();
 
+            if (args.Length != 0 && handleArguments(args))
+                return;
+
+            setupLogging();
+            startEditor();
+        }
+
+        private static bool handleArguments(string[] args)
+        {
+            switch (args[0])
+            {
+                case "update":
+                    if (args.Length < 3) return false;
+                    setupLogging(Path.Combine(args[1], DefaultLogPath), "update.log");
+                    Updater.Update(args[1], new Version(args[2]));
+                    return true;
+            }
+            return false;
+        }
+
+        #region Editor
+
+        private static void startEditor()
+        {
             settings = new Settings();
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
@@ -144,6 +168,8 @@ namespace StorybrewEditor
             }
         }
 
+        #endregion
+
         #region Scheduling
 
         private static readonly Queue<Action> scheduledActions = new Queue<Action>();
@@ -219,17 +245,15 @@ namespace StorybrewEditor
 
         #region Error Handling
 
-        private static TraceLogger logger;
-        private static void setupLogging()
-        {
-#if DEBUG
-            return;
-#endif
+        public const string DefaultLogPath = "logs";
 
-            var logsPath = "logs";
-            var tracePath = Path.Combine(logsPath, "trace.log");
-            var exceptionPath = Path.Combine(logsPath, "exception.log");
-            var crashPath = Path.Combine(logsPath, "crash.log");
+        private static TraceLogger logger;
+        private static void setupLogging(string logsPath = null, string commonLogFilename = null)
+        {
+            logsPath = logsPath ?? DefaultLogPath;
+            var tracePath = Path.Combine(logsPath, commonLogFilename ?? "trace.log");
+            var exceptionPath = Path.Combine(logsPath, commonLogFilename ?? "exception.log");
+            var crashPath = Path.Combine(logsPath, commonLogFilename ?? "crash.log");
 
             if (!Directory.Exists(logsPath))
                 Directory.CreateDirectory(logsPath);

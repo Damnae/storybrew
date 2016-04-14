@@ -13,10 +13,14 @@ namespace StorybrewEditor.Util
             Trace.Listeners.Add(this);
         }
 
-        public override void Write(string message)
-            => File.AppendAllText(path, message + "\n");
+        public override void Write(string message) => log(message);
+        public override void WriteLine(string message) => log(message);
 
-        public override void WriteLine(string message)
-            => File.AppendAllText(path, message + "\n");
+        private void log(string message)
+        {
+            if (!Program.IsMainThread)
+                Program.Schedule(() => File.AppendAllText(path, message + "\n"));
+            else File.AppendAllText(path, message + "\n");
+        }
     }
 }

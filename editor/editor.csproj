@@ -63,6 +63,8 @@
   <ItemGroup>
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioStream.cs" />
+    <None Include="Librairies\ZipStorer\LICENSE" />
+    <Compile Include="Librairies\ZipStorer\ZipStorer.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
     <Compile Include="Editor.cs" />
@@ -72,7 +74,9 @@
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
     <None Include="Resources\scripttemplate.csx" />
+    <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Updater.cs" />
     <Compile Include="UserInterface\Drawables\CompositeDrawable.cs" />
     <Compile Include="UserInterface\Drawables\Drawable.cs" />
     <Compile Include="UserInterface\Drawables\NinePatch.cs" />
@@ -219,6 +223,7 @@
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
     <Compile Include="Util\IconFont.cs" />
     <Compile Include="Util\OsuHelper.cs" />
+    <Compile Include="Util\PathHelper.cs" />
     <Compile Include="Util\SafeWriteStream.cs" />
     <Compile Include="UserInterface\Button.cs" />
     <Compile Include="UserInterface\ClickBehavior.cs" />

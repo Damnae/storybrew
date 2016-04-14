@@ -7,26 +7,6 @@ namespace StorybrewEditor.Util
 {
     public static class NetHelper
     {
-        public static string Request(string url, string cachePath, int cacheDuration)
-        {
-            var fullPath = Path.GetFullPath(cachePath);
-            var folder = Path.GetDirectoryName(fullPath);
-
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-            else if (File.Exists(cachePath) && File.GetLastWriteTimeUtc(cachePath).AddSeconds(cacheDuration) > DateTime.UtcNow)
-                return File.ReadAllText(cachePath);
-
-            using (var webClient = new WebClient())
-            {
-                Debug.Print($"Requesting {url}");
-                webClient.Headers.Add("user-agent", Program.Name);
-                var response = webClient.DownloadString(url);
-                File.WriteAllText(cachePath, response);
-                return response;
-            }
-        }
-
         public static void Request(string url, string cachePath, int cacheDuration, Action<string, Exception> action)
         {
             try
@@ -38,7 +18,7 @@ namespace StorybrewEditor.Util
                     Directory.CreateDirectory(folder);
                 else if (File.Exists(cachePath) && File.GetLastWriteTimeUtc(cachePath).AddSeconds(cacheDuration) > DateTime.UtcNow)
                 {
-                    action(File.ReadAllText(cachePath), null);
+                    Program.Schedule(() => action(File.ReadAllText(cachePath), null));
                     return;
                 }
 
@@ -47,20 +27,66 @@ namespace StorybrewEditor.Util
                     Debug.Print($"Requesting {url}");
                     webClient.Headers.Add("user-agent", Program.Name);
                     webClient.DownloadStringCompleted += (sender, e) =>
-                    {
-                        if (e.Error == null)
+                        Program.Schedule(() =>
                         {
-                            File.WriteAllText(cachePath, e.Result);
-                            action(e.Result, null);
-                        }
-                        else action(null, e.Error);
-                    };
+                            if (e.Error == null)
+                            {
+                                File.WriteAllText(cachePath, e.Result);
+                                action(e.Result, null);
+                            }
+                            else action(null, e.Error);
+                        });
                     webClient.DownloadStringAsync(new Uri(url));
                 }
             }
             catch (Exception e)
             {
-                action(null, e);
+                Program.Schedule(() => action(null, e));
+            }
+        }
+
+        public static void Download(string url, string filename, Func<float, bool> progressFunc, Action<Exception> completedAction)
+        {
+            try
+            {
+                var fullPath = Path.GetFullPath(filename);
+                var folder = Path.GetDirectoryName(fullPath);
+
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+                else if (File.Exists(filename))
+                    File.Delete(filename);
+
+                using (var webClient = new WebClient())
+                {
+                    Debug.Print($"Downloading {url}");
+                    webClient.Headers.Add("user-agent", Program.Name);
+                    webClient.DownloadProgressChanged += (sender, e) =>
+                        Program.Schedule(() =>
+                        {
+                            if (!progressFunc((float)e.BytesReceived / e.TotalBytesToReceive))
+                            {
+                                webClient.CancelAsync();
+                            }
+                        });
+                    webClient.DownloadFileCompleted += (sender, e) =>
+                        Program.Schedule(() =>
+                        {
+                            if (e.Cancelled)
+                            {
+                                Debug.Print($"Download cancelled {url}");
+                                return;
+                            }
+                            if (e.Error == null)
+                                completedAction(null);
+                            else completedAction(e.Error);
+                        });
+                    webClient.DownloadFileAsync(new Uri(url), filename);
+                }
+            }
+            catch (Exception e)
+            {
+                Program.Schedule(() => completedAction(e));
             }
         }
     }
