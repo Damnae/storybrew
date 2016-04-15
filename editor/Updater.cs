@@ -70,6 +70,10 @@ namespace StorybrewEditor
 
         private static void replaceFile(string sourceFilename, string destinationFilename, int timeout = 5000)
         {
+            var destinationFolder = Path.GetDirectoryName(destinationFilename);
+            if (!Directory.Exists(destinationFolder))
+                Directory.CreateDirectory(destinationFolder);
+
             var attempts = 0;
             while (true)
             {
