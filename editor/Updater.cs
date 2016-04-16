@@ -43,6 +43,14 @@ namespace StorybrewEditor
             Process.Start(processPath);
         }
 
+        public static void Cleanup()
+        {
+            if (File.Exists(UpdateArchivePath))
+                withRetries(() => File.Delete(UpdateArchivePath));
+            if (Directory.Exists(UpdateFolderPath))
+                withRetries(() => Directory.Delete(UpdateFolderPath, true));
+        }
+
         private static void replaceFiles(string sourceFolder, string destinationFolder, string[] ignorePaths)
         {
             Trace.WriteLine($"\nCopying files from {sourceFolder} to {destinationFolder}");
@@ -68,28 +76,32 @@ namespace StorybrewEditor
             }
         }
 
-        private static void replaceFile(string sourceFilename, string destinationFilename, int timeout = 5000)
+        private static void replaceFile(string sourceFilename, string destinationFilename)
         {
             var destinationFolder = Path.GetDirectoryName(destinationFilename);
             if (!Directory.Exists(destinationFolder))
                 Directory.CreateDirectory(destinationFolder);
 
-            var attempts = 0;
+            withRetries(() => File.Copy(sourceFilename, destinationFilename, true), 5000);
+        }
+
+        private static void withRetries(Action action, int timeout = 2000)
+        {
+            var sleepTime = 0;
             while (true)
             {
                 try
                 {
-                    File.Copy(sourceFilename, destinationFilename, true);
+                    action();
                     return;
                 }
                 catch
                 {
-                    attempts++;
-                    var delay = 200;
-                    if (attempts * delay > timeout) throw;
+                    if (sleepTime >= timeout) throw;
 
-                    Trace.WriteLine($"      Waiting for {destinationFilename} {attempts}/{timeout / delay}");
-                    Thread.Sleep(delay);
+                    var retryDelay = timeout / 10;
+                    sleepTime += retryDelay;
+                    Thread.Sleep(retryDelay);
                 }
             }
         }

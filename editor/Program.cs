@@ -12,7 +12,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace StorybrewEditor
 {
@@ -60,6 +59,8 @@ namespace StorybrewEditor
 
         private static void startEditor()
         {
+            Updater.Cleanup();
+
             settings = new Settings();
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
