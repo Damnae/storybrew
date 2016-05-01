@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 using StorybrewEditor.Audio;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Util;
@@ -10,7 +9,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace StorybrewEditor
@@ -70,9 +68,7 @@ namespace StorybrewEditor
             {
                 DrawState.CheckError("initializing openGL context");
                 Trace.WriteLine("graphics mode: " + window.Context.GraphicsMode);
-
-                setupOpenGLDebugOutput();
-
+                
                 window.Icon = new Icon(typeof(Program), "icon.ico");
                 window.Resize += (sender, e) =>
                 {
@@ -292,41 +288,6 @@ namespace StorybrewEditor
             {
                 Trace.WriteLine(e2.Message);
             }
-        }
-
-        private static DebugProc openGLDebugDelegate;
-        private static void setupOpenGLDebugOutput()
-        {
-#if !DEBUG
-            return;
-#endif
-            if (!DrawState.HasCapabilities(4, 3, "GL_KHR_debug"))
-            {
-                Trace.WriteLine("openGL debug output is unavailable");
-                return;
-            }
-
-            Trace.WriteLine("\nenabling openGL debug output");
-
-            GL.Enable(EnableCap.DebugOutput);
-            GL.Enable(EnableCap.DebugOutputSynchronous);
-            DrawState.CheckError("enabling debug output");
-
-            openGLDebugDelegate = new DebugProc(openGLDebugCallback);
-
-            GL.DebugMessageCallback(openGLDebugDelegate, IntPtr.Zero);
-            GL.DebugMessageControl(DebugSourceControl.DontCare, DebugTypeControl.DontCare, DebugSeverityControl.DontCare, 0, new int[0], true);
-            DrawState.CheckError("setting up debug output");
-
-            GL.DebugMessageInsert(DebugSourceExternal.DebugSourceApplication, DebugType.DebugTypeMarker, 0, DebugSeverity.DebugSeverityNotification, -1, "Debug output enabled");
-            DrawState.CheckError("testing debug output");
-        }
-
-        private static void openGLDebugCallback(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
-        {
-            Trace.WriteLine(source == DebugSource.DebugSourceApplication ?
-                $"openGL - {Marshal.PtrToStringAnsi(message, length)}" :
-                $"openGL - {Marshal.PtrToStringAnsi(message, length)}\n\tid:{id} severity:{severity} type:{type} source:{source}\n");
         }
 
         #endregion

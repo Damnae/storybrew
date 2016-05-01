@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace StorybrewEditor.Graphics
 {
@@ -17,10 +18,6 @@ namespace StorybrewEditor.Graphics
     {
         public const bool AllowShaders = true;
         public const bool UseSrgb = false;
-
-        private static Version openGlVersion;
-        private static Version glslVersion;
-        private static string[] supportedExtensions;
 
         private static int maxDrawBuffers;
         public static int MaxDrawBuffers => maxDrawBuffers;
@@ -32,6 +29,9 @@ namespace StorybrewEditor.Graphics
 
         public static void Initialize(int width, int height)
         {
+            retrieveRendererInfo();
+            setupDebugOutput();
+
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.Disable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Lighting);
@@ -478,46 +478,81 @@ namespace StorybrewEditor.Graphics
         private static FontManager fontManager;
         public static FontManager FontManager => fontManager;
 
-        internal static bool HasCapabilities(int major, int minor, params string[] extensions)
+        private static Version openGlVersion;
+        private static Version glslVersion;
+        private static string[] supportedExtensions;
+        private static string rendererName;
+        private static string rendererVendor;
+
+        private static void retrieveRendererInfo()
         {
-            if (openGlVersion == null)
-            {
-                var openGlVersionString = GL.GetString(StringName.Version);
-                openGlVersion = new Version(openGlVersionString.Split(' ')[0]);
-                Trace.WriteLine("gl version: " + openGlVersionString);
-                CheckError("retrieving openGL version");
-            }
-            return openGlVersion >= new Version(major, minor) || HasExtensions(extensions);
+            var openGlVersionString = GL.GetString(StringName.Version);
+            openGlVersion = new Version(openGlVersionString.Split(' ')[0]);
+
+            var glslVersionString = GL.GetString(StringName.ShadingLanguageVersion);
+            glslVersion = string.IsNullOrEmpty(glslVersionString) ? new Version() : new Version(glslVersionString.Split(' ')[0]);
+
+            var extensionsString = GL.GetString(StringName.Extensions);
+            supportedExtensions = extensionsString.Split(' ');
+
+            rendererName = GL.GetString(StringName.Renderer);
+            rendererVendor = GL.GetString(StringName.Vendor);
+
+            CheckError("retrieving openGL version");
+
+            Trace.WriteLine($"gl version: {openGlVersionString}, glsl: {glslVersionString}");
+            Trace.WriteLine($"renderer: {rendererName}, vendor: {rendererVendor}");
+            Trace.WriteLine($"extensions: {extensionsString}");
         }
 
-        internal static bool HasExtensions(params string[] extensions)
+        private static DebugProc openGLDebugDelegate;
+        private static void setupDebugOutput()
         {
-            if (supportedExtensions == null)
+#if !DEBUG
+            return;
+#endif
+            if (!HasCapabilities(4, 3, "GL_KHR_debug"))
             {
-                var extensionsString = GL.GetString(StringName.Extensions);
-                supportedExtensions = extensionsString.Split(' ');
-                Trace.WriteLine("extensions: " + extensionsString);
-                CheckError("retrieving available openGL extensions");
+                Trace.WriteLine("openGL debug output is unavailable");
+                return;
             }
+
+            Trace.WriteLine("\nenabling openGL debug output");
+
+            GL.Enable(EnableCap.DebugOutput);
+            GL.Enable(EnableCap.DebugOutputSynchronous);
+            CheckError("enabling debug output");
+
+            openGLDebugDelegate = new DebugProc(openGLDebugCallback);
+
+            GL.DebugMessageCallback(openGLDebugDelegate, IntPtr.Zero);
+            GL.DebugMessageControl(DebugSourceControl.DontCare, DebugTypeControl.DontCare, DebugSeverityControl.DontCare, 0, new int[0], true);
+            CheckError("setting up debug output");
+
+            GL.DebugMessageInsert(DebugSourceExternal.DebugSourceApplication, DebugType.DebugTypeMarker, 0, DebugSeverity.DebugSeverityNotification, -1, "Debug output enabled");
+            CheckError("testing debug output");
+        }
+
+        private static void openGLDebugCallback(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        {
+            Trace.WriteLine(source == DebugSource.DebugSourceApplication ?
+                $"openGL - {Marshal.PtrToStringAnsi(message, length)}" :
+                $"openGL - {Marshal.PtrToStringAnsi(message, length)}\n\tid:{id} severity:{severity} type:{type} source:{source}\n");
+        }
+
+        public static bool HasCapabilities(int major, int minor, params string[] extensions)
+             => openGlVersion >= new Version(major, minor) || HasExtensions(extensions);
+
+        public static bool HasExtensions(params string[] extensions)
+        {
             foreach (var extension in extensions)
-            {
                 if (!supportedExtensions.Contains(extension))
                     return false;
-            }
             return true;
         }
 
-        internal static bool HasShaderCapabilities(int major, int minor)
-        {
-            if (glslVersion == null)
-            {
-                var glslVersionString = GL.GetString(StringName.ShadingLanguageVersion);
-                glslVersion = string.IsNullOrEmpty(glslVersionString) ? new Version() : new Version(glslVersionString.Split(' ')[0]);
-                Trace.WriteLine("glsl version: " + glslVersionString);
-                CheckError("retrieving GLSL version");
-            }
-            return glslVersion >= new Version(major, minor);
-        }
+        public static bool HasShaderCapabilities(int major, int minor)
+            => glslVersion >= new Version(major, minor);
 
         public static TextureTarget ToTextureTarget(TexturingModes mode)
         {

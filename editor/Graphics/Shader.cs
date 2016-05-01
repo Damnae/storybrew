@@ -43,12 +43,15 @@ namespace StorybrewEditor.Graphics
         public Shader(string vertexShaderCode, string fragmentShaderCode)
         {
             initialize(vertexShaderCode, fragmentShaderCode);
-            Trace.WriteLine(Log);
 
-            if (!isInitialized)
+            if (isInitialized)
+                Trace.WriteLine(string.IsNullOrWhiteSpace(log) ? 
+                    $"Shader {programId} initialized" : 
+                    $"Shader {programId} initialized:\n{log}");
+            else
             {
                 Dispose(true);
-                throw new Exception("Failed to initialize shader:\n\n" + log);
+                throw new Exception($"Failed to initialize shader:\n\n{log}");
             }
 
             retrieveAttributes();
