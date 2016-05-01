@@ -106,24 +106,37 @@ namespace StorybrewEditor.ScreenLayers
 
         private void updateButtonsState()
         {
-            startButton.Disabled = !areFieldsValid();
+            startButton.Disabled = !updateFieldsValid();
         }
 
-        private bool areFieldsValid()
+        private bool updateFieldsValid()
         {
             if (!Directory.Exists(mapsetPathSelector.Value))
+            {
+                startButton.Tooltip = "The selected mapset folder does not exist";
                 return false;
+            }
+
+            if (Directory.GetFiles(mapsetPathSelector.Value, "*.osu", SearchOption.TopDirectoryOnly).Length == 0)
+            {
+                startButton.Tooltip = $"No .osu found in the selected mapset folder";
+                return false;
+            }
 
             var autoProjectPath = string.IsNullOrWhiteSpace(projectPathSelector.Value);
             if (autoProjectPath && File.Exists(Path.Combine(mapsetPathSelector.Value, Project.DefaultFilename)))
+            {
+                startButton.Tooltip = $"A project already exist in the selected mapset folder, you must pick a project path";
                 return false;
+            }
 
             if (!autoProjectPath && !Directory.Exists(Path.GetDirectoryName(projectPathSelector.Value)))
+            {
+                startButton.Tooltip = $"The project path doesn't exist";
                 return false;
+            }
 
-            if (Directory.GetFiles(mapsetPathSelector.Value, "*.osu", SearchOption.TopDirectoryOnly).Length == 0)
-                return false;
-
+            startButton.Tooltip = string.Empty;
             return true;
         }
     }
