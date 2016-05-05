@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StorybrewEditor</RootNamespace>
     <AssemblyName>StorybrewEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -34,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>StorybrewEditor.Program</StartupObject>
@@ -42,6 +44,10 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ManagedBass, Version=0.20.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.0.20.0\lib\ManagedBass.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -114,69 +120,6 @@
     <Compile Include="Input\InputDispatcher.cs" />
     <Compile Include="Input\InputHandler.cs" />
     <Compile Include="Input\InputManager.cs" />
-    <Compile Include="Librairies\ManagedBass\BitHelper.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\DownloadProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\DSPProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileCloseProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileLengthProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileReadProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\FileSeekProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\IOSNotifyProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\RecordProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\StreamProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Delegates\SyncProcedure.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\Algorithm3D.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\BassFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\BassInfoFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\ChannelAttribute.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\ChannelType.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\Configuration.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DataFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DeviceInfoFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DeviceInitFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DeviceType.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DSInterface.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DXPhase.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\DXWaveform.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\EAXEnvironment.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\EffectType.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\FileStreamPosition.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\InputFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\InputTypeFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\IOSNotify.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\LevelRetrievalFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\Mode3D.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\PlaybackState.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\PositionFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\RecordFormatFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\RecordInfoFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\StreamProcedureType.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\StreamSystem.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\SyncFlags.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\TagType.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Enumerations\VAMMode.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\3D.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Bass.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Channels.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Config.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Devices.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Record.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Samples.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\PInvoke\Streams.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\BassInfo.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\ChannelInfo.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\DeviceInfo.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\FileProcedures.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\PluginFormat.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\PluginInfo.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\RecordInfo.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\SampleInfo.cs" />
-    <Compile Include="Librairies\ManagedBass\Dynamics\Bass\Structures\Vector3D.cs" />
-    <Compile Include="Librairies\ManagedBass\Errors.cs" />
-    <Compile Include="Librairies\ManagedBass\Extensions.cs" />
-    <Compile Include="Librairies\ManagedBass\Resolution.cs" />
-    <Compile Include="Librairies\ManagedBass\Return.cs" />
-    <Compile Include="Librairies\ManagedBass\WindowsNative.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -259,7 +202,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Librairies\ManagedBass\LICENSE.md" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Resources\FontAwesome.ttf" />
@@ -279,7 +221,6 @@
     </Content>
     <Content Include="bass_fx.dll" />
     <EmbeddedResource Include="icon.ico" />
-    <Content Include="Librairies\ManagedBass\VERSION.txt" />
     <Content Include="Resources\ui-line.png" />
     <Content Include="Resources\ui-rounded-borders.png" />
   </ItemGroup>

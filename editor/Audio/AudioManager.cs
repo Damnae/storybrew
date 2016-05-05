@@ -1,4 +1,4 @@
-﻿using ManagedBass.Dynamics;
+﻿using ManagedBass;
 using System;
 using System.Collections.Generic;
 
@@ -13,10 +13,9 @@ namespace StorybrewEditor.Audio
         public AudioManager(IntPtr windowHandle)
         {
             Bass.Init(-1, 44100, DeviceInitFlags.Default, windowHandle);
-
-            Bass.Configure(Configuration.PlaybackBufferLength, 100);
-            Bass.Configure(Configuration.NetBufferLength, 500);
-            Bass.Configure(Configuration.UpdatePeriod, 10);
+            Bass.PlaybackBufferLength = 100;
+            Bass.NetBufferLength = 500;
+            Bass.UpdatePeriod = 10;
 
             updateVolume();
             Program.Settings.Volume.OnValueChanged += (sender, e) => updateVolume();
@@ -54,7 +53,7 @@ namespace StorybrewEditor.Audio
                 if (disposing)
                 {
                 }
-                Bass.Free(Bass.CurrentDevice);
+                Bass.Free();
                 disposedValue = true;
             }
         }

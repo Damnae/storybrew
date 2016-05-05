@@ -1,4 +1,4 @@
-﻿using ManagedBass.Dynamics;
+﻿using ManagedBass;
 using System;
 
 namespace StorybrewEditor.Audio
@@ -55,7 +55,7 @@ namespace StorybrewEditor.Audio
             }
         }
 
-        internal AudioStream(AudioManager manager, string path)
+        public AudioStream(AudioManager manager, string path)
         {
             Manager = manager;
             this.path = path;
@@ -64,7 +64,7 @@ namespace StorybrewEditor.Audio
             UpdateVolume();
         }
 
-        internal void UpdateVolume()
+        public void UpdateVolume()
         {
             Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Program.Settings.Volume);
         }
