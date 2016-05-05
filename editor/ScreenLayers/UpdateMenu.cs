@@ -55,65 +55,66 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            NetHelper.Download(downloadUrl, Updater.UpdateArchivePath, (progress) =>
-            {
-                if (IsDisposed) return false;
-                progressBar.Value = progress;
-                return true;
-            },
-            (exception) =>
-            {
-                if (IsDisposed) return;
-                if (exception != null)
+            NetHelper.Download(downloadUrl, Updater.UpdateArchivePath,
+                (progress) =>
                 {
-                    Manager.ShowMessage($"Failed to download the new version, please update manually.\n\n{exception}", () => Updater.OpenLastestReleasePage());
-                    Exit();
-                    return;
-                }
-                try
+                    if (IsDisposed) return false;
+                    progressBar.Value = progress;
+                    return true;
+                },
+                (exception) =>
                 {
-                    using (var zip = ZipStorer.Open(Updater.UpdateArchivePath, FileAccess.Read))
+                    if (IsDisposed) return;
+                    if (exception != null)
                     {
-                        if (Directory.Exists(Updater.UpdateFolderPath))
-                            Directory.Delete(Updater.UpdateFolderPath, true);
-
-                        string executablePath = null;
-                        var entries = zip.ReadCentralDir();
-                        foreach (var entry in entries)
+                        Manager.ShowMessage($"Failed to download the new version, please update manually.\n\n{exception}", () => Updater.OpenLastestReleasePage());
+                        Exit();
+                        return;
+                    }
+                    try
+                    {
+                        using (var zip = ZipStorer.Open(Updater.UpdateArchivePath, FileAccess.Read))
                         {
-                            var entryPath = Path.GetFullPath(Path.Combine(Updater.UpdateFolderPath, entry.FilenameInZip));
-                            Debug.Print($"Extracting {entryPath}");
-                            zip.ExtractFile(entry, entryPath);
+                            if (Directory.Exists(Updater.UpdateFolderPath))
+                                Directory.Delete(Updater.UpdateFolderPath, true);
 
-                            if (Path.GetExtension(entryPath) == ".exe")
-                                executablePath = entryPath;
-                        }
-
-                        actionLabel.Text = "Updating";
-
-                        var localPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                        var process = new Process()
-                        {
-                            StartInfo = new ProcessStartInfo(executablePath, $"update \"{localPath}\" {Program.Version}")
+                            string executablePath = null;
+                            var entries = zip.ReadCentralDir();
+                            foreach (var entry in entries)
                             {
-                                WorkingDirectory = Updater.UpdateFolderPath,
-                            },
-                        };
-                        if (process.Start())
-                            Manager.Exit();
-                        else
-                        {
-                            Manager.ShowMessage("Failed to start the update process, please update manually.", () => Updater.OpenLastestReleasePage());
-                            Exit();
+                                var entryPath = Path.GetFullPath(Path.Combine(Updater.UpdateFolderPath, entry.FilenameInZip));
+                                Debug.Print($"Extracting {entryPath}");
+                                zip.ExtractFile(entry, entryPath);
+
+                                if (Path.GetExtension(entryPath) == ".exe")
+                                    executablePath = entryPath;
+                            }
+
+                            actionLabel.Text = "Updating";
+
+                            var localPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                            var process = new Process()
+                            {
+                                StartInfo = new ProcessStartInfo(executablePath, $"update \"{localPath}\" {Program.Version}")
+                                {
+                                    WorkingDirectory = Updater.UpdateFolderPath,
+                                },
+                            };
+                            if (process.Start())
+                                Manager.Exit();
+                            else
+                            {
+                                Manager.ShowMessage("Failed to start the update process, please update manually.", () => Updater.OpenLastestReleasePage());
+                                Exit();
+                            }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Manager.ShowMessage($"Failed to start the update process, please update manually.\n\n{e}", () => Updater.OpenLastestReleasePage());
-                    Exit();
-                }
-            });
+                    catch (Exception e)
+                    {
+                        Manager.ShowMessage($"Failed to start the update process, please update manually.\n\n{e}", () => Updater.OpenLastestReleasePage());
+                        Exit();
+                    }
+                });
         }
 
         public override void Resize(int width, int height)

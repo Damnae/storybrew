@@ -105,60 +105,61 @@ namespace StorybrewEditor.ScreenLayers
 
         private void checkLatestVersion()
         {
-            NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases/latest", "cache/net/latestrelease", 15 * 60, (response, exception) =>
-            {
-                if (IsDisposed) return;
-                if (exception != null)
+            NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases/latest", "cache/net/latestrelease", 15 * 60,
+                (response, exception) =>
                 {
-                    handleLastestVersionException(exception);
-                    return;
-                }
-                try
-                {
-                    var jsonResponse = JObject.Parse(response);
-
-                    var name = jsonResponse.Value<string>("name");
-                    var latestVersion = new Version(name);
-
-                    var authorName = jsonResponse.GetValue("author").Value<string>("login");
-
-                    var body = jsonResponse.Value<string>("body");
-                    if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
-
-                    var publishedAt = jsonResponse.Value<string>("published_at");
-                    var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-
-                    if (Program.Version < latestVersion)
+                    if (IsDisposed) return;
+                    if (exception != null)
                     {
-                        string downloadUrl = null;
-                        var assets = jsonResponse.GetValue("assets");
-                        foreach (var asset in assets)
-                        {
-                            var downloadName = asset.Value<string>("name");
-                            if (downloadName.EndsWith(".zip"))
-                            {
-                                downloadUrl = asset.Value<string>("browser_download_url");
-                                break;
-                            }
-                        }
-
-                        updateButton.Text = $"Version {latestVersion} available!";
-                        updateButton.Tooltip = $"What's new:\n\n{body}\n\nPublished {date.ToTimeAgo()} by {authorName}.";
-                        updateButton.OnClick += (sender, e) =>
-                        {
-                            if (downloadUrl != null && latestVersion >= new Version(1, 4))
-                                Manager.Add(new UpdateMenu(downloadUrl));
-                            else Updater.OpenLastestReleasePage();
-                        };
-                        updateButton.Displayed = true;
-                        bottomLayout.Pack(600);
+                        handleLastestVersionException(exception);
+                        return;
                     }
-                }
-                catch (Exception e)
-                {
-                    handleLastestVersionException(e);
-                }
-            });
+                    try
+                    {
+                        var jsonResponse = JObject.Parse(response);
+
+                        var name = jsonResponse.Value<string>("name");
+                        var latestVersion = new Version(name);
+
+                        var authorName = jsonResponse.GetValue("author").Value<string>("login");
+
+                        var body = jsonResponse.Value<string>("body");
+                        if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
+
+                        var publishedAt = jsonResponse.Value<string>("published_at");
+                        var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+
+                        if (Program.Version < latestVersion)
+                        {
+                            string downloadUrl = null;
+                            var assets = jsonResponse.GetValue("assets");
+                            foreach (var asset in assets)
+                            {
+                                var downloadName = asset.Value<string>("name");
+                                if (downloadName.EndsWith(".zip"))
+                                {
+                                    downloadUrl = asset.Value<string>("browser_download_url");
+                                    break;
+                                }
+                            }
+
+                            updateButton.Text = $"Version {latestVersion} available!";
+                            updateButton.Tooltip = $"What's new:\n\n{body}\n\nPublished {date.ToTimeAgo()} by {authorName}.";
+                            updateButton.OnClick += (sender, e) =>
+                            {
+                                if (downloadUrl != null && latestVersion >= new Version(1, 4))
+                                    Manager.Add(new UpdateMenu(downloadUrl));
+                                else Updater.OpenLastestReleasePage();
+                            };
+                            updateButton.Displayed = true;
+                            bottomLayout.Pack(600);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        handleLastestVersionException(e);
+                    }
+                });
         }
 
         private void handleLastestVersionException(Exception exception)

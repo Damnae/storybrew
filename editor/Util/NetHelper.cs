@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace StorybrewEditor.Util
 {
@@ -45,6 +47,33 @@ namespace StorybrewEditor.Util
             }
         }
 
+        public static void Post(string url, NameValueCollection data, Action<string, Exception> action)
+        {
+            try
+            {
+                using (var webClient = new WebClient())
+                {
+                    Debug.Print($"Post {url}");
+                    webClient.Headers.Add("user-agent", Program.Name);
+                    webClient.UploadValuesCompleted += (sender, e) =>
+                        Program.Schedule(() =>
+                        {
+                            if (e.Error == null)
+                            {
+                                var response = Encoding.UTF8.GetString(e.Result);
+                                action(response, null);
+                            }
+                            else action(null, e.Error);
+                        });
+                    webClient.UploadValuesAsync(new Uri(url), data);
+                }
+            }
+            catch (Exception e)
+            {
+                Program.Schedule(() => action(null, e));
+            }
+        }
+
         public static void Download(string url, string filename, Func<float, bool> progressFunc, Action<Exception> completedAction)
         {
             try
@@ -65,9 +94,7 @@ namespace StorybrewEditor.Util
                         Program.Schedule(() =>
                         {
                             if (!progressFunc((float)e.BytesReceived / e.TotalBytesToReceive))
-                            {
                                 webClient.CancelAsync();
-                            }
                         });
                     webClient.DownloadFileCompleted += (sender, e) =>
                         Program.Schedule(() =>
