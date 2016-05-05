@@ -57,6 +57,7 @@ namespace StorybrewEditor
 
         private static void startEditor()
         {
+            enableScheduling();
             Updater.Cleanup();
 
             settings = new Settings();
@@ -169,7 +170,13 @@ namespace StorybrewEditor
 
         #region Scheduling
 
+        private static bool schedulingEnabled;
         private static readonly Queue<Action> scheduledActions = new Queue<Action>();
+
+        public static void enableScheduling()
+        {
+            schedulingEnabled = true;
+        }
 
         /// <summary>
         /// Schedule the action to run in the main thread.
@@ -177,8 +184,19 @@ namespace StorybrewEditor
         /// </summary>
         public static void Schedule(Action action)
         {
-            lock (scheduledActions)
-                scheduledActions.Enqueue(action);
+            if (schedulingEnabled)
+                lock (scheduledActions)
+                    scheduledActions.Enqueue(action);
+            else
+                try
+                {
+                    Debug.WriteLine($"Scheduling not available for {action.Method}");
+                    action.Invoke();
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Scheduled task {action.Method} failed (scheduling not available):\n{e}");
+                }
         }
 
         /// <summary>
