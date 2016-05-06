@@ -2,17 +2,26 @@
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Mapset;
 using System.Collections.Generic;
+using System;
+using StorybrewEditor.Audio;
 
 namespace StorybrewEditor.Storyboarding
 {
     public class EditorGeneratorContext : GeneratorContext
     {
         private Effect effect;
-        private EditorBeatmap beatmap;
+        private FftStream stream;
 
+        private EditorBeatmap beatmap;
         public override Beatmap Beatmap => beatmap;
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
+
+        public EditorGeneratorContext(Effect effect, EditorBeatmap beatmap)
+        {
+            this.effect = effect;
+            this.beatmap = beatmap;
+        }
 
         public override StoryboardLayer GetLayer(string identifier)
         {
@@ -21,10 +30,18 @@ namespace StorybrewEditor.Storyboarding
             return layer;
         }
 
-        public EditorGeneratorContext(Effect effect, EditorBeatmap beatmap)
+        public override float[] GetFft(double time)
         {
-            this.effect = effect;
-            this.beatmap = beatmap;
+            if (stream == null)
+                stream = new FftStream(effect.Project.AudioPath);
+
+            return stream.GetFft(time);
+        }
+
+        public void DisposeResources()
+        {
+            stream?.Dispose();
+            stream = null;
         }
     }
 }

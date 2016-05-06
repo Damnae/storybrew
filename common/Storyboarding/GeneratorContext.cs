@@ -8,5 +8,7 @@ namespace StorybrewCommon.Storyboarding
         public virtual Beatmap Beatmap { get; }
 
         public abstract StoryboardLayer GetLayer(string identifier);
+
+        public abstract float[] GetFft(double time);
     }
 }

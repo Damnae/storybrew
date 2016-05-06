@@ -70,6 +70,7 @@
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioStream.cs" />
     <None Include="Librairies\ZipStorer\LICENSE" />
+    <Compile Include="Audio\FftStream.cs" />
     <Compile Include="Librairies\ZipStorer\ZipStorer.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />

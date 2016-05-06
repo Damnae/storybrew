@@ -37,6 +37,19 @@ namespace StorybrewCommon.Scripting
             initializeConfigurableFields();
         }
 
+        private float[] fftCache;
+        private double fftCacheTime;
+
+        public float[] GetFft(double time)
+        {
+            if (fftCacheTime == -1 || fftCacheTime != time)
+            {
+                fftCache = context.GetFft(time);
+                fftCacheTime = time;
+            }
+            return fftCache;
+        }
+
         public bool Configure(EffectConfig config)
         {
             if (context != null) throw new InvalidOperationException();

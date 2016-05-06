@@ -120,6 +120,10 @@ namespace StorybrewEditor.Storyboarding
                 changeStatus(EffectStatus.ExecutionFailed, $"Unexpected error during {status}:\n{e.ToString()}");
                 return;
             }
+            finally
+            {
+                context.DisposeResources();
+            }
             changeStatus(EffectStatus.Ready);
 
             Program.Schedule(() =>
