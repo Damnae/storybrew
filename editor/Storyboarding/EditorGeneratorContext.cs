@@ -35,7 +35,7 @@ namespace StorybrewEditor.Storyboarding
             if (stream == null)
                 stream = new FftStream(effect.Project.AudioPath);
 
-            return stream.GetFft(time);
+            return stream.GetFft(time * 0.001);
         }
 
         public void DisposeResources()

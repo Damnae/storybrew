@@ -20,7 +20,7 @@ namespace StorybrewEditor.Audio
 
         public float[] GetFft(double time)
         {
-            var position = Bass.ChannelSeconds2Bytes(stream, time * 0.001);
+            var position = Bass.ChannelSeconds2Bytes(stream, time);
             Bass.ChannelSetPosition(stream, position);
 
             var data = new float[1024];
