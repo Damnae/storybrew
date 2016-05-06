@@ -37,17 +37,40 @@ namespace StorybrewCommon.Scripting
             initializeConfigurableFields();
         }
 
-        private float[] fftCache;
-        private double fftCacheTime;
-
+        /// <summary>
+        /// Returns the Fast Fourier Transform of the song at a certain time, with the default amount of magnitudes.
+        /// Useful to make spectrum effets.
+        /// </summary>
         public float[] GetFft(double time)
+            => context.GetFft(time);
+
+        /// <summary>
+        /// Returns the Fast Fourier Transform of the song at a certain time, with the specified amount of magnitudes.
+        /// Useful to make spectrum effets.
+        /// </summary>
+        public float[] GetFft(double time, int magnitudes)
         {
-            if (fftCacheTime == -1 || fftCacheTime != time)
-            {
-                fftCache = context.GetFft(time);
-                fftCacheTime = time;
-            }
-            return fftCache;
+            var fft = GetFft(time);
+            var resultFft = new float[magnitudes];
+
+            if (magnitudes == fft.Length)
+                Array.Copy(fft, resultFft, magnitudes);
+            else
+                for (var i = 0; i < magnitudes; i++)
+                {
+                    var left = (int)(((double)i / magnitudes) * fft.Length);
+                    var right = (int)(((i + 1.0) / magnitudes) * fft.Length);
+
+                    if (left == right)
+                        right++;
+
+                    var value = 0f;
+                    for (var j = left; j < right; j++)
+                        value = Math.Max(value, fft[j]);
+
+                    resultFft[i] = value;
+                }
+            return resultFft;
         }
 
         public bool Configure(EffectConfig config)
