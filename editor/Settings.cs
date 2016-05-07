@@ -8,6 +8,7 @@ namespace StorybrewEditor
     public class Settings
     {
         public readonly Setting<float> Volume = new Setting<float>(0.1f);
+        public readonly Setting<bool> ShowStats = new Setting<bool>(false);
 
         private const string settingsFilename = "settings.cfg";
 

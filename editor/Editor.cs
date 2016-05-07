@@ -115,6 +115,7 @@ namespace StorybrewEditor
                     {
                         StyleName = "small",
                         AnchorTo = UiAlignment.Centre,
+                        Displayed = Program.Settings.ShowStats,
                     },
                 }
             });
@@ -176,7 +177,8 @@ namespace StorybrewEditor
                 altOverlayTop.Opacity = altOpacity;
                 altOverlayTop.Displayed = altOpacity > 0;
 
-                statsLabel.Text = Program.Stats;
+                if (statsLabel.Visible)
+                    statsLabel.Text = Program.Stats;
             }
         }
 
