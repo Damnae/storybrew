@@ -25,6 +25,6 @@ namespace StorybrewCommon.Storyboarding.Commands
         }
 
         protected override string GetCommandGroupHeader(ExportSettings exportSettings)
-            => $"L,{((int)StartTime).ToString(CultureInfo.InvariantCulture)},{LoopCount.ToString(CultureInfo.InvariantCulture)}";
+            => $"L,{((int)StartTime).ToString(exportSettings.NumberFormat)},{LoopCount.ToString(exportSettings.NumberFormat)}";
     }
 }

@@ -245,7 +245,7 @@ namespace StorybrewCommon.Storyboarding
                 return string.Empty;
 
             var lines = new string[commands.Count + 1];
-            lines[0] = $"Sprite,{Layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(CultureInfo.InvariantCulture)},{InitialPosition.Y.ToString(CultureInfo.InvariantCulture)}";
+            lines[0] = $"Sprite,{Layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}";
             for (var i = 0; i < commands.Count; i++)
                 lines[i + 1] = commands[i].ToOsbString(exportSettings);
 

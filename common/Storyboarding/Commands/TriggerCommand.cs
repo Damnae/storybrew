@@ -16,6 +16,6 @@ namespace StorybrewCommon.Storyboarding.Commands
         }
 
         protected override string GetCommandGroupHeader(ExportSettings exportSettings)
-            => $"T,{TriggerName},{((int)StartTime).ToString(CultureInfo.InvariantCulture)},{((int)EndTime).ToString(CultureInfo.InvariantCulture)},{Group.ToString(CultureInfo.InvariantCulture)}";
+            => $"T,{TriggerName},{((int)StartTime).ToString(exportSettings.NumberFormat)},{((int)EndTime).ToString(exportSettings.NumberFormat)},{Group.ToString(exportSettings.NumberFormat)}";
     }
 }

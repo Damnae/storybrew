@@ -33,7 +33,7 @@ namespace StorybrewCommon.Storyboarding.CommandValues
             => (float)Math.Abs(value - ((CommandDecimal)obj).value);
 
         public string ToOsbString(ExportSettings exportSettings)
-            => value.ToString(CultureInfo.InvariantCulture);
+            => ((float)value).ToString(exportSettings.NumberFormat);
 
         public static CommandDecimal operator -(CommandDecimal left, CommandDecimal right)
             => new CommandDecimal(left.value - right.value);

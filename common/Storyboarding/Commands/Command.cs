@@ -41,8 +41,8 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public virtual string ToOsbString(ExportSettings exportSettings)
         {
-            var startTimeString = ((int)StartTime).ToString(CultureInfo.InvariantCulture);
-            var endTimeString = ((int)EndTime).ToString(CultureInfo.InvariantCulture);
+            var startTimeString = ((int)StartTime).ToString(exportSettings.NumberFormat);
+            var endTimeString = ((int)EndTime).ToString(exportSettings.NumberFormat);
             var startValueString = StartValue.ToOsbString(exportSettings);
             var endValueString = EndValue.ToOsbString(exportSettings);
 
@@ -51,7 +51,7 @@ namespace StorybrewCommon.Storyboarding.Commands
 
             string[] parameters =
             {
-                Identifier, ((int)Easing).ToString(CultureInfo.InvariantCulture),
+                Identifier, ((int)Easing).ToString(exportSettings.NumberFormat),
                 startTimeString, endTimeString, startValueString
             };
 
