@@ -4,7 +4,7 @@ using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -81,15 +81,13 @@ namespace StorybrewEditor.Storyboarding
             Visible = other.Visible;
         }
 
-        public string ToOsbString(ExportSettings exportSettings, OsbLayer osbLayer)
+        public void WriteOsbSprites(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)
         {
-            var sb = new StringBuilder();
             foreach (var sbo in storyboardObjects)
             {
                 if (sbo.Layer != osbLayer) continue;
-                sb.Append(sbo.ToOsbString(exportSettings));
+                sbo.WriteOsb(writer, exportSettings);
             }
-            return sb.ToString();
         }
     }
 }

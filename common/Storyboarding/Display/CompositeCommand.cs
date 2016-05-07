@@ -1,6 +1,7 @@
 ﻿using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using System;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Display
 {
@@ -10,7 +11,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
         public bool Enabled => true;
 
-        public string ToOsbString(ExportSettings exportSettings)
+        public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             throw new InvalidOperationException();
         }

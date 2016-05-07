@@ -16,7 +16,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
-using StorybrewCommon.Mapset;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -537,19 +536,19 @@ namespace StorybrewEditor.Storyboarding
             Debug.Print($"Exporting osb to {osbPath}");
             var exportSettings = new ExportSettings();
 
-            var sb = new StringBuilder();
-            sb.AppendLine("[Events]");
-            sb.AppendLine("//Background and Video events");
-            foreach (var osbLayer in new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, })
+            using (var stream = new SafeWriteStream(osbPath))
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
-                sb.AppendLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
-                foreach (var layer in localLayers)
-                    sb.Append(layer.ToOsbString(exportSettings, osbLayer));
+                writer.WriteLine("[Events]");
+                writer.WriteLine("//Background and Video events");
+                foreach (var osbLayer in new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, })
+                {
+                    writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
+                    foreach (var layer in localLayers)
+                        layer.WriteOsbSprites(writer, exportSettings, osbLayer);
+                }
+                writer.WriteLine("//Storyboard Sound Samples");
             }
-            sb.AppendLine("//Storyboard Sound Samples");
-            Debug.Print(sb.ToString());
-
-            File.WriteAllText(osbPath, sb.ToString());
         }
 
         private string getOsbPath()

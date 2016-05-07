@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding
 {
@@ -6,6 +7,6 @@ namespace StorybrewCommon.Storyboarding
     {
         public OsbLayer Layer { get; set; } = OsbLayer.Background;
 
-        public abstract string ToOsbString(ExportSettings exportSettings);
+        public abstract void WriteOsb(TextWriter writer, ExportSettings exportSettings);
     }
 }

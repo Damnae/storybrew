@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
@@ -53,17 +54,15 @@ namespace StorybrewCommon.Storyboarding.Commands
         public void Add(ICommand command)
             => commands.Add(command);
 
-        public string ToOsbString(ExportSettings exportSettings)
+        public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             if (commands.Count <= 0)
-                return string.Empty;
+                return;
 
             var lines = new string[commands.Count + 1];
-            lines[0] = GetCommandGroupHeader(exportSettings);
-            for (int i = 0; i < commands.Count; i++)
-                lines[i + 1] = " " + commands[i].ToOsbString(exportSettings);
-
-            return string.Join("\n ", lines);
+            writer.WriteLine(new string(' ', indentation) + GetCommandGroupHeader(exportSettings));
+            foreach (var command in commands)
+                command.WriteOsb(writer, exportSettings, indentation + 1);
         }
 
         protected abstract string GetCommandGroupHeader(ExportSettings exportSettings);

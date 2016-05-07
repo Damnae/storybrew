@@ -4,7 +4,7 @@ using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding
 {
@@ -239,17 +239,14 @@ namespace StorybrewCommon.Storyboarding
         public bool IsActive(double time)
             => CommandsStartTime <= time && time <= CommandsEndTime;
 
-        public override string ToOsbString(ExportSettings exportSettings)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings)
         {
             if (commands.Count == 0)
-                return string.Empty;
+                return;
 
-            var lines = new string[commands.Count + 1];
-            lines[0] = $"Sprite,{Layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}";
-            for (var i = 0; i < commands.Count; i++)
-                lines[i + 1] = commands[i].ToOsbString(exportSettings);
-
-            return string.Join("\n ", lines) + "\n";
+            writer.WriteLine($"Sprite,{Layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+            foreach (var command in commands)
+                command.WriteOsb(writer, exportSettings, 1);
         }
     }
 

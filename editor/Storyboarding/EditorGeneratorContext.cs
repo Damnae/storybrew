@@ -2,7 +2,6 @@
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Mapset;
 using System.Collections.Generic;
-using System;
 using StorybrewEditor.Audio;
 
 namespace StorybrewEditor.Storyboarding

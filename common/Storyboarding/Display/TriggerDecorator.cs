@@ -1,6 +1,7 @@
 ﻿using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using System;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Display
 {
@@ -50,11 +51,12 @@ namespace StorybrewCommon.Storyboarding.Display
             return command.ValueAtTime(commandTime);
         }
 
-        public string ToOsbString(ExportSettings exportSettings)
+        public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             throw new InvalidOperationException();
         }
 
         public override string ToString() => $"triggerable ({StartTime}s - {EndTime}s active:{triggered})";
+
     }
 }

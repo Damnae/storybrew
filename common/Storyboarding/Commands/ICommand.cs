@@ -1,4 +1,6 @@
 
+using System.IO;
+
 namespace StorybrewCommon.Storyboarding.Commands
 {
     public interface ICommand
@@ -7,6 +9,6 @@ namespace StorybrewCommon.Storyboarding.Commands
         double EndTime { get; }
         bool Enabled { get; }
 
-        string ToOsbString(ExportSettings exportSettings);
+        void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation);
     }
 }

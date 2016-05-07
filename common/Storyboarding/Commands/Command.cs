@@ -1,7 +1,7 @@
 ﻿using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding.CommandValues;
 using System;
-using System.Globalization;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
@@ -39,7 +39,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public abstract TValue ValueAtProgress(double progress);
         public abstract TValue Midpoint(Command<TValue> endCommand, double progress);
 
-        public virtual string ToOsbString(ExportSettings exportSettings)
+        public string ToOsbString(ExportSettings exportSettings)
         {
             var startTimeString = ((int)StartTime).ToString(exportSettings.NumberFormat);
             var endTimeString = ((int)EndTime).ToString(exportSettings.NumberFormat);
@@ -62,7 +62,10 @@ namespace StorybrewCommon.Storyboarding.Commands
             return result;
         }
 
-        public override string ToString() 
+        public virtual void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
+            => writer.WriteLine(new string(' ', indentation) + ToOsbString(exportSettings));
+
+        public override string ToString()
             => ToOsbString(ExportSettings.Default);
     }
 }
