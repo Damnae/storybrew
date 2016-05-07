@@ -34,26 +34,42 @@ namespace StorybrewCommon.Storyboarding
 
         public IEnumerable<ICommand> Commands => commands;
 
+        private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
         {
             get
             {
-                var commandsStartTime = double.MaxValue;
-                foreach (ICommand command in commands)
-                    commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
+                if (commandsStartTime == double.MaxValue)
+                    refreshStartEndTimes();
                 return commandsStartTime;
             }
         }
 
+        private double commandsEndTime = double.MinValue;
         public double CommandsEndTime
         {
             get
             {
-                var commandsEndTime = double.MinValue;
-                foreach (ICommand command in commands)
-                    commandsEndTime = Math.Max(commandsEndTime, command.EndTime);
+                if (commandsEndTime == double.MinValue)
+                    refreshStartEndTimes();
                 return commandsEndTime;
             }
+        }
+
+        private void refreshStartEndTimes()
+        {
+            clearStartEndTimes();
+            foreach (ICommand command in commands)
+            {
+                commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
+                commandsEndTime = Math.Max(commandsEndTime, command.EndTime);
+            }
+        }
+
+        private void clearStartEndTimes()
+        {
+            commandsStartTime = double.MaxValue;
+            commandsEndTime = double.MinValue;
         }
 
         public OsbSprite()
@@ -150,6 +166,7 @@ namespace StorybrewCommon.Storyboarding
                     commands.Add(command);
                 addDisplayCommand(command);
             }
+            clearStartEndTimes();
         }
 
         #region Display 
