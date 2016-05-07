@@ -47,7 +47,7 @@ namespace StorybrewEditor.ScreenLayers
                     },
                     new Label(WidgetManager)
                     {
-                        StyleName = "hint",
+                        StyleName = "small",
                         Text = "Leave the Project Path empty to store the project inside the mapset's folder.",
                         AnchorTo = UiAlignment.Centre,
                     },

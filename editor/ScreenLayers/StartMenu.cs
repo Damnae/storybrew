@@ -73,7 +73,7 @@ namespace StorybrewEditor.ScreenLayers
                     },
                     versionLabel = new Label(WidgetManager)
                     {
-                        StyleName = "hint",
+                        StyleName = "small",
                         Text = Program.FullName,
                         AnchorTo = UiAlignment.Centre,
                     },

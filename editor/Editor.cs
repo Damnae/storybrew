@@ -85,7 +85,9 @@ namespace StorybrewEditor
         private WidgetManager overlay;
         private CameraOrtho overlayCamera;
         private LinearLayout overlayTop;
+        private LinearLayout altOverlayTop;
         private Slider volumeSlider;
+        private Label statsLabel;
 
         private WidgetManager createOverlay(ScreenLayerManager screenLayerManager)
         {
@@ -109,6 +111,25 @@ namespace StorybrewEditor
                 Displayed = false,
                 Children = new Widget[]
                 {
+                    statsLabel = new Label(overlay)
+                    {
+                        StyleName = "small",
+                        AnchorTo = UiAlignment.Centre,
+                    },
+                }
+            });
+            overlayTop.Pack(1024, 16);
+
+            overlay.Root.Add(altOverlayTop = new LinearLayout(overlay)
+            {
+                AnchorTarget = overlay.Root,
+                AnchorFrom = UiAlignment.Top,
+                AnchorTo = UiAlignment.Top,
+                Horizontal = true,
+                Opacity = 0,
+                Displayed = false,
+                Children = new Widget[]
+                {
                     new Label(overlay)
                     {
                         StyleName = "icon",
@@ -119,10 +140,10 @@ namespace StorybrewEditor
                     {
                         Step = 0.01f,
                         AnchorTo = UiAlignment.Centre,
-                    }
+                    },
                 }
             });
-            overlayTop.Pack(0, 0, 1024);
+            altOverlayTop.Pack(0, 0, 1024);
 
             volumeSlider.BindToSetting(Program.Settings.Volume, () => volumeSlider.Tooltip = $"Volume: {volumeSlider.Value:P0}");
             overlay.Root.OnMouseWheel += (sender, e) =>
@@ -140,17 +161,22 @@ namespace StorybrewEditor
             if (IsFixedRateUpdate)
             {
                 var mousePosition = overlay.MousePosition;
-                var bounds = overlayTop.Bounds;
+                var bounds = altOverlayTop.Bounds;
 
-                var showOverlayTop = InputManager.AltOnly || (overlayTop.Displayed && bounds.Top < mousePosition.Y && mousePosition.Y < bounds.Bottom);
+                var showAltOverlayTop = InputManager.AltOnly || (altOverlayTop.Displayed && bounds.Top < mousePosition.Y && mousePosition.Y < bounds.Bottom);
 
-                var opacity = overlayTop.Opacity;
-                var targetOpacity = showOverlayTop ? 1f : 0f;
-                if (Math.Abs(opacity - targetOpacity) <= 0.07f) opacity = targetOpacity;
-                else opacity = MathHelper.Clamp(opacity + (opacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
+                var altOpacity = altOverlayTop.Opacity;
+                var targetOpacity = showAltOverlayTop ? 1f : 0f;
+                if (Math.Abs(altOpacity - targetOpacity) <= 0.07f) altOpacity = targetOpacity;
+                else altOpacity = MathHelper.Clamp(altOpacity + (altOpacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
 
-                overlayTop.Opacity = opacity;
-                overlayTop.Displayed = opacity > 0;
+                overlayTop.Opacity = 1 - altOpacity;
+                overlayTop.Displayed = altOpacity < 1;
+
+                altOverlayTop.Opacity = altOpacity;
+                altOverlayTop.Displayed = altOpacity > 0;
+
+                statsLabel.Text = Program.Stats;
             }
         }
 

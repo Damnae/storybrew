@@ -43,7 +43,7 @@ namespace StorybrewEditor.ScreenLayers
                     },
                     statusLabel = new Label(WidgetManager)
                     {
-                        StyleName = "hint",
+                        StyleName = "small",
                         Text = downloadUrl,
                         AnchorTo = UiAlignment.Centre,
                     },

@@ -188,10 +188,6 @@
 			{
 				FontName: "@iconFont",
 			},
-			"hint":
-			{
-				FontSize: "@fontSizeSmall",
-			},
 			"light":
 			{
 				FontName: "@lightFont",
@@ -211,6 +207,10 @@
 				FontSize: "@fontSizeSmall",
 				TextAlignment: "BottomRight",
 				Trimming: "EllipsisCharacter",
+			},
+			"small":
+			{
+				FontSize: "@fontSizeSmall",
 			},
 
 			"buttonLabel":

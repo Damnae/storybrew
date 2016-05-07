@@ -55,6 +55,9 @@ namespace StorybrewEditor
 
         #region Editor
 
+        private static string stats;
+        public static string Stats => stats;
+
         private static void startEditor()
         {
             enableScheduling();
@@ -69,7 +72,7 @@ namespace StorybrewEditor
             {
                 DrawState.CheckError("initializing openGL context");
                 Trace.WriteLine("graphics mode: " + window.Context.GraphicsMode);
-                
+
                 window.Icon = new Icon(typeof(Program), "icon.ico");
                 window.Resize += (sender, e) =>
                 {
@@ -157,9 +160,11 @@ namespace StorybrewEditor
                 averageFrameTime = (frameTime + averageFrameTime) / 2;
                 longestFrameTime = Math.Max(frameTime, longestFrameTime);
 
-                if (lastStatTime + 10 < time)
+                if (lastStatTime + 1 < time)
                 {
-                    Debug.WriteLine($"Frame - avg:{averageFrameTime * 1000:0} hi:{longestFrameTime * 1000:0} fps:{1 / averageFrameTime:0}, TexBinds - {DrawState.TextureBinds}, {editor.GetStats()}");
+                    stats = $"fps:{1 / averageFrameTime:0} (avg:{averageFrameTime * 1000:0}ms hi:{longestFrameTime * 1000:0}ms)";
+                    if (false) Debug.Print($"TexBinds - {DrawState.TextureBinds}, {editor.GetStats()}");
+
                     longestFrameTime = 0;
                     lastStatTime = time;
                 }
