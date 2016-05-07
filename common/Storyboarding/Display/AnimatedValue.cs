@@ -62,6 +62,8 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue ValueAtTime(double time)
         {
             if (commands.Count == 0) return DefaultValue;
+            if (time >= EndTime) return EndValue;
+
             ITypedCommand<TValue> previousCommand = null, candidateCommand = null;
             foreach (var command in commands)
             {
