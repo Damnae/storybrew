@@ -1,9 +1,9 @@
-﻿using Librairies;
-using StorybrewEditor.UserInterface;
+﻿using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 
 namespace StorybrewEditor.ScreenLayers
@@ -67,50 +67,62 @@ namespace StorybrewEditor.ScreenLayers
                     if (IsDisposed) return;
                     if (exception != null)
                     {
+                        Trace.WriteLine($"Failed to download the new version.\n\n{exception}");
                         Manager.ShowMessage($"Failed to download the new version, please update manually.\n\n{exception}", () => Updater.OpenLastestReleasePage());
                         Exit();
                         return;
                     }
                     try
                     {
-                        using (var zip = ZipStorer.Open(Updater.UpdateArchivePath, FileAccess.Read))
+                        string executablePath = null;
+                        using (var zip = ZipFile.OpenRead(Updater.UpdateArchivePath))
                         {
                             if (Directory.Exists(Updater.UpdateFolderPath))
                                 Directory.Delete(Updater.UpdateFolderPath, true);
 
-                            string executablePath = null;
-                            var entries = zip.ReadCentralDir();
-                            foreach (var entry in entries)
+                            foreach (var entry in zip.Entries)
                             {
-                                var entryPath = Path.GetFullPath(Path.Combine(Updater.UpdateFolderPath, entry.FilenameInZip));
-                                Debug.Print($"Extracting {entryPath}");
-                                zip.ExtractFile(entry, entryPath);
+                                // Folders don't have a name
+                                if (entry.Name.Length == 0) continue;
+
+                                var entryPath = Path.GetFullPath(Path.Combine(Updater.UpdateFolderPath, entry.FullName));
+                                var entryFolder = Path.GetDirectoryName(entryPath);
+
+                                if (!Directory.Exists(entryFolder))
+                                {
+                                    Trace.WriteLine($"Creating {entryFolder}");
+                                    Directory.CreateDirectory(entryFolder);
+                                }
+
+                                Trace.WriteLine($"Extracting {entryPath}");
+                                entry.ExtractToFile(entryPath);
 
                                 if (Path.GetExtension(entryPath) == ".exe")
                                     executablePath = entryPath;
                             }
+                        }
 
-                            actionLabel.Text = "Updating";
+                        actionLabel.Text = "Updating";
 
-                            var localPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                            var process = new Process()
+                        var localPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                        var process = new Process()
+                        {
+                            StartInfo = new ProcessStartInfo(executablePath, $"update \"{localPath}\" {Program.Version}")
                             {
-                                StartInfo = new ProcessStartInfo(executablePath, $"update \"{localPath}\" {Program.Version}")
-                                {
-                                    WorkingDirectory = Updater.UpdateFolderPath,
-                                },
-                            };
-                            if (process.Start())
-                                Manager.Exit();
-                            else
-                            {
-                                Manager.ShowMessage("Failed to start the update process, please update manually.", () => Updater.OpenLastestReleasePage());
-                                Exit();
-                            }
+                                WorkingDirectory = Updater.UpdateFolderPath,
+                            },
+                        };
+                        if (process.Start())
+                            Manager.Exit();
+                        else
+                        {
+                            Manager.ShowMessage("Failed to start the update process, please update manually.", () => Updater.OpenLastestReleasePage());
+                            Exit();
                         }
                     }
                     catch (Exception e)
                     {
+                        Trace.WriteLine($"Failed to start the update process.\n\n{e}");
                         Manager.ShowMessage($"Failed to start the update process, please update manually.\n\n{e}", () => Updater.OpenLastestReleasePage());
                         Exit();
                     }

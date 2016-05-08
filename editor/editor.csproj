@@ -59,6 +59,8 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -69,9 +71,7 @@
   <ItemGroup>
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioStream.cs" />
-    <None Include="Librairies\ZipStorer\LICENSE" />
     <Compile Include="Audio\FftStream.cs" />
-    <Compile Include="Librairies\ZipStorer\ZipStorer.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
     <Compile Include="Editor.cs" />
