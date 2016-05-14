@@ -28,8 +28,8 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public TValue ValueAtTime(double time)
         {
-            if (time < StartTime || EndTime < time)
-                throw new InvalidOperationException($"No value for {time} ({StartTime} - {EndTime})");
+            if (time <= StartTime) return StartValue;
+            if (EndTime <= time) return EndValue;
 
             var duration = EndTime - StartTime;
             var progress = Easing.Ease((time - StartTime) / duration);

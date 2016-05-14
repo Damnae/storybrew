@@ -34,13 +34,13 @@ namespace StorybrewCommon.Storyboarding.Display
             if (command.EndTime < command.StartTime)
                 Debug.Print($"'{command}' ends before it starts");
 
-            var index = 0;
-            while (index < commands.Count && commands[index].StartTime < command.StartTime)
-                index++;
+            int index;
+            findCommandIndex(command.StartTime, out index);
 
-            if (index > 0 && command.StartTime < commands[index - 1].EndTime
-                || index < commands.Count && commands[index].StartTime < command.EndTime)
-                Debug.Print($"'{command}' overlaps existing command '{commands[index]}'");
+            if (index > 0 && command.StartTime < commands[index - 1].EndTime)
+                Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
+            if (index < commands.Count && commands[index].StartTime < command.EndTime)
+                Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
 
             commands.Insert(index, command);
 
@@ -64,23 +64,29 @@ namespace StorybrewCommon.Storyboarding.Display
             if (commands.Count == 0) return DefaultValue;
             if (time >= EndTime) return EndValue;
 
-            ITypedCommand<TValue> previousCommand = null, candidateCommand = null;
-            foreach (var command in commands)
+            int index;
+            if (!findCommandIndex(time, out index) && index > 0)
+                index--;
+
+            return commands[index].ValueAtTime(time);
+        }
+
+        private bool findCommandIndex(double time, out int index)
+        {
+            var left = 0;
+            var right = commands.Count - 1;
+            while (left <= right)
             {
-                if (!command.Enabled) continue;
-                if (time < command.StartTime)
-                {
-                    if (candidateCommand != null) return candidateCommand.ValueAtTime(time);
-                    if (previousCommand != null) return previousCommand.EndValue;
-                    return command.StartValue;
-                }
-                previousCommand = command;
-                if (command.EndTime < time) continue;
-                candidateCommand = command;
+                index = left + ((right - left) >> 1);
+                var commandTime = commands[index].StartTime;
+                if (commandTime == time)
+                    return true;
+                else if (commandTime < time)
+                    left = index + 1;
+                else right = index - 1;
             }
-            if (candidateCommand != null) return candidateCommand.ValueAtTime(time);
-            if (previousCommand != null) return previousCommand.EndValue;
-            return DefaultValue;
+            index = left;
+            return false;
         }
 
         private void triggerable_OnTimeChanged(object sender, EventArgs e)
@@ -88,10 +94,8 @@ namespace StorybrewCommon.Storyboarding.Display
             var command = (ITypedCommand<TValue>)sender;
             if (commands.Remove(command))
             {
-                var index = 0;
-                while (index < commands.Count && commands[index].StartTime < command.StartTime)
-                    index++;
-
+                int index;
+                findCommandIndex(command.StartTime, out index);
                 commands.Insert(index, command);
             }
             else throw new InvalidOperationException();
