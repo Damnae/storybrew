@@ -15,6 +15,8 @@ namespace StorybrewCommon.Storyboarding.Display
         public IEnumerable<ITypedCommand<TValue>> Commands => commands;
         public bool HasCommands => commands.Count > 0;
 
+        private bool hasOverlap;
+
         public double StartTime => commands.Count > 0 ? commands[0].StartTime : 0;
         public double EndTime => commands.Count > 0 ? commands[commands.Count - 1].EndTime : 0;
         public TValue StartValue => commands.Count > 0 ? commands[0].StartValue : DefaultValue;
@@ -38,9 +40,15 @@ namespace StorybrewCommon.Storyboarding.Display
             findCommandIndex(command.StartTime, out index);
 
             if (index > 0 && command.StartTime < commands[index - 1].EndTime)
+            {
+                hasOverlap = true;
                 Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
-            if (index < commands.Count && commands[index].StartTime < command.EndTime)
+            }
+            else if (index < commands.Count && commands[index].StartTime < command.EndTime)
+            {
+                hasOverlap = true;
                 Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
+            }
 
             commands.Insert(index, command);
 
@@ -67,6 +75,14 @@ namespace StorybrewCommon.Storyboarding.Display
             int index;
             if (!findCommandIndex(time, out index) && index > 0)
                 index--;
+
+            if (hasOverlap)
+                for (var i = 0; i < index; i++)
+                    if (time < commands[index - 1].EndTime)
+                    {
+                        index = i;
+                        break;
+                    }
 
             return commands[index].ValueAtTime(time);
         }
