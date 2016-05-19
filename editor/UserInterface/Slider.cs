@@ -59,15 +59,15 @@ namespace StorybrewEditor.UserInterface
 
         public void BindToSetting<T>(Setting<T> setting, Action changedAction)
         {
-            OnValueChanged += (sender, e) => setting.Set((T)Convert.ChangeType(Value, typeof(T)));
-            EventHandler volumeChanged;
-            setting.OnValueChanged += volumeChanged = (sender, e) =>
+            OnValueChanged += (sender, e) => setting.Set(Value);
+            EventHandler handler;
+            setting.OnValueChanged += handler = (sender, e) =>
             {
                 Value = (float)Convert.ChangeType((T)setting, typeof(float));
                 changedAction();
             };
-            OnDisposed += (sender, e) => setting.OnValueChanged -= volumeChanged;
-            volumeChanged(this, EventArgs.Empty);
+            OnDisposed += (sender, e) => setting.OnValueChanged -= handler;
+            handler(this, EventArgs.Empty);
         }
 
         public float GetValueForPosition(Vector2 position)

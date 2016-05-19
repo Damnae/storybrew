@@ -76,6 +76,19 @@ namespace StorybrewEditor.UserInterface
             clickBehavior.OnClick += (sender, e) => Click();
         }
 
+        public void BindToSetting<T>(Setting<T> setting, Action changedAction)
+        {
+            OnValueChanged += (sender, e) => setting.Set(Checked);
+            EventHandler handler;
+            setting.OnValueChanged += handler = (sender, e) =>
+            {
+                Checked = (bool)Convert.ChangeType((T)setting, typeof(bool));
+                changedAction();
+            };
+            OnDisposed += (sender, e) => setting.OnValueChanged -= handler;
+            handler(this, EventArgs.Empty);
+        }
+
         public void Click()
         {
             if (isCheckable)

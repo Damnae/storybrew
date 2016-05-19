@@ -8,6 +8,7 @@ namespace StorybrewEditor
     public class Settings
     {
         public readonly Setting<float> Volume = new Setting<float>(0.1f);
+        public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
 
         private const string settingsFilename = "settings.cfg";
@@ -71,16 +72,10 @@ namespace StorybrewEditor
             this.value = value;
             OnValueChanged?.Invoke(this, EventArgs.Empty);
         }
+        public void Set(object value) => Set((T)Convert.ChangeType(value, typeof(T)));
 
-        public void Set(object value)
-        {
-            this.value = (T)Convert.ChangeType(value, typeof(T));
-        }
+        public static implicit operator T(Setting<T> setting) => setting.value;
 
-        public static implicit operator T(Setting<T> setting)
-            => setting.value;
-
-        public override string ToString()
-            => value.ToString();
+        public override string ToString() => value.ToString();
     }
 }
