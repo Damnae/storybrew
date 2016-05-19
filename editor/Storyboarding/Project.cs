@@ -446,6 +446,7 @@ namespace StorybrewEditor.Storyboarding
                     w.Write(effects.IndexOf(layer.Effect));
                     w.Write(layer.Visible);
                 }
+                stream.Commit();
             }
         }
 
@@ -548,6 +549,7 @@ namespace StorybrewEditor.Storyboarding
                         layer.WriteOsbSprites(writer, exportSettings, osbLayer);
                 }
                 writer.WriteLine("//Storyboard Sound Samples");
+                stream.Commit();
             }
         }
 

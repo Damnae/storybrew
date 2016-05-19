@@ -47,6 +47,7 @@ namespace StorybrewEditor
                     var setting = (Setting)field.GetValue(this);
                     writer.WriteLine($"{field.Name}: {setting}");
                 }
+                stream.Commit();
             }
         }
     }

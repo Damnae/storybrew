@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace StorybrewEditor.Util
 {
@@ -6,6 +7,7 @@ namespace StorybrewEditor.Util
     {
         private string temporaryPath;
         private string path;
+        private bool commited;
         private bool disposed;
 
         public SafeWriteStream(string path)
@@ -15,6 +17,8 @@ namespace StorybrewEditor.Util
             temporaryPath = Name;
         }
 
+        public void Commit() => commited = true;
+
         protected override void Dispose(bool disposing)
         {
             if (disposed) return;
@@ -22,7 +26,7 @@ namespace StorybrewEditor.Util
 
             base.Dispose(disposing);
 
-            if (disposing)
+            if (disposing && commited)
             {
                 if (File.Exists(path))
                     File.Replace(temporaryPath, path, null);
