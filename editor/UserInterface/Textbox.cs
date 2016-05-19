@@ -98,6 +98,21 @@ namespace StorybrewEditor.UserInterface
                         if (Value.Length > 0)
                             Value = Value.Substring(0, Value.Length - 1);
                         break;
+                    case Key.C:
+                        if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
+                            System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
+                        break;
+                    case Key.V:
+                        if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
+                            Value += System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
+                        break;
+                    case Key.X:
+                        if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
+                        {
+                            System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
+                            Value = string.Empty;
+                        }
+                        break;
                 }
                 return true;
             };
