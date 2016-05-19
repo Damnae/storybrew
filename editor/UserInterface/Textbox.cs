@@ -153,7 +153,7 @@ namespace StorybrewEditor.UserInterface
             {
                 var contentBounds = content.TextBounds;
                 var position = new Vector2(string.IsNullOrEmpty(Value) ? contentBounds.Left : contentBounds.Right, contentBounds.Top + content.TextBounds.Height * 0.2f);
-                var scale = new Vector2(2, content.TextBounds.Height * 0.6f);
+                var scale = new Vector2(Manager.PixelSize, content.TextBounds.Height * 0.6f);
 
                 cursorLine.Color = Color4.White;
                 cursorLine.Draw(drawContext, Manager.Camera, new Box2(position, position + scale), actualOpacity);
