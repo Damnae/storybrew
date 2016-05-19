@@ -24,9 +24,12 @@ namespace StorybrewEditor.UserInterface
         {
             get
             {
+                var contentSize = content.PreferredSize;
+                if (string.IsNullOrWhiteSpace(label.Text))
+                    return new Vector2(Math.Max(contentSize.X, 200), contentSize.Y);
+
                 var labelSize = label.PreferredSize;
-                var contentSize = label.PreferredSize;
-                return new Vector2(Math.Max(labelSize.X, 150), labelSize.Y + contentSize.Y);
+                return new Vector2(Math.Max(labelSize.X, 200), labelSize.Y + contentSize.Y);
             }
         }
 

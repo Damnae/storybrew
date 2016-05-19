@@ -125,7 +125,6 @@ namespace StorybrewEditor.UserInterface.Components
                     AnchorFrom = UiAlignment.Centre,
                     AnchorTo = UiAlignment.Centre,
                     Horizontal = true,
-                    FitChildren = true,
                     Fill = true,
                     Children = new Widget[]
                     {
@@ -133,8 +132,8 @@ namespace StorybrewEditor.UserInterface.Components
                         {
                             StyleName = "listItem",
                             Text = field.DisplayName,
-                            AnchorFrom = UiAlignment.TopLeft,
-                            AnchorTo = UiAlignment.TopLeft,
+                            AnchorFrom = UiAlignment.Left,
+                            AnchorTo = UiAlignment.Left,
                         },
                         buildFieldEditor(field),
                     }
@@ -150,8 +149,9 @@ namespace StorybrewEditor.UserInterface.Components
                 {
                     Value = field.Value,
                     Options = field.AllowedValues,
-                    AnchorFrom = UiAlignment.TopRight,
-                    AnchorTo = UiAlignment.TopRight,
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
                 };
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
                 return widget;
@@ -161,8 +161,9 @@ namespace StorybrewEditor.UserInterface.Components
                 var widget = new Textbox(Manager)
                 {
                     Value = field.Value.ToString(),
-                    AnchorFrom = UiAlignment.TopRight,
-                    AnchorTo = UiAlignment.TopRight,
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
                 };
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
                 widget.OnValueCommited += (sender, e) => widget.Value = effect.Config.GetValue(field.Name).ToString();
@@ -173,8 +174,9 @@ namespace StorybrewEditor.UserInterface.Components
                 var widget = new Textbox(Manager)
                 {
                     Value = field.Value.ToString(),
-                    AnchorFrom = UiAlignment.TopRight,
-                    AnchorTo = UiAlignment.TopRight,
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
                 };
                 widget.OnValueChanged += (sender, e) =>
                 {
@@ -194,8 +196,9 @@ namespace StorybrewEditor.UserInterface.Components
                 StyleName = "listItem",
                 Text = field.Value.ToString(),
                 Tooltip = $"Values of type {field.Type.Name} cannot be edited",
-                AnchorFrom = UiAlignment.TopRight,
-                AnchorTo = UiAlignment.TopRight,
+                AnchorFrom = UiAlignment.Right,
+                AnchorTo = UiAlignment.Right,
+                CanGrow = false,
             };
         }
 
