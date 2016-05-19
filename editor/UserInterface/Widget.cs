@@ -141,10 +141,12 @@ namespace StorybrewEditor.UserInterface
             {
                 if (displayed == value) return;
                 displayed = value;
+                OnDisplayedChanged?.Invoke(this, EventArgs.Empty);
                 if (hoverable) manager.RefreshHover();
             }
         }
         public bool Visible => displayed && (parent == null || parent.Visible);
+        public event EventHandler OnDisplayedChanged;
 
         private bool hoverable = true;
         public bool Hoverable

@@ -175,6 +175,7 @@ namespace StorybrewEditor.ScreenLayers
                 Offset = new Vector2(16, 16),
                 Displayed = false,
             });
+            effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
 
             WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
             {
@@ -340,8 +341,6 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Resize(width, height);
 
-            resizeStoryboard();
-
             bottomLeftLayout.Pack(650);
             bottomRightLayout.Pack(1024 - bottomLeftLayout.Width);
 
@@ -349,11 +348,19 @@ namespace StorybrewEditor.ScreenLayers
             layersList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
 
             effectConfigUi.Pack(bottomRightLayout.Width, WidgetManager.Root.Height - bottomLeftLayout.Height - 16);
+
+            resizeStoryboard();
         }
 
         private void resizeStoryboard()
         {
             var parentSize = WidgetManager.Size;
+            if (effectConfigUi.Displayed)
+            {
+                mainStoryboardContainer.Offset = new Vector2(effectConfigUi.Bounds.Right / 2, 0);
+                parentSize.X -= effectConfigUi.Bounds.Right;
+            }
+            else mainStoryboardContainer.Offset = Vector2.Zero;
             mainStoryboardContainer.Size = fitButton.Checked ? new Vector2(parentSize.X, (parentSize.X * 9) / 16) : parentSize;
         }
 
