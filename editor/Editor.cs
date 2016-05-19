@@ -146,7 +146,7 @@ namespace StorybrewEditor
             });
             altOverlayTop.Pack(0, 0, 1024);
 
-            volumeSlider.BindToSetting(Program.Settings.Volume, () => volumeSlider.Tooltip = $"Volume: {volumeSlider.Value:P0}");
+            Program.Settings.Volume.Bind(volumeSlider, () => volumeSlider.Tooltip = $"Volume: {volumeSlider.Value:P0}");
             overlay.Root.OnMouseWheel += (sender, e) =>
             {
                 if (!InputManager.AltOnly)

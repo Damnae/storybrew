@@ -1,4 +1,5 @@
 ﻿using StorybrewCommon.Util;
+using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System;
 using System.IO;
@@ -73,6 +74,19 @@ namespace StorybrewEditor
             OnValueChanged?.Invoke(this, EventArgs.Empty);
         }
         public void Set(object value) => Set((T)Convert.ChangeType(value, typeof(T)));
+
+        public void Bind(Field field, Action changedAction)
+        {
+            field.OnValueChanged += (sender, e) => Set(field.FieldValue);
+            EventHandler handler;
+            OnValueChanged += handler = (sender, e) =>
+            {
+                field.FieldValue = value;
+                changedAction();
+            };
+            field.OnDisposed += (sender, e) => OnValueChanged -= handler;
+            handler(this, EventArgs.Empty);
+        }
 
         public static implicit operator T(Setting<T> setting) => setting.value;
 

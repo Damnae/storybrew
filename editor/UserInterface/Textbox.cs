@@ -9,7 +9,7 @@ using System;
 
 namespace StorybrewEditor.UserInterface
 {
-    public class Textbox : Widget
+    public class Textbox : Widget, Field
     {
         private Label label;
         private Label content;
@@ -46,6 +46,11 @@ namespace StorybrewEditor.UserInterface
                 if (hasFocus) hasCommitPending = true;
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
             }
+        }
+        public object FieldValue
+        {
+            get { return Value; }
+            set { Value = (string)value; }
         }
 
         public event EventHandler OnValueChanged;

@@ -151,6 +151,7 @@
     <Compile Include="Storyboarding\Project.cs" />
     <Compile Include="Storyboarding\ScriptedEffect.cs" />
     <Compile Include="UserInterface\Components\EffectConfigUi.cs" />
+    <Compile Include="UserInterface\Field.cs" />
     <Compile Include="UserInterface\ScrollArea.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />
     <Compile Include="UserInterface\Skinning\Styles\SelectboxStyle.cs" />

@@ -5,7 +5,7 @@ using System;
 
 namespace StorybrewEditor.UserInterface
 {
-    public class Selectbox : Widget
+    public class Selectbox : Widget, Field
     {
         private Button button;
 
@@ -38,6 +38,11 @@ namespace StorybrewEditor.UserInterface
                 button.Text = findValueName(this.value);
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
             }
+        }
+        public object FieldValue
+        {
+            get { return Value; }
+            set { Value = value; }
         }
 
         public event EventHandler OnValueChanged;

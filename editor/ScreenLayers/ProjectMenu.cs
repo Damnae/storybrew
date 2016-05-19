@@ -243,7 +243,7 @@ namespace StorybrewEditor.ScreenLayers
                 return true;
             };
             playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
-            fitButton.BindToSetting(Program.Settings.FitStoryboard, () => resizeStoryboard());
+            Program.Settings.FitStoryboard.Bind(fitButton, () => resizeStoryboard());
 
             divisorButton.OnClick += (sender, e) =>
             {

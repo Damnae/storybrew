@@ -6,7 +6,7 @@ using System;
 
 namespace StorybrewEditor.UserInterface
 {
-    public class ProgressBar : Widget
+    public class ProgressBar : Widget, Field
     {
         private Drawable bar = NullDrawable.Instance;
 
@@ -28,6 +28,11 @@ namespace StorybrewEditor.UserInterface
                 this.value = value;
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
             }
+        }
+        public object FieldValue
+        {
+            get { return Value; }
+            set { Value = (float)Convert.ChangeType(value, typeof(float)); }
         }
 
         public void SetValueSilent(float value)

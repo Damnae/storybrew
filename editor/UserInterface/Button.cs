@@ -5,7 +5,7 @@ using System;
 
 namespace StorybrewEditor.UserInterface
 {
-    public class Button : Widget
+    public class Button : Widget, Field
     {
         private Label label;
         private ClickBehavior clickBehavior;
@@ -52,7 +52,12 @@ namespace StorybrewEditor.UserInterface
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        
+        public object FieldValue
+        {
+            get { return Checked; }
+            set { Checked = (bool)Convert.ChangeType(value, typeof(bool)); }
+        }
+
         public bool Disabled
         {
             get { return clickBehavior.Disabled; }
