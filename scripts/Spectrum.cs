@@ -12,11 +12,27 @@ namespace StorybrewScripts
     /// </summary>
     public class Spectrum : StoryboardObjectGenerator
     {
+        [Configurable]
+        public string SpriteName = "sb/pl.png";
+        
+        [Configurable]
+        public int SpriteWidth = 76;
+        
+        [Configurable]
+        public int StartTime = 0;
+        
+        [Configurable]
+        public int EndTime = 10000;
+        
+        [Configurable]
+        public int BarCount = 256;
+        
+        [Configurable]
+        public int Step = 4;
+        
         public override void Generate()
         {
-            // Create a spectrum effect from 0 to 20 seconds, using the sprite located at sb/pl.png
-            // 256 bars are created and updated every 1/8
-            MakeSpectrum(0, 10000, "sb/pl.png", 256, 8);
+            MakeSpectrum(StartTime, EndTime, SpriteName, BarCount, Step);
         }
 
         private void MakeSpectrum(int tStart, int tEnd, string spritePath, int barCount, double beatDivisor)
@@ -26,7 +42,7 @@ namespace StorybrewScripts
 
             var bars = new OsbSprite[barCount];
             var barWidth = 640.0 / bars.Length;
-            var imageWidth = 76;
+            var imageWidth = SpriteWidth;
 
             for (var i = 0; i < bars.Length; i++)
             {
