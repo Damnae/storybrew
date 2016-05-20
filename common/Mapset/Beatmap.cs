@@ -14,6 +14,7 @@ namespace StorybrewCommon.Mapset
         /// This beatmap diff name, also called version.
         /// </summary>
         public abstract string Name { get; }
+        public abstract long Id { get; }
 
         public abstract double SliderMultiplier { get; }
 

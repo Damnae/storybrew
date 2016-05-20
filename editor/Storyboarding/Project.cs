@@ -408,7 +408,10 @@ namespace StorybrewEditor.Storyboarding
             {
                 w.Write(Version);
                 w.Write(Program.FullName);
+
                 w.Write(MapsetPath);
+                w.Write(MainBeatmap.Id);
+                w.Write(MainBeatmap.Name);
 
                 w.Write(effects.Count);
                 foreach (var effect in effects)
@@ -459,6 +462,19 @@ namespace StorybrewEditor.Storyboarding
                 Debug.Print($"Loading project saved by {savedBy}");
 
                 project.MapsetPath = r.ReadString();
+                if (version >= 1)
+                {
+                    var mainBeatmapId = r.ReadInt64();
+                    var mainBeatmapName = r.ReadString();
+
+                    foreach (var beatmap in project.MapsetManager.Beatmaps)
+                        if ((mainBeatmapId > 0 && beatmap.Id == mainBeatmapId) ||
+                            (mainBeatmapName.Length > 0 && beatmap.Name == mainBeatmapName))
+                        {
+                            project.MainBeatmap = beatmap;
+                            break;
+                        }
+                }
 
                 var effectCount = r.ReadInt32();
                 for (int effectIndex = 0; effectIndex < effectCount; effectIndex++)

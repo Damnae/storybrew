@@ -17,6 +17,9 @@ namespace StorybrewEditor.Mapset
         private string name;
         public override string Name => name;
 
+        private long id;
+        public override long Id => id;
+
         private List<int> bookmarks = new List<int>();
         public override IEnumerable<int> Bookmarks => bookmarks;
 
@@ -34,6 +37,7 @@ namespace StorybrewEditor.Mapset
         #region Timing
 
         private List<ControlPoint> controlPoints = new List<ControlPoint>();
+
         public override IEnumerable<ControlPoint> ControlPoints => controlPoints;
         public override IEnumerable<ControlPoint> TimingPoints
         {
@@ -130,6 +134,7 @@ namespace StorybrewEditor.Mapset
                 switch (key)
                 {
                     case "Version": beatmap.name = value; break;
+                    case "BeatmapID": beatmap.id = long.Parse(value); break;
                 }
             });
         }
