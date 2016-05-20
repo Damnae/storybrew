@@ -2,10 +2,10 @@
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
-using StorybrewEditor.Mapset;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Textures;
+using StorybrewEditor.Mapset;
 using StorybrewEditor.Scripting;
 using StorybrewEditor.Util;
 using System;
@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -31,8 +30,6 @@ namespace StorybrewEditor.Storyboarding
 
         private TextureContainer textureContainer;
         public TextureContainer TextureContainer => textureContainer;
-
-        private static BinaryFormatter formatter = new BinaryFormatter();
 
         public string AudioPath
         {
@@ -96,11 +93,13 @@ namespace StorybrewEditor.Storyboarding
 
         #region Display
 
+        private static readonly OsbLayer[] osbLayers = new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, };
+
         public double DisplayTime;
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
-            foreach (var osbLayer in new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, })
+            foreach (var osbLayer in osbLayers)
                 foreach (var layer in layers)
                     layer.Draw(drawContext, camera, bounds, opacity, osbLayer);
         }
@@ -398,7 +397,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 0;
+        public const int Version = 1;
 
         public void Save()
         {
@@ -417,25 +416,21 @@ namespace StorybrewEditor.Storyboarding
                     w.Write(effect.BaseName);
                     w.Write(effect.Name);
 
-                    if (Version >= 1)
+                    var config = effect.Config;
+                    w.Write(config.FieldCount);
+                    foreach (var field in config.Fields)
                     {
-                        var config = effect.Config;
-                        w.Write(config.FieldCount);
-                        foreach (var field in config.Fields)
-                        {
-                            w.Write(field.Name);
-                            w.Write(field.DisplayName);
-                            formatter.Serialize(stream, field.Value);
-                            w.Write(field.Type.AssemblyQualifiedName);
+                        w.Write(field.Name);
+                        w.Write(field.DisplayName);
+                        ObjectSerializer.Write(w, field.Value);
 
-                            w.Write(field.AllowedValues?.Length ?? 0);
-                            if (field.AllowedValues != null)
-                                foreach (var allowedValue in field.AllowedValues)
-                                {
-                                    w.Write(allowedValue.Name);
-                                    formatter.Serialize(stream, allowedValue.Value);
-                                }
-                        }
+                        w.Write(field.AllowedValues?.Length ?? 0);
+                        if (field.AllowedValues != null)
+                            foreach (var allowedValue in field.AllowedValues)
+                            {
+                                w.Write(allowedValue.Name);
+                                ObjectSerializer.Write(w, allowedValue.Value);
+                            }
                     }
                 }
 
@@ -456,7 +451,7 @@ namespace StorybrewEditor.Storyboarding
             using (var stream = new FileStream(projectFilename, FileMode.Open))
             using (var r = new BinaryReader(stream, Encoding.UTF8))
             {
-                int version = r.ReadInt32();
+                var version = r.ReadInt32();
                 if (version > Version)
                     throw new InvalidOperationException("This project was saved with a more recent version, you need to update to open it");
 
@@ -474,30 +469,28 @@ namespace StorybrewEditor.Storyboarding
                     var effect = project.AddEffect(baseName);
                     effect.Name = name;
 
-                    if (false && version >= 1)
+                    if (version >= 1)
                     {
                         var fieldCount = r.ReadInt32();
                         for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++)
                         {
                             var fieldName = r.ReadString();
                             var fieldDisplayName = r.ReadString();
-                            var fieldValue = formatter.Deserialize(stream);
-                            var fieldTypeName = r.ReadString();
-                            var fieldType = Type.GetType(fieldTypeName);
+                            var fieldValue = ObjectSerializer.Read(r);
 
                             var allowedValueCount = r.ReadInt32();
                             var allowedValues = allowedValueCount > 0 ? new NamedValue[allowedValueCount] : null;
                             for (int allowedValueIndex = 0; allowedValueIndex < allowedValueCount; allowedValueIndex++)
                             {
                                 var allowedValueName = r.ReadString();
-                                var allowedValue = formatter.Deserialize(stream);
+                                var allowedValue = ObjectSerializer.Read(r);
                                 allowedValues[allowedValueIndex] = new NamedValue()
                                 {
                                     Name = allowedValueName,
                                     Value = allowedValue,
                                 };
                             }
-                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldType, fieldValue, allowedValues);
+                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldValue.GetType(), fieldValue, allowedValues);
                         }
                     }
                 }
@@ -542,7 +535,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 writer.WriteLine("[Events]");
                 writer.WriteLine("//Background and Video events");
-                foreach (var osbLayer in new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, })
+                foreach (var osbLayer in osbLayers)
                 {
                     writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                     foreach (var layer in localLayers)
