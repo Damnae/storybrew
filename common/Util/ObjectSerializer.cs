@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace StorybrewEditor.Util
+namespace StorybrewCommon.Util
 {
     public abstract class ObjectSerializer
     {
@@ -23,14 +23,22 @@ namespace StorybrewEditor.Util
         {
             var typeName = reader.ReadString();
             var type = Type.GetType(typeName);
-            return GetSerializer(type).ReadValue(reader);
+
+            var serializer = GetSerializer(type);
+            if (serializer == null) throw new NotSupportedException($"Cannot read objects of type {typeName}");
+
+            return serializer.ReadValue(reader);
         }
 
         public static void Write(BinaryWriter writer, object value)
         {
             var type = value.GetType();
+
+            var serializer = GetSerializer(type);
+            if (serializer == null) throw new NotSupportedException($"Cannot write objects of type {type.FullName}");
+
             writer.Write(type.FullName);
-            GetSerializer(type).WriteValue(writer, value);
+            serializer.WriteValue(writer, value);
         }
 
         public static ObjectSerializer GetSerializer(Type type)
@@ -39,8 +47,10 @@ namespace StorybrewEditor.Util
                 if (serializer.CanSerialize(type))
                     return serializer;
 
-            throw new NotSupportedException($"The type {type} isn't supported");
+            return null;
         }
+
+        public static bool Supports(Type type) => GetSerializer(type) != null;
     }
 
     public class SimpleObjectSerializer<T> : ObjectSerializer
