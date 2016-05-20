@@ -13,48 +13,44 @@ namespace StorybrewScripts
     public class Spectrum : StoryboardObjectGenerator
     {
         [Configurable]
-        public string SpriteName = "sb/pl.png";
-        
-        [Configurable]
-        public int SpriteWidth = 76;
-        
-        [Configurable]
         public int StartTime = 0;
-        
+
         [Configurable]
         public int EndTime = 10000;
-        
+
+        [Configurable]
+        public int BeatDivisor = 4;
+
         [Configurable]
         public int BarCount = 256;
-        
+
         [Configurable]
-        public int Step = 4;
-        
+        public string SpritePath = "sb/pl.png";
+
+        [Configurable]
+        public int SpriteWidth = 76;
+
         public override void Generate()
         {
-            MakeSpectrum(StartTime, EndTime, SpriteName, BarCount, Step);
-        }
-
-        private void MakeSpectrum(int tStart, int tEnd, string spritePath, int barCount, double beatDivisor)
-        {
             var layer = GetLayer("Spectrum");
-            var fftTimeStep = Beatmap.GetTimingPointAt(tStart).BeatDuration / beatDivisor;
+            var fftTimeStep = Beatmap.GetTimingPointAt(StartTime).BeatDuration / BeatDivisor;
 
-            var bars = new OsbSprite[barCount];
+            var bars = new OsbSprite[BarCount];
             var barWidth = 640.0 / bars.Length;
             var imageWidth = SpriteWidth;
 
             for (var i = 0; i < bars.Length; i++)
             {
-                bars[i] = layer.CreateSprite(spritePath, OsbLayer.Background, OsbOrigin.CentreLeft);
-                bars[i].Move(tStart, i * barWidth, 240);
-                bars[i].ScaleVec(tStart, barWidth / imageWidth, 0);
-                bars[i].Additive(tStart, tEnd);
+                bars[i] = layer.CreateSprite(SpritePath, OsbLayer.Background, OsbOrigin.CentreLeft);
+                bars[i].Move(StartTime, i * barWidth, 240);
+                bars[i].ScaleVec(StartTime, barWidth / imageWidth, 0);
+                bars[i].Additive(StartTime, EndTime);
             }
 
-            for (var time = (double)tStart; time < tEnd; time += fftTimeStep)
+            var fftOffset = fftTimeStep * 0.2;
+            for (var time = (double)StartTime; time < EndTime; time += fftTimeStep)
             {
-                var fft = GetFft(time + fftTimeStep * 0.2, bars.Length);
+                var fft = GetFft(time + fftOffset, bars.Length);
                 for (var i = 0; i < bars.Length; i++)
                 {
                     var height = fft[i] * 2000 / imageWidth;
