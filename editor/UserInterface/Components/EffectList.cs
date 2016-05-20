@@ -161,9 +161,6 @@ namespace StorybrewEditor.UserInterface.Components
                             AnchorFrom = UiAlignment.Centre,
                             AnchorTo = UiAlignment.Centre,
                             CanGrow = false,
-#if !DEBUG
-                            Disabled = true,
-#endif
                         },
                         editButton = new Button(Manager)
                         {
