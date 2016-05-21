@@ -40,7 +40,11 @@ namespace StorybrewEditor
             var processPath = Path.Combine(destinationFolder, relativeProcessPath);
 
             Trace.WriteLine($"\nUpdate complete, starting {processPath}");
-            Process.Start(processPath);
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = processPath,
+                WorkingDirectory = destinationFolder,
+            });
         }
 
         public static void Cleanup()
