@@ -41,7 +41,7 @@ namespace StorybrewScripts
 
             for (var i = 0; i < bars.Length; i++)
             {
-                bars[i] = layer.CreateSprite(SpritePath, OsbLayer.Background, OsbOrigin.CentreLeft);
+                bars[i] = layer.CreateSprite(SpritePath, OsbOrigin.CentreLeft);
                 bars[i].Move(StartTime, i * barWidth, 240);
                 bars[i].ScaleVec(StartTime, barWidth / imageWidth, 0);
                 bars[i].Additive(StartTime, EndTime);

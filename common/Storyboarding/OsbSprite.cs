@@ -239,12 +239,12 @@ namespace StorybrewCommon.Storyboarding
         public bool IsActive(double time)
             => CommandsStartTime <= time && time <= CommandsEndTime;
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             if (commands.Count == 0)
                 return;
 
-            writer.WriteLine($"Sprite,{Layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+            writer.WriteLine($"Sprite,{layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
             foreach (var command in commands)
                 command.WriteOsb(writer, exportSettings, 1);
         }

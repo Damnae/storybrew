@@ -54,7 +54,7 @@ namespace StorybrewScripts
             Intro(TimeIntro, TimePart1);
 
             // Background
-            var bg = bgLayer.CreateSprite("bg.jpg", OsbLayer.Background, OsbOrigin.Centre);
+            var bg = bgLayer.CreateSprite("bg.jpg", OsbOrigin.Centre);
             bg.Scale(TimeSbStart, BgScaling);
             bg.Fade(TimePart1 - BeatDuration * 2, TimePart1, 0, 1);
             bg.ColorHsb(TimeSbStart, 0, 0, 0.3);
@@ -70,7 +70,7 @@ namespace StorybrewScripts
             var hitobjectLayer = GetLayer("HitObjects");
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                var hSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbLayer.Background, OsbOrigin.Centre);
+                var hSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbOrigin.Centre);
                 hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + 200, 1, 0.2);
                 hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + 200, 1, 0);
                 hSprite.Move(hitobject.StartTime, hitobject.EndTime, hitobject.Position, hitobject.EndPosition);
@@ -95,7 +95,7 @@ namespace StorybrewScripts
 
         private void Intro(int tStart, int tEnd)
         {
-            var bg = bgLayer.CreateSprite("sb/bgg.png", OsbLayer.Background, OsbOrigin.BottomCentre);
+            var bg = bgLayer.CreateSprite("sb/bgg.png", OsbOrigin.BottomCentre);
             bg.Scale(TimeSbStart, BgScaling);
             bg.Move(TimeSbStart, 320, 480);
             bg.Fade(OsbEasing.In, TimeSbStart, tStart, 0, 1);
@@ -249,7 +249,7 @@ namespace StorybrewScripts
                 var t0 = 42421 + Offset + BeatDuration * i * 3 / 2;
                 var t1 = t0 + BeatDuration * 3 / 2;
 
-                var bg = mainLayer.CreateSprite("sb/jt" + i + ".png", OsbLayer.Background, OsbOrigin.Centre);
+                var bg = mainLayer.CreateSprite("sb/jt" + i + ".png", OsbOrigin.Centre);
                 bg.Scale(OsbEasing.Out, t0, t1, i % 2 == 0 ? 0.7 : 0.65, i % 2 == 0 ? 0.65 : 0.7);
                 bg.Fade(OsbEasing.In, t0, t1, 1, 0);
             }
@@ -598,7 +598,7 @@ namespace StorybrewScripts
             var hue1 = Random(340, 360);
             var hue2 = Random(240, 260);
 
-            var note = spritePools.Get(t0, t3, "sb/pl.png", OsbLayer.Background, OsbOrigin.Centre, true);
+            var note = spritePools.Get(t0, t3, "sb/pl.png", OsbOrigin.Centre, true);
             note.Move(OsbEasing.In, t0, t2, x0, y0, x1, y1);
             note.Fade(OsbEasing.Out, t0, t2, 0, 1);
             note.Fade(OsbEasing.In, t2, t3, 1, 0);
@@ -606,7 +606,7 @@ namespace StorybrewScripts
             note.ScaleVec(OsbEasing.In, t0, t3, 0.8, 0.2, 1, 1);
             note.ColorHsb(t0, outTime >= 260 ? hue1 : hue2, 0.5, 1);
 
-            var backNote = spritePools.Get(t1b, t4, "sb/pl.png", OsbLayer.Background, OsbOrigin.Centre, true);
+            var backNote = spritePools.Get(t1b, t4, "sb/pl.png", OsbOrigin.Centre, true);
             backNote.Move(OsbEasing.In, t1b, t2, lightX, lightY, x1, y1);
             backNote.Fade(OsbEasing.In, t1b, t2, 0, 1);
             backNote.Fade(OsbEasing.Out, t2, t4, 1, 0);
@@ -615,7 +615,7 @@ namespace StorybrewScripts
             backNote.ColorHsb(t1b, outTime >= 260 ? hue1 : hue2, 0.4, 1);
             backNote.ColorHsb(t2, outTime >= 260 ? hue2 : hue1, 0.4, 1);
 
-            var light = spritePools.Get(t2, t4, "sb/l.png", OsbLayer.Background, OsbOrigin.CentreLeft, true);
+            var light = spritePools.Get(t2, t4, "sb/l.png", OsbOrigin.CentreLeft, true);
             light.Move(t2, lightX, lightY);
             light.Fade(OsbEasing.Out, t2, t4, 1, 0);
             light.ScaleVec(OsbEasing.In, t2, t4, 1, 0.4, 1, 0.1);
@@ -663,7 +663,7 @@ namespace StorybrewScripts
 
                 var squish = Random(1.2, 2.2);
 
-                var particle = spritePools.Get(pt0, pt3, "sb/pl.png", OsbLayer.Background, OsbOrigin.Centre, true, 1);
+                var particle = spritePools.Get(pt0, pt3, "sb/pl.png", OsbOrigin.Centre, true, 1);
                 particle.MoveX((OsbEasing)Random(3), pt0, pt1, px0, px1);
                 particle.MoveY((OsbEasing)Random(3), pt0, pt1, py0, py1);
                 particle.MoveX((OsbEasing)Random(3), pt1, pt2, px1, px2);
@@ -697,7 +697,7 @@ namespace StorybrewScripts
             var x = 640 + 107 + 450 * (baseScale - 1);
             var y = 480 + 200 * (baseScale - 1);
 
-            var c3 = spritePools.Get(t3, t5, "sb/c3.png", OsbLayer.Background, OsbOrigin.BottomRight);
+            var c3 = spritePools.Get(t3, t5, "sb/c3.png", OsbOrigin.BottomRight);
             c3.Scale(t3, scale);
             c3.Move(t3, x - (401 + 309 + 281) * scale, y);
             c3.ColorHsb(OsbEasing.Out, t3, t4, 0, 1, 1, 0, 0, 1);
@@ -708,7 +708,7 @@ namespace StorybrewScripts
             }
             else c3.ColorHsb(OsbEasing.In, t4, t5, 0, 0, 1, 0, 0, 0);
 
-            var c2 = spritePools.Get(t2, t5, "sb/c2.png", OsbLayer.Background, OsbOrigin.BottomRight);
+            var c2 = spritePools.Get(t2, t5, "sb/c2.png", OsbOrigin.BottomRight);
             c2.Scale(t2, scale);
             c2.Move(t2, x - (401 + 309) * scale, y);
             c2.ColorHsb(OsbEasing.Out, t2, t3, 0, 1, 1, 0, 0, 1);
@@ -719,7 +719,7 @@ namespace StorybrewScripts
             }
             else c2.ColorHsb(OsbEasing.In, t4, t5, 0, 0, 1, 0, 0, 0);
 
-            var c1 = spritePools.Get(t1, t5, "sb/c1.png", OsbLayer.Background, OsbOrigin.BottomRight);
+            var c1 = spritePools.Get(t1, t5, "sb/c1.png", OsbOrigin.BottomRight);
             c1.Scale(t1, scale);
             c1.Move(t1, x - (401) * scale, y);
             c1.ColorHsb(OsbEasing.Out, t1, t2, 0, 1, 1, 0, 0, 1);
@@ -730,7 +730,7 @@ namespace StorybrewScripts
             }
             else c1.ColorHsb(OsbEasing.In, t4, t5, 0, 0, 1, 0, 0, 0);
 
-            var c0 = spritePools.Get(t0, t5, "sb/c0.png", OsbLayer.Background, OsbOrigin.BottomRight);
+            var c0 = spritePools.Get(t0, t5, "sb/c0.png", OsbOrigin.BottomRight);
             c0.Scale(t0, scale);
             c0.Move(t0, x, y);
             c0.ColorHsb(OsbEasing.Out, t0, t1, 0, 1, 1, 0, 0, 1);

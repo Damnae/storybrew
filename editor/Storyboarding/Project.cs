@@ -101,7 +101,8 @@ namespace StorybrewEditor.Storyboarding
         {
             foreach (var osbLayer in osbLayers)
                 foreach (var layer in layers)
-                    layer.Draw(drawContext, camera, bounds, opacity, osbLayer);
+                    if (layer.OsbLayer == osbLayer)
+                        layer.Draw(drawContext, camera, bounds, opacity);
         }
 
         private void reloadTextures()
@@ -397,7 +398,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 1;
+        public const int Version = 2;
 
         public void Save()
         {
@@ -442,6 +443,7 @@ namespace StorybrewEditor.Storyboarding
                 {
                     w.Write(layer.Identifier);
                     w.Write(effects.IndexOf(layer.Effect));
+                    w.Write((int)layer.OsbLayer);
                     w.Write(layer.Visible);
                 }
                 stream.Commit();
@@ -516,11 +518,13 @@ namespace StorybrewEditor.Storyboarding
                 {
                     var identifier = r.ReadString();
                     var effectIndex = r.ReadInt32();
+                    var osbLayer = version >= 2 ? (OsbLayer)r.ReadInt32() : OsbLayer.Background;
                     var visible = r.ReadBoolean();
 
                     var effect = project.effects[effectIndex];
                     effect.AddPlaceholder(new EditorStoryboardLayer(identifier, effect)
                     {
+                        OsbLayer = osbLayer,
                         Visible = visible,
                     });
                 }
@@ -555,7 +559,8 @@ namespace StorybrewEditor.Storyboarding
                 {
                     writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                     foreach (var layer in localLayers)
-                        layer.WriteOsbSprites(writer, exportSettings, osbLayer);
+                        if (layer.OsbLayer == osbLayer)
+                            layer.WriteOsbSprites(writer, exportSettings);
                 }
                 writer.WriteLine("//Storyboard Sound Samples");
                 stream.Commit();

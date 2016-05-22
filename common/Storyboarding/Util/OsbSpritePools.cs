@@ -19,24 +19,24 @@ namespace StorybrewCommon.Storyboarding.Util
             pools.Clear();
         }
 
-        public OsbSprite Get(double startTime, double endTime, string path, OsbLayer osbLayer, OsbOrigin origin = OsbOrigin.Centre, bool additive = false, int poolGroup = 0)
-            => getPool(path, osbLayer, origin, additive, poolGroup).Get(startTime, endTime);
+        public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin = OsbOrigin.Centre, bool additive = false, int poolGroup = 0)
+            => getPool(path, origin, additive, poolGroup).Get(startTime, endTime);
 
         public void Release(OsbSprite sprite, double endTime)
-            => getPool(sprite.TexturePath, sprite.Layer, sprite.Origin, false, 0).Release(sprite, endTime);
+            => getPool(sprite.TexturePath, sprite.Origin, false, 0).Release(sprite, endTime);
 
-        private OsbSpritePool getPool(string path, OsbLayer osbLayer, OsbOrigin origin, bool additive, int poolGroup)
+        private OsbSpritePool getPool(string path, OsbOrigin origin, bool additive, int poolGroup)
         {
-            string key = getKey(path, osbLayer, origin, additive, poolGroup);
+            string key = getKey(path, origin, additive, poolGroup);
 
             OsbSpritePool pool;
             if (!pools.TryGetValue(key, out pool))
-                pools.Add(key, pool = new OsbSpritePool(layer, path, osbLayer, origin, additive));
+                pools.Add(key, pool = new OsbSpritePool(layer, path, origin, additive));
 
             return pool;
         }
 
-        private string getKey(string path, OsbLayer layer, OsbOrigin origin, bool additive, int poolGroup)
-            => $"{path}#{layer}#{origin}#{(additive ? "1" : "0")}#{poolGroup}";
+        private string getKey(string path, OsbOrigin origin, bool additive, int poolGroup)
+            => $"{path}#{origin}#{(additive ? "1" : "0")}#{poolGroup}";
     }
 }

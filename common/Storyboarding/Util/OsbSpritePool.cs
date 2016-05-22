@@ -6,17 +6,15 @@ namespace StorybrewCommon.Storyboarding.Util
     {
         private StoryboardLayer layer;
         private string path;
-        private OsbLayer osbLayer;
         private OsbOrigin origin;
         private bool additive;
 
         private List<PooledSprite> pooledSprites = new List<PooledSprite>();
 
-        public OsbSpritePool(StoryboardLayer layer, string path, OsbLayer osbLayer, OsbOrigin origin, bool additive)
+        public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, bool additive)
         {
             this.layer = layer;
             this.path = path;
-            this.osbLayer = osbLayer;
             this.origin = origin;
             this.additive = additive;
         }
@@ -53,7 +51,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 return result.Sprite;
             }
 
-            return layer.CreateSprite(path, osbLayer, origin);
+            return layer.CreateSprite(path, origin);
         }
 
         public void Release(OsbSprite sprite, double endTime)
