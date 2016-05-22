@@ -14,15 +14,6 @@ namespace StorybrewCommon.Scripting
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
-        [Configurable(DisplayName = "Random seed")]
-        public int RandomSeed;
-
-        private Random random;
-        public int Random(int minValue, int maxValue) => random.Next(minValue, maxValue);
-        public int Random(int maxValue) => random.Next(maxValue);
-        public double Random(double minValue, double maxValue) => minValue + random.NextDouble() * (maxValue - minValue);
-        public double Random(double maxValue) => random.NextDouble() * maxValue;
-
         /// <summary>
         /// Creates or retrieves a layer. 
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
@@ -36,6 +27,23 @@ namespace StorybrewCommon.Scripting
         {
             initializeConfigurableFields();
         }
+
+        #region Random
+
+        [Configurable(DisplayName = "Random seed")]
+        public int RandomSeed;
+
+        private Random random;
+        public int Random(int minValue, int maxValue) => random.Next(minValue, maxValue);
+        public int Random(int maxValue) => random.Next(maxValue);
+        public double Random(double minValue, double maxValue) => minValue + random.NextDouble() * (maxValue - minValue);
+        public double Random(double maxValue) => random.NextDouble() * maxValue;
+
+        #endregion
+
+        #region Audio data
+
+        public double AudioDuration => context.AudioDuration;
 
         /// <summary>
         /// Returns the Fast Fourier Transform of the song at a certain time, with the default amount of magnitudes.
@@ -72,6 +80,8 @@ namespace StorybrewCommon.Scripting
                 }
             return resultFft;
         }
+
+        #endregion
 
         public bool Configure(EffectConfig config)
         {

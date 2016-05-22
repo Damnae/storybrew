@@ -32,8 +32,11 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
+            var endTime = Math.Min(EndTime, (int)AudioDuration);
+            var startTime = Math.Min(StartTime, endTime);
+
             var layer = GetLayer("Spectrum");
-            var fftTimeStep = Beatmap.GetTimingPointAt(StartTime).BeatDuration / BeatDivisor;
+            var fftTimeStep = Beatmap.GetTimingPointAt(startTime).BeatDuration / BeatDivisor;
 
             var bars = new OsbSprite[BarCount];
             var barWidth = 640.0 / bars.Length;
@@ -42,13 +45,13 @@ namespace StorybrewScripts
             for (var i = 0; i < bars.Length; i++)
             {
                 bars[i] = layer.CreateSprite(SpritePath, OsbOrigin.CentreLeft);
-                bars[i].Move(StartTime, i * barWidth, 240);
-                bars[i].ScaleVec(StartTime, barWidth / imageWidth, 0);
-                bars[i].Additive(StartTime, EndTime);
+                bars[i].Move(startTime, i * barWidth, 240);
+                bars[i].ScaleVec(startTime, barWidth / imageWidth, 0);
+                bars[i].Additive(startTime, endTime);
             }
 
             var fftOffset = fftTimeStep * 0.2;
-            for (var time = (double)StartTime; time < EndTime; time += fftTimeStep)
+            for (var time = (double)startTime; time < endTime; time += fftTimeStep)
             {
                 var fft = GetFft(time + fftOffset, bars.Length);
                 for (var i = 0; i < bars.Length; i++)

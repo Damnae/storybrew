@@ -5,10 +5,10 @@ namespace StorybrewCommon.Storyboarding
 {
     public abstract class GeneratorContext : MarshalByRefObject
     {
-        public virtual Beatmap Beatmap { get; }
-
+        public abstract Beatmap Beatmap { get; }
         public abstract StoryboardLayer GetLayer(string identifier);
 
+        public abstract double AudioDuration { get; }
         public abstract float[] GetFft(double time);
     }
 }
