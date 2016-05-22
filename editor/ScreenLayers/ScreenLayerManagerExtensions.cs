@@ -1,5 +1,6 @@
 ﻿using StorybrewEditor.ScreenLayers.Util;
 using System;
+using System.IO;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -23,7 +24,7 @@ namespace StorybrewEditor.ScreenLayers
             });
         }
 
-        public static void OpenFilePicker(this ScreenLayerManager screenLayerManager, string description, string initialValue, string filter, Action<string> callback)
+        public static void OpenFilePicker(this ScreenLayerManager screenLayerManager, string description, string initialValue, string initialDirectory, string filter, Action<string> callback)
         {
             screenLayerManager.AsyncLoading("Select a file...", () =>
             {
@@ -34,6 +35,7 @@ namespace StorybrewEditor.ScreenLayers
                     ShowHelp = false,
                     FileName = initialValue,
                     Filter = filter,
+                    InitialDirectory = initialDirectory != null ? Path.GetFullPath(initialDirectory) : string.Empty,
                 })
                     if (dialog.ShowDialog(screenLayerManager.Editor.FormsWindow) == System.Windows.Forms.DialogResult.OK)
                     {

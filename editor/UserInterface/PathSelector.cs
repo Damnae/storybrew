@@ -64,7 +64,10 @@ namespace StorybrewEditor.UserInterface
                         Manager.ScreenLayerManager.OpenFolderPicker(LabelText, textbox.Value, (path) => textbox.Value = path);
                         break;
                     case PathSelectorMode.OpenFile:
-                        Manager.ScreenLayerManager.OpenFilePicker(LabelText, textbox.Value, Filter, (path) => textbox.Value = path);
+                        Manager.ScreenLayerManager.OpenFilePicker(LabelText, textbox.Value, null, Filter, (path) => textbox.Value = path);
+                        break;
+                    case PathSelectorMode.OpenDirectory:
+                        Manager.ScreenLayerManager.OpenFilePicker(LabelText, "", textbox.Value, Filter, (path) => textbox.Value = path);
                         break;
                     case PathSelectorMode.SaveFile:
                         Manager.ScreenLayerManager.OpenSaveLocationPicker(LabelText, textbox.Value, SaveExtension, Filter, (path) => textbox.Value = path);
@@ -104,6 +107,7 @@ namespace StorybrewEditor.UserInterface
     {
         Folder,
         OpenFile,
+        OpenDirectory,
         SaveFile,
     }
 }

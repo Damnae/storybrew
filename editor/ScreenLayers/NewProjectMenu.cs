@@ -38,7 +38,7 @@ namespace StorybrewEditor.ScreenLayers
                         LabelText = "Project Name",
                         AnchorTo = UiAlignment.Centre,
                     },
-                    mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.OpenFile)
+                    mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.OpenDirectory)
                     {
                         Value = OsuHelper.GetOsuSongFolder(),
                         LabelText = "Mapset Path",

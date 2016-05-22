@@ -83,7 +83,7 @@ namespace StorybrewEditor.ScreenLayers
             newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
             openProjectButton.OnClick += (sender, e) =>
             {
-                Manager.OpenFilePicker("", "", Project.FileFilter, (path) =>
+                Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (path) =>
                 {
                     Manager.AsyncLoading("Loading project...", () =>
                     {
