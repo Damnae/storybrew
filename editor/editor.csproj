@@ -83,6 +83,7 @@
     <None Include="Resources\scripttemplate.csx" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Storyboarding\EditorOsbAnimation.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="UserInterface\Drawables\CompositeDrawable.cs" />
     <Compile Include="UserInterface\Drawables\Drawable.cs" />

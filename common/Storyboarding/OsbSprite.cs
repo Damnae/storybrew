@@ -16,6 +16,9 @@ namespace StorybrewCommon.Storyboarding
         private CommandGroup currentCommandGroup;
 
         public string TexturePath = "";
+        public virtual string GetTexturePathAt(double time)
+            => TexturePath;
+
         public OsbOrigin Origin = OsbOrigin.Centre;
 
         private Vector2 initialPosition;
@@ -239,12 +242,15 @@ namespace StorybrewCommon.Storyboarding
         public bool IsActive(double time)
             => CommandsStartTime <= time && time <= CommandsEndTime;
 
+        protected virtual void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
+            => writer.WriteLine($"Sprite,{layer},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             if (commands.Count == 0)
                 return;
 
-            writer.WriteLine($"Sprite,{layer.ToString()},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+            WriteHeader(writer, exportSettings, layer);
             foreach (var command in commands)
                 command.WriteOsb(writer, exportSettings, 1);
         }
@@ -269,6 +275,12 @@ namespace StorybrewCommon.Storyboarding
         BottomLeft,
         BottomCentre,
         BottomRight,
+    }
+
+    public enum OsbLoopType
+    {
+        LoopForever,
+        LoopOnce,
     }
 
     public enum OsbEasing

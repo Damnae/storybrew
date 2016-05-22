@@ -61,13 +61,6 @@ namespace StorybrewEditor.Storyboarding
         private List<StoryboardObject> storyboardObjects = new List<StoryboardObject>();
         private List<DisplayableObject> displayableObjects = new List<DisplayableObject>();
 
-        public override OsbSprite CreateSprite(string path, OsbOrigin origin)
-            => CreateSprite(path, origin, OsbSprite.DefaultPosition);
-
-        [Obsolete]
-        public override OsbSprite CreateSprite(string path, OsbLayer layer, OsbOrigin origin)
-            => CreateSprite(path, origin, OsbSprite.DefaultPosition);
-
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
         {
             var storyboardObject = new EditorOsbSprite()
@@ -80,6 +73,32 @@ namespace StorybrewEditor.Storyboarding
             displayableObjects.Add(storyboardObject);
             return storyboardObject;
         }
+
+        public override OsbSprite CreateSprite(string path, OsbOrigin origin)
+            => CreateSprite(path, origin, OsbSprite.DefaultPosition);
+
+        [Obsolete]
+        public override OsbSprite CreateSprite(string path, OsbLayer layer, OsbOrigin origin)
+            => CreateSprite(path, origin, OsbSprite.DefaultPosition);
+
+        public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition)
+        {
+            var storyboardObject = new EditorOsbAnimation()
+            {
+                TexturePath = path,
+                Origin = origin,
+                FrameCount = frameCount,
+                FrameDelay = frameDelay,
+                LoopType = loopType,
+                InitialPosition = initialPosition,
+            };
+            storyboardObjects.Add(storyboardObject);
+            displayableObjects.Add(storyboardObject);
+            return storyboardObject;
+        }
+
+        public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre)
+            => CreateAnimation(path, frameCount, frameDelay, loopType, origin, OsbSprite.DefaultPosition);
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {

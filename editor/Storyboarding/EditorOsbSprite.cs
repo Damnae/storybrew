@@ -12,19 +12,22 @@ namespace StorybrewEditor.Storyboarding
     public class EditorOsbSprite : OsbSprite, DisplayableObject
     {
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project)
+            => Draw(drawContext, camera, bounds, opacity, project, this);
+
+        public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, OsbSprite sprite)
         {
             var time = project.DisplayTime * 1000;
-            if (!IsActive(time)) return;
+            if (!sprite.IsActive(time)) return;
 
-            var fade = OpacityAt(time);
+            var fade = sprite.OpacityAt(time);
             if (fade < 0.00001f) return;
 
-            var scale = (Vector2)ScaleAt(time);
+            var scale = (Vector2)sprite.ScaleAt(time);
             if (scale.X == 0 || scale.Y == 0) return;
-            if (FlipHAt(time)) scale.X = -scale.X;
-            if (FlipVAt(time)) scale.Y = -scale.Y;
+            if (sprite.FlipHAt(time)) scale.X = -scale.X;
+            if (sprite.FlipVAt(time)) scale.Y = -scale.Y;
 
-            var fullPath = Path.Combine(project.MapsetPath, TexturePath);
+            var fullPath = Path.Combine(project.MapsetPath, sprite.GetTexturePathAt(time));
             Texture2d texture = null;
             try
             {
@@ -37,14 +40,14 @@ namespace StorybrewEditor.Storyboarding
             }
             if (texture == null) return;
 
-            var position = PositionAt(time);
-            var rotation = RotationAt(time);
-            var color = ColorAt(time);
+            var position = sprite.PositionAt(time);
+            var rotation = sprite.RotationAt(time);
+            var color = sprite.ColorAt(time);
             var finalColor = ((Color4)color).WithOpacity(opacity * fade);
-            var additive = AdditiveAt(time);
+            var additive = sprite.AdditiveAt(time);
 
             Vector2 origin;
-            switch (Origin)
+            switch (sprite.Origin)
             {
                 default:
                 case OsbOrigin.TopLeft: origin = new Vector2(0, 0); break;

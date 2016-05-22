@@ -95,6 +95,7 @@
     <Compile Include="Storyboarding\CommandValues\CommandParameter.cs" />
     <Compile Include="Storyboarding\CommandValues\CommandPosition.cs" />
     <Compile Include="Storyboarding\CommandValues\CommandScale.cs" />
+    <Compile Include="Storyboarding\OsbAnimation.cs" />
     <Compile Include="Storyboarding\OsbSprite.cs" />
     <Compile Include="Storyboarding\StoryboardObject.cs" />
     <Compile Include="Storyboarding\StoryboardLayer.cs" />

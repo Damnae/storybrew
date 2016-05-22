@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 
