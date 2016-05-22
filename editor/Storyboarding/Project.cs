@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,6 +23,8 @@ namespace StorybrewEditor.Storyboarding
     {
         public const string Extension = ".sbp";
         public const string DefaultFilename = "project" + Extension;
+        public const string ProjectsFolder = "projects";
+
         public const string FileFilter = "project files (*" + Extension + ")|*" + Extension + "|All files (*.*)|*.*";
 
         private string projectFilename;
@@ -56,13 +59,8 @@ namespace StorybrewEditor.Storyboarding
 
             reloadTextures();
 
-            var scriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
-            if (!Directory.Exists(scriptsSourcePath))
-            {
-                scriptsSourcePath = Path.GetFullPath("scripts");
-                if (!Directory.Exists(scriptsSourcePath))
-                    Directory.CreateDirectory(scriptsSourcePath);
-            }
+            //var scriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
+            var scriptsSourcePath = Path.GetDirectoryName(projectFilename);
             Trace.WriteLine($"Scripts path: {scriptsSourcePath}");
 
             var compiledScriptsPath = Path.GetFullPath("cache/scripts");
@@ -529,6 +527,32 @@ namespace StorybrewEditor.Storyboarding
                     });
                 }
             }
+            return project;
+        }
+
+        public static Project Create(string projectFolderName, string mapsetPath)
+        {
+            if (!Directory.Exists(ProjectsFolder))
+                Directory.CreateDirectory(ProjectsFolder);
+
+            if (string.IsNullOrWhiteSpace(projectFolderName))
+                throw new InvalidOperationException($"{projectFolderName} isn't a valid project folder name");
+
+            var projectFolderPath = Path.Combine(ProjectsFolder, projectFolderName);
+            if (Directory.Exists(projectFolderPath))
+                throw new InvalidOperationException($"A project already exists at {projectFolderPath}");
+
+            Directory.CreateDirectory(projectFolderPath);
+            using (var stream = new MemoryStream(Resources.projecttemplate))
+            using (var zip = new ZipArchive(stream))
+                zip.ExtractToDirectory(projectFolderPath);
+
+            var project = new Project(Path.Combine(projectFolderPath, DefaultFilename))
+            {
+                MapsetPath = mapsetPath,
+            };
+            project.Save();
+
             return project;
         }
 

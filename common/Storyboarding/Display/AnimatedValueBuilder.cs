@@ -1,6 +1,6 @@
-﻿using System;
-using StorybrewCommon.Storyboarding.Commands;
+﻿using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
+using System;
 
 namespace StorybrewCommon.Storyboarding.Display
 {

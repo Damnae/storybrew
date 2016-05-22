@@ -73,6 +73,16 @@ namespace StorybrewEditor {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] projecttemplate {
+            get {
+                object obj = ResourceManager.GetObject("projecttemplate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Roboto_Light {
             get {
                 object obj = ResourceManager.GetObject("Roboto_Light", resourceCulture);

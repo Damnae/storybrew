@@ -2,13 +2,14 @@
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System.IO;
+using System;
 
 namespace StorybrewEditor.ScreenLayers
 {
     public class NewProjectMenu : UiScreenLayer
     {
         private LinearLayout mainLayout;
-        private PathSelector projectPathSelector;
+        private Textbox projectNameTextbox;
         private PathSelector mapsetPathSelector;
         private Button startButton;
         private Button cancelButton;
@@ -32,24 +33,17 @@ namespace StorybrewEditor.ScreenLayers
                         Text = "New Project",
                         AnchorTo = UiAlignment.Centre,
                     },
-                    mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.Folder)
+                    projectNameTextbox = new Textbox(WidgetManager)
+                    {
+                        LabelText = "Project Name",
+                        AnchorTo = UiAlignment.Centre,
+                    },
+                    mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.OpenFile)
                     {
                         Value = OsuHelper.GetOsuSongFolder(),
                         LabelText = "Mapset Path",
                         AnchorTo = UiAlignment.Centre,
-                    },
-                    projectPathSelector = new PathSelector(WidgetManager, PathSelectorMode.SaveFile)
-                    {
-                        LabelText = "Project Path",
-                        AnchorTo = UiAlignment.Centre,
-                        Filter = Project.FileFilter,
-                        SaveExtension = Project.Extension,
-                    },
-                    new Label(WidgetManager)
-                    {
-                        StyleName = "small",
-                        Text = "Leave the Project Path empty to store the project inside the mapset's folder.",
-                        AnchorTo = UiAlignment.Centre,
+                        Filter = ".osu files (*.osu)|*.osu",
                     },
                     new LinearLayout(WidgetManager)
                     {
@@ -73,8 +67,23 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            projectPathSelector.OnValueChanged += (sender, e) => updateButtonsState();
-            mapsetPathSelector.OnValueChanged += (sender, e) => updateButtonsState();
+            projectNameTextbox.OnValueChanged += (sender, e) => updateButtonsState();
+            projectNameTextbox.OnValueCommited += (sender, e) =>
+            {
+                var name = projectNameTextbox.Value;
+                foreach (var character in Path.GetInvalidFileNameChars())
+                    name = name.Replace(character, '_');
+                projectNameTextbox.Value = name;
+            };
+            mapsetPathSelector.OnValueChanged += (sender, e) =>
+            {
+                if (!Directory.Exists(mapsetPathSelector.Value))
+                {
+                    mapsetPathSelector.Value = Path.GetDirectoryName(mapsetPathSelector.Value);
+                    return;
+                }
+                updateButtonsState();
+            };
             updateButtonsState();
 
             startButton.OnClick += (sender, e) => createProject();
@@ -89,17 +98,9 @@ namespace StorybrewEditor.ScreenLayers
 
         private void createProject()
         {
-            var projectFilename = projectPathSelector.Value;
-            if (string.IsNullOrWhiteSpace(projectFilename))
-                projectFilename = Path.Combine(mapsetPathSelector.Value, Project.DefaultFilename);
-
             Manager.AsyncLoading("Creating project...", () =>
             {
-                var project = new Project(projectFilename)
-                {
-                    MapsetPath = mapsetPathSelector.Value,
-                };
-                project.Save();
+                var project = Project.Create(projectNameTextbox.Value, mapsetPathSelector.Value);
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
             });
         }
@@ -111,6 +112,20 @@ namespace StorybrewEditor.ScreenLayers
 
         private bool updateFieldsValid()
         {
+            var projectFolderName = projectNameTextbox.Value;
+            if (string.IsNullOrWhiteSpace(projectFolderName))
+            {
+                startButton.Tooltip = $"The project name isn't valid";
+                return false;
+            }
+
+            var projectFolderPath = Path.Combine(Project.ProjectsFolder, projectFolderName);
+            if (Directory.Exists(projectFolderPath))
+            {
+                startButton.Tooltip = $"A project named {projectFolderName} already exists";
+                return false;
+            }
+
             if (!Directory.Exists(mapsetPathSelector.Value))
             {
                 startButton.Tooltip = "The selected mapset folder does not exist";
@@ -120,19 +135,6 @@ namespace StorybrewEditor.ScreenLayers
             if (Directory.GetFiles(mapsetPathSelector.Value, "*.osu", SearchOption.TopDirectoryOnly).Length == 0)
             {
                 startButton.Tooltip = $"No .osu found in the selected mapset folder";
-                return false;
-            }
-
-            var autoProjectPath = string.IsNullOrWhiteSpace(projectPathSelector.Value);
-            if (autoProjectPath && File.Exists(Path.Combine(mapsetPathSelector.Value, Project.DefaultFilename)))
-            {
-                startButton.Tooltip = $"A project already exist in the selected mapset folder, you must pick a project path";
-                return false;
-            }
-
-            if (!autoProjectPath && !Directory.Exists(Path.GetDirectoryName(projectPathSelector.Value)))
-            {
-                startButton.Tooltip = $"The project path doesn't exist";
                 return false;
             }
 
