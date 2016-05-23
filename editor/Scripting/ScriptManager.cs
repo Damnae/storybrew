@@ -13,6 +13,7 @@ namespace StorybrewEditor.Scripting
     {
         private string scriptsNamespace;
         private string scriptsSourcePath;
+        private string commonScriptsPath;
         private string compiledScriptsPath;
         private string[] referencedAssemblies;
 
@@ -22,10 +23,11 @@ namespace StorybrewEditor.Scripting
 
         public string ScriptsPath => scriptsSourcePath;
 
-        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string compiledScriptsPath, params string[] referencedAssemblies)
+        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string compiledScriptsPath, params string[] referencedAssemblies)
         {
             this.scriptsNamespace = scriptsNamespace;
             this.scriptsSourcePath = scriptsSourcePath;
+            this.commonScriptsPath = commonScriptsPath;
             this.referencedAssemblies = referencedAssemblies;
             this.compiledScriptsPath = compiledScriptsPath;
 
@@ -51,6 +53,13 @@ namespace StorybrewEditor.Scripting
             var scriptTypeName = $"{scriptsNamespace}.{scriptName}";
             var sourcePath = Path.Combine(scriptsSourcePath, $"{scriptName}.cs");
 
+            if (commonScriptsPath != null && !File.Exists(sourcePath))
+            {
+                var commonSourcePath = Path.Combine(commonScriptsPath, $"{scriptName}.cs");
+                if (File.Exists(commonSourcePath))
+                    File.Copy(commonSourcePath, sourcePath);
+            }
+
             scriptContainer = new ScriptContainer<TScript>(this, scriptTypeName, sourcePath, compiledScriptsPath, referencedAssemblies);
             scriptContainers.Add(scriptName, scriptContainer);
             return scriptContainer;
@@ -58,8 +67,19 @@ namespace StorybrewEditor.Scripting
 
         public IEnumerable<string> GetScriptNames()
         {
+            var projectScriptNames = new List<string>();
             foreach (var scriptPath in Directory.GetFiles(scriptsSourcePath, "*.cs", SearchOption.TopDirectoryOnly))
-                yield return Path.GetFileNameWithoutExtension(scriptPath);
+            {
+                var name = Path.GetFileNameWithoutExtension(scriptPath);
+                projectScriptNames.Add(name);
+                yield return name;
+            }
+            foreach (var scriptPath in Directory.GetFiles(commonScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
+            {
+                var name = Path.GetFileNameWithoutExtension(scriptPath);
+                if (!projectScriptNames.Contains(name))
+                    yield return name;
+            }
         }
 
         private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -68,6 +88,8 @@ namespace StorybrewEditor.Scripting
 
             Program.Schedule(() =>
             {
+                if (disposedValue) return;
+
                 ScriptContainer<TScript> container;
                 if (scriptContainers.TryGetValue(scriptName, out container))
                 {

@@ -29,7 +29,12 @@ namespace StorybrewEditor.Storyboarding
 
         private string projectPath;
         private ScriptManager<StoryboardObjectGenerator> scriptManager;
-        public string ScriptsPath => scriptManager.ScriptsPath;
+
+        private string commonScriptsSourcePath;
+        public string CommonScriptsPath => commonScriptsSourcePath;
+
+        private string scriptsSourcePath;
+        public string ScriptsPath => scriptsSourcePath;
 
         private TextureContainer textureContainer;
         public TextureContainer TextureContainer => textureContainer;
@@ -53,15 +58,24 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public Project(string projectPath)
+        public Project(string projectPath, bool withCommonScripts)
         {
             this.projectPath = projectPath;
 
             reloadTextures();
 
-            //var scriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
-            var scriptsSourcePath = Path.GetDirectoryName(projectPath);
-            Trace.WriteLine($"Scripts path: {scriptsSourcePath}");
+            scriptsSourcePath = Path.GetDirectoryName(projectPath);
+            if (withCommonScripts)
+            {
+                commonScriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
+                if (!Directory.Exists(commonScriptsSourcePath))
+                {
+                    commonScriptsSourcePath = Path.GetFullPath("scripts");
+                    if (!Directory.Exists(commonScriptsSourcePath))
+                        Directory.CreateDirectory(commonScriptsSourcePath);
+                }
+            }
+            Trace.WriteLine($"Scripts path - project:{scriptsSourcePath}, common:{commonScriptsSourcePath}");
 
             var compiledScriptsPath = Path.GetFullPath("cache/scripts");
             if (!Directory.Exists(compiledScriptsPath))
@@ -79,7 +93,7 @@ namespace StorybrewEditor.Storyboarding
                 "OpenTK.dll",
                 Assembly.GetAssembly(typeof(Script)).Location,
             };
-            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, compiledScriptsPath, referencedAssemblies);
+            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, compiledScriptsPath, referencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
             OnMainBeatmapChanged += (sender, e) =>
@@ -449,9 +463,9 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectPath)
+        public static Project Load(string projectPath, bool withCommonScripts)
         {
-            var project = new Project(projectPath);
+            var project = new Project(projectPath, withCommonScripts);
             using (var stream = new FileStream(projectPath, FileMode.Open))
             using (var r = new BinaryReader(stream, Encoding.UTF8))
             {
@@ -531,7 +545,7 @@ namespace StorybrewEditor.Storyboarding
             return project;
         }
 
-        public static Project Create(string projectFolderName, string mapsetPath)
+        public static Project Create(string projectFolderName, string mapsetPath, bool withCommonScripts)
         {
             if (!Directory.Exists(ProjectsFolder))
                 Directory.CreateDirectory(ProjectsFolder);
@@ -556,7 +570,7 @@ namespace StorybrewEditor.Storyboarding
             using (var zip = new ZipArchive(stream))
                 zip.ExtractToDirectory(projectFolderPath);
 
-            var project = new Project(Path.Combine(projectFolderPath, DefaultFilename))
+            var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts)
             {
                 MapsetPath = mapsetPath,
             };
@@ -569,8 +583,8 @@ namespace StorybrewEditor.Storyboarding
         {
             Trace.WriteLine($"Migrating project '{projectPath}' to '{projectFolderName}'");
 
-            using (var project = Load(projectPath))
-            using (var placeholderProject = Create(projectFolderName, project.MapsetPath))
+            using (var project = Load(projectPath, false))
+            using (var placeholderProject = Create(projectFolderName, project.MapsetPath, false))
             {
                 var oldProjectPath = project.projectPath;
 

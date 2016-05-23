@@ -100,7 +100,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             Manager.AsyncLoading("Creating project...", () =>
             {
-                var project = Project.Create(projectNameTextbox.Value, mapsetPathSelector.Value);
+                var project = Project.Create(projectNameTextbox.Value, mapsetPathSelector.Value, true);
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
             });
         }
