@@ -16,6 +16,23 @@ namespace StorybrewEditor.Util
         public delegate void ActionFailedEventHandler(T target, Exception e);
         public event ActionFailedEventHandler OnActionFailed;
 
+        private bool enabled;
+        public bool Enabled
+        {
+            get { return enabled; }
+            set
+            {
+                if (enabled == value)
+                    return;
+
+                enabled = value;
+
+                lock (queue)
+                    if (queue.Count > 0)
+                        Monitor.Pulse(queue);
+            }
+        }
+
         public AsyncActionQueue(string threadName, bool allowDuplicates = false)
         {
             this.threadName = threadName;
@@ -36,7 +53,7 @@ namespace StorybrewEditor.Util
                         ActionContainer toUpdate;
                         lock (queue)
                         {
-                            while (queue.Count == 0)
+                            while (!enabled || queue.Count == 0)
                             {
                                 if (thread != localThread)
                                 {

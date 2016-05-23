@@ -97,6 +97,7 @@ namespace StorybrewEditor.Storyboarding
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
+            effectUpdateQueue.Enabled = true;
             foreach (var osbLayer in osbLayers)
                 foreach (var layer in layers)
                     if (layer.OsbLayer == osbLayer)
