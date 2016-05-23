@@ -25,6 +25,7 @@ namespace StorybrewEditor.UserInterface
         public string SaveExtension = "";
 
         public event EventHandler OnValueChanged;
+        public event EventHandler OnValueCommited;
 
         public PathSelector(WidgetManager manager, PathSelectorMode mode) : base(manager)
         {
@@ -56,6 +57,7 @@ namespace StorybrewEditor.UserInterface
             });
 
             textbox.OnValueChanged += (sender, e) => OnValueChanged?.Invoke(this, EventArgs.Empty);
+            textbox.OnValueCommited += (sender, e) => OnValueCommited?.Invoke(this, EventArgs.Empty);
             button.OnClick += (sender, e) =>
             {
                 switch (mode)

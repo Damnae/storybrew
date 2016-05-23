@@ -75,9 +75,10 @@ namespace StorybrewEditor.ScreenLayers
                     name = name.Replace(character, '_');
                 projectNameTextbox.Value = name;
             };
-            mapsetPathSelector.OnValueChanged += (sender, e) =>
+            mapsetPathSelector.OnValueChanged += (sender, e) => updateButtonsState();
+            mapsetPathSelector.OnValueCommited += (sender, e) =>
             {
-                if (!Directory.Exists(mapsetPathSelector.Value))
+                if (!Directory.Exists(mapsetPathSelector.Value) && File.Exists(mapsetPathSelector.Value))
                 {
                     mapsetPathSelector.Value = Path.GetDirectoryName(mapsetPathSelector.Value);
                     return;

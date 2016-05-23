@@ -45,6 +45,7 @@ namespace StorybrewEditor.UserInterface
 
                 if (hasFocus) hasCommitPending = true;
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
+                if (!hasFocus) OnValueCommited?.Invoke(this, EventArgs.Empty);
             }
         }
         public object FieldValue
