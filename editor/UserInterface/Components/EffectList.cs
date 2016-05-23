@@ -73,7 +73,7 @@ namespace StorybrewEditor.UserInterface.Components
             });
 
             addEffectButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new EffectNameSelector(project, (effectName) => project.AddEffect(effectName)));
-            newScriptButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowName("", name => createScript(name));
+            newScriptButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Script name", name => createScript(name));
 
             project.OnEffectsChanged += project_OnEffectsChanged;
             refreshEffects();
@@ -197,7 +197,7 @@ namespace StorybrewEditor.UserInterface.Components
                 effectRoot.OnDisposed += (sender, e) => ef.OnChanged -= changedHandler;
 
                 statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
-                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowName(ef.Name, (newName) => ef.Name = newName);
+                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", (newName) => ef.Name = newName);
                 editButton.OnClick += (sender, e) => openEffectEditor(ef);
                 configButton.OnClick += (sender, e) =>
                 {

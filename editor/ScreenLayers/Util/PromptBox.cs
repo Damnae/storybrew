@@ -4,29 +4,34 @@ using System;
 
 namespace StorybrewEditor.ScreenLayers.Util
 {
-    public class NameBox : UiScreenLayer
+    public class PromptBox : UiScreenLayer
     {
-        private string initialName;
-        private Action<string> nameAction;
+        private string title;
+        private string description;
+        private string initialText;
+        private Action<string> action;
 
         private LinearLayout mainLayout;
-        private Textbox nameTextbox;
+        private Textbox textbox;
         private LinearLayout buttonsLayout;
         private Button okButton;
         private Button cancelButton;
 
         public override bool IsPopup => true;
 
-        public NameBox(string initialName, Action<string> nameAction)
+        public PromptBox(string title, string description, string initialText, Action<string> action)
         {
-            this.initialName = initialName;
-            this.nameAction = nameAction;
+            this.title = title;
+            this.description = description;
+            this.initialText = initialText;
+            this.action = action;
         }
 
         public override void Load()
         {
             base.Load();
 
+            Label descriptionLabel;
             WidgetManager.Root.Add(mainLayout = new LinearLayout(WidgetManager)
             {
                 StyleName = "panel",
@@ -36,11 +41,17 @@ namespace StorybrewEditor.ScreenLayers.Util
                 Padding = new FourSide(16),
                 Children = new Widget[]
                 {
-                    nameTextbox = new Textbox(WidgetManager)
+                    descriptionLabel = new Label(WidgetManager)
                     {
-                        LabelText = "Name",
+                        StyleName = "small",
+                        Text = description,
                         AnchorTo = UiAlignment.Centre,
-                        Value = initialName,
+                    },
+                    textbox = new Textbox(WidgetManager)
+                    {
+                        LabelText = title,
+                        AnchorTo = UiAlignment.Centre,
+                        Value = initialText,
                     },
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
@@ -63,10 +74,13 @@ namespace StorybrewEditor.ScreenLayers.Util
                 },
             });
 
+            if (string.IsNullOrWhiteSpace(description))
+                descriptionLabel.Dispose();
+
             okButton.OnClick += (sender, e) =>
             {
                 Exit();
-                nameAction?.Invoke(nameTextbox.Value);
+                action?.Invoke(textbox.Value);
             };
             cancelButton.OnClick += (sender, e) => Exit();
         }

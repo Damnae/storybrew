@@ -25,9 +25,9 @@ namespace StorybrewEditor.Storyboarding
         public const string DefaultFilename = "project" + Extension;
         public const string ProjectsFolder = "projects";
 
-        public const string FileFilter = "project files (*" + Extension + ")|*" + Extension + "|All files (*.*)|*.*";
+        public const string FileFilter = "project files (*" + Extension + ")|*" + Extension;
 
-        private string projectFilename;
+        private string projectPath;
         private ScriptManager<StoryboardObjectGenerator> scriptManager;
         public string ScriptsPath => scriptManager.ScriptsPath;
 
@@ -53,14 +53,14 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public Project(string projectFilename)
+        public Project(string projectPath)
         {
-            this.projectFilename = projectFilename;
+            this.projectPath = projectPath;
 
             reloadTextures();
 
             //var scriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
-            var scriptsSourcePath = Path.GetDirectoryName(projectFilename);
+            var scriptsSourcePath = Path.GetDirectoryName(projectPath);
             Trace.WriteLine($"Scripts path: {scriptsSourcePath}");
 
             var compiledScriptsPath = Path.GetFullPath("cache/scripts");
@@ -402,7 +402,7 @@ namespace StorybrewEditor.Storyboarding
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
-            using (var stream = new SafeWriteStream(projectFilename))
+            using (var stream = new SafeWriteStream(projectPath))
             using (var w = new BinaryWriter(stream, Encoding.UTF8))
             {
                 w.Write(Version);
@@ -448,10 +448,10 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectFilename)
+        public static Project Load(string projectPath)
         {
-            var project = new Project(projectFilename);
-            using (var stream = new FileStream(projectFilename, FileMode.Open))
+            var project = new Project(projectPath);
+            using (var stream = new FileStream(projectPath, FileMode.Open))
             using (var r = new BinaryReader(stream, Encoding.UTF8))
             {
                 var version = r.ReadInt32();
@@ -535,12 +535,20 @@ namespace StorybrewEditor.Storyboarding
             if (!Directory.Exists(ProjectsFolder))
                 Directory.CreateDirectory(ProjectsFolder);
 
-            if (string.IsNullOrWhiteSpace(projectFolderName))
-                throw new InvalidOperationException($"{projectFolderName} isn't a valid project folder name");
+            var hasInvalidCharacters = false;
+            foreach (var character in Path.GetInvalidFileNameChars())
+                if (projectFolderName.Contains(character.ToString()))
+                {
+                    hasInvalidCharacters = true;
+                    break;
+                }
+
+            if (hasInvalidCharacters || string.IsNullOrWhiteSpace(projectFolderName))
+                throw new InvalidOperationException($"'{projectFolderName}' isn't a valid project folder name");
 
             var projectFolderPath = Path.Combine(ProjectsFolder, projectFolderName);
             if (Directory.Exists(projectFolderPath))
-                throw new InvalidOperationException($"A project already exists at {projectFolderPath}");
+                throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
             using (var stream = new MemoryStream(Resources.projecttemplate))
@@ -554,6 +562,23 @@ namespace StorybrewEditor.Storyboarding
             project.Save();
 
             return project;
+        }
+
+        public static string Migrate(string projectPath, string projectFolderName)
+        {
+            Trace.WriteLine($"Migrating project '{projectPath}' to '{projectFolderName}'");
+
+            using (var project = Load(projectPath))
+            using (var placeholderProject = Create(projectFolderName, project.MapsetPath))
+            {
+                var oldProjectPath = project.projectPath;
+
+                project.projectPath = placeholderProject.projectPath;
+                project.Save();
+
+                File.Delete(oldProjectPath);
+                return project.projectPath;
+            }
         }
 
         /// <summary>

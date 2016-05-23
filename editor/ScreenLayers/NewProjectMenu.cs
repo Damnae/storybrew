@@ -122,7 +122,7 @@ namespace StorybrewEditor.ScreenLayers
             var projectFolderPath = Path.Combine(Project.ProjectsFolder, projectFolderName);
             if (Directory.Exists(projectFolderPath))
             {
-                startButton.Tooltip = $"A project named {projectFolderName} already exists";
+                startButton.Tooltip = $"A project named '{projectFolderName}' already exists";
                 return false;
             }
 

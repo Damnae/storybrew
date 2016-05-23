@@ -83,13 +83,11 @@ namespace StorybrewEditor.ScreenLayers
             newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
             openProjectButton.OnClick += (sender, e) =>
             {
-                Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (path) =>
+                Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
                 {
-                    Manager.AsyncLoading("Loading project...", () =>
-                    {
-                        var project = Project.Load(path);
-                        Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
-                    });
+                    if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
+                        migrateProject(projectPath);
+                    else openProject(projectPath);
                 });
             };
             closeButton.OnClick += (sender, e) => Exit();
@@ -101,6 +99,32 @@ namespace StorybrewEditor.ScreenLayers
             base.Resize(width, height);
             mainLayout.Pack(300);
             bottomLayout.Pack(600);
+        }
+
+        private void openProject(string projectPath)
+        {
+            Manager.AsyncLoading("Loading project...", () =>
+            {
+                var project = Project.Load(projectPath);
+                Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
+            });
+        }
+
+        private void migrateProject(string projectPath)
+        {
+            Manager.ShowPrompt("Project name", "Projects are now placed in their own folder under the 'projects' folder.\n\nThis project will be moved there, please choose a name for it.", (projectFolderName) =>
+            {
+                try
+                {
+                    var newProjectPath = Project.Migrate(projectPath, projectFolderName);
+                    openProject(newProjectPath);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Project migration for {projectPath} failed:\n{e}");
+                    Manager.ShowMessage($"Project migration failed:\n{e.Message}", () => migrateProject(projectPath));
+                }
+            });
         }
 
         private void checkLatestVersion()

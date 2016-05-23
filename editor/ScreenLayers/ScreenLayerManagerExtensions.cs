@@ -79,7 +79,13 @@ namespace StorybrewEditor.ScreenLayers
         public static void ShowMessage(this ScreenLayerManager screenLayerManager, string message, Action yesAction, Action noAction, bool cancelable)
             => screenLayerManager.Add(new MessageBox(message, yesAction, noAction, cancelable));
 
-        public static void ShowName(this ScreenLayerManager screenLayerManager, string initialName, Action<string> renameAction)
-            => screenLayerManager.Add(new NameBox(initialName, renameAction));
+        public static void ShowPrompt(this ScreenLayerManager screenLayerManager, string title, Action<string> action)
+            => screenLayerManager.Add(new PromptBox(title, string.Empty, string.Empty, action));
+
+        public static void ShowPrompt(this ScreenLayerManager screenLayerManager, string title, string description, Action<string> action)
+            => screenLayerManager.Add(new PromptBox(title, description, string.Empty, action));
+
+        public static void ShowPrompt(this ScreenLayerManager screenLayerManager, string title, string description, string initialText, Action<string> action)
+            => screenLayerManager.Add(new PromptBox(title, description, initialText, action));
     }
 }

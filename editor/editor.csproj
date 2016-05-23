@@ -135,7 +135,7 @@
     <Compile Include="ScreenLayers\NewProjectMenu.cs" />
     <Compile Include="ScreenLayers\StartMenu.cs" />
     <Compile Include="ScreenLayers\ProjectMenu.cs" />
-    <Compile Include="ScreenLayers\Util\NameBox.cs" />
+    <Compile Include="ScreenLayers\Util\PromptBox.cs" />
     <Compile Include="ScreenLayers\Util\MessageBox.cs" />
     <Compile Include="ScreenLayers\ScreenLayer.cs" />
     <Compile Include="ScreenLayers\ScreenLayerManager.cs" />
