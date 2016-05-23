@@ -43,6 +43,16 @@
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Build|AnyCPU'">
+    <OutputPath>bin\Build\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedBass, Version=0.20.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedBass.0.20.0\lib\ManagedBass.dll</HintPath>
@@ -72,6 +82,7 @@
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioStream.cs" />
     <Compile Include="Audio\FftStream.cs" />
+    <Compile Include="Builder.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
     <Compile Include="Editor.cs" />

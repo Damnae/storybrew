@@ -49,6 +49,10 @@ namespace StorybrewEditor
                     setupLogging(Path.Combine(args[1], DefaultLogPath), "update.log");
                     Updater.Update(args[1], new Version(args[2]));
                     return true;
+                case "build":
+                    setupLogging(null, "build.log");
+                    Builder.Build();
+                    return true;
             }
             return false;
         }
