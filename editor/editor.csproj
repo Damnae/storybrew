@@ -202,7 +202,6 @@
     <Compile Include="Util\ScaleMode.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\NetHelper.cs" />
-    <None Include="Resources\vscode\settings.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

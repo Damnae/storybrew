@@ -139,15 +139,5 @@ namespace StorybrewEditor {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] vscode_settings_json {
-            get {
-                object obj = ResourceManager.GetObject("vscode_settings_json", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

@@ -11,8 +11,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Text;
 
 namespace StorybrewEditor
 {
@@ -64,7 +62,6 @@ namespace StorybrewEditor
             inputDispatcher.Add(createOverlay(ScreenLayerManager));
             inputDispatcher.Add(ScreenLayerManager.InputHandler);
 
-            initializeVsCode();
             Restart(initialLayer);
 
             window.Resize += window_Resize;
@@ -234,15 +231,6 @@ namespace StorybrewEditor
 
         private void window_Closing(object sender, CancelEventArgs e)
             => e.Cancel = ScreenLayerManager.Close();
-
-        private void initializeVsCode()
-        {
-            var vscodePath = Path.GetFullPath(".vscode");
-            if (!Directory.Exists(vscodePath))
-                Directory.CreateDirectory(vscodePath);
-
-            File.WriteAllText(Path.Combine(vscodePath, "settings.json"), Encoding.UTF8.GetString(Resources.vscode_settings_json).StripUtf8Bom());
-        }
 
         private void resizeToWindow()
         {

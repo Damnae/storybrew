@@ -139,9 +139,6 @@
   <data name="scripttemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\scripttemplate.csx;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="vscode_settings_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\vscode\settings.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="projecttemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\projecttemplate.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
