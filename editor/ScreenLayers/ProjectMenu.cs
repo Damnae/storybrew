@@ -366,7 +366,14 @@ namespace StorybrewEditor.ScreenLayers
         }
 
         public override void Close()
-            => Manager.ShowMessage("Quit to desktop?", () => Exit(), () => Manager.Editor.Restart(), true);
+        {
+            Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving...", () =>
+            {
+                project.Save();
+                Program.Schedule(() => Manager.Editor.Restart());
+            }),
+            () => Manager.Editor.Restart(), true);
+        }
 
         private void project_OnEffectsStatusChanged(object sender, EventArgs e)
         {
