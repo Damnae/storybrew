@@ -11,6 +11,7 @@ namespace StorybrewEditor
     public static class Updater
     {
         private static string[] ignoredPaths = { ".vscode/", "cache/", "logs/", "settings.cfg" };
+        private static string[] readOnlyPaths = { "scripts/" };
 
         public const string UpdateArchivePath = "cache/net/update";
         public const string UpdateFolderPath = "cache/update";
@@ -25,7 +26,7 @@ namespace StorybrewEditor
             var sourceFolder = Path.GetDirectoryName(updaterPath);
             try
             {
-                replaceFiles(sourceFolder, destinationFolder, ignoredPaths);
+                replaceFiles(sourceFolder, destinationFolder);
             }
             catch (Exception e)
             {
@@ -55,38 +56,53 @@ namespace StorybrewEditor
                 withRetries(() => Directory.Delete(UpdateFolderPath, true));
         }
 
-        private static void replaceFiles(string sourceFolder, string destinationFolder, string[] ignorePaths)
+        private static void replaceFiles(string sourceFolder, string destinationFolder)
         {
             Trace.WriteLine($"\nCopying files from {sourceFolder} to {destinationFolder}");
             foreach (var sourceFilename in Directory.GetFiles(sourceFolder, "*", SearchOption.AllDirectories))
             {
                 var relativeFilename = PathHelper.GetRelativePath(sourceFolder, sourceFilename);
 
-                var ignoreFile = false;
-                foreach (var ignorePath in ignorePaths)
+                if (matchFilter(relativeFilename, ignoredPaths))
                 {
-                    if (relativeFilename.StartsWith(ignorePath))
-                    {
-                        Trace.WriteLine($"  Ignoring {relativeFilename}, matches {ignorePath}");
-                        ignoreFile = true;
-                        break;
-                    }
+                    Trace.WriteLine($"  Ignoring {relativeFilename}");
+                    continue;
                 }
-                if (ignoreFile) continue;
+                var readOnly = matchFilter(relativeFilename, readOnlyPaths);
 
                 var destinationFilename = Path.Combine(destinationFolder, relativeFilename);
                 Trace.WriteLine($"  Copying {relativeFilename} to {destinationFilename}");
-                replaceFile(sourceFilename, destinationFilename);
+                replaceFile(sourceFilename, destinationFilename, readOnly);
             }
         }
 
-        private static void replaceFile(string sourceFilename, string destinationFilename)
+        private static void replaceFile(string sourceFilename, string destinationFilename, bool readOnly)
         {
             var destinationFolder = Path.GetDirectoryName(destinationFilename);
             if (!Directory.Exists(destinationFolder))
                 Directory.CreateDirectory(destinationFolder);
 
+            if (readOnly && File.Exists(destinationFilename))
+            {
+                var attributes = File.GetAttributes(destinationFilename);
+                if (!attributes.HasFlag(FileAttributes.ReadOnly))
+                {
+                    Trace.WriteLine($"  Creating backup for {destinationFilename}");
+                    File.Move(destinationFilename, destinationFilename + ".bak");
+                }
+                else File.SetAttributes(destinationFilename, attributes & ~FileAttributes.ReadOnly);
+            }
+
             withRetries(() => File.Copy(sourceFilename, destinationFilename, true), 5000);
+            if (readOnly) File.SetAttributes(destinationFilename, FileAttributes.ReadOnly);
+        }
+
+        private static bool matchFilter(string filename, string[] filters)
+        {
+            foreach (var filter in filters)
+                if (filename.StartsWith(filter))
+                    return true;
+            return false;
         }
 
         private static void withRetries(Action action, int timeout = 2000)

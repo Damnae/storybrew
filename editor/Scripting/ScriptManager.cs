@@ -57,7 +57,10 @@ namespace StorybrewEditor.Scripting
             {
                 var commonSourcePath = Path.Combine(commonScriptsPath, $"{scriptName}.cs");
                 if (File.Exists(commonSourcePath))
+                {
                     File.Copy(commonSourcePath, sourcePath);
+                    File.SetAttributes(sourcePath, File.GetAttributes(sourcePath) & ~FileAttributes.ReadOnly);
+                }
             }
 
             scriptContainer = new ScriptContainer<TScript>(this, scriptTypeName, sourcePath, compiledScriptsPath, referencedAssemblies);
