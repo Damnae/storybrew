@@ -65,7 +65,7 @@ namespace StorybrewEditor
         private static void startEditor()
         {
             enableScheduling();
-            Updater.Cleanup();
+            Updater.NotifyEditorRun();
 
             settings = new Settings();
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);

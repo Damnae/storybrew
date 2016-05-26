@@ -55,6 +55,7 @@ namespace StorybrewEditor
                     addFile(archive, path, appDirectory);
                 foreach (var path in Directory.EnumerateFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, scriptsDirectory, "scripts");
+                archive.CreateEntry(Updater.FirstRunPath);
             }
         }
 

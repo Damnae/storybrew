@@ -12,20 +12,20 @@ namespace StorybrewEditor
         public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
 
-        private const string settingsFilename = "settings.cfg";
+        public const string SettingsFilename = "settings.cfg";
 
         public Settings()
         {
-            if (!File.Exists(settingsFilename)) return;
+            if (!File.Exists(SettingsFilename)) return;
 
-            using (var stream = new FileStream(settingsFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var stream = new FileStream(SettingsFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
             {
                 var type = GetType();
                 reader.ParseKeyValueSection((key, value) =>
                 {
                     var field = type.GetField(key);
-                    if (field == null || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
+                    if (field == null || !field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
                         return;
 
                     var setting = (Setting)field.GetValue(this);
@@ -36,12 +36,12 @@ namespace StorybrewEditor
 
         public void Save()
         {
-            using (var stream = new SafeWriteStream(settingsFilename))
+            using (var stream = new SafeWriteStream(SettingsFilename))
             using (var writer = new StreamWriter(stream, System.Text.Encoding.UTF8))
             {
                 foreach (var field in GetType().GetFields())
                 {
-                    if (!typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
+                    if (!field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
                         continue;
 
                     var setting = (Setting)field.GetValue(this);
