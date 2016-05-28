@@ -14,6 +14,9 @@ namespace StorybrewEditor.Mapset
 
         public MapsetManager(string path)
         {
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException("Mapset path cannot be empty", nameof(path));
+
             this.path = path;
             loadBeatmaps();
             initializeMapsetWatcher();
