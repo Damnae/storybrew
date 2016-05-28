@@ -145,7 +145,7 @@ namespace StorybrewEditor.UserInterface
                             else if ((snap * 8) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickYellow; }
                             else lineSize.Y *= 0.4f;
 
-                            if (snap != 0 || beatCount % timingPoint.BeatPerMeasure != 0)
+                            if (snap != 0 || (tickCount == 0 && timingPoint.OmitFirstBarLine) || beatCount % timingPoint.BeatPerMeasure != 0)
                                 lineSize.Y *= 0.5f;
 
                             var tickX = offset.X + (float)Manager.SnapToPixel((time - leftTime) * timeScale);

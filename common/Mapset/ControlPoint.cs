@@ -13,6 +13,7 @@ namespace StorybrewCommon.Mapset
         public float Volume;
         public bool IsInherited;
         public bool IsKiai;
+        public bool OmitFirstBarLine;
 
         private double beatDurationSV;
         public double BeatDuration
@@ -33,7 +34,7 @@ namespace StorybrewCommon.Mapset
         }
 
         public override string ToString()
-            => IsInherited ? $"{Offset}ms, {SliderMultiplier}x, {BeatPerMeasure}/4" : $"{Offset}ms, {Bpm}bpm, {BeatPerMeasure}/4";
+            => (IsInherited ? $"{Offset}ms, {SliderMultiplier}x, {BeatPerMeasure}/4" : $"{Offset}ms, {Bpm}bpm, {BeatPerMeasure}/4") + (IsKiai ? " Kiai" : "");
 
         public static ControlPoint Parse(string line)
         {
@@ -49,7 +50,8 @@ namespace StorybrewCommon.Mapset
                 SampleSet = values.Length > 4 ? (SampleSet)int.Parse(values[4]) : SampleSet.Normal,
                 Volume = values.Length > 5 ? int.Parse(values[5]) : 100,
                 IsInherited = values.Length > 6 ? int.Parse(values[6]) == 0 : false,
-                IsKiai = values.Length > 7 ? int.Parse(values[7]) != 0 : false,
+                IsKiai = values.Length > 7 ? (int.Parse(values[7]) & 1) != 0 : false,
+                OmitFirstBarLine = values.Length > 7 ? (int.Parse(values[7]) & 8) != 0 : false,
             };
         }
     }
