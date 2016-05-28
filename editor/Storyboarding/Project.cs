@@ -591,7 +591,7 @@ namespace StorybrewEditor.Storyboarding
                 project.projectPath = placeholderProject.projectPath;
                 project.Save();
 
-                File.Delete(oldProjectPath);
+                File.Move(oldProjectPath, project.projectPath + ".bak");
                 return project.projectPath;
             }
         }
