@@ -5,6 +5,7 @@ using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -83,6 +84,9 @@ namespace StorybrewEditor.ScreenLayers
             newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
             openProjectButton.OnClick += (sender, e) =>
             {
+                if (!Directory.Exists(Project.ProjectsFolder))
+                    Directory.CreateDirectory(Project.ProjectsFolder);
+
                 Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
                 {
                     if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
