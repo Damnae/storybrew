@@ -138,7 +138,7 @@ namespace StorybrewEditor.Storyboarding
 
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
         public void QueueEffectUpdate(Effect effect)
-            => effectUpdateQueue.Queue(effect, (e) => e.Update());
+            => effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());
 
         public IEnumerable<string> GetEffectNames()
             => scriptManager.GetScriptNames();

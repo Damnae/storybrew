@@ -11,7 +11,8 @@ namespace StorybrewEditor.Util
         private bool allowDuplicates;
 
         private Thread thread;
-        private Queue<ActionContainer> queue = new Queue<ActionContainer>();
+        private List<ActionContainer> queue = new List<ActionContainer>();
+        private HashSet<string> running = new HashSet<string>();
 
         public delegate void ActionFailedEventHandler(T target, Exception e);
         public event ActionFailedEventHandler OnActionFailed;
@@ -39,7 +40,10 @@ namespace StorybrewEditor.Util
             this.allowDuplicates = allowDuplicates;
         }
 
-        public void Queue(T key, Action<T> action)
+        public void Queue(T target, Action<T> action)
+            => Queue(target, null, action);
+
+        public void Queue(T target, string uniqueKey, Action<T> action)
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(AsyncActionQueue<T>));
 
@@ -50,7 +54,6 @@ namespace StorybrewEditor.Util
                 {
                     while (true)
                     {
-                        ActionContainer toUpdate;
                         lock (queue)
                         {
                             while (!enabled || queue.Count == 0)
@@ -62,21 +65,42 @@ namespace StorybrewEditor.Util
                                 }
                                 Monitor.Wait(queue);
                             }
-                            toUpdate = queue.Dequeue();
-                        }
 
-                        try
-                        {
-                            toUpdate.Action.Invoke(toUpdate.Target);
-                        }
-                        catch (Exception e)
-                        {
-                            var target = toUpdate.Target;
-                            Program.Schedule(() =>
-                            {
-                                if (OnActionFailed != null) OnActionFailed.Invoke(target, e);
-                                else Trace.WriteLine($"Action failed for '{toUpdate.Target}': {e}");
-                            });
+                            var startedTasks = new List<ActionContainer>();
+                            lock (running)
+                                foreach (var task in queue)
+                                {
+                                    if (running.Contains(task.UniqueKey))
+                                        continue;
+
+                                    running.Add(task.UniqueKey);
+                                    startedTasks.Add(task);
+
+                                    var taskToRun = task;
+                                    ThreadPool.QueueUserWorkItem((state) =>
+                                    {
+                                        try
+                                        {
+                                            taskToRun.Action.Invoke(taskToRun.Target);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            var toUpdateTarget = taskToRun.Target;
+                                            Program.Schedule(() =>
+                                            {
+                                                if (OnActionFailed != null) OnActionFailed.Invoke(toUpdateTarget, e);
+                                                else Trace.WriteLine($"Action failed for '{taskToRun.Target}': {e}");
+                                            });
+                                        }
+                                        lock (running)
+                                            running.Remove(taskToRun.UniqueKey);
+                                        lock (queue)
+                                            if (queue.Count > 0)
+                                                Monitor.Pulse(queue);
+                                    });
+                                }
+                            foreach (var startedTask in startedTasks)
+                                queue.Remove(startedTask);
                         }
                     }
                 })
@@ -90,10 +114,10 @@ namespace StorybrewEditor.Util
             {
                 if (!allowDuplicates)
                     foreach (var queued in queue)
-                        if (queued.Target.Equals(key))
+                        if (queued.Target.Equals(target))
                             return;
 
-                queue.Enqueue(new ActionContainer() { Target = key, Action = action });
+                queue.Add(new ActionContainer() { Target = target, UniqueKey = uniqueKey, Action = action });
                 Monitor.Pulse(queue);
             }
         }
@@ -140,6 +164,7 @@ namespace StorybrewEditor.Util
         private struct ActionContainer
         {
             public T Target;
+            public string UniqueKey;
             public Action<T> Action;
         }
     }
