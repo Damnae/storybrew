@@ -1,4 +1,5 @@
 ﻿using ManagedBass;
+using ManagedBass.Fx;
 using System;
 
 namespace StorybrewEditor.Audio
@@ -7,6 +8,7 @@ namespace StorybrewEditor.Audio
     {
         private string path;
         private int stream;
+        private int decodeStream;
 
         public readonly AudioManager Manager;
 
@@ -55,18 +57,46 @@ namespace StorybrewEditor.Audio
             }
         }
 
+        private double timeFactor = 1;
+        public double TimeFactor
+        {
+            get
+            {
+                return timeFactor;
+            }
+            set
+            {
+                if (timeFactor == value) return;
+                timeFactor = value;
+                updateTimeFactor();
+            }
+        }
+
         public AudioStream(AudioManager manager, string path)
         {
             Manager = manager;
             this.path = path;
-            stream = Bass.CreateStream(path, 0, 0, BassFlags.Prescan);
+
+            decodeStream = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Prescan);
+            stream = BassFx.TempoCreate(decodeStream, BassFlags.Default);
+
+            Bass.ChannelSetAttribute(stream, ChannelAttribute.TempoUseQuickAlgorithm, 1);
+            Bass.ChannelSetAttribute(stream, ChannelAttribute.TempoOverlapMilliseconds, 4);
+            Bass.ChannelSetAttribute(stream, ChannelAttribute.TempoSequenceMilliseconds, 30);
             duration = Bass.ChannelBytes2Seconds(stream, Bass.ChannelGetLength(stream));
+
             UpdateVolume();
+            updateTimeFactor();
         }
 
         public void UpdateVolume()
         {
             Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Program.Settings.Volume);
+        }
+
+        private void updateTimeFactor()
+        {
+            Bass.ChannelSetAttribute(stream, ChannelAttribute.Tempo, (int)((timeFactor - 1) * 100));
         }
 
         #region IDisposable Support
@@ -81,6 +111,9 @@ namespace StorybrewEditor.Audio
                 }
                 Bass.StreamFree(stream);
                 stream = 0;
+                Bass.StreamFree(decodeStream);
+                decodeStream = 0;
+
                 disposedValue = true;
                 if (disposing) Manager.NotifyDisposed(this);
             }

@@ -233,7 +233,9 @@
     <Content Include="bass.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="bass_fx.dll" />
+    <Content Include="bass_fx.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="icon.ico" />
     <Content Include="Resources\ui-line.png" />
     <Content Include="Resources\ui-rounded-borders.png" />

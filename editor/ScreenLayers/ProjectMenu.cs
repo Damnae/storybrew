@@ -29,10 +29,11 @@ namespace StorybrewEditor.ScreenLayers
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
         private Label timeLabel;
+        private Button divisorButton;
+        private Button audioTimeFactorButton;
         private TimelineSlider timeline;
         private Button playPauseButton;
         private Button fitButton;
-        private Button divisorButton;
         private Button mapsetFolderButton;
         private Button saveButton;
         private Button exportButton;
@@ -57,6 +58,8 @@ namespace StorybrewEditor.ScreenLayers
         public override void Load()
         {
             base.Load();
+
+            audio = Program.AudioManager.LoadStream(project.AudioPath);
 
             WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager)
             {
@@ -88,6 +91,14 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "small",
                         Text = $"1/{snapDivisor}",
                         Tooltip = "Snap divisor",
+                        AnchorTo = UiAlignment.Centre,
+                        CanGrow = false,
+                    },
+                    audioTimeFactorButton = new Button(WidgetManager)
+                    {
+                        StyleName = "small",
+                        Text = $"{audio.TimeFactor:P0}",
+                        Tooltip = "Audio speed",
                         AnchorTo = UiAlignment.Centre,
                         CanGrow = false,
                     },
@@ -230,8 +241,6 @@ namespace StorybrewEditor.ScreenLayers
                 Size = new Vector2(16, 9) * 16,
             });
 
-            audio = Program.AudioManager.LoadStream(project.AudioPath);
-
             timeline.MaxValue = (float)audio.Duration;
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
@@ -253,6 +262,13 @@ namespace StorybrewEditor.ScreenLayers
                 if (snapDivisor > 16) snapDivisor = 1;
                 timeline.SnapDivisor = snapDivisor;
                 divisorButton.Text = $"1/{snapDivisor}";
+            };
+            audioTimeFactorButton.OnClick += (sender, e) =>
+            {
+                var speed = audio.TimeFactor * 0.5;
+                if (speed < 0.2) speed = 1;
+                audio.TimeFactor = speed;
+                audioTimeFactorButton.Text = $"{audio.TimeFactor:P0}";
             };
 
             helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
