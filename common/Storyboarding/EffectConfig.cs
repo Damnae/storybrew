@@ -10,8 +10,17 @@ namespace StorybrewCommon.Storyboarding
 
         public string ConfigurationTarget;
 
-        public IEnumerable<ConfigField> Fields => fields.Values;
         public int FieldCount => fields.Count;
+        public IEnumerable<ConfigField> Fields => fields.Values;
+        public IEnumerable<ConfigField> SortedFields
+        {
+            get
+            {
+                var sortedValues = new List<ConfigField>(fields.Values);
+                sortedValues.Sort((first, second) => first.Order - second.Order);
+                return sortedValues;
+            }
+        }
 
         public string[] FieldNames
         {
@@ -23,7 +32,7 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
-        public void UpdateField(string name, string displayName, Type fieldType, object defaultValue, NamedValue[] allowedValues)
+        public void UpdateField(string name, string displayName, int order, Type fieldType, object defaultValue, NamedValue[] allowedValues)
         {
             ConfigField field;
             var value = fields.TryGetValue(name, out field) ?
@@ -48,6 +57,7 @@ namespace StorybrewCommon.Storyboarding
                 Value = value,
                 Type = fieldType,
                 AllowedValues = allowedValues,
+                Order = order,
             };
         }
 
@@ -68,6 +78,7 @@ namespace StorybrewCommon.Storyboarding
                 Value = value,
                 Type = field.Type,
                 AllowedValues = field.AllowedValues,
+                Order = field.Order,
             };
             return true;
         }
@@ -97,6 +108,7 @@ namespace StorybrewCommon.Storyboarding
             public object Value;
             public Type Type;
             public NamedValue[] AllowedValues;
+            public int Order;
         }
     }
 }

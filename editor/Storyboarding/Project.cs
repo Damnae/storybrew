@@ -435,7 +435,7 @@ namespace StorybrewEditor.Storyboarding
 
                     var config = effect.Config;
                     w.Write(config.FieldCount);
-                    foreach (var field in config.Fields)
+                    foreach (var field in config.SortedFields)
                     {
                         w.Write(field.Name);
                         w.Write(field.DisplayName);
@@ -521,7 +521,7 @@ namespace StorybrewEditor.Storyboarding
                                     Value = allowedValue,
                                 };
                             }
-                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldValue.GetType(), fieldValue, allowedValues);
+                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldIndex, fieldValue.GetType(), fieldValue, allowedValues);
                         }
                     }
                 }

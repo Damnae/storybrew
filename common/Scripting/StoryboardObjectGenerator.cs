@@ -117,7 +117,7 @@ namespace StorybrewCommon.Scripting
                     {
                         var displayName = configurableField.Attribute.DisplayName ?? field.Name;
                         var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
-                        config.UpdateField(field.Name, displayName, fieldType, initialValue, allowedValues);
+                        config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
 
                         var value = config.GetValue(field.Name);
                         field.SetValue(this, value);
@@ -175,6 +175,7 @@ namespace StorybrewCommon.Scripting
         {
             configurableFields = new List<ConfigurableField>();
 
+            var order = 0;
             var type = GetType();
             foreach (var field in type.GetFields())
             {
@@ -191,6 +192,7 @@ namespace StorybrewCommon.Scripting
                         Field = field,
                         Attribute = configurable,
                         InitialValue = field.GetValue(this),
+                        Order = order++,
                     });
                     break;
                 }
@@ -202,6 +204,9 @@ namespace StorybrewCommon.Scripting
             public FieldInfo Field;
             public ConfigurableAttribute Attribute;
             public object InitialValue;
+            public int Order;
+
+            public override string ToString() => $"{Field.Name} {InitialValue}";
         }
     }
 }

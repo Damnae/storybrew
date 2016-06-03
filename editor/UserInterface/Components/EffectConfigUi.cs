@@ -118,7 +118,7 @@ namespace StorybrewEditor.UserInterface.Components
             configFieldsLayout.ClearWidgets();
             if (effect == null) return;
 
-            foreach (var field in effect.Config.Fields)
+            foreach (var field in effect.Config.SortedFields)
             {
                 configFieldsLayout.Add(new LinearLayout(Manager)
                 {
