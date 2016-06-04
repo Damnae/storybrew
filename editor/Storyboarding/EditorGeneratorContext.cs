@@ -33,7 +33,7 @@ namespace StorybrewEditor.Storyboarding
         private FftStream audioStream;
         protected FftStream AudioStream => audioStream ?? (audioStream = new FftStream(effect.Project.AudioPath));
 
-        public override double AudioDuration 
+        public override double AudioDuration
             => AudioStream.Duration * 1000;
 
         public override float[] GetFft(double time)

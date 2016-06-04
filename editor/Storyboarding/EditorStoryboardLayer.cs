@@ -49,6 +49,18 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
+        private bool diffSpecific = true;
+        public bool DiffSpecific
+        {
+            get { return diffSpecific; }
+            set
+            {
+                if (diffSpecific == value) return;
+                diffSpecific = value;
+                RaiseChanged();
+            }
+        }
+
         public event EventHandler OnChanged;
         protected void RaiseChanged()
             => OnChanged?.Invoke(this, EventArgs.Empty);
@@ -109,6 +121,7 @@ namespace StorybrewEditor.Storyboarding
 
         public void CopySettings(EditorStoryboardLayer other)
         {
+            DiffSpecific = other.DiffSpecific;
             OsbLayer = other.OsbLayer;
             Visible = other.Visible;
         }

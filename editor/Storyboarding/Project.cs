@@ -112,10 +112,8 @@ namespace StorybrewEditor.Storyboarding
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             effectUpdateQueue.Enabled = true;
-            foreach (var osbLayer in osbLayers)
-                foreach (var layer in layers)
-                    if (layer.OsbLayer == osbLayer)
-                        layer.Draw(drawContext, camera, bounds, opacity);
+            foreach (var layer in DrawOrderedLayers)
+                layer.Draw(drawContext, camera, bounds, opacity);
         }
 
         private void reloadTextures()
@@ -225,8 +223,24 @@ namespace StorybrewEditor.Storyboarding
         #region Layers
 
         private List<EditorStoryboardLayer> layers = new List<EditorStoryboardLayer>();
-        public IEnumerable<EditorStoryboardLayer> Layers => layers;
+
         public int LayersCount => layers.Count;
+        public IEnumerable<EditorStoryboardLayer> Layers => layers;
+        public IEnumerable<EditorStoryboardLayer> DrawOrderedLayers
+        {
+            get
+            {
+                foreach (var osbLayer in osbLayers)
+                {
+                    foreach (var layer in layers)
+                        if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
+                            yield return layer;
+                    foreach (var layer in layers)
+                        if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)
+                            yield return layer;
+                }
+            }
+        }
 
         public event EventHandler OnLayersChanged;
 
@@ -411,7 +425,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 2;
+        public const int Version = 3;
 
         public void Save()
         {
@@ -456,6 +470,7 @@ namespace StorybrewEditor.Storyboarding
                 {
                     w.Write(layer.Identifier);
                     w.Write(effects.IndexOf(layer.Effect));
+                    w.Write(layer.DiffSpecific);
                     w.Write((int)layer.OsbLayer);
                     w.Write(layer.Visible);
                 }
@@ -531,12 +546,14 @@ namespace StorybrewEditor.Storyboarding
                 {
                     var identifier = r.ReadString();
                     var effectIndex = r.ReadInt32();
+                    var diffSpecific = version >= 3 ? r.ReadBoolean() : false;
                     var osbLayer = version >= 2 ? (OsbLayer)r.ReadInt32() : OsbLayer.Background;
                     var visible = r.ReadBoolean();
 
                     var effect = project.effects[effectIndex];
                     effect.AddPlaceholder(new EditorStoryboardLayer(identifier, effect)
                     {
+                        DiffSpecific = diffSpecific,
                         OsbLayer = osbLayer,
                         Visible = visible,
                     });
