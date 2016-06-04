@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
@@ -66,9 +67,21 @@ namespace StorybrewEditor.UserInterface.Components
         {
             layersLayout.ClearWidgets();
             var index = 0;
+
+            var currentOsbLayer = (OsbLayer)(-1);
             foreach (var layer in project.Layers)
             {
                 var effect = layer.Effect;
+
+                if (currentOsbLayer != layer.OsbLayer)
+                {
+                    currentOsbLayer = layer.OsbLayer;
+                    layersLayout.Add(new Label(Manager)
+                    {
+                        StyleName = "small",
+                        Text = currentOsbLayer.ToString(),
+                    });
+                }
 
                 Widget layerRoot;
                 Label nameLabel, effectNameLabel;
