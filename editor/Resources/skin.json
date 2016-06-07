@@ -173,6 +173,12 @@
 				Trimming: "None",
 				Color: "@colorText",
 			},
+			"listHeader":
+			{
+				FontSize: "@fontSizeSmall",
+				Color: "@colorTextSecondary",
+				TextAlignment: "Right",
+			},
 			"listItem":
 			{
 				FontSize: "@fontSizeSmall",

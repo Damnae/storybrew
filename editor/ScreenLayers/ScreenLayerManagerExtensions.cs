@@ -1,5 +1,6 @@
 ﻿using StorybrewEditor.ScreenLayers.Util;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace StorybrewEditor.ScreenLayers
@@ -87,5 +88,14 @@ namespace StorybrewEditor.ScreenLayers
 
         public static void ShowPrompt(this ScreenLayerManager screenLayerManager, string title, string description, string initialText, Action<string> action)
             => screenLayerManager.Add(new PromptBox(title, description, initialText, action));
+
+        public static void ShowContextMenu<T>(this ScreenLayerManager screenLayerManager, string title, Action<T> action, params ContextMenu<T>.Option[] options)
+            => screenLayerManager.Add(new ContextMenu<T>(title, action, options));
+
+        public static void ShowContextMenu<T>(this ScreenLayerManager screenLayerManager, string title, Action<T> action, params T[] options)
+            => screenLayerManager.Add(new ContextMenu<T>(title, action, options));
+
+        public static void ShowContextMenu<T>(this ScreenLayerManager screenLayerManager, string title, Action<T> action, IEnumerable<T> options)
+            => screenLayerManager.Add(new ContextMenu<T>(title, action, options));
     }
 }

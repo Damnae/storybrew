@@ -72,7 +72,7 @@ namespace StorybrewEditor.UserInterface.Components
                 },
             });
 
-            addEffectButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new EffectNameSelector(project, (effectName) => project.AddEffect(effectName)));
+            addEffectButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Select an effect", (effectName) => project.AddEffect(effectName), project.GetEffectNames());
             newScriptButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Script name", name => createScript(name));
 
             project.OnEffectsChanged += project_OnEffectsChanged;

@@ -1,24 +1,42 @@
-﻿using System;
-using StorybrewEditor.Storyboarding;
-using StorybrewEditor.UserInterface;
+﻿using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
+using System;
+using System.Collections.Generic;
 
 namespace StorybrewEditor.ScreenLayers
 {
-    public class EffectNameSelector : UiScreenLayer
+    public class ContextMenu<T> : UiScreenLayer
     {
-        private Project project;
-        private Action<string> callback;
+        private string title;
+        private Action<T> callback;
+        private List<Option> options = new List<Option>();
 
         private LinearLayout mainLayout;
         private Button cancelButton;
 
         public override bool IsPopup => true;
 
-        public EffectNameSelector(Project project, Action<string> callback)
+        public ContextMenu(string title, Action<T> callback, params Option[] options)
         {
-            this.project = project;
+            this.title = title;
             this.callback = callback;
+            this.options.AddRange(options);
+        }
+
+        public ContextMenu(string title, Action<T> callback, params T[] options)
+        {
+            this.title = title;
+            this.callback = callback;
+            foreach (var option in options)
+                this.options.Add(new Option(option.ToString(), option));
+        }
+
+        public ContextMenu(string title, Action<T> callback, IEnumerable<T> options)
+        {
+            this.title = title;
+            this.callback = callback;
+            foreach (var option in options)
+                this.options.Add(new Option(option.ToString(), option));
         }
 
         public override void Load()
@@ -43,7 +61,7 @@ namespace StorybrewEditor.ScreenLayers
                         {
                             new Label(WidgetManager)
                             {
-                                Text = "Select an effect",
+                                Text = title,
                             },
                             cancelButton = new Button(WidgetManager)
                             {
@@ -58,17 +76,17 @@ namespace StorybrewEditor.ScreenLayers
             });
             cancelButton.OnClick += (sender, e) => Exit();
 
-            foreach (var effectName in project.GetEffectNames())
+            foreach (var option in options)
             {
                 Button button;
                 mainLayout.Add(button = new Button(WidgetManager)
                 {
                     StyleName = "small",
-                    Text = effectName,
+                    Text = option.Name,
                     AnchorTo = UiAlignment.Centre,
                 });
 
-                var result = effectName;
+                var result = option.Value;
                 button.OnClick += (sender, e) =>
                 {
                     callback.Invoke(result);
@@ -81,6 +99,18 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Resize(width, height);
             mainLayout.Pack(400, 0);
+        }
+
+        public struct Option
+        {
+            public readonly string Name;
+            public readonly T Value;
+
+            public Option(string name, T value)
+            {
+                Name = name;
+                Value = value;
+            }
         }
     }
 }

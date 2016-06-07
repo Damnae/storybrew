@@ -261,6 +261,9 @@ namespace StorybrewEditor
                 catch (Exception e)
                 {
                     Trace.WriteLine($"Scheduled task {action.Method} failed:\n{e}");
+#if DEBUG
+                    throw;
+#endif
                 }
             }
         }

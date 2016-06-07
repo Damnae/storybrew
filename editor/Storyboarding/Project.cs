@@ -105,7 +105,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Display
 
-        private static readonly OsbLayer[] osbLayers = new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, };
+        public static readonly OsbLayer[] OsbLayers = new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, };
 
         public double DisplayTime;
 
@@ -230,7 +230,7 @@ namespace StorybrewEditor.Storyboarding
         {
             get
             {
-                foreach (var osbLayer in osbLayers)
+                foreach (var osbLayer in OsbLayers)
                 {
                     foreach (var layer in layers)
                         if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
@@ -241,6 +241,7 @@ namespace StorybrewEditor.Storyboarding
                 }
             }
         }
+        public List<EditorStoryboardLayer> FindLayers(Predicate<EditorStoryboardLayer> predicate) => layers.FindAll(predicate);
 
         public event EventHandler OnLayersChanged;
 
@@ -636,7 +637,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 writer.WriteLine("[Events]");
                 writer.WriteLine("//Background and Video events");
-                foreach (var osbLayer in osbLayers)
+                foreach (var osbLayer in OsbLayers)
                 {
                     writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                     foreach (var layer in localLayers)

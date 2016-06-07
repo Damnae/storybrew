@@ -94,6 +94,7 @@
     <None Include="Resources\projecttemplate.zip" />
     <None Include="Resources\scripttemplate.csx" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
+    <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Storyboarding\EditorOsbAnimation.cs" />
     <Compile Include="Updater.cs" />
@@ -141,7 +142,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ScreenLayers\EffectNameSelector.cs" />
     <Compile Include="ScreenLayers\Util\LoadingScreen.cs" />
     <Compile Include="ScreenLayers\NewProjectMenu.cs" />
     <Compile Include="ScreenLayers\StartMenu.cs" />
