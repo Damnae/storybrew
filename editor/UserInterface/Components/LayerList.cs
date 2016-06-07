@@ -91,7 +91,7 @@ namespace StorybrewEditor.UserInterface.Components
 
                 Widget layerRoot;
                 Label nameLabel, effectNameLabel;
-                Button moveUpButton, moveDownButton, osbLayerButton, showHideButton;
+                Button moveUpButton, moveDownButton, diffSpecificButton, osbLayerButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
                 {
                     AnchorFrom = UiAlignment.Centre,
@@ -142,6 +142,15 @@ namespace StorybrewEditor.UserInterface.Components
                             CanGrow = false,
                             Disabled = index == layers.Count - 1,
                         },
+                        diffSpecificButton = new Button(Manager)
+                        {
+                            StyleName = "icon",
+                            Icon = layer.DiffSpecific ? IconFont.FileO : IconFont.FilesO,
+                            Tooltip = layer.DiffSpecific ? "Diff. specific\n(exports to .osu)": "All diffs\n(exports to .osb)",
+                            AnchorFrom = UiAlignment.Centre,
+                            AnchorTo = UiAlignment.Centre,
+                            CanGrow = false,
+                        },
                         osbLayerButton = new Button(Manager)
                         {
                             StyleName = "icon",
@@ -171,7 +180,7 @@ namespace StorybrewEditor.UserInterface.Components
                 layer.OnChanged += changedHandler = (sender, e) =>
                 {
                     nameLabel.Text = la.Name;
-                    showHideButton.Icon = layer.Visible ? IconFont.Eye : IconFont.EyeSlash;
+                    showHideButton.Icon = la.Visible ? IconFont.Eye : IconFont.EyeSlash;
                     showHideButton.Checked = la.Visible;
                 };
                 effect.OnChanged += effectChangedHandler = (sender, e) =>
@@ -186,6 +195,11 @@ namespace StorybrewEditor.UserInterface.Components
 
                 moveUpButton.OnClick += (sender, e) => project.MoveUp(la);
                 moveDownButton.OnClick += (sender, e) => project.MoveDown(la);
+                diffSpecificButton.OnClick += (sender, e) =>
+                {
+                    la.DiffSpecific = !la.DiffSpecific;
+                    refreshLayers();
+                };
                 osbLayerButton.OnClick += (sender, e) =>
                 {
                     Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer =>
