@@ -118,9 +118,11 @@ namespace StorybrewEditor.UserInterface
                 RefreshHover();
             if (keyboardFocus == widget)
                 keyboardFocus = null;
-            foreach (var entry in dragTargets)
-                if (entry.Value == widget)
-                    dragTargets[entry.Key] = null;
+
+            var keys = new List<MouseButton>(dragTargets.Keys);
+            foreach (var key in keys)
+                if (dragTargets[key] == widget)
+                    dragTargets[key] = null;
         }
 
         public void Draw(DrawContext drawContext)
