@@ -541,7 +541,7 @@ namespace StorybrewEditor.UserInterface
                 foreach (var handlerDelegate in handler.GetInvocationList())
                     try
                     {
-                        if ((bool)handlerDelegate.DynamicInvoke(evt, e))
+                        if (((HandleableWidgetEventHandler<T>)handlerDelegate)(evt, e))
                         {
                             evt.Handled = true;
                             break;
@@ -559,7 +559,7 @@ namespace StorybrewEditor.UserInterface
         {
             if (handler != null)
                 foreach (var handlerDelegate in handler.GetInvocationList())
-                    handlerDelegate.DynamicInvoke(evt, e);
+                    ((WidgetEventHandler<T>)handlerDelegate)(evt, e);
         }
 
         public event EventHandler OnDisposed;
