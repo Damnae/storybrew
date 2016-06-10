@@ -493,17 +493,62 @@ namespace StorybrewEditor.Storyboarding
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
-            string osbPath = null;
+            string osuPath = null, osbPath = null;
             List<EditorStoryboardLayer> localLayers = null;
             Program.RunMainThread(() =>
             {
+                osuPath = MainBeatmap.Path;
                 osbPath = getOsbPath();
                 localLayers = new List<EditorStoryboardLayer>(layerManager.Layers);
             });
 
-            Debug.Print($"Exporting osb to {osbPath}");
             var exportSettings = new ExportSettings();
 
+            Debug.Print($"Exporting diff specific events to {osuPath}");
+            using (var stream = new SafeWriteStream(osuPath))
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            using (var fileStream = new FileStream(osuPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var reader = new StreamReader(fileStream, Encoding.UTF8))
+            {
+                string line;
+                var inEvents = false;
+                var inStoryboard = false;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var trimmedLine = line.Trim();
+                    if (!inEvents && trimmedLine == "[Events]")
+                        inEvents = true;
+                    else if (trimmedLine.Length == 0)
+                        inEvents = false;
+
+                    if (inEvents)
+                    {
+                        if (trimmedLine.StartsWith("//Storyboard Layer"))
+                        {
+                            if (!inStoryboard)
+                            {
+                                foreach (var osbLayer in OsbLayers)
+                                {
+                                    writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
+                                    foreach (var layer in localLayers)
+                                        if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
+                                            layer.WriteOsbSprites(writer, exportSettings);
+                                }
+                                inStoryboard = true;
+                            }
+                        }
+                        else if (inStoryboard && trimmedLine.StartsWith("//"))
+                            inStoryboard = false;
+
+                        if (inStoryboard)
+                            continue;
+                    }
+                    writer.WriteLine(line);
+                }
+                stream.Commit();
+            }
+
+            Debug.Print($"Exporting osb to {osbPath}");
             using (var stream = new SafeWriteStream(osbPath))
             using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
@@ -513,7 +558,7 @@ namespace StorybrewEditor.Storyboarding
                 {
                     writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                     foreach (var layer in localLayers)
-                        if (layer.OsbLayer == osbLayer)
+                        if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)
                             layer.WriteOsbSprites(writer, exportSettings);
                 }
                 writer.WriteLine("//Storyboard Sound Samples");
