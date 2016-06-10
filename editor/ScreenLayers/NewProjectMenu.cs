@@ -2,7 +2,6 @@
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System.IO;
-using System;
 
 namespace StorybrewEditor.ScreenLayers
 {

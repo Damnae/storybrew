@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace StorybrewEditor
@@ -20,13 +21,19 @@ namespace StorybrewEditor
         public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public static string FullName => $"{Name} {Version} ({Repository})";
 
-        private static int mainThreadId;
         public static AudioManager audioManager;
         public static Settings settings;
 
-        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == mainThreadId;
         public static AudioManager AudioManager => audioManager;
         public static Settings Settings => settings;
+
+        private static int mainThreadId;
+        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == mainThreadId;
+        public static void CheckMainThread([CallerFilePath] string callerPath = "", [CallerLineNumber] int callerLine = -1, [CallerMemberName] string callerName = "")
+        {
+            if (IsMainThread) return;
+            throw new InvalidOperationException($"{callerPath}:L{callerLine} {callerName} called from the thread '{Thread.CurrentThread.Name}', must be called from the main thread");
+        }
 
         [STAThread]
         public static void Main(string[] args)
@@ -254,17 +261,18 @@ namespace StorybrewEditor
 
             foreach (var action in actionsToRun)
             {
+#if !DEBUG
                 try
                 {
-                    action.Invoke();
+#endif
+                action.Invoke();
+#if !DEBUG
                 }
                 catch (Exception e)
                 {
                     Trace.WriteLine($"Scheduled task {action.Method} failed:\n{e}");
-#if DEBUG
-                    throw;
-#endif
                 }
+#endif
             }
         }
 

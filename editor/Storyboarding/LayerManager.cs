@@ -1,9 +1,9 @@
 ﻿using OpenTK;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
+using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -12,14 +12,15 @@ namespace StorybrewEditor.Storyboarding
         private List<EditorStoryboardLayer> layers = new List<EditorStoryboardLayer>();
 
         public int LayersCount => layers.Count;
-        public IEnumerable<EditorStoryboardLayer> Layers => layers.OrderBy(x => x);
+        public IEnumerable<EditorStoryboardLayer> Layers => layers;
         public List<EditorStoryboardLayer> FindLayers(Predicate<EditorStoryboardLayer> predicate) => layers.FindAll(predicate);
 
         public event EventHandler OnLayersChanged;
 
         public void Add(EditorStoryboardLayer layer)
         {
-            layers.Add(layer);
+            layers.Insert(findLayerIndex(layer), layer);
+            layer.OnChanged += layer_OnChanged;
             OnLayersChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -28,7 +29,9 @@ namespace StorybrewEditor.Storyboarding
             var index = layers.IndexOf(oldLayer);
             if (index != -1)
             {
-                newLayer.CopySettings(layers[index]);
+                newLayer.CopySettings(oldLayer);
+                newLayer.OnChanged += layer_OnChanged;
+                oldLayer.OnChanged -= layer_OnChanged;
                 layers[index] = newLayer;
             }
             else throw new InvalidOperationException($"Cannot replace layer '{oldLayer.Name}' with '{newLayer.Name}', old layer not found");
@@ -52,9 +55,13 @@ namespace StorybrewEditor.Storyboarding
                     oldLayers.Remove(oldLayer);
                 }
                 else layers.Add(newLayer);
+                newLayer.OnChanged += layer_OnChanged;
             }
             foreach (var oldLayer in oldLayers)
+            {
+                oldLayer.OnChanged -= layer_OnChanged;
                 layers.Remove(oldLayer);
+            }
             OnLayersChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -64,8 +71,13 @@ namespace StorybrewEditor.Storyboarding
             if (index != -1)
             {
                 foreach (var newLayer in newLayers)
+                {
                     newLayer.CopySettings(oldLayer);
+                    newLayer.OnChanged += layer_OnChanged;
+                }
                 layers.InsertRange(index, newLayers);
+
+                oldLayer.OnChanged -= layer_OnChanged;
                 layers.Remove(oldLayer);
             }
             else throw new InvalidOperationException($"Cannot replace layer '{oldLayer.Name}' with multiple layers, old layer not found");
@@ -75,55 +87,83 @@ namespace StorybrewEditor.Storyboarding
         public void Remove(EditorStoryboardLayer layer)
         {
             if (layers.Remove(layer))
+            {
+                layer.OnChanged -= layer_OnChanged;
                 OnLayersChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
-        public void MoveUp(EditorStoryboardLayer layer)
+        public bool MoveUp(EditorStoryboardLayer layer)
         {
             var index = layers.IndexOf(layer);
             if (index != -1)
             {
-                var otherLayer = layers[index - 1];
-                layers[index - 1] = layer;
-                layers[index] = otherLayer;
+                if (index > 0 && layer.CompareTo(layers[index - 1]) == 0)
+                {
+                    var otherLayer = layers[index - 1];
+                    layers[index - 1] = layer;
+                    layers[index] = otherLayer;
+                }
+                else return false;
             }
-            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}', not found");
+            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
             OnLayersChanged?.Invoke(this, EventArgs.Empty);
+            return true;
         }
 
-        public void MoveDown(EditorStoryboardLayer layer)
+        public bool MoveDown(EditorStoryboardLayer layer)
         {
             var index = layers.IndexOf(layer);
             if (index != -1)
             {
-                var otherLayer = layers[index + 1];
-                layers[index + 1] = layer;
-                layers[index] = otherLayer;
+                if (index < layers.Count - 1 && layer.CompareTo(layers[index + 1]) == 0)
+                {
+                    var otherLayer = layers[index + 1];
+                    layers[index + 1] = layer;
+                    layers[index] = otherLayer;
+                }
+                else return false;
             }
-            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}', not found");
+            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
             OnLayersChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void MoveTop(EditorStoryboardLayer layer)
-        {
-            if (layers.Remove(layer))
-                layers.Insert(0, layer);
-            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}', not found");
-            OnLayersChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void MoveBottom(EditorStoryboardLayer layer)
-        {
-            if (layers.Remove(layer))
-                layers.Add(layer);
-            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}', not found");
-            OnLayersChanged?.Invoke(this, EventArgs.Empty);
+            return true;
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             foreach (var layer in Layers)
                 layer.Draw(drawContext, camera, bounds, opacity);
+        }
+
+        private void layer_OnChanged(object sender, ChangedEventArgs e)
+        {
+            if (e.PropertyName == null || e.PropertyName == nameof(EditorStoryboardLayer.OsbLayer) || e.PropertyName == nameof(EditorStoryboardLayer.DiffSpecific))
+                sortLayer((EditorStoryboardLayer)sender);
+        }
+
+        private void sortLayer(EditorStoryboardLayer layer)
+        {
+            var initialIndex = layers.IndexOf(layer);
+            if (initialIndex < 0) new InvalidOperationException($"Layer '{layer.Name}' cannot be found");
+
+            var newIndex = initialIndex;
+            while (newIndex > 0 && layer.CompareTo(layers[newIndex - 1]) < 0) newIndex--;
+            while (newIndex < layers.Count - 1 && layer.CompareTo(layers[newIndex + 1]) > 0) newIndex++;
+
+            layers.Move(initialIndex, newIndex);
+            OnLayersChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private int findLayerIndex(EditorStoryboardLayer layer)
+        {
+            var index = layers.BinarySearch(layer);
+            if (index >= 0)
+            {
+                while (index < layers.Count && layer.CompareTo(layers[index]) == 0)
+                    index++;
+                return index;
+            }
+            else return ~index;
         }
     }
 }

@@ -180,7 +180,10 @@
     <Compile Include="Util\ActionDisposable.cs" />
     <Compile Include="Util\AsyncActionQueue.cs" />
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
+    <Compile Include="Util\ChangedHandler.cs" />
+    <Compile Include="Util\EventHelper.cs" />
     <Compile Include="Util\IconFont.cs" />
+    <Compile Include="Util\ListExtensions.cs" />
     <Compile Include="Util\OsuHelper.cs" />
     <Compile Include="Util\PathHelper.cs" />
     <Compile Include="Util\SafeWriteStream.cs" />

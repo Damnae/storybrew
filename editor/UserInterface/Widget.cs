@@ -3,6 +3,7 @@ using OpenTK.Input;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
+using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -541,6 +542,9 @@ namespace StorybrewEditor.UserInterface
                 foreach (var handlerDelegate in handler.GetInvocationList())
                     try
                     {
+                        if (!Array.Exists(handler.GetInvocationList(), h => h == handlerDelegate))
+                            continue;
+
                         if (((HandleableWidgetEventHandler<T>)handlerDelegate)(evt, e))
                         {
                             evt.Handled = true;
@@ -556,11 +560,7 @@ namespace StorybrewEditor.UserInterface
         }
 
         protected static void Raise<T>(WidgetEventHandler<T> handler, WidgetEvent evt, T e)
-        {
-            if (handler != null)
-                foreach (var handlerDelegate in handler.GetInvocationList())
-                    ((WidgetEventHandler<T>)handlerDelegate)(evt, e);
-        }
+            => EventHelper.InvokeStrict(() => handler, d => ((WidgetEventHandler<T>)d)(evt, e));
 
         public event EventHandler OnDisposed;
 
@@ -598,10 +598,7 @@ namespace StorybrewEditor.UserInterface
 
         #endregion
 
-        public override string ToString()
-        {
-            return $"{GetType().Name} {StyleName} #{Id} {Width}x{Height}";
-        }
+        public override string ToString() => $"{GetType().Name} {StyleName} #{Id} {Width}x{Height}";
     }
 
     [Flags]

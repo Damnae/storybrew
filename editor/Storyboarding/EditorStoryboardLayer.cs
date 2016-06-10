@@ -2,6 +2,7 @@
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
+using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (name == value) return;
                 name = value;
-                RaiseChanged();
+                RaiseChanged(nameof(Name));
             }
         }
 
@@ -33,7 +34,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (visible == value) return;
                 visible = value;
-                RaiseChanged();
+                RaiseChanged(nameof(Visible));
             }
         }
 
@@ -45,11 +46,11 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (osbLayer == value) return;
                 osbLayer = value;
-                RaiseChanged();
+                RaiseChanged(nameof(OsbLayer));
             }
         }
 
-        private bool diffSpecific = true;
+        private bool diffSpecific;
         public bool DiffSpecific
         {
             get { return diffSpecific; }
@@ -57,13 +58,13 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (diffSpecific == value) return;
                 diffSpecific = value;
-                RaiseChanged();
+                RaiseChanged(nameof(DiffSpecific));
             }
         }
 
-        public event EventHandler OnChanged;
-        protected void RaiseChanged()
-            => OnChanged?.Invoke(this, EventArgs.Empty);
+        public event ChangedHandler OnChanged;
+        protected void RaiseChanged(string propertyName)
+            => EventHelper.InvokeStrict(() => OnChanged, d => ((ChangedHandler)d)(this, new ChangedEventArgs(propertyName)));
 
         public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
         {
@@ -135,8 +136,10 @@ namespace StorybrewEditor.Storyboarding
         public int CompareTo(EditorStoryboardLayer other)
         {
             var value = osbLayer - other.osbLayer;
-            if (value == 0) value = (diffSpecific ? 1 : 0) - (other.diffSpecific ? 1 : 0);
+            if (value == 0) value = (other.diffSpecific ? 1 : 0) - (diffSpecific ? 1 : 0);
             return value;
         }
+
+        public override string ToString() => $"name:{name}, id:{Identifier}, layer:{osbLayer}, diffSpec:{diffSpecific}";
     }
 }

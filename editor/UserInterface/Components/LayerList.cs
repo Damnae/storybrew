@@ -41,7 +41,7 @@ namespace StorybrewEditor.UserInterface.Components
                 },
             });
 
-            layerManager.OnLayersChanged += project_OnLayersChanged;
+            layerManager.OnLayersChanged += layerManager_OnLayersChanged;
             refreshLayers();
         }
 
@@ -49,7 +49,7 @@ namespace StorybrewEditor.UserInterface.Components
         {
             if (disposing)
             {
-                layerManager.OnLayersChanged -= project_OnLayersChanged;
+                layerManager.OnLayersChanged -= layerManager_OnLayersChanged;
             }
             layerManager = null;
             base.Dispose(disposing);
@@ -61,7 +61,7 @@ namespace StorybrewEditor.UserInterface.Components
             layout.Size = Size;
         }
 
-        private void project_OnLayersChanged(object sender, EventArgs e)
+        private void layerManager_OnLayersChanged(object sender, EventArgs e)
             => refreshLayers();
 
         private void refreshLayers()
@@ -122,26 +122,6 @@ namespace StorybrewEditor.UserInterface.Components
                                 },
                             },
                         },
-                        moveUpButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            Icon = IconFont.AngleUp,
-                            Tooltip = "Up",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
-                            CanGrow = false,
-                            Disabled = index == 0,
-                        },
-                        moveDownButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            Icon = IconFont.AngleDown,
-                            Tooltip = "Down",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
-                            CanGrow = false,
-                            Disabled = index == layers.Count - 1,
-                        },
                         diffSpecificButton = new Button(Manager)
                         {
                             StyleName = "icon",
@@ -160,6 +140,32 @@ namespace StorybrewEditor.UserInterface.Components
                             AnchorTo = UiAlignment.Centre,
                             CanGrow = false,
                         },
+                        new LinearLayout(Manager)
+                        {
+                            StyleName = "condensed",
+                            CanGrow = false,
+                            Children = new Widget[]
+                            {
+                                moveUpButton = new Button(Manager)
+                                {
+                                    StyleName = "icon",
+                                    Icon = IconFont.AngleUp,
+                                    Tooltip = "Up",
+                                    AnchorFrom = UiAlignment.Centre,
+                                    AnchorTo = UiAlignment.Centre,
+                                    CanGrow = false,
+                                },
+                                moveDownButton = new Button(Manager)
+                                {
+                                    StyleName = "icon",
+                                    Icon = IconFont.AngleDown,
+                                    Tooltip = "Down",
+                                    AnchorFrom = UiAlignment.Centre,
+                                    AnchorTo = UiAlignment.Centre,
+                                    CanGrow = false,
+                                },
+                            },
+                        },
                         showHideButton = new Button(Manager)
                         {
                             StyleName = "icon",
@@ -176,17 +182,17 @@ namespace StorybrewEditor.UserInterface.Components
 
                 var la = layer;
 
-                EventHandler changedHandler, effectChangedHandler;
+                ChangedHandler changedHandler;
+                EventHandler effectChangedHandler;
                 layer.OnChanged += changedHandler = (sender, e) =>
                 {
                     nameLabel.Text = la.Name;
+                    diffSpecificButton.Icon = la.DiffSpecific ? IconFont.FileO : IconFont.FilesO;
+                    diffSpecificButton.Tooltip = la.DiffSpecific ? "Diff. specific\n(exports to .osu)" : "All diffs\n(exports to .osb)";
                     showHideButton.Icon = la.Visible ? IconFont.Eye : IconFont.EyeSlash;
                     showHideButton.Checked = la.Visible;
                 };
-                effect.OnChanged += effectChangedHandler = (sender, e) =>
-                {
-                    effectNameLabel.Text = $"using {effect.BaseName}";
-                };
+                effect.OnChanged += effectChangedHandler = (sender, e) => effectNameLabel.Text = $"using {effect.BaseName}";
                 layerRoot.OnDisposed += (sender, e) =>
                 {
                     la.OnChanged -= changedHandler;
@@ -195,18 +201,8 @@ namespace StorybrewEditor.UserInterface.Components
 
                 moveUpButton.OnClick += (sender, e) => layerManager.MoveUp(la);
                 moveDownButton.OnClick += (sender, e) => layerManager.MoveDown(la);
-                diffSpecificButton.OnClick += (sender, e) =>
-                {
-                    la.DiffSpecific = !la.DiffSpecific;
-                    refreshLayers();
-                };
-                osbLayerButton.OnClick += (sender, e) =>
-                    Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer =>
-                    {
-                        la.OsbLayer = selectedOsbLayer;
-                        refreshLayers();
-                    },
-                    Project.OsbLayers);
+                diffSpecificButton.OnClick += (sender, e) => la.DiffSpecific = !la.DiffSpecific;
+                osbLayerButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer => la.OsbLayer = selectedOsbLayer, Project.OsbLayers);
                 showHideButton.OnValueChanged += (sender, e) => la.Visible = showHideButton.Checked;
                 index++;
             }
