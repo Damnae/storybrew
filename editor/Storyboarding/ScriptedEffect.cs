@@ -46,7 +46,7 @@ namespace StorybrewEditor.Storyboarding
             layers.Add(placeHolderLayer = new EditorStoryboardLayer(string.Empty, this));
             refreshLayerNames();
 
-            Project.Add(placeHolderLayer);
+            Project.LayerManager.Add(placeHolderLayer);
 
             scriptContainer.OnScriptChanged += scriptContainer_OnScriptChanged;
         }
@@ -59,13 +59,13 @@ namespace StorybrewEditor.Storyboarding
             if (placeHolderLayer != null)
             {
                 layers.Remove(placeHolderLayer);
-                Project.Remove(placeHolderLayer);
+                Project.LayerManager.Remove(placeHolderLayer);
                 placeHolderLayer = null;
             }
             layers.Add(layer);
             refreshLayerNames();
 
-            Project.Add(layer);
+            Project.LayerManager.Add(layer);
         }
 
         /// <summary>
@@ -133,10 +133,10 @@ namespace StorybrewEditor.Storyboarding
 
                 if (placeHolderLayer != null)
                 {
-                    Project.Replace(placeHolderLayer, context.EditorLayers);
+                    Project.LayerManager.Replace(placeHolderLayer, context.EditorLayers);
                     placeHolderLayer = null;
                 }
-                else Project.Replace(layers, context.EditorLayers);
+                else Project.LayerManager.Replace(layers, context.EditorLayers);
                 layers = context.EditorLayers;
                 refreshLayerNames();
             });
@@ -150,7 +150,7 @@ namespace StorybrewEditor.Storyboarding
             scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
 
             foreach (var layer in layers)
-                Project.Remove(layer);
+                Project.LayerManager.Remove(layer);
             layers = null;
         }
 

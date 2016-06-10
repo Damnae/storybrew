@@ -97,6 +97,7 @@
     <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Storyboarding\EditorOsbAnimation.cs" />
+    <Compile Include="Storyboarding\LayerManager.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="UserInterface\Drawables\CompositeDrawable.cs" />
     <Compile Include="UserInterface\Drawables\Drawable.cs" />

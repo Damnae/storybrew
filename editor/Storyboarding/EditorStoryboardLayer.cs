@@ -8,7 +8,7 @@ using System.IO;
 
 namespace StorybrewEditor.Storyboarding
 {
-    public class EditorStoryboardLayer : StoryboardLayer
+    public class EditorStoryboardLayer : StoryboardLayer, IComparable<EditorStoryboardLayer>
     {
         private string name = "";
         public string Name
@@ -130,6 +130,13 @@ namespace StorybrewEditor.Storyboarding
         {
             foreach (var sbo in storyboardObjects)
                 sbo.WriteOsb(writer, exportSettings, osbLayer);
+        }
+
+        public int CompareTo(EditorStoryboardLayer other)
+        {
+            var value = osbLayer - other.osbLayer;
+            if (value == 0) value = (diffSpecific ? 1 : 0) - (other.diffSpecific ? 1 : 0);
+            return value;
         }
     }
 }

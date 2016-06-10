@@ -196,7 +196,7 @@ namespace StorybrewEditor.ScreenLayers
                 Offset = new Vector2(-16, 0),
             });
 
-            WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project)
+            WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager)
             {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = UiAlignment.BottomRight,

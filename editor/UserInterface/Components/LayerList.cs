@@ -11,15 +11,15 @@ namespace StorybrewEditor.UserInterface.Components
     {
         private LinearLayout layout;
         private LinearLayout layersLayout;
-        private Project project;
+        private LayerManager layerManager;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
-        public LayerList(WidgetManager manager, Project project) : base(manager)
+        public LayerList(WidgetManager manager, LayerManager layerManager) : base(manager)
         {
-            this.project = project;
+            this.layerManager = layerManager;
 
             Add(layout = new LinearLayout(manager)
             {
@@ -41,7 +41,7 @@ namespace StorybrewEditor.UserInterface.Components
                 },
             });
 
-            project.OnLayersChanged += project_OnLayersChanged;
+            layerManager.OnLayersChanged += project_OnLayersChanged;
             refreshLayers();
         }
 
@@ -49,9 +49,9 @@ namespace StorybrewEditor.UserInterface.Components
         {
             if (disposing)
             {
-                project.OnLayersChanged -= project_OnLayersChanged;
+                layerManager.OnLayersChanged -= project_OnLayersChanged;
             }
-            project = null;
+            layerManager = null;
             base.Dispose(disposing);
         }
 
@@ -82,7 +82,7 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void buildLayers(OsbLayer osbLayer, bool diffSpecific)
         {
-            var layers = project.FindLayers(l => l.OsbLayer == osbLayer && l.DiffSpecific == diffSpecific);
+            var layers = layerManager.FindLayers(l => l.OsbLayer == osbLayer && l.DiffSpecific == diffSpecific);
 
             var index = 0;
             foreach (var layer in layers)
@@ -146,7 +146,7 @@ namespace StorybrewEditor.UserInterface.Components
                         {
                             StyleName = "icon",
                             Icon = layer.DiffSpecific ? IconFont.FileO : IconFont.FilesO,
-                            Tooltip = layer.DiffSpecific ? "Diff. specific\n(exports to .osu)": "All diffs\n(exports to .osb)",
+                            Tooltip = layer.DiffSpecific ? "Diff. specific\n(exports to .osu)" : "All diffs\n(exports to .osb)",
                             AnchorFrom = UiAlignment.Centre,
                             AnchorTo = UiAlignment.Centre,
                             CanGrow = false,
@@ -193,22 +193,20 @@ namespace StorybrewEditor.UserInterface.Components
                     effect.OnChanged -= effectChangedHandler;
                 };
 
-                moveUpButton.OnClick += (sender, e) => project.MoveUp(la);
-                moveDownButton.OnClick += (sender, e) => project.MoveDown(la);
+                moveUpButton.OnClick += (sender, e) => layerManager.MoveUp(la);
+                moveDownButton.OnClick += (sender, e) => layerManager.MoveDown(la);
                 diffSpecificButton.OnClick += (sender, e) =>
                 {
                     la.DiffSpecific = !la.DiffSpecific;
                     refreshLayers();
                 };
                 osbLayerButton.OnClick += (sender, e) =>
-                {
                     Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer =>
                     {
                         la.OsbLayer = selectedOsbLayer;
                         refreshLayers();
                     },
                     Project.OsbLayers);
-                };
                 showHideButton.OnValueChanged += (sender, e) => la.Visible = showHideButton.Checked;
                 index++;
             }
