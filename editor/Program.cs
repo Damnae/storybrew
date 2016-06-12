@@ -296,7 +296,6 @@ namespace StorybrewEditor
             {
                 if (File.Exists(tracePath)) File.Delete(tracePath);
                 if (File.Exists(exceptionPath)) File.Delete(exceptionPath);
-                if (File.Exists(crashPath)) File.Delete(crashPath);
             }
 
             logger = new TraceLogger(tracePath);
