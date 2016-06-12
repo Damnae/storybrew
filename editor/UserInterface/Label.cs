@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.UserInterface.Drawables;
+using StorybrewEditor.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using StorybrewEditor.Util;
 

@@ -2,7 +2,7 @@
 using OpenTK.Graphics;
 using OpenTK.Input;
 using StorybrewEditor.Graphics;
-using StorybrewEditor.UserInterface.Drawables;
+using StorybrewEditor.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using StorybrewEditor.Util;
 using System;

@@ -1,12 +1,10 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.UserInterface.Skinning;
 using System;
 
-namespace StorybrewEditor.UserInterface.Drawables
+namespace StorybrewEditor.Graphics.Drawables
 {
-    public interface Drawable : Skinnable, IDisposable
+    public interface Drawable : IDisposable
     {
         Vector2 MinSize { get; }
         Vector2 PreferredSize { get; }

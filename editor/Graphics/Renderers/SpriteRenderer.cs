@@ -1,7 +1,6 @@
-﻿using OpenTK;
+﻿using StorybrewEditor.Graphics.Textures;
+using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.Graphics.Textures;
 using System;
 
 namespace StorybrewEditor.Graphics.Renderers
@@ -9,8 +8,6 @@ namespace StorybrewEditor.Graphics.Renderers
     public interface SpriteRenderer : Renderer, IDisposable
     {
         Shader Shader { get; set; }
-
-        Camera Camera { get; set; }
         Matrix4 TransformMatrix { get; set; }
 
         int RenderedSpriteCount { get; }

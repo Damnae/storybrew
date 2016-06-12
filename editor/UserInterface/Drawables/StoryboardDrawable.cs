@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
+using StorybrewEditor.Graphics.Drawables;
 using StorybrewEditor.Storyboarding;
 
 namespace StorybrewEditor.UserInterface.Drawables

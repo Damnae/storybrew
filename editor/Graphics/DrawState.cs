@@ -7,6 +7,7 @@ using StorybrewEditor.Graphics.Text;
 using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -16,7 +17,6 @@ namespace StorybrewEditor.Graphics
 {
     public static class DrawState
     {
-        public const bool AllowShaders = true;
         public const bool UseSrgb = false;
 
         private static int maxDrawBuffers;
@@ -33,9 +33,7 @@ namespace StorybrewEditor.Graphics
             setupDebugOutput();
 
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
-            GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Blend);
+            SetCapability(EnableCap.Lighting, false);
 
             if (UseSrgb && HasCapabilities(3, 0, "GL_ARB_framebuffer_object"))
             {
@@ -43,7 +41,7 @@ namespace StorybrewEditor.Graphics
                 GL.GetFramebufferAttachmentParameter(FramebufferTarget.Framebuffer, FramebufferAttachment.BackLeft, FramebufferParameterName.FramebufferAttachmentColorEncoding, out defaultFramebufferColorEncoding);
                 if (defaultFramebufferColorEncoding == (int)0x8C40)
                 {
-                    GL.Enable(EnableCap.FramebufferSrgb);
+                    SetCapability(EnableCap.FramebufferSrgb, true);
                     colorCorrected = true;
                 }
                 else Trace.WriteLine("Warning: The default framebuffer isn't sRgb");
@@ -70,8 +68,6 @@ namespace StorybrewEditor.Graphics
             fontManager = new FontManager();
 
             Viewport = new Rectangle(0, 0, width, height);
-            ProjViewMatrix = CameraOrtho.Default.ProjectionView;
-            SetBlending(BlendingMode.Default);
         }
 
         public static void Cleanup()
@@ -89,6 +85,9 @@ namespace StorybrewEditor.Graphics
         public static void CompleteFrame()
         {
             Renderer = null;
+
+            capabilityCache.Clear();
+            RenderStates.ClearStateCache();
         }
 
         private static Renderer renderer;
@@ -99,6 +98,8 @@ namespace StorybrewEditor.Graphics
             {
                 if (renderer == value)
                     return;
+
+                FlushRenderer();
 
                 flushingRenderer = true;
                 renderer?.EndRendering();
@@ -111,14 +112,22 @@ namespace StorybrewEditor.Graphics
         }
 
         private static bool flushingRenderer;
-        public static void FlushRenderer()
+        public static void FlushRenderer(bool canBuffer = false)
         {
             if (renderer == null || flushingRenderer)
                 return;
 
             flushingRenderer = true;
-            renderer.Flush();
+            renderer.Flush(canBuffer);
             flushingRenderer = false;
+        }
+
+        public static T Prepare<T>(T renderer, Camera camera, RenderStates renderStates) where T : Renderer
+        {
+            Renderer = renderer;
+            renderer.Camera = camera;
+            renderStates.Apply();
+            return renderer;
         }
 
         #region Texture states
@@ -166,10 +175,10 @@ namespace StorybrewEditor.Graphics
             {
                 ActiveTextureUnit = samplerIndex;
                 if (previousMode != TexturingModes.None)
-                    GL.Disable((EnableCap)ToTextureTarget(previousMode));
+                    SetCapability((EnableCap)ToTextureTarget(previousMode), false);
 
                 if (mode != TexturingModes.None)
-                    GL.Enable((EnableCap)ToTextureTarget(mode));
+                    SetCapability((EnableCap)ToTextureTarget(mode), true);
             }
 
             samplerTexturingModes[samplerIndex] = mode;
@@ -331,16 +340,14 @@ namespace StorybrewEditor.Graphics
                     return;
 
                 FlushRenderer();
-
                 clipRegion = value;
+
+                SetCapability(EnableCap.ScissorTest, clipRegion.HasValue);
                 if (clipRegion.HasValue)
                 {
                     var actualClipRegion = Rectangle.Intersect(clipRegion.Value, viewport);
-
-                    GL.Enable(EnableCap.ScissorTest);
                     GL.Scissor(actualClipRegion.X, actualClipRegion.Y, actualClipRegion.Width, actualClipRegion.Height);
                 }
-                else GL.Disable(EnableCap.ScissorTest);
             }
         }
 
@@ -362,25 +369,6 @@ namespace StorybrewEditor.Graphics
             return Clip(clipRectangle);
         }
 
-        private static Matrix4 projViewMatrix;
-        public static Matrix4 ProjViewMatrix
-        {
-            get { return projViewMatrix; }
-            set
-            {
-                if (projViewMatrix == value)
-                    return;
-
-                FlushRenderer();
-
-                projViewMatrix = value;
-
-                GL.MatrixMode(MatrixMode.Projection);
-                GL.LoadMatrix(ref projViewMatrix);
-                CheckError("setting up projection / view");
-            }
-        }
-
         private static int programId;
         public static int ProgramId
         {
@@ -395,80 +383,17 @@ namespace StorybrewEditor.Graphics
             }
         }
 
-        private static BlendingFactorSrc srcBlendingColor;
-        private static BlendingFactorDest destBlendingColor;
-        private static BlendingFactorSrc srcBlendingAlpha;
-        private static BlendingFactorDest destBlendingAlpha;
-
-        public static void SetBlending(BlendingFactorSrc src, BlendingFactorDest dest)
+        private static Dictionary<EnableCap, bool> capabilityCache = new Dictionary<EnableCap, bool>();
+        internal static void SetCapability(EnableCap capability, bool enable)
         {
-            if (srcBlendingColor == src && destBlendingColor == dest
-                && srcBlendingAlpha == src && destBlendingAlpha == dest)
+            bool isEnabled;
+            if (capabilityCache.TryGetValue(capability, out isEnabled) && isEnabled == enable)
                 return;
 
-            FlushRenderer();
-            GL.BlendFunc(src, dest);
+            if (enable) GL.Enable(capability);
+            else GL.Disable(capability);
 
-            srcBlendingColor = src;
-            destBlendingColor = dest;
-            srcBlendingAlpha = src;
-            destBlendingAlpha = dest;
-        }
-
-        public static void SetBlending(BlendingFactorSrc src, BlendingFactorDest dest, BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDest)
-        {
-            if (srcBlendingColor == src && destBlendingColor == dest
-                && srcBlendingAlpha == alphaSrc && destBlendingAlpha == alphaDest)
-                return;
-
-            FlushRenderer();
-            GL.BlendFuncSeparate(src, dest, alphaSrc, alphaDest);
-
-            srcBlendingColor = src;
-            destBlendingColor = dest;
-            srcBlendingAlpha = alphaSrc;
-            destBlendingAlpha = alphaDest;
-        }
-
-        public static void SetBlending(BlendingMode blendingMode)
-        {
-            switch (blendingMode)
-            {
-                case BlendingMode.Default:
-                    SetBlending(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha); break;
-                case BlendingMode.Color:
-                    SetBlending(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.Zero, BlendingFactorDest.One); break;
-                case BlendingMode.Additive:
-                    SetBlending(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One); break;
-                case BlendingMode.Premultiply:
-                    SetBlending(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha); break;
-                case BlendingMode.Premultiplied:
-                    SetBlending(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha); break;
-            }
-        }
-
-        private static BlendEquationMode blendColorEquation = BlendEquationMode.FuncAdd;
-        private static BlendEquationMode blendAlphaEquation = BlendEquationMode.FuncAdd;
-
-        public static void SetBlendingEquation(BlendEquationMode mode)
-        {
-            if (blendColorEquation == mode && blendColorEquation == mode) return;
-
-            FlushRenderer();
-            GL.BlendEquation(mode);
-
-            blendColorEquation = blendAlphaEquation = mode;
-        }
-
-        public static void SetBlendingEquation(BlendEquationMode colorMode, BlendEquationMode alphaMode)
-        {
-            if (blendColorEquation == colorMode && blendColorEquation == alphaMode) return;
-
-            FlushRenderer();
-            GL.BlendEquationSeparate(colorMode, alphaMode);
-
-            blendColorEquation = colorMode;
-            blendAlphaEquation = alphaMode;
+            capabilityCache[capability] = enable;
         }
 
         #endregion
@@ -519,8 +444,8 @@ namespace StorybrewEditor.Graphics
 
             Trace.WriteLine("\nenabling openGL debug output");
 
-            GL.Enable(EnableCap.DebugOutput);
-            GL.Enable(EnableCap.DebugOutputSynchronous);
+            SetCapability(EnableCap.DebugOutput, true);
+            SetCapability(EnableCap.DebugOutputSynchronous, true);
             CheckError("enabling debug output");
 
             openGLDebugDelegate = new DebugProc(openGLDebugCallback);
@@ -578,7 +503,8 @@ namespace StorybrewEditor.Graphics
 
     public enum BlendingMode
     {
-        Default,
+        Off,
+        Alphablend,
         Color,
         Additive,
         Premultiply,

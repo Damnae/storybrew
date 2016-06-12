@@ -1,8 +1,7 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 
-namespace StorybrewEditor.UserInterface.Drawables
+namespace StorybrewEditor.Graphics.Drawables
 {
     public class NullDrawable : Drawable
     {

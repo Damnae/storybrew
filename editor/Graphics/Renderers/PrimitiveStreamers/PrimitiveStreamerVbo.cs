@@ -18,8 +18,7 @@ namespace StorybrewEditor.Graphics.Renderers.PrimitiveStreamers
 
         protected Shader currentShader;
         protected bool bound;
-
-        public bool SupportsShaders => true;
+        
         public int DiscardedBufferCount { get; protected set; }
         public int BufferWaitCount { get; protected set; }
 

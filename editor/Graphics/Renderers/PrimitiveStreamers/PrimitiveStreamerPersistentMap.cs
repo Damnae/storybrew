@@ -1,5 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL;
-using StorybrewEditor.Util;
+﻿using StorybrewEditor.Util;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;

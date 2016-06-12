@@ -16,52 +16,65 @@ namespace StorybrewEditor.Graphics
         public int ComponentCount = 1;
         public bool Normalized = false;
         public int Offset;
-        public ArrayCap ClientStateCap;
+        public AttributeUsage Usage = AttributeUsage.Undefined;
 
+        public string ShaderTypeName => ComponentCount == 1 ? "float" : "vec" + ComponentCount;
         public int Size => ComponentCount * ComponentSize;
 
-        public override string ToString()
+        public override bool Equals(object other)
         {
-            return Name + " " + ComponentCount + "x " + Type;
+            if (other == this) return true;
+
+            var otherAttribute = other as VertexAttribute;
+            if (otherAttribute == null) return false;
+            if (Name != otherAttribute.Name) return false;
+            if (Type != otherAttribute.Type) return false;
+            if (ComponentSize != otherAttribute.ComponentSize) return false;
+            if (ComponentCount != otherAttribute.ComponentCount) return false;
+            if (Normalized != otherAttribute.Normalized) return false;
+            if (Offset != otherAttribute.Offset) return false;
+            if (Usage != otherAttribute.Usage) return false;
+
+            return true;
         }
+
+        public override string ToString()
+            => $"{Name} {ComponentCount}x {Type} (used as {Usage})";
 
         public static VertexAttribute CreatePosition2d()
-        {
-            return new VertexAttribute() { Name = PositionAttributeName, ComponentCount = 2, ClientStateCap = ArrayCap.VertexArray };
-        }
+            => new VertexAttribute() { Name = PositionAttributeName, ComponentCount = 2, Usage = AttributeUsage.Position };
 
         public static VertexAttribute CreatePosition3d()
-        {
-            return new VertexAttribute() { Name = PositionAttributeName, ComponentCount = 3, ClientStateCap = ArrayCap.VertexArray };
-        }
+            => new VertexAttribute() { Name = PositionAttributeName, ComponentCount = 3, Usage = AttributeUsage.Position };
 
         public static VertexAttribute CreateNormal()
-        {
-            return new VertexAttribute() { Name = NormalAttributeName, ComponentCount = 3, ClientStateCap = ArrayCap.NormalArray };
-        }
+            => new VertexAttribute() { Name = NormalAttributeName, ComponentCount = 3, Usage = AttributeUsage.Normal };
 
-        public static VertexAttribute CreateTextureCoord(int index = 0)
-        {
-            return new VertexAttribute() { Name = TextureCoordAttributeName + index, ComponentCount = 2, ClientStateCap = ArrayCap.TextureCoordArray };
-        }
+        public static VertexAttribute CreateDiffuseCoord(int index = 0)
+            => new VertexAttribute() { Name = TextureCoordAttributeName + index, ComponentCount = 2, Usage = AttributeUsage.DiffuseMapCoord };
 
         public static VertexAttribute CreateColor(bool packed)
-        {
-            return packed ?
-                new VertexAttribute() { Name = ColorAttributeName, ComponentCount = 4, ComponentSize = 1, Type = VertexAttribPointerType.UnsignedByte, Normalized = true, ClientStateCap = ArrayCap.ColorArray } :
-                new VertexAttribute() { Name = ColorAttributeName, ComponentCount = 4, ClientStateCap = ArrayCap.ColorArray };
-        }
+            => packed ?
+                new VertexAttribute() { Name = ColorAttributeName, ComponentCount = 4, ComponentSize = 1, Type = VertexAttribPointerType.UnsignedByte, Normalized = true, Usage = AttributeUsage.Color } :
+                new VertexAttribute() { Name = ColorAttributeName, ComponentCount = 4, Usage = AttributeUsage.Color };
 
         public static VertexAttribute CreateBoneWeight(int index = 0)
-        {
-            return new VertexAttribute() { Name = BoneWeightAttributeName + index, ComponentCount = 2 };
-        }
+            => new VertexAttribute() { Name = BoneWeightAttributeName + index, ComponentCount = 2, Usage = AttributeUsage.BoneWeight };
 
-        public static VertexAttribute CreateVec4(string name, bool packed)
-        {
-            return packed ?
-                new VertexAttribute() { Name = name, ComponentCount = 4, ComponentSize = 1, Type = VertexAttribPointerType.UnsignedByte, Normalized = true } :
-                new VertexAttribute() { Name = name, ComponentCount = 4 };
-        }
+        public static VertexAttribute CreateVec4(string name, bool packed, AttributeUsage usage)
+            => packed ?
+                new VertexAttribute() { Name = name, ComponentCount = 4, ComponentSize = 1, Type = VertexAttribPointerType.UnsignedByte, Normalized = true, Usage = usage } :
+                new VertexAttribute() { Name = name, ComponentCount = 4, Usage = usage };
+    }
+
+    public enum AttributeUsage
+    {
+        Undefined,
+        Position,
+        Color,
+        Normal,
+        DiffuseMapCoord,
+        NormalMapCoord,
+        BoneWeight
     }
 }

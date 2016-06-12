@@ -14,7 +14,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (fieldOfView == value) return;
                 fieldOfView = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 

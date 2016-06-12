@@ -8,17 +8,17 @@ namespace StorybrewEditor.Graphics.Cameras
     {
         private Rectangle internalViewport;
         private Rectangle extendedViewport;
-        public Rectangle InternalViewport { get { CheckDirty(); return internalViewport; } }
-        public Rectangle ExtendedViewport { get { CheckDirty(); return extendedViewport; } }
+        public Rectangle InternalViewport { get { Validate(); return internalViewport; } }
+        public Rectangle ExtendedViewport { get { Validate(); return extendedViewport; } }
 
         private Matrix4 projection;
         private Matrix4 view;
         private Matrix4 projectionView;
         private Matrix4 invertedProjectionView;
-        public Matrix4 Projection { get { CheckDirty(); return projection; } }
-        public Matrix4 View { get { CheckDirty(); return view; } }
-        public Matrix4 ProjectionView { get { CheckDirty(); return projectionView; } }
-        public Matrix4 InvertedProjectionView { get { CheckDirty(); return invertedProjectionView; } }
+        public Matrix4 Projection { get { Validate(); return projection; } }
+        public Matrix4 View { get { Validate(); return view; } }
+        public Matrix4 ProjectionView { get { Validate(); return projectionView; } }
+        public Matrix4 InvertedProjectionView { get { Validate(); return invertedProjectionView; } }
 
         public event EventHandler Changed;
 
@@ -30,7 +30,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (nearPlane == value) return;
                 nearPlane = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -42,7 +42,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (farPlane == value) return;
                 farPlane = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -54,7 +54,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (viewport == value) return;
                 viewport = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -66,7 +66,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (position == value) return;
                 position = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -78,7 +78,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (direction == value) return;
                 direction = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -90,7 +90,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (up == value) return;
                 up = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -98,7 +98,7 @@ namespace StorybrewEditor.Graphics.Cameras
         {
             viewport = DrawState.Viewport;
             DrawState.ViewportChanged += drawState_ViewportChanged;
-            dirty = true;
+            needsUpdate = true;
         }
 
         public void Dispose()
@@ -108,7 +108,7 @@ namespace StorybrewEditor.Graphics.Cameras
 
         public Vector3 FromScreen(Vector2 screenCoords)
         {
-            CheckDirty();
+            Validate();
 
             var deviceX = 2 * (screenCoords.X / viewport.Width) - 1;
             var deviceY = -2 * (screenCoords.Y / viewport.Height) + 1;
@@ -125,7 +125,7 @@ namespace StorybrewEditor.Graphics.Cameras
 
         public Vector3 ToScreen(Vector3 worldCoords)
         {
-            CheckDirty();
+            Validate();
 
             var devicePosition = Vector3.Transform(worldCoords, projectionView);
             return new Vector3(
@@ -155,7 +155,7 @@ namespace StorybrewEditor.Graphics.Cameras
                 direction = newDirection;
                 up = Vector3.Cross(Vector3.Cross(direction, up).Normalized(), direction).Normalized();
 
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -164,24 +164,24 @@ namespace StorybrewEditor.Graphics.Cameras
             var rotation = Matrix4.CreateFromAxisAngle(axis, angle);
             Vector3.Transform(ref up, ref rotation, out up);
             Vector3.Transform(ref direction, ref rotation, out direction);
-            MarkDirty();
+            Invalidate();
         }
 
-        private bool dirty;
-        protected void CheckDirty()
+        private bool needsUpdate;
+        protected void Validate()
         {
-            if (!dirty) return;
+            if (!needsUpdate) return;
 
             Recalculate(out view, out projection, out internalViewport, out extendedViewport);
-            dirty = false;
+            needsUpdate = false;
 
             projectionView = view * projection;
             invertedProjectionView = projectionView.Inverted();
         }
 
-        protected void MarkDirty()
+        protected void Invalidate()
         {
-            dirty = true;
+            needsUpdate = true;
             Changed?.Invoke(this, EventArgs.Empty);
         }
 

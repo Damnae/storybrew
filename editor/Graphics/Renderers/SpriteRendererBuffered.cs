@@ -1,10 +1,10 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using StorybrewEditor.Graphics.Cameras;
+﻿using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Renderers.PrimitiveStreamers;
 using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.Util;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -17,7 +17,7 @@ namespace StorybrewEditor.Graphics.Renderers
         public const string CombinedMatrixUniformName = "u_combinedMatrix";
         public const string TextureUniformName = "u_texture";
 
-        public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(VertexAttribute.CreatePosition2d(), VertexAttribute.CreateTextureCoord(0), VertexAttribute.CreateColor(true));
+        public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(VertexAttribute.CreatePosition2d(), VertexAttribute.CreateDiffuseCoord(0), VertexAttribute.CreateColor(true));
 
         #region Default Shader
 
@@ -62,15 +62,12 @@ namespace StorybrewEditor.Graphics.Renderers
             get { return ownsShader ? null : shader; }
             set
             {
-                if (!primitiveStreamer.SupportsShaders)
-                    throw new NotSupportedException();
-
                 if (shader != null && (shader == value || (ownsShader && value == null)))
                     return;
 
                 if (rendering)
                 {
-                    Flush();
+                    DrawState.FlushRenderer();
                     primitiveStreamer.Unbind();
                     shader.End();
                 }
@@ -136,15 +133,14 @@ namespace StorybrewEditor.Graphics.Renderers
         public SpriteRendererBuffered(Shader shader = null, int maxSpritesPerBatch = 4096, int primitiveBufferSize = 0) :
             this((vertexDeclaration, minRenderableVertexCount) =>
             {
-                if (DrawState.AllowShaders && PrimitiveStreamerPersistentMap<SpritePrimitive>.HasCapabilities())
+                if (PrimitiveStreamerPersistentMap<SpritePrimitive>.HasCapabilities())
                     return new PrimitiveStreamerPersistentMap<SpritePrimitive>(vertexDeclaration, minRenderableVertexCount);
-                else if (DrawState.AllowShaders && PrimitiveStreamerBufferData<SpritePrimitive>.HasCapabilities())
+                else if (PrimitiveStreamerBufferData<SpritePrimitive>.HasCapabilities())
                     return new PrimitiveStreamerBufferData<SpritePrimitive>(vertexDeclaration, minRenderableVertexCount);
-                else if (DrawState.AllowShaders && PrimitiveStreamerVbo<SpritePrimitive>.HasCapabilities())
+                else if (PrimitiveStreamerVbo<SpritePrimitive>.HasCapabilities())
                     return new PrimitiveStreamerVbo<SpritePrimitive>(vertexDeclaration);
-                else if (PrimitiveStreamerFpVbo<SpritePrimitive>.HasCapabilities())
-                    return new PrimitiveStreamerFpVbo<SpritePrimitive>(vertexDeclaration);
-                return PrimitiveStreamerFpImmediate<SpritePrimitive>.CreateSpriteStreamer();
+                throw new NotSupportedException();
+
             }, shader, maxSpritesPerBatch, primitiveBufferSize)
         {
         }
@@ -155,9 +151,7 @@ namespace StorybrewEditor.Graphics.Renderers
 
             var primitiveBatchSize = Math.Max(maxSpritesPerBatch, primitiveBufferSize / (VertexPerSprite * VertexDeclaration.VertexSize));
             primitiveStreamer = createPrimitiveStreamer(VertexDeclaration, primitiveBatchSize * VertexPerSprite);
-
-            if (primitiveStreamer.SupportsShaders)
-                Shader = shader;
+            Shader = shader;
 
             spriteArray = new SpritePrimitive[maxSpritesPerBatch];
             Trace.WriteLine($"Initialized {nameof(SpriteRenderer)} using {primitiveStreamer.GetType().Name}");
@@ -190,8 +184,7 @@ namespace StorybrewEditor.Graphics.Renderers
         {
             if (rendering) throw new InvalidOperationException("Already rendering");
 
-            if (primitiveStreamer.SupportsShaders)
-                shader.Begin();
+            shader.Begin();
             primitiveStreamer.Bind(shader);
 
             rendering = true;
@@ -201,10 +194,8 @@ namespace StorybrewEditor.Graphics.Renderers
         {
             if (!rendering) throw new InvalidOperationException("Not rendering");
 
-            Flush();
             primitiveStreamer.Unbind();
-            if (primitiveStreamer.SupportsShaders)
-                shader.End();
+            shader.End();
 
             currentTexture = null;
             rendering = false;
@@ -216,29 +207,21 @@ namespace StorybrewEditor.Graphics.Renderers
             if (spritesInBatch == 0)
                 return;
 
-            Debug.Assert(currentTexture != null);
+            if (currentTexture == null)
+                throw new InvalidOperationException("currentTexture is null");
 
             // When the previous flush was bufferable, draw state should stay the same.
             if (!lastFlushWasBuffered)
             {
                 var combinedMatrix = transformMatrix * Camera.ProjectionView;
 
-                if (shader != null)
+                var samplerUnit = CustomTextureBind != null ? CustomTextureBind(currentTexture) : DrawState.BindTexture(currentTexture);
+                if (currentSamplerUnit != samplerUnit)
                 {
-                    var samplerUnit = CustomTextureBind != null ? CustomTextureBind(currentTexture) : DrawState.BindTexture(currentTexture);
-                    if (currentSamplerUnit != samplerUnit)
-                    {
-                        currentSamplerUnit = samplerUnit;
-                        GL.Uniform1(shader.GetUniformLocation(SpriteRendererBuffered.TextureUniformName), currentSamplerUnit);
-                    }
-
-                    GL.UniformMatrix4(shader.GetUniformLocation(CombinedMatrixUniformName), false, ref combinedMatrix);
+                    currentSamplerUnit = samplerUnit;
+                    GL.Uniform1(shader.GetUniformLocation(TextureUniformName), currentSamplerUnit);
                 }
-                else
-                {
-                    DrawState.BindPrimaryTexture(currentTexture.TextureId, currentTexture.TexturingMode);
-                    DrawState.ProjViewMatrix = combinedMatrix;
-                }
+                GL.UniformMatrix4(shader.GetUniformLocation(CombinedMatrixUniformName), false, ref combinedMatrix);
             }
 
             primitiveStreamer.Render(PrimitiveType.Quads, spriteArray, spritesInBatch, spritesInBatch * VertexPerSprite, canBuffer);
@@ -266,11 +249,12 @@ namespace StorybrewEditor.Graphics.Renderers
 
             if (currentTexture != texture)
             {
-                Flush();
+                DrawState.FlushRenderer();
                 currentTexture = texture;
             }
             else if (spritesInBatch == maxSpritesPerBatch)
             {
+                DrawState.FlushRenderer(true);
                 Flush(true);
             }
 

@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 using StorybrewEditor.Graphics;
-using StorybrewEditor.UserInterface.Drawables;
+using StorybrewEditor.Graphics.Drawables;
 
 namespace StorybrewEditor.UserInterface
 {

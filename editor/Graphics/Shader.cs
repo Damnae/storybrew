@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StorybrewEditor.Graphics
 {
@@ -45,8 +47,8 @@ namespace StorybrewEditor.Graphics
             initialize(vertexShaderCode, fragmentShaderCode);
 
             if (isInitialized)
-                Trace.WriteLine(string.IsNullOrWhiteSpace(log) ? 
-                    $"Shader {programId} initialized" : 
+                Trace.WriteLine(string.IsNullOrWhiteSpace(log) ?
+                    $"Shader {programId} initialized" :
                     $"Shader {programId} initialized:\n{log}");
             else
             {
@@ -105,7 +107,6 @@ namespace StorybrewEditor.Graphics
         {
             if (!started) throw new InvalidOperationException("Not started");
 
-            DrawState.ProgramId = 0;
             started = false;
         }
 
@@ -130,7 +131,7 @@ namespace StorybrewEditor.Graphics
             if (uniforms.TryGetValue(identifier, out property))
                 return property.Location;
 
-            throw new ArgumentException(identifier + " isn't a valid uniform identifier");
+            throw new ArgumentException($"{identifier} isn't a valid uniform identifier");
         }
 
         public bool HasUniform(string name, int index = -1, string field = null)
@@ -170,7 +171,7 @@ namespace StorybrewEditor.Graphics
             GL.GetShader(id, ShaderParameter.CompileStatus, out compileStatus);
             if (compileStatus == 0)
             {
-                log += GL.GetShaderInfoLog(id);
+                log += $"--- {type} ---\n{addLineExtracts(GL.GetShaderInfoLog(id), code)}";
                 return -1;
             }
 
@@ -227,8 +228,38 @@ namespace StorybrewEditor.Graphics
             }
         }
 
+        private string addLineExtracts(string log, string code)
+        {
+            var errorRegex = new Regex(@"^ERROR: (\d+):(\d+): ", RegexOptions.IgnoreCase);
+            var splitCode = code.Replace("\r\n", "\n").Split('\n');
+
+            var sb = new StringBuilder();
+            foreach (var line in log.Split('\n'))
+            {
+                sb.AppendLine(line);
+
+                var match = errorRegex.Match(line);
+                if (match.Success)
+                {
+                    var character = int.Parse(match.Groups[1].Value);
+                    var lineNumber = int.Parse(match.Groups[2].Value) - 1;
+
+                    if (lineNumber > 0)
+                    {
+                        sb.Append("  ");
+                        sb.AppendLine(splitCode[lineNumber - 1]);
+                    }
+
+                    sb.Append("> ");
+                    sb.AppendLine(splitCode[lineNumber]);
+                    sb.AppendLine(new string(' ', character + 2) + "^");
+                }
+            }
+            return sb.ToString();
+        }
+
         public override string ToString()
-            => string.Format("program:{0} vs:{1} fs:{2}", programId, vertexShaderId, fragmentShaderId);
+            => $"program:{programId} vs:{vertexShaderId} fs:{fragmentShaderId}";
 
         private struct Property<TType>
         {
@@ -246,7 +277,7 @@ namespace StorybrewEditor.Graphics
             }
 
             public override string ToString()
-                => string.Format("{0}@{3} {2}x{1}", Name, Size, Type, Location);
+                => $"{Size}@{Location} {Type}x{Size}";
         }
     }
 }

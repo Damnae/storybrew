@@ -151,10 +151,7 @@ namespace StorybrewEditor.Graphics
                 }
             }
 
-            public override string ToString()
-            {
-                return string.Format("{0} - {1} ({2})", Index, Index + Length - 1, Length, Fence);
-            }
+            public override string ToString() => $"{Index} - {Index + Length - 1} ({Length})";
 
             #region IDisposable Support
 

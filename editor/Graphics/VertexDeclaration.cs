@@ -1,5 +1,4 @@
 ﻿using OpenTK.Graphics.OpenGL;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -25,6 +24,23 @@ namespace StorybrewEditor.Graphics
             }
         }
 
+        public VertexAttribute GetAttribute(AttributeUsage usage)
+        {
+            foreach (var attribute in vertexAttributes)
+                if (attribute.Usage == usage)
+                    return attribute;
+            return null;
+        }
+
+        public List<VertexAttribute> GetAttributes(AttributeUsage usage)
+        {
+            var attributes = new List<VertexAttribute>();
+            foreach (var attribute in vertexAttributes)
+                if (attribute.Usage == usage)
+                    attributes.Add(attribute);
+            return attributes;
+        }
+
         public void ActivateAttributes(Shader shader)
         {
             foreach (var attribute in vertexAttributes)
@@ -48,49 +64,24 @@ namespace StorybrewEditor.Graphics
             }
         }
 
-        public void ActivateFpAttributes()
+        public override bool Equals(object other)
         {
-            foreach (var attribute in vertexAttributes)
-            {
-                GL.EnableClientState(attribute.ClientStateCap);
-                switch (attribute.ClientStateCap)
-                {
-                    case ArrayCap.VertexArray:
-                        GL.VertexPointer(attribute.ComponentCount, (VertexPointerType)attribute.Type, VertexSize, attribute.Offset);
-                        break;
+            if (other == this) return true;
 
-                    case ArrayCap.TextureCoordArray:
-                        GL.TexCoordPointer(attribute.ComponentCount, (TexCoordPointerType)attribute.Type, VertexSize, attribute.Offset);
-                        break;
+            var otherDeclaration = other as VertexDeclaration;
+            if (otherDeclaration == null) return false;
+            if (AttributeCount != otherDeclaration.AttributeCount) return false;
+            for (var i = 0; i < AttributeCount; i++)
+                if (!this[i].Equals(otherDeclaration[i]))
+                    return false;
 
-                    case ArrayCap.ColorArray:
-                        GL.ColorPointer(attribute.ComponentCount, (ColorPointerType)attribute.Type, VertexSize, attribute.Offset);
-                        break;
-
-                    default:
-                        throw new NotSupportedException(attribute.Type.ToString());
-                }
-                DrawState.CheckError("binding");
-            }
-        }
-
-        public void DeactivateFpAttributes()
-        {
-            foreach (var attribute in vertexAttributes)
-                GL.DisableClientState(attribute.ClientStateCap);
+            return true;
         }
 
         #region Enumerable
 
-        public IEnumerator<VertexAttribute> GetEnumerator()
-        {
-            return ((IEnumerable<VertexAttribute>)vertexAttributes).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<VertexAttribute>)vertexAttributes).GetEnumerator();
-        }
+        public IEnumerator<VertexAttribute> GetEnumerator() => ((IEnumerable<VertexAttribute>)vertexAttributes).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<VertexAttribute>)vertexAttributes).GetEnumerator();
 
         #endregion
     }

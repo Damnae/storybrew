@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using StorybrewEditor.Graphics.Drawables;
 using StorybrewEditor.Graphics.Textures;
-using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using StorybrewEditor.Util;
 using System;
@@ -166,7 +166,7 @@ namespace StorybrewEditor.UserInterface.Skinning
                     throw new InvalidDataException($"Drawable '{data.Path}' must declare a type");
 
                 var drawableTypeName = drawableTypeData.Value<string>();
-                var drawableType = Type.GetType($"{nameof(StorybrewEditor)}.{nameof(UserInterface)}.{nameof(Drawables)}.{drawableTypeName}", true, true);
+                var drawableType = Type.GetType($"{nameof(StorybrewEditor)}.{nameof(Graphics)}.{nameof(Drawables)}.{drawableTypeName}", true, true);
                 var drawable = (Drawable)Activator.CreateInstance(drawableType);
 
                 parseFields(drawable, data, null, skin);
@@ -244,7 +244,7 @@ namespace StorybrewEditor.UserInterface.Skinning
             }
         }
 
-        private static void parseFields(Skinnable skinnable, JToken data, Skinnable parent, Skin skin)
+        private static void parseFields(object skinnable, JToken data, object parent, Skin skin)
         {
             var type = skinnable.GetType();
             while (type != typeof(object))

@@ -5,8 +5,6 @@ namespace StorybrewEditor.Graphics.Renderers.PrimitiveStreamers
 {
     public interface PrimitiveStreamer<TPrimitive> : IDisposable where TPrimitive : struct
     {
-        bool SupportsShaders { get; }
-
         int DiscardedBufferCount { get; }
         int BufferWaitCount { get; }
 

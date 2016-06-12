@@ -1,8 +1,8 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using StorybrewEditor.Graphics;
+using StorybrewEditor.Graphics.Drawables;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.Util;
 using System;
 

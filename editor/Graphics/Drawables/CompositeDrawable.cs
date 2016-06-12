@@ -1,10 +1,9 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using System;
 using System.Collections.Generic;
 
-namespace StorybrewEditor.UserInterface.Drawables
+namespace StorybrewEditor.Graphics.Drawables
 {
     public class CompositeDrawable : Drawable
     {

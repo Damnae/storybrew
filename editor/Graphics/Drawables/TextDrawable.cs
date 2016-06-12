@@ -1,12 +1,12 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Textures;
+using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System.Drawing;
 
-namespace StorybrewEditor.UserInterface.Drawables
+namespace StorybrewEditor.Graphics.Drawables
 {
     public class TextDrawable : Drawable
     {
@@ -117,7 +117,7 @@ namespace StorybrewEditor.UserInterface.Drawables
             }
         }
 
-        public BlendingMode BlendingMode = BlendingMode.Default;
+        public readonly RenderStates RenderStates = new RenderStates();
         public Color4 Color = Color4.White;
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
@@ -125,11 +125,8 @@ namespace StorybrewEditor.UserInterface.Drawables
             if (textureMaxSize != maxSize || textureScaling != scaling) invalidateTexture();
             validateTexture();
 
-            var renderer = drawContext.SpriteRenderer;
-            DrawState.Renderer = renderer;
-            DrawState.SetBlending(BlendingMode);
-            renderer.Camera = camera;
-            renderer.Draw(texture, bounds.Left, bounds.Top, 0, 0, 1 / scaling, 1 / scaling, 0, Color.WithOpacity(opacity));
+            DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates)
+                .Draw(texture, bounds.Left, bounds.Top, 0, 0, 1 / scaling, 1 / scaling, 0, Color.WithOpacity(opacity));
         }
 
         private void validateMeasuredSize()

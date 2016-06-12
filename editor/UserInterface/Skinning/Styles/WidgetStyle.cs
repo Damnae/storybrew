@@ -1,8 +1,8 @@
-﻿using StorybrewEditor.UserInterface.Drawables;
+﻿using StorybrewEditor.Graphics.Drawables;
 
 namespace StorybrewEditor.UserInterface.Skinning.Styles
 {
-    public class WidgetStyle : Skinnable
+    public class WidgetStyle
     {
         public Drawable Background;
         public Drawable Foreground;

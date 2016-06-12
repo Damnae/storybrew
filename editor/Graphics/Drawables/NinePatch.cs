@@ -1,16 +1,15 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.Util;
 
-namespace StorybrewEditor.UserInterface.Drawables
+namespace StorybrewEditor.Graphics.Drawables
 {
     public class NinePatch : Drawable
     {
         public Texture2d Texture;
-        public BlendingMode BlendingMode = BlendingMode.Default;
+        public readonly RenderStates RenderStates = new RenderStates();
         public Color4 Color = Color4.White;
         public FourSide Borders;
         public FourSide Outset;
@@ -40,11 +39,7 @@ namespace StorybrewEditor.UserInterface.Drawables
             var verticalScale = (y2 - y1) / (Borders.Bottom - Borders.Top);
 
             var color = Color.WithOpacity(opacity);
-
-            var renderer = drawContext.SpriteRenderer;
-            DrawState.Renderer = renderer;
-            DrawState.SetBlending(BlendingMode);
-            renderer.Camera = camera;
+            var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
 
             // Center
             if (!BordersOnly && horizontalScale > 0 && verticalScale > 0)

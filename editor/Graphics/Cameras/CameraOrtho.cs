@@ -18,7 +18,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (virtualWidth == value) return;
                 virtualWidth = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -30,7 +30,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (virtualHeight == value) return;
                 virtualHeight = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 
@@ -42,7 +42,7 @@ namespace StorybrewEditor.Graphics.Cameras
             {
                 if (zoom == value) return;
                 zoom = value;
-                MarkDirty();
+                Invalidate();
             }
         }
 

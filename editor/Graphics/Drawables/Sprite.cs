@@ -1,17 +1,16 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
+﻿using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.Util;
+using OpenTK;
+using OpenTK.Graphics;
 using System;
 
-namespace StorybrewEditor.UserInterface.Drawables
+namespace StorybrewEditor.Graphics.Drawables
 {
     public class Sprite : Drawable
     {
         public Texture2d Texture;
-        public BlendingMode BlendingMode = BlendingMode.Default;
+        public readonly RenderStates RenderStates = new RenderStates();
         public float Rotation;
         public Color4 Color = Color4.White;
         public ScaleMode ScaleMode = ScaleMode.None;
@@ -23,11 +22,7 @@ namespace StorybrewEditor.UserInterface.Drawables
         {
             if (Texture == null) return;
 
-            var renderer = drawContext.SpriteRenderer;
-            DrawState.Renderer = renderer;
-            DrawState.SetBlending(BlendingMode);
-            renderer.Camera = camera;
-
+            var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
             var color = Color.WithOpacity(opacity);
 
             float textureX0 = 0;
