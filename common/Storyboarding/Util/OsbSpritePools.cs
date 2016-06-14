@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding.Util
 {
@@ -18,6 +19,10 @@ namespace StorybrewCommon.Storyboarding.Util
                 pool.Value.Clear();
             pools.Clear();
         }
+
+        [Obsolete("OsbLayer comes from the storyboard layer and is ignored by this method")]
+        public OsbSprite Get(double startTime, double endTime, string path, OsbLayer layer, OsbOrigin origin = OsbOrigin.Centre, bool additive = false, int poolGroup = 0)
+            => Get(startTime, endTime, path, origin, additive, poolGroup);
 
         public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin = OsbOrigin.Centre, bool additive = false, int poolGroup = 0)
             => getPool(path, origin, additive, poolGroup).Get(startTime, endTime);
