@@ -4,9 +4,9 @@ namespace StorybrewCommon.Animations
 {
     public struct Keyframe<TValue> : IComparable<Keyframe<TValue>>
     {
-        public double Time;
-        public TValue Value;
-        public Func<double, double> Ease;
+        public readonly double Time;
+        public readonly TValue Value;
+        public readonly Func<double, double> Ease;
 
         public Keyframe(double time)
             : this(time, default(TValue))
@@ -14,7 +14,7 @@ namespace StorybrewCommon.Animations
         }
 
         public Keyframe(double time, TValue value)
-            : this(time, value, EasingFunctions.Step)
+            : this(time, value, EasingFunctions.Linear)
         {
         }
 
@@ -30,9 +30,6 @@ namespace StorybrewCommon.Animations
             return Math.Sign(Time - other.Time);
         }
 
-        public override string ToString()
-        {
-            return string.Format("{0:0.000}s {1}:{2}", Time, typeof(TValue), Value);
-        }
+        public override string ToString() => $"{Time:0.000}s {typeof(TValue)}:{Value}";
     }
 }

@@ -146,7 +146,7 @@ namespace StorybrewEditor.Graphics.Cameras
             var newDirection = (target - position).Normalized();
             if (newDirection != Vector3.Zero)
             {
-                float dot = Vector3.Dot(newDirection, up);
+                var dot = Vector3.Dot(newDirection, up);
                 if (Math.Abs(dot - 1) < 0.000000001f)
                     up = direction * -1;
                 else if (Math.Abs(dot + 1) < 0.000000001f)
