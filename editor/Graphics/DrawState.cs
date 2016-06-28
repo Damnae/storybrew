@@ -51,7 +51,7 @@ namespace StorybrewEditor.Graphics
             maxFpTextureUnits = HasCapabilities(1, 3) ? GL.GetInteger(GetPName.MaxTextureUnits) : 1;
             maxTextureImageUnits = GL.GetInteger(GetPName.MaxTextureImageUnits);
             maxVertexTextureImageUnits = GL.GetInteger(GetPName.MaxVertexTextureImageUnits);
-            maxGeometryTextureImageUnits = GL.GetInteger(GetPName.MaxGeometryTextureImageUnits);
+            maxGeometryTextureImageUnits = HasCapabilities(3, 2, "GL_ARB_geometry_shader4") ? GL.GetInteger(GetPName.MaxGeometryTextureImageUnits) : 0;
             maxCombinedTextureImageUnits = GL.GetInteger(GetPName.MaxCombinedTextureImageUnits);
             maxTextureCoords = GL.GetInteger(GetPName.MaxTextureCoords);
 
@@ -62,6 +62,8 @@ namespace StorybrewEditor.Graphics
 
             samplerTextureIds = new int[maxTextureImageUnits];
             samplerTexturingModes = new TexturingModes[maxTextureImageUnits];
+
+            CheckError("initializing openGL context");
 
             whitePixel = Texture2d.Create(Color4.White, "whitepixel");
             normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel");

@@ -81,7 +81,6 @@ namespace StorybrewEditor
             using (audioManager = new AudioManager(window.WindowInfo.Handle))
             using (var editor = new Editor(window))
             {
-                DrawState.CheckError("initializing openGL context");
                 Trace.WriteLine("graphics mode: " + window.Context.GraphicsMode);
 
                 window.Icon = new Icon(typeof(Program), "icon.ico");
