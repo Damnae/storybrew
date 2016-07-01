@@ -184,7 +184,7 @@ namespace StorybrewCommon.Scripting
                     var configurable = attribute as ConfigurableAttribute;
                     if (configurable == null) continue;
 
-                    if (!ObjectSerializer.Supports(field.FieldType))
+                    if (!field.FieldType.IsEnum && !ObjectSerializer.Supports(field.FieldType))
                         continue;
 
                     configurableFields.Add(new ConfigurableField()
