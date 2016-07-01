@@ -42,12 +42,12 @@ namespace StorybrewCommon.Storyboarding.Display
             if (index > 0 && command.StartTime < commands[index - 1].EndTime)
             {
                 hasOverlap = true;
-                Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
+                //Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
             }
             else if (index < commands.Count && commands[index].StartTime < command.EndTime)
             {
                 hasOverlap = true;
-                Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
+                //Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
             }
 
             commands.Insert(index, command);
