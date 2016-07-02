@@ -36,6 +36,7 @@ namespace StorybrewCommon.Storyboarding
         }
 
         public IEnumerable<ICommand> Commands => commands;
+        public int CommandCount => commands.Count;
 
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
