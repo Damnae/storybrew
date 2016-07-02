@@ -165,8 +165,11 @@ namespace StorybrewEditor.UserInterface.Components
                     AnchorTo = UiAlignment.Right,
                     CanGrow = false,
                 };
-                widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
-                widget.OnValueCommited += (sender, e) => widget.Value = effect.Config.GetValue(field.Name).ToString();
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = effect.Config.GetValue(field.Name).ToString();
+                };
                 return widget;
             }
             else if (Array.IndexOf(numberTypes, field.Type) != -1)
@@ -178,7 +181,7 @@ namespace StorybrewEditor.UserInterface.Components
                     AnchorTo = UiAlignment.Right,
                     CanGrow = false,
                 };
-                widget.OnValueChanged += (sender, e) =>
+                widget.OnValueCommited += (sender, e) =>
                 {
                     decimal decimalValue;
                     if (decimal.TryParse(widget.Value, out decimalValue))
@@ -186,8 +189,8 @@ namespace StorybrewEditor.UserInterface.Components
                         var value = Convert.ChangeType(decimalValue, field.Type);
                         setFieldValue(field, value);
                     }
+                    widget.Value = effect.Config.GetValue(field.Name).ToString();
                 };
-                widget.OnValueCommited += (sender, e) => widget.Value = effect.Config.GetValue(field.Name).ToString();
                 return widget;
             }
 
