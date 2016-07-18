@@ -150,8 +150,10 @@ namespace StorybrewCommon.Storyboarding
 
         public void EndGroup()
         {
-            endDisplayComposites();
+            currentCommandGroup.EndGroup();
             currentCommandGroup = null;
+
+            endDisplayComposites();
         }
 
         private void addCommand(ICommand command)

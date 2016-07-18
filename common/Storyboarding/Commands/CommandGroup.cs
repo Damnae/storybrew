@@ -6,6 +6,8 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public abstract class CommandGroup : MarshalByRefObject, ICommand
     {
+        private bool ended;
+
         public double StartTime { get; set; }
         public virtual double EndTime { get; set; }
         public bool Enabled => true;
@@ -52,7 +54,15 @@ namespace StorybrewCommon.Storyboarding.Commands
         }
 
         public void Add(ICommand command)
-            => commands.Add(command);
+        {
+            if (ended) throw new InvalidOperationException("Cannot add commands to a group after it ended");
+            commands.Add(command);
+        }
+
+        public virtual void EndGroup()
+        {
+            ended = true;
+        }
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {

@@ -73,6 +73,7 @@
     <Compile Include="Mapset\OsuHold.cs" />
     <Compile Include="Mapset\OsuSlider.cs" />
     <Compile Include="Mapset\OsuSpinner.cs" />
+    <Compile Include="Storyboarding\Commands\IOffsetable.cs" />
     <Compile Include="Storyboarding\ConfigurableAttribute.cs" />
     <Compile Include="Storyboarding\EffectConfig.cs" />
     <Compile Include="Storyboarding\GeneratorContext.cs" />
