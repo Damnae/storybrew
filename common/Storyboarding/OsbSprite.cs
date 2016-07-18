@@ -134,7 +134,7 @@ namespace StorybrewCommon.Storyboarding
 
         public LoopCommand StartLoopGroup(double startTime, int loopCount)
         {
-            LoopCommand loopCommand = new LoopCommand(startTime, loopCount);
+            var loopCommand = new LoopCommand(startTime, loopCount);
             addCommand(loopCommand);
             startDisplayLoop(loopCommand);
             return loopCommand;
@@ -142,7 +142,7 @@ namespace StorybrewCommon.Storyboarding
 
         public TriggerCommand StartTriggerGroup(string triggerName, double startTime, double endTime, int group = 0)
         {
-            TriggerCommand triggerCommand = new TriggerCommand(triggerName, startTime, endTime, group);
+            var triggerCommand = new TriggerCommand(triggerName, startTime, endTime, group);
             addCommand(triggerCommand);
             startDisplayTrigger(triggerCommand);
             return triggerCommand;

@@ -19,7 +19,7 @@ namespace StorybrewCommon.Storyboarding.Commands
             {
                 var commandsStartTime = double.MaxValue;
                 foreach (ICommand command in Commands)
-                    commandsStartTime = Math.Min(commandsStartTime, command.EndTime);
+                    commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
 
                 return commandsStartTime;
             }
