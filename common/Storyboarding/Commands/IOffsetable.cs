@@ -1,6 +1,6 @@
 ﻿namespace StorybrewCommon.Storyboarding.Commands
 {
-    public interface IOffsetable
+    internal interface IOffsetable
     {
         void Offset(double offset);
     }
