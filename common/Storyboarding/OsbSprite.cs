@@ -63,8 +63,9 @@ namespace StorybrewCommon.Storyboarding
         private void refreshStartEndTimes()
         {
             clearStartEndTimes();
-            foreach (ICommand command in commands)
+            foreach (var command in commands)
             {
+                if (!command.Enabled) continue;
                 commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
                 commandsEndTime = Math.Max(commandsEndTime, command.EndTime);
             }

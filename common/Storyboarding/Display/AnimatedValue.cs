@@ -33,35 +33,37 @@ namespace StorybrewCommon.Storyboarding.Display
 
         public void Add(ITypedCommand<TValue> command)
         {
-            if (command.EndTime < command.StartTime)
-                Debug.Print($"'{command}' ends before it starts");
-
-            int index;
-            findCommandIndex(command.StartTime, out index);
-
-            if (index > 0 && command.StartTime < commands[index - 1].EndTime)
-            {
-                hasOverlap = true;
-                //Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
-            }
-            else if (index < commands.Count && commands[index].StartTime < command.EndTime)
-            {
-                hasOverlap = true;
-                //Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
-            }
-
-            commands.Insert(index, command);
-
             var triggerable = command as TriggerDecorator<TValue>;
-            if (triggerable != null) triggerable.OnTimeChanged += triggerable_OnTimeChanged;
+            if (triggerable == null)
+            {
+                if (command.EndTime < command.StartTime)
+                    Debug.Print($"'{command}' ends before it starts");
+
+                int index;
+                findCommandIndex(command.StartTime, out index);
+
+                if (index > 0 && command.StartTime < commands[index - 1].EndTime)
+                {
+                    hasOverlap = true;
+                    //Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
+                }
+                else if (index < commands.Count && commands[index].StartTime < command.EndTime)
+                {
+                    hasOverlap = true;
+                    //Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
+                }
+
+                commands.Insert(index, command);
+            }
+            else triggerable.OnStateChanged += triggerable_OnStateChanged;
         }
 
         public void Remove(ITypedCommand<TValue> command)
         {
-            commands.Remove(command);
-
             var triggerable = command as TriggerDecorator<TValue>;
-            if (triggerable != null) triggerable.OnTimeChanged -= triggerable_OnTimeChanged;
+            if (triggerable == null)
+                commands.Remove(command);
+            else triggerable.OnStateChanged -= triggerable_OnStateChanged;
         }
 
         public bool IsActive(double time)
@@ -78,7 +80,7 @@ namespace StorybrewCommon.Storyboarding.Display
 
             if (hasOverlap)
                 for (var i = 0; i < index; i++)
-                    if (time < commands[index - 1].EndTime)
+                    if (time < commands[i].EndTime)
                     {
                         index = i;
                         break;
@@ -105,7 +107,7 @@ namespace StorybrewCommon.Storyboarding.Display
             return false;
         }
 
-        private void triggerable_OnTimeChanged(object sender, EventArgs e)
+        private void triggerable_OnStateChanged(object sender, EventArgs e)
         {
             var command = (ITypedCommand<TValue>)sender;
             if (commands.Remove(command))
