@@ -7,7 +7,7 @@ namespace StorybrewCommon.Storyboarding.Commands
     {
         double StartTime { get; }
         double EndTime { get; }
-        bool Enabled { get; }
+        bool Active { get; }
 
         void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation);
     }

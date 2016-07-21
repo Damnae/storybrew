@@ -18,7 +18,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public double EndTime => startTime + RepeatDuration * repeats;
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
-        public bool Enabled => true;
+        public bool Active => true;
 
         public double RepeatDuration => repeatDuration < 0 ? command.EndTime : repeatDuration;
 

@@ -13,7 +13,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public double EndTime { get; set; }
         public TValue StartValue { get; set; }
         public TValue EndValue { get; set; }
-        public bool Enabled => true;
+        public bool Active => true;
 
         protected Command(string identifier, OsbEasing easing, double startTime, double endTime, TValue startValue, TValue endValue)
         {

@@ -10,7 +10,7 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public double StartTime { get; set; }
         public virtual double EndTime { get; set; }
-        public virtual bool Enabled => true;
+        public virtual bool Active => true;
 
         private List<ICommand> commands = new List<ICommand>();
         public IEnumerable<ICommand> Commands => commands;

@@ -110,13 +110,14 @@ namespace StorybrewCommon.Storyboarding.Display
         private void triggerable_OnStateChanged(object sender, EventArgs e)
         {
             var command = (ITypedCommand<TValue>)sender;
-            if (commands.Remove(command))
+
+            commands.Remove(command);
+            if (command.Active)
             {
                 int index;
                 findCommandIndex(command.StartTime, out index);
                 commands.Insert(index, command);
             }
-            else throw new InvalidOperationException();
         }
     }
 }

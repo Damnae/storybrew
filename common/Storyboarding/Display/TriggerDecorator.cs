@@ -17,7 +17,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public double EndTime => triggerTime + command.EndTime;
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
-        public bool Enabled => triggered;
+        public bool Active => triggered;
 
         public event EventHandler OnStateChanged;
 
