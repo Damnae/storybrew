@@ -38,23 +38,23 @@ namespace StorybrewEditor.ScreenLayers
                     newProjectButton = new Button(WidgetManager)
                     {
                         Text = "New project",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     openProjectButton = new Button(WidgetManager)
                     {
                         Text = "Open project",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     preferencesButton = new Button(WidgetManager)
                     {
                         Text = "Preferences",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Disabled = true,
                     },
                     closeButton = new Button(WidgetManager)
                     {
                         Text = "Close",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                 },
             });
@@ -69,14 +69,14 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     updateButton = new Button(WidgetManager)
                     {
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Displayed = false,
                     },
                     versionLabel = new Label(WidgetManager)
                     {
                         StyleName = "small",
                         Text = Program.FullName,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                 },
             });

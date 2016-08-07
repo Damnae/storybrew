@@ -196,7 +196,7 @@ namespace StorybrewEditor.UserInterface
                     var childBreadth = fitChildren ? Math.Max(minSize.Y, innerSize.Y) : Math.Max(minSize.Y, Math.Min(item.PreferredSize.Y, innerSize.Y));
                     if (maxSize.Y > 0 && childBreadth > maxSize.Y) childBreadth = maxSize.Y;
 
-                    var anchor = (child.AnchorTo & UiAlignment.Vertical) | UiAlignment.Left;
+                    var anchor = (child.AnchorFrom & UiAlignment.Vertical) | UiAlignment.Left;
                     PlaceChildren(child, new Vector2(distance, padding.GetVerticalOffset(anchor)), new Vector2(item.Length, childBreadth), anchor);
                 }
                 else
@@ -204,7 +204,7 @@ namespace StorybrewEditor.UserInterface
                     var childBreadth = fitChildren ? Math.Max(minSize.X, innerSize.X) : Math.Max(minSize.X, Math.Min(item.PreferredSize.X, innerSize.X));
                     if (maxSize.X > 0 && childBreadth > maxSize.X) childBreadth = maxSize.X;
 
-                    var anchor = (child.AnchorTo & UiAlignment.Horizontal) | UiAlignment.Top;
+                    var anchor = (child.AnchorFrom & UiAlignment.Horizontal) | UiAlignment.Top;
                     PlaceChildren(child, new Vector2(padding.GetHorizontalOffset(anchor), distance), new Vector2(childBreadth, item.Length), anchor);
                 }
 

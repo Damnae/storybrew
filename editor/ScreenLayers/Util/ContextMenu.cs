@@ -67,7 +67,7 @@ namespace StorybrewEditor.ScreenLayers
                             {
                                 StyleName = "icon",
                                 Icon = IconFont.TimesCircle,
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = UiAlignment.Centre,
                                 CanGrow = false,
                             }
                         },
@@ -83,7 +83,7 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     StyleName = "small",
                     Text = option.Name,
-                    AnchorTo = UiAlignment.Centre,
+                    AnchorFrom = UiAlignment.Centre,
                 });
 
                 var result = option.Value;

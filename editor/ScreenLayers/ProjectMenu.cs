@@ -82,7 +82,7 @@ namespace StorybrewEditor.ScreenLayers
                     timeLabel = new Label(WidgetManager)
                     {
                         StyleName = "light",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Text = "--:--:---",
                         CanGrow = false,
                     },
@@ -91,7 +91,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "small",
                         Text = $"1/{snapDivisor}",
                         Tooltip = "Snap divisor",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                     },
                     audioTimeFactorButton = new Button(WidgetManager)
@@ -99,12 +99,12 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "small",
                         Text = $"{audio.TimeFactor:P0}",
                         Tooltip = "Audio speed",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                     },
                     timeline = new TimelineSlider(WidgetManager, project)
                     {
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         SnapDivisor = snapDivisor,
                     },
                     playPauseButton = new Button(WidgetManager)
@@ -112,7 +112,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.Play,
                         Tooltip = "Play/Pause\nShortcut: Space",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                     },
                     fitButton = new Button(WidgetManager)
@@ -120,7 +120,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.Desktop,
                         Tooltip = "Fit/Fill",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                         Checkable = true,
                     },
@@ -156,7 +156,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.FolderOpen,
                         Tooltip = "Open mapset folder",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                     },
                     saveButton = new Button(WidgetManager)
@@ -164,7 +164,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.Save,
                         Tooltip = "Save project\nShortcut: Ctrl-S",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                     },
                     exportButton = new Button(WidgetManager)
@@ -172,7 +172,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.PuzzlePiece,
                         Tooltip = "Export to .osb",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         CanGrow = false,
                     },
                 },
@@ -219,12 +219,12 @@ namespace StorybrewEditor.ScreenLayers
                     statusIcon = new Label(WidgetManager)
                     {
                         StyleName = "icon",
-                        AnchorTo = UiAlignment.Left,
+                        AnchorFrom = UiAlignment.Left,
                         CanGrow = false,
                     },
                     statusMessage = new Label(WidgetManager)
                     {
-                        AnchorTo = UiAlignment.Left,
+                        AnchorFrom = UiAlignment.Left,
                     },
                 },
             });

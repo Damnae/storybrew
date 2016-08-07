@@ -45,29 +45,29 @@ namespace StorybrewEditor.ScreenLayers.Util
                     {
                         StyleName = "small",
                         Text = description,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     textbox = new Textbox(WidgetManager)
                     {
                         LabelText = title,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Value = initialText,
                     },
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Children = new Widget[]
                         {
                             okButton = new Button(WidgetManager)
                             {
                                 Text = "Ok",
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = UiAlignment.Centre,
                             },
                             cancelButton = new Button(WidgetManager)
                             {
                                 Text = "Cancel",
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = UiAlignment.Centre,
                             },
                         },
                     },

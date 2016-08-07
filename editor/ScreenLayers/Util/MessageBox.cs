@@ -42,12 +42,12 @@ namespace StorybrewEditor.ScreenLayers.Util
                     new Label(WidgetManager)
                     {
                         Text = message,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                 },
             });
@@ -55,7 +55,7 @@ namespace StorybrewEditor.ScreenLayers.Util
             var yesButton = new Button(WidgetManager)
             {
                 Text = noAction != null ? "Yes" : "Ok",
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = UiAlignment.Centre,
             };
             yesButton.OnClick += (sender, e) =>
             {
@@ -69,7 +69,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                 var noButton = new Button(WidgetManager)
                 {
                     Text = "No",
-                    AnchorTo = UiAlignment.Centre,
+                    AnchorFrom = UiAlignment.Centre,
                 };
                 noButton.OnClick += (sender, e) =>
                 {
@@ -84,7 +84,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                 var cancelButton = new Button(WidgetManager)
                 {
                     Text = "Cancel",
-                    AnchorTo = UiAlignment.Centre,
+                    AnchorFrom = UiAlignment.Centre,
                 };
                 cancelButton.OnClick += (sender, e) => Exit();
                 buttonsLayout.Add(cancelButton);
