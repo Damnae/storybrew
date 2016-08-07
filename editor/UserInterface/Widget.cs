@@ -410,7 +410,7 @@ namespace StorybrewEditor.UserInterface
             if (maxHeight > 0 && newSize.Y > maxHeight) newSize.Y = maxHeight;
             Size = newSize;
 
-            // Labels don't know their height until they know their width
+            // Flow layouts and labels don't know their height until they know their width
             manager.RefreshAnchors();
             if (preferredSize != PreferredSize)
                 Pack(width, height, maxWidth, maxHeight);
