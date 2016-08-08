@@ -182,6 +182,7 @@
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
     <Compile Include="Util\ChangedHandler.cs" />
     <Compile Include="Util\EventHelper.cs" />
+    <Compile Include="Util\GameWindowExtensions.cs" />
     <Compile Include="Util\IconFont.cs" />
     <Compile Include="Util\ListExtensions.cs" />
     <Compile Include="Util\OsuHelper.cs" />

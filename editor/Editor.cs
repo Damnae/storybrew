@@ -37,9 +37,7 @@ namespace StorybrewEditor
         public Editor(GameWindow window)
         {
             this.window = window;
-
-            // window.WindowInfo.Handle doesn't always work
-            FormsWindow = new FormsWindow(Native.FindProcessWindow(window.Title));
+            FormsWindow = new FormsWindow(window.GetWindowHandle());
         }
 
         public void Initialize(ScreenLayer initialLayer = null)

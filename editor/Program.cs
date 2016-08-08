@@ -78,7 +78,7 @@ namespace StorybrewEditor
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
             using (var window = createWindow(displayDevice))
-            using (audioManager = new AudioManager(window.WindowInfo.Handle))
+            using (audioManager = new AudioManager(window.GetWindowHandle()))
             using (var editor = new Editor(window))
             {
                 Trace.WriteLine("graphics mode: " + window.Context.GraphicsMode);
