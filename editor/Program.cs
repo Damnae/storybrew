@@ -81,7 +81,8 @@ namespace StorybrewEditor
             using (audioManager = new AudioManager(window.GetWindowHandle()))
             using (var editor = new Editor(window))
             {
-                Trace.WriteLine("graphics mode: " + window.Context.GraphicsMode);
+                Trace.WriteLine($"{Environment.OSVersion} / {window.WindowInfo}");
+                Trace.WriteLine($"graphics mode: {window.Context.GraphicsMode}");
 
                 window.Icon = new Icon(typeof(Program), "icon.ico");
                 window.Resize += (sender, e) =>
