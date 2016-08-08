@@ -18,10 +18,10 @@ namespace StorybrewEditor.Util
         public static extern bool EnumThreadWindows(int dwThreadId, EnumThreadDelegate lpfn, IntPtr lParam);
         public delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
 
-        [DllImport("user32.DLL")]
+        [DllImport("user32.dll")]
         public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-        [DllImport("user32.DLL")]
+        [DllImport("user32.dll")]
         public static extern int GetWindowTextLength(IntPtr hWnd);
 
         public static string GetWindowText(IntPtr hWnd)
@@ -46,6 +46,14 @@ namespace StorybrewEditor.Util
                 IntPtr.Zero);
 
             return handles;
+        }
+
+        public static IntPtr FindProcessWindow(string title)
+        {
+            foreach (var hWnd in EnumerateProcessWindowHandles(Process.GetCurrentProcess()))
+                if (GetWindowText(hWnd) == title)
+                    return hWnd;
+            return IntPtr.Zero;
         }
     }
 }
