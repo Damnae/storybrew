@@ -54,6 +54,21 @@ namespace StorybrewEditor.UserInterface
             set { Value = (string)value; }
         }
 
+        private bool acceptMultiline;
+        public bool AcceptMultiline
+        {
+            get { return acceptMultiline; }
+            set
+            {
+                if (acceptMultiline == value) return;
+                acceptMultiline = value;
+
+                if (!acceptMultiline)
+                    Value = Value.Replace("\n", "");
+            }
+        }
+        public bool EnterCommits = true;
+
         public event EventHandler OnValueChanged;
         public event EventHandler OnValueCommited;
 
@@ -113,13 +128,28 @@ namespace StorybrewEditor.UserInterface
                         break;
                     case Key.V:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
-                            Value += System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
+                        {
+                            var clipboardText = System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
+                            if (!AcceptMultiline)
+                                clipboardText = clipboardText.Replace("\n", "");
+                            Value += clipboardText;
+                        }
                         break;
                     case Key.X:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
                         {
                             System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
                             Value = string.Empty;
+                        }
+                        break;
+                    case Key.Enter:
+                    case Key.KeypadEnter:
+                        if (AcceptMultiline && (!EnterCommits || manager.ScreenLayerManager.Editor.InputManager.Shift))
+                            Value += "\n";
+                        else if (EnterCommits && hasCommitPending)
+                        {
+                            OnValueCommited?.Invoke(this, EventArgs.Empty);
+                            hasCommitPending = false;
                         }
                         break;
                 }
@@ -158,7 +188,8 @@ namespace StorybrewEditor.UserInterface
         {
             base.DrawForeground(drawContext, actualOpacity);
 
-            if (hasFocus)
+            // Cursor disabled for now in multiline mode
+            if (hasFocus && !acceptMultiline)
             {
                 var contentBounds = content.TextBounds;
                 var position = new Vector2(string.IsNullOrEmpty(Value) ? contentBounds.Left : contentBounds.Right, contentBounds.Top + content.TextBounds.Height * 0.2f);
