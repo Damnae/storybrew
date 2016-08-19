@@ -100,7 +100,7 @@
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
     <None Include="Resources\projecttemplate.zip" />
     <None Include="Resources\scripttemplate.csx" />
-    <Compile Include="ScreenLayers\FlowLayoutTest.cs" />
+    <Compile Include="ScreenLayers\Test\FlowLayoutTest.cs" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
     <Compile Include="Settings.cs" />

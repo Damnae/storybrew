@@ -2,7 +2,7 @@
 using StorybrewEditor.Util;
 using System;
 
-namespace StorybrewEditor.ScreenLayers
+namespace StorybrewEditor.ScreenLayers.Test
 {
     public class FlowLayoutTest : UiScreenLayer
     {
