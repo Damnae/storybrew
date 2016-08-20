@@ -10,13 +10,17 @@ namespace StorybrewEditor.Storyboarding
     {
         private Effect effect;
 
+        private string projectPath;
+        public override string ProjectPath => projectPath;
+
         private EditorBeatmap beatmap;
         public override Beatmap Beatmap => beatmap;
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
-        public EditorGeneratorContext(Effect effect, EditorBeatmap beatmap)
+        public EditorGeneratorContext(Effect effect, string projectPath, EditorBeatmap beatmap)
         {
+            this.projectPath = projectPath;
             this.effect = effect;
             this.beatmap = beatmap;
         }

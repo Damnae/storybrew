@@ -76,7 +76,7 @@ namespace StorybrewEditor.Storyboarding
         {
             if (!scriptContainer.HasScript) return;
 
-            var context = new EditorGeneratorContext(this, Project.MainBeatmap);
+            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MainBeatmap);
             try
             {
                 changeStatus(EffectStatus.Loading);

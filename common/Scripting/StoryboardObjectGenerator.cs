@@ -1,9 +1,11 @@
 ﻿using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Subtitles;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 
 namespace StorybrewCommon.Scripting
@@ -80,6 +82,14 @@ namespace StorybrewCommon.Scripting
                 }
             return resultFft;
         }
+
+        #endregion
+
+        #region Subtitles
+
+        private SrtParser srtParser = new SrtParser();
+        public SubtitleSet LoadSubtitles(string path)
+            => srtParser.Parse(Path.Combine(context.ProjectPath, path));
 
         #endregion
 

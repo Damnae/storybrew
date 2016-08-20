@@ -27,8 +27,10 @@ namespace StorybrewEditor.Storyboarding
 
         public const string FileFilter = "project files (*" + Extension + ")|*" + Extension;
 
-        private string projectPath;
         private ScriptManager<StoryboardObjectGenerator> scriptManager;
+
+        private string projectPath;
+        public string ProjectFolderPath => Path.GetDirectoryName(projectPath);
 
         private string commonScriptsSourcePath;
         public string CommonScriptsPath => commonScriptsSourcePath;
