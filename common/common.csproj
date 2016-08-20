@@ -66,6 +66,7 @@
     <Compile Include="Animations\InterpolatingFunctions.cs" />
     <Compile Include="Animations\Keyframe.cs" />
     <Compile Include="Animations\KeyframedValue.cs" />
+    <Compile Include="Subtitles\FontGenerator.cs" />
     <Compile Include="Subtitles\SrtParser.cs" />
     <Compile Include="Subtitles\SubtitleLine.cs" />
     <Compile Include="Mapset\ControlPoint.cs" />

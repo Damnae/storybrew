@@ -91,7 +91,12 @@ namespace StorybrewCommon.Scripting
         public SubtitleSet LoadSubtitles(string path)
             => srtParser.Parse(Path.Combine(context.ProjectPath, path));
 
+        public FontGenerator GetFont(string directory, FontDescription description)
+            => new FontGenerator(directory, description, context.ProjectPath, context.MapsetPath);
+
         #endregion
+
+        #region Configuration
 
         public bool Configure(EffectConfig config)
         {
@@ -164,23 +169,6 @@ namespace StorybrewCommon.Scripting
             }
         }
 
-        public void Generate(GeneratorContext context)
-        {
-            try
-            {
-                this.context = context;
-
-                random = new Random(RandomSeed);
-                Generate();
-            }
-            finally
-            {
-                this.context = null;
-            }
-        }
-
-        public abstract void Generate();
-
         private void initializeConfigurableFields()
         {
             configurableFields = new List<ConfigurableField>();
@@ -218,5 +206,24 @@ namespace StorybrewCommon.Scripting
 
             public override string ToString() => $"{Field.Name} {InitialValue}";
         }
+
+        #endregion
+
+        public void Generate(GeneratorContext context)
+        {
+            try
+            {
+                this.context = context;
+
+                random = new Random(RandomSeed);
+                Generate();
+            }
+            finally
+            {
+                this.context = null;
+            }
+        }
+
+        public abstract void Generate();
     }
 }

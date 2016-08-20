@@ -123,7 +123,7 @@ namespace StorybrewEditor.Graphics.Text
             FontFamily fontFamily;
             if (!fontFamilies.TryGetValue(resourceName, out fontFamily))
             {
-                byte[] bytes = (byte[])Resources.ResourceManager.GetObject(resourceName);
+                var bytes = (byte[])Resources.ResourceManager.GetObject(resourceName);
                 if (bytes != null)
                 {
                     GCHandle pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);
