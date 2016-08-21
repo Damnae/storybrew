@@ -13,6 +13,7 @@ namespace StorybrewCommon.Subtitles
     {
         private string path;
         public string Path => path;
+        public bool IsEmpty => path == null;
 
         private int width;
         public int Width => width;
@@ -97,6 +98,9 @@ namespace StorybrewCommon.Subtitles
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
                     width = (int)(measuredSize.Width + 1 + description.HorizontalPadding * 2 + description.ShadowThickness * shadowExpandFactor * 2);
                     height = (int)(measuredSize.Height + 1 + description.VerticalPadding * 2 + description.ShadowThickness * shadowExpandFactor * 2);
+
+                    if (text.Length == 1 && char.IsWhiteSpace(text[0]))
+                        return new FontText(null, width, height);
 
                     float offsetX = width / 2;
                     float offsetY = description.VerticalPadding + description.ShadowThickness * shadowExpandFactor;
