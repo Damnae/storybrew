@@ -15,15 +15,23 @@ namespace StorybrewCommon.Subtitles
         public string Path => path;
         public bool IsEmpty => path == null;
 
+        private int baseWidth;
+        public int BaseWidth => baseWidth;
+
+        private int baseHeight;
+        public int BaseHeight => baseHeight;
+
         private int width;
         public int Width => width;
 
         private int height;
         public int Height => height;
 
-        public FontText(string path, int width, int height)
+        public FontText(string path, int baseWidth, int baseHeight, int width, int height)
         {
             this.path = path;
+            this.baseWidth = baseWidth;
+            this.baseHeight = baseHeight;
             this.width = width;
             this.height = height;
         }
@@ -33,12 +41,13 @@ namespace StorybrewCommon.Subtitles
     {
         public string FontPath;
         public int FontSize = 76;
-        public bool Outlined = false;
+        public bool Outlined;
         public int ShadowThickness = 8;
         public int HorizontalPadding = 0;
         public int VerticalPadding = 0;
         public Color TextColor = Color.FromArgb(255, 255, 255, 255);
         public Color ShadowColor = Color.FromArgb(100, 0, 0, 0);
+        public bool Debug;
     }
 
     public class FontGenerator
@@ -76,7 +85,7 @@ namespace StorybrewCommon.Subtitles
             var fontPath = Path.Combine(projectDirectory, description.FontPath);
             if (!File.Exists(fontPath)) fontPath = description.FontPath;
 
-            int width, height;
+            int baseWidth, baseHeight, width, height;
             using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
             using (StringFormat stringFormat = new StringFormat(StringFormat.GenericTypographic))
             using (var textBrush = new SolidBrush(description.TextColor))
@@ -96,14 +105,16 @@ namespace StorybrewCommon.Subtitles
                     var shadowExpandFactor = 1.4f;
 
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
-                    width = (int)(measuredSize.Width + 1 + description.HorizontalPadding * 2 + description.ShadowThickness * shadowExpandFactor * 2);
-                    height = (int)(measuredSize.Height + 1 + description.VerticalPadding * 2 + description.ShadowThickness * shadowExpandFactor * 2);
+                    baseWidth = (int)measuredSize.Width + 1 + description.HorizontalPadding * 2;
+                    baseHeight = (int)measuredSize.Height + 1 + description.VerticalPadding * 2;
+                    width = (int)(baseWidth + description.ShadowThickness * shadowExpandFactor * 2);
+                    height = (int)(baseHeight + description.ShadowThickness * shadowExpandFactor * 2);
 
                     if (text.Length == 1 && char.IsWhiteSpace(text[0]))
-                        return new FontText(null, width, height);
+                        return new FontText(null, baseWidth, baseHeight, width, height);
 
-                    float offsetX = width / 2;
-                    float offsetY = description.VerticalPadding + description.ShadowThickness * shadowExpandFactor;
+                    var offsetX = width / 2;
+                    var offsetY = description.VerticalPadding + description.ShadowThickness * shadowExpandFactor;
 
                     using (Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
                     {
@@ -112,6 +123,12 @@ namespace StorybrewCommon.Subtitles
                             textGraphics.TextRenderingHint = graphics.TextRenderingHint;
                             textGraphics.SmoothingMode = SmoothingMode.HighQuality;
                             textGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                            if (description.Debug)
+                            {
+                                var r = new Random();
+                                textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
+                            }
 
                             for (var i = 1; i <= description.ShadowThickness; i++)
                             {
@@ -140,7 +157,7 @@ namespace StorybrewCommon.Subtitles
                     }
                 }
             }
-            return new FontText(Path.Combine(directory, filename), width, height);
+            return new FontText(Path.Combine(directory, filename), baseWidth, baseHeight, width, height);
         }
 
         private static void withRetries(Action action, int timeout = 2000)
