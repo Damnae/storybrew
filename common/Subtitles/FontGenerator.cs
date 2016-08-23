@@ -95,11 +95,15 @@ namespace StorybrewCommon.Subtitles
                 stringFormat.Alignment = StringAlignment.Center;
                 stringFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.NoClip;
 
-                fontCollection.AddFontFile(fontPath);
-                var fontFamily = fontCollection.Families[0];
+                FontFamily fontFamily = null;
+                if (File.Exists(fontPath))
+                {
+                    fontCollection.AddFontFile(fontPath);
+                    fontFamily = fontCollection.Families[0];
+                }
 
                 var fontStyle = FontStyle.Regular;
-                using (var font = new Font(fontFamily, description.FontSize, fontStyle))
+                using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize, fontStyle) : new Font(fontPath, description.FontSize, fontStyle))
                 {
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
                     width = baseWidth = (int)(measuredSize.Width + 1 + description.Padding.X * 2);
