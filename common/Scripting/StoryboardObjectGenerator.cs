@@ -91,8 +91,8 @@ namespace StorybrewCommon.Scripting
         public SubtitleSet LoadSubtitles(string path)
             => srtParser.Parse(Path.Combine(context.ProjectPath, path));
 
-        public FontGenerator GetFont(string directory, FontDescription description)
-            => new FontGenerator(directory, description, context.ProjectPath, context.MapsetPath);
+        public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
+            => new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
 
         #endregion
 

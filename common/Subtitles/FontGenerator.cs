@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OpenTK;
+using OpenTK.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -9,7 +11,7 @@ using System.Threading;
 
 namespace StorybrewCommon.Subtitles
 {
-    public class FontText
+    public class FontTexture
     {
         private string path;
         public string Path => path;
@@ -27,7 +29,7 @@ namespace StorybrewCommon.Subtitles
         private int height;
         public int Height => height;
 
-        public FontText(string path, int baseWidth, int baseHeight, int width, int height)
+        public FontTexture(string path, int baseWidth, int baseHeight, int width, int height)
         {
             this.path = path;
             this.baseWidth = baseWidth;
@@ -41,41 +43,39 @@ namespace StorybrewCommon.Subtitles
     {
         public string FontPath;
         public int FontSize = 76;
-        public bool Outlined;
-        public int ShadowThickness = 8;
-        public int HorizontalPadding = 0;
-        public int VerticalPadding = 0;
-        public Color TextColor = Color.FromArgb(255, 255, 255, 255);
-        public Color ShadowColor = Color.FromArgb(100, 0, 0, 0);
+        public Color4 Color = new Color4(0, 0, 0, 100);
+        public Vector2 Padding = Vector2.Zero;
         public bool Debug;
     }
 
     public class FontGenerator
     {
         private FontDescription description;
+        private FontEffect[] effects;
         private string projectDirectory;
         private string mapsetDirectory;
         private string directory;
 
-        private Dictionary<string, FontText> letters = new Dictionary<string, FontText>();
+        private Dictionary<string, FontTexture> letters = new Dictionary<string, FontTexture>();
 
-        public FontGenerator(string directory, FontDescription description, string projectDirectory, string mapsetDirectory)
+        public FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string mapsetDirectory)
         {
             this.description = description;
+            this.effects = effects;
             this.projectDirectory = projectDirectory;
             this.mapsetDirectory = mapsetDirectory;
             this.directory = directory;
         }
 
-        public FontText GetText(string text)
+        public FontTexture GetTexture(string text)
         {
-            FontText letter;
-            if (!letters.TryGetValue(text, out letter))
-                letters.Add(text, letter = generateText(text));
-            return letter;
+            FontTexture texture;
+            if (!letters.TryGetValue(text, out texture))
+                letters.Add(text, texture = generateTexture(text));
+            return texture;
         }
 
-        private FontText generateText(string text)
+        private FontTexture generateTexture(string text)
         {
             var filename = text.Length == 1 ? $"{(int)text[0]:x4}.png" : $"_{letters.Count:x3}.png";
             var bitmapPath = Path.Combine(mapsetDirectory, directory, filename);
@@ -88,8 +88,7 @@ namespace StorybrewCommon.Subtitles
             int baseWidth, baseHeight, width, height;
             using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
             using (StringFormat stringFormat = new StringFormat(StringFormat.GenericTypographic))
-            using (var textBrush = new SolidBrush(description.TextColor))
-            using (var shadowBrush = new SolidBrush(description.ShadowColor))
+            using (var textBrush = new SolidBrush(Color.FromArgb(description.Color.ToArgb())))
             using (var fontCollection = new PrivateFontCollection())
             {
                 graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
@@ -102,19 +101,21 @@ namespace StorybrewCommon.Subtitles
                 var fontStyle = FontStyle.Regular;
                 using (var font = new Font(fontFamily, description.FontSize, fontStyle))
                 {
-                    var shadowExpandFactor = 1.4f;
-
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
-                    baseWidth = (int)measuredSize.Width + 1 + description.HorizontalPadding * 2;
-                    baseHeight = (int)measuredSize.Height + 1 + description.VerticalPadding * 2;
-                    width = (int)(baseWidth + description.ShadowThickness * shadowExpandFactor * 2);
-                    height = (int)(baseHeight + description.ShadowThickness * shadowExpandFactor * 2);
+                    width = baseWidth = (int)(measuredSize.Width + 1 + description.Padding.X * 2);
+                    height = baseHeight = (int)(measuredSize.Height + 1 + description.Padding.Y * 2);
+                    foreach (var effect in effects)
+                    {
+                        var effectSize = effect.Measure();
+                        width = Math.Max(width, (int)(baseWidth + effectSize.X));
+                        height = Math.Max(height, (int)(baseHeight + effectSize.Y));
+                    }
 
                     if (text.Length == 1 && char.IsWhiteSpace(text[0]))
-                        return new FontText(null, baseWidth, baseHeight, width, height);
+                        return new FontTexture(null, baseWidth, baseHeight, width, height);
 
                     var offsetX = width / 2;
-                    var offsetY = description.VerticalPadding + description.ShadowThickness * shadowExpandFactor;
+                    var offsetY = description.Padding.Y + (height - baseHeight) / 2;
 
                     using (Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
                     {
@@ -124,40 +125,27 @@ namespace StorybrewCommon.Subtitles
                             textGraphics.SmoothingMode = SmoothingMode.HighQuality;
                             textGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
+                            var r = new Random(letters.Count);
                             if (description.Debug)
-                            {
-                                var r = new Random();
                                 textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
-                            }
 
-                            for (var i = 1; i <= description.ShadowThickness; i++)
-                            {
-                                if (description.Outlined)
-                                {
-                                    if (i % 2 == 0)
-                                    {
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX - i * shadowExpandFactor, offsetY, stringFormat);
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX, offsetY - i * shadowExpandFactor, stringFormat);
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX + i * shadowExpandFactor, offsetY, stringFormat);
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX, offsetY + i * shadowExpandFactor, stringFormat);
-                                    }
-                                    else
-                                    {
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX - i, offsetY - i, stringFormat);
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX - i, offsetY + i, stringFormat);
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX + i, offsetY + i, stringFormat);
-                                        textGraphics.DrawString(text, font, shadowBrush, offsetX + i, offsetY - i, stringFormat);
-                                    }
-                                }
-                                else textGraphics.DrawString(text, font, shadowBrush, offsetX + i, offsetY + i, stringFormat);
-                            }
+                            foreach (var effect in effects)
+                                if (!effect.Overlay)
+                                    effect.Draw(textGraphics, font, stringFormat, text, offsetX, offsetY);
                             textGraphics.DrawString(text, font, textBrush, offsetX, offsetY, stringFormat);
+                            foreach (var effect in effects)
+                                if (effect.Overlay)
+                                    effect.Draw(textGraphics, font, stringFormat, text, offsetX, offsetY);
+                            
+                            if (description.Debug)
+                                using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
+                                    textGraphics.DrawLine(pen, offsetX, offsetY, offsetX, offsetY + baseHeight);
                         }
                         withRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
                     }
                 }
             }
-            return new FontText(Path.Combine(directory, filename), baseWidth, baseHeight, width, height);
+            return new FontTexture(Path.Combine(directory, filename), baseWidth, baseHeight, width, height);
         }
 
         private static void withRetries(Action action, int timeout = 2000)
