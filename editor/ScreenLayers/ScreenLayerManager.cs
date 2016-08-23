@@ -34,8 +34,8 @@ namespace StorybrewEditor.ScreenLayers
             layers.Add(layer);
             layer.Load();
 
-            var width = editor.Window.Width;
-            var height = editor.Window.Height;
+            var width = Math.Max(1, editor.Window.Width);
+            var height = Math.Max(1, editor.Window.Height);
             layer.Resize(width, height);
         }
 
