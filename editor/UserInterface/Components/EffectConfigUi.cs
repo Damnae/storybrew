@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
@@ -149,6 +150,23 @@ namespace StorybrewEditor.UserInterface.Components
                 {
                     Value = field.Value,
                     Options = field.AllowedValues,
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
+                };
+                widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
+                return widget;
+            }
+            else if (field.Type == typeof(bool))
+            {
+                var widget = new Selectbox(Manager)
+                {
+                    Value = field.Value,
+                    Options = new NamedValue[]
+                    {
+                        new NamedValue() { Name = true.ToString(), Value = true, },
+                        new NamedValue() { Name = false.ToString(), Value = false, },
+                    },
                     AnchorFrom = UiAlignment.Right,
                     AnchorTo = UiAlignment.Right,
                     CanGrow = false,
