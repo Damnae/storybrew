@@ -3,6 +3,7 @@ using OpenTK.Graphics;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Subtitles;
+using System;
 
 namespace StorybrewScripts
 {
@@ -39,6 +40,9 @@ namespace StorybrewScripts
         public float SubtitleY = 400;
 
         [Configurable]
+        public bool PerCharacter = false;
+
+        [Configurable]
         public bool Debug = false;
 
         public override void Generate()
@@ -54,7 +58,7 @@ namespace StorybrewScripts
             new FontOutline()
             {
                 Thickness = OutlineThickness,
-                Color = new Color4(30, 30, 30, 200),
+                Color = new Color4(50, 50, 50, 200),
             },
             new FontShadow()
             {
@@ -62,15 +66,59 @@ namespace StorybrewScripts
                 Color = new Color4(0, 0, 0, 100),
             });
 
-            var layer = GetLayer("");
             var subtitles = LoadSubtitles(SubtitlesPath);
+            if (PerCharacter) generatePerCharacter(font, subtitles);
+            else generatePerLine(font, subtitles);
+        }
+
+        public void generatePerLine(FontGenerator font, SubtitleSet subtitles)
+        {
+            var layer = GetLayer("");
+            foreach (var line in subtitles.Lines)
+            {
+                var texture = font.GetTexture(line.Text);
+                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(320, SubtitleY));
+                sprite.Scale(line.StartTime, FontScale);
+                sprite.Fade(line.StartTime - 200, line.StartTime, 0, 1);
+                sprite.Fade(line.EndTime - 200, line.EndTime, 1, 0);
+            }
+        }
+
+        public void generatePerCharacter(FontGenerator font, SubtitleSet subtitles)
+        {
+            var layer = GetLayer("");
             foreach (var subtitleLine in subtitles.Lines)
             {
-                var texture = font.GetTexture(subtitleLine.Text);
-                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.Centre, new Vector2(320, SubtitleY));
-                sprite.Scale(subtitleLine.StartTime, FontScale);
-                sprite.Fade(subtitleLine.StartTime - 200, subtitleLine.StartTime, 0, 1);
-                sprite.Fade(subtitleLine.EndTime - 200, subtitleLine.EndTime, 1, 0);
+                var letterY = SubtitleY;
+                foreach (var line in subtitleLine.Text.Split('\n'))
+                {
+                    var lineWidth = 0f;
+                    var lineHeight = 0f;
+                    foreach (var letter in line)
+                    {
+                        var texture = font.GetTexture(letter.ToString());
+                        lineWidth += texture.BaseWidth * FontScale;
+                        lineHeight = Math.Max(lineHeight, texture.BaseHeight * FontScale);
+                    }
+
+                    var letterX = 320 - lineWidth * 0.5f;
+                    foreach (var letter in line)
+                    {
+                        var texture = font.GetTexture(letter.ToString());
+                        if (!texture.IsEmpty)
+                        {
+                            var x = letterX + texture.BaseWidth * FontScale * 0.5f;
+                            var y = letterY;
+
+                            var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(x, y));
+                            sprite.Scale(subtitleLine.StartTime, FontScale);
+                            sprite.Fade(subtitleLine.StartTime - 200, subtitleLine.StartTime, 0, 1);
+                            sprite.Fade(subtitleLine.EndTime - 200, subtitleLine.EndTime, 1, 0);
+                        }
+                        letterX += texture.BaseWidth * FontScale;
+                    }
+                    letterY += lineHeight;
+                }
             }
         }
     }
