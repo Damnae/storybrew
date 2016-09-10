@@ -354,7 +354,7 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectPath, bool withCommonScripts)
+        public static Project Load(string projectPath, bool withCommonScripts, bool updateSolution)
         {
             var project = new Project(projectPath, withCommonScripts);
             using (var stream = new FileStream(projectPath, FileMode.Open))
@@ -435,6 +435,7 @@ namespace StorybrewEditor.Storyboarding
                     });
                 }
             }
+            if (updateSolution) updateSolutionFiles(Path.GetDirectoryName(projectPath));
             return project;
         }
 
@@ -459,9 +460,7 @@ namespace StorybrewEditor.Storyboarding
                 throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
-            using (var stream = new MemoryStream(Resources.projecttemplate))
-            using (var zip = new ZipArchive(stream))
-                zip.ExtractToDirectory(projectFolderPath);
+            updateSolutionFiles(projectFolderPath);
 
             var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts)
             {
@@ -472,11 +471,18 @@ namespace StorybrewEditor.Storyboarding
             return project;
         }
 
+        private static void updateSolutionFiles(string projectFolderPath)
+        {
+            using (var stream = new MemoryStream(Resources.projecttemplate))
+            using (var zip = new ZipArchive(stream))
+                zip.ExtractToDirectoryOverwrite(projectFolderPath);
+        }
+
         public static string Migrate(string projectPath, string projectFolderName)
         {
             Trace.WriteLine($"Migrating project '{projectPath}' to '{projectFolderName}'");
 
-            using (var project = Load(projectPath, false))
+            using (var project = Load(projectPath, false, false))
             using (var placeholderProject = Create(projectFolderName, project.MapsetPath, false))
             {
                 var oldProjectPath = project.projectPath;
