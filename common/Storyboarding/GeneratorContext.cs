@@ -8,6 +8,8 @@ namespace StorybrewCommon.Storyboarding
         public abstract string ProjectPath { get; }
         public abstract string MapsetPath { get; }
 
+        public abstract void AddDependency(string path);
+
         public abstract Beatmap Beatmap { get; }
         public abstract StoryboardLayer GetLayer(string identifier);
 

@@ -3,12 +3,15 @@ using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Audio;
 using StorybrewEditor.Mapset;
 using System.Collections.Generic;
+using System;
+using StorybrewEditor.Util;
 
 namespace StorybrewEditor.Storyboarding
 {
     public class EditorGeneratorContext : GeneratorContext
     {
         private Effect effect;
+        private MultiFileWatcher watcher;
 
         private string projectPath;
         public override string ProjectPath => projectPath;
@@ -21,12 +24,13 @@ namespace StorybrewEditor.Storyboarding
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
-        public EditorGeneratorContext(Effect effect, string projectPath, string mapsetPath, EditorBeatmap beatmap)
+        public EditorGeneratorContext(Effect effect, string projectPath, string mapsetPath, EditorBeatmap beatmap, MultiFileWatcher watcher)
         {
             this.projectPath = projectPath;
             this.mapsetPath = mapsetPath;
             this.effect = effect;
             this.beatmap = beatmap;
+            this.watcher = watcher;
         }
 
         public override StoryboardLayer GetLayer(string identifier)
@@ -35,6 +39,9 @@ namespace StorybrewEditor.Storyboarding
             if (layer == null) EditorLayers.Add(layer = new EditorStoryboardLayer(identifier, effect));
             return layer;
         }
+
+        public override void AddDependency(string path)
+            => watcher.Watch(path);
 
         #region Audio data
 

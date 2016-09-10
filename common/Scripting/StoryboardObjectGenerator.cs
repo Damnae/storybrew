@@ -5,6 +5,7 @@ using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 
@@ -29,6 +30,63 @@ namespace StorybrewCommon.Scripting
         {
             initializeConfigurableFields();
         }
+
+        public void AddDependency(string path)
+            => context.AddDependency(path);
+
+        #region File loading
+
+        private Dictionary<string, Bitmap> bitmaps = new Dictionary<string, Bitmap>();
+
+        /// <summary>
+        /// Returns a Bitmap from the project's directory.
+        /// Do not call Dispose, it will be disposed automatically when the script ends.
+        /// </summary>
+        public Bitmap GetProjectBitmap(string path)
+            => getBitmap(Path.Combine(context.ProjectPath, path));
+
+        /// <summary>
+        /// Returns a Bitmap from the mapset's directory.
+        /// Do not call Dispose, it will be disposed automatically when the script ends.
+        /// </summary>
+        public Bitmap GetMapsetBitmap(string path)
+            => getBitmap(Path.Combine(context.MapsetPath, path));
+
+        private Bitmap getBitmap(string path)
+        {
+            path = Path.GetFullPath(path);
+
+            Bitmap bitmap;
+            if (!bitmaps.TryGetValue(path, out bitmap))
+            {
+                context.AddDependency(path);
+                bitmaps.Add(path, bitmap = (Bitmap)Image.FromFile(path));
+            }
+            return bitmap;
+        }
+
+        /// <summary>
+        /// Opens a project file in read-only mode. 
+        /// You are responsible for disposing it.
+        /// </summary>
+        public Stream OpenProjectFile(string path)
+            => openFile(Path.Combine(context.ProjectPath, path));
+
+        /// <summary>
+        /// Opens a mapset file in read-only mode. 
+        /// You are responsible for disposing it.
+        /// </summary>
+        public Stream OpenMapsetFile(string path)
+            => openFile(Path.Combine(context.MapsetPath, path));
+
+        private Stream openFile(string path)
+        {
+            path = Path.GetFullPath(path);
+            context.AddDependency(path);
+            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        }
+
+        #endregion
 
         #region Random
 
@@ -89,7 +147,11 @@ namespace StorybrewCommon.Scripting
 
         private SrtParser srtParser = new SrtParser();
         public SubtitleSet LoadSubtitles(string path)
-            => srtParser.Parse(Path.Combine(context.ProjectPath, path));
+        {
+            path = Path.Combine(context.ProjectPath, path);
+            context.AddDependency(path);
+            return srtParser.Parse(path);
+        }
 
         public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
             => new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
@@ -221,6 +283,10 @@ namespace StorybrewCommon.Scripting
             finally
             {
                 this.context = null;
+
+                foreach (var bitmap in bitmaps.Values)
+                    bitmap.Dispose();
+                bitmaps.Clear();
             }
         }
 

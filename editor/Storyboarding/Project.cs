@@ -156,7 +156,7 @@ namespace StorybrewEditor.Storyboarding
             var effect = new ScriptedEffect(this, scriptManager.Get(effectName));
 
             effects.Add(effect);
-            effect.OnChanged += Effect_OnChanged;
+            effect.OnChanged += effect_OnChanged;
             refreshEffectsStatus();
 
             OnEffectsChanged?.Invoke(this, EventArgs.Empty);
@@ -170,7 +170,7 @@ namespace StorybrewEditor.Storyboarding
 
             effect.Clear();
             effects.Remove(effect);
-            effect.OnChanged -= Effect_OnChanged;
+            effect.OnChanged -= effect_OnChanged;
             refreshEffectsStatus();
 
             OnEffectsChanged?.Invoke(this, EventArgs.Empty);
@@ -186,7 +186,7 @@ namespace StorybrewEditor.Storyboarding
             return name;
         }
 
-        private void Effect_OnChanged(object sender, EventArgs e)
+        private void effect_OnChanged(object sender, EventArgs e)
             => refreshEffectsStatus();
 
         private void refreshEffectsStatus()

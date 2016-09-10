@@ -1,5 +1,6 @@
 ﻿using StorybrewCommon.Scripting;
 using StorybrewEditor.Scripting;
+using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,6 +35,8 @@ namespace StorybrewEditor.Storyboarding
         public override EffectStatus Status => status;
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
+
+        private MultiFileWatcher dependencyWatcher;
 
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {
@@ -76,7 +79,11 @@ namespace StorybrewEditor.Storyboarding
         {
             if (!scriptContainer.HasScript) return;
 
-            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap);
+            var newDependencyWatcher = new MultiFileWatcher();
+            newDependencyWatcher.OnFileChanged += (sender, e) => Refresh();
+
+            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, newDependencyWatcher);
+            var success = false;
             try
             {
                 changeStatus(EffectStatus.Loading);
@@ -91,6 +98,7 @@ namespace StorybrewEditor.Storyboarding
 
                 changeStatus(EffectStatus.Updating);
                 script.Generate(context);
+                success = true;
             }
             catch (RemotingException e)
             {
@@ -122,12 +130,20 @@ namespace StorybrewEditor.Storyboarding
             }
             finally
             {
+                if (!success)
+                {
+                    newDependencyWatcher.Dispose();
+                    newDependencyWatcher = null;
+                }
                 context.DisposeResources();
             }
             changeStatus(EffectStatus.Ready);
 
             Program.Schedule(() =>
             {
+                dependencyWatcher?.Dispose();
+                dependencyWatcher = newDependencyWatcher;
+
                 if (Project.IsDisposed || layers == null)
                     return;
 
@@ -144,6 +160,9 @@ namespace StorybrewEditor.Storyboarding
 
         public override void Clear()
         {
+            dependencyWatcher?.Dispose();
+            dependencyWatcher = null;
+
             if (layers == null)
                 return;
 
