@@ -56,9 +56,6 @@ namespace StorybrewEditor.Storyboarding
 
         public override void AddPlaceholder(EditorStoryboardLayer layer)
         {
-            if (layers == null)
-                throw new InvalidOperationException();
-
             if (placeHolderLayer != null)
             {
                 layers.Remove(placeHolderLayer);
@@ -80,7 +77,11 @@ namespace StorybrewEditor.Storyboarding
             if (!scriptContainer.HasScript) return;
 
             var newDependencyWatcher = new MultiFileWatcher();
-            newDependencyWatcher.OnFileChanged += (sender, e) => Refresh();
+            newDependencyWatcher.OnFileChanged += (sender, e) =>
+            {
+                if (IsDisposed) return;
+                Refresh();
+            };
 
             var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, newDependencyWatcher);
             var success = false;
@@ -141,10 +142,16 @@ namespace StorybrewEditor.Storyboarding
 
             Program.Schedule(() =>
             {
+                if (IsDisposed)
+                {
+                    newDependencyWatcher.Dispose();
+                    return;
+                }
+
                 dependencyWatcher?.Dispose();
                 dependencyWatcher = newDependencyWatcher;
 
-                if (Project.IsDisposed || layers == null)
+                if (Project.IsDisposed)
                     return;
 
                 if (placeHolderLayer != null)
@@ -158,32 +165,17 @@ namespace StorybrewEditor.Storyboarding
             });
         }
 
-        public override void Clear()
-        {
-            dependencyWatcher?.Dispose();
-            dependencyWatcher = null;
-
-            if (layers == null)
-                return;
-
-            scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
-
-            foreach (var layer in layers)
-                Project.LayerManager.Remove(layer);
-            layers = null;
-        }
-
         public override void Refresh()
-            => Project.QueueEffectUpdate(this);
+        {
+            if (Project.IsDisposed) return;
+            Project.QueueEffectUpdate(this);
+        }
 
         private void scriptContainer_OnScriptChanged(object sender, EventArgs e)
             => Refresh();
 
         private void refreshLayerNames()
         {
-            if (layers == null)
-                return;
-
             foreach (var layer in layers)
                 layer.Name = string.IsNullOrWhiteSpace(layer.Identifier) ? $"{name}" : $"{name} ({layer.Identifier})";
         }
@@ -213,5 +205,24 @@ namespace StorybrewEditor.Storyboarding
                 statusStopwatch.Restart();
             });
         }
+
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                dependencyWatcher?.Dispose();
+                scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
+                foreach (var layer in layers)
+                    Project.LayerManager.Remove(layer);
+            }
+            dependencyWatcher = null;
+            layers = null;
+
+            base.Dispose(disposing);
+        }
+
+        #endregion
     }
 }

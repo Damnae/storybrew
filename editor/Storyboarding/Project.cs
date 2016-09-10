@@ -168,9 +168,9 @@ namespace StorybrewEditor.Storyboarding
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
-            effect.Clear();
             effects.Remove(effect);
-            effect.OnChanged -= effect_OnChanged;
+            effect.Dispose();
+
             refreshEffectsStatus();
 
             OnEffectsChanged?.Invoke(this, EventArgs.Empty);
