@@ -95,6 +95,7 @@ namespace StorybrewEditor.Storyboarding
             var referencedAssemblies = new string[]
             {
                 "System.dll",
+                "System.Drawing.dll",
                 "OpenTK.dll",
                 Assembly.GetAssembly(typeof(Script)).Location,
             };
