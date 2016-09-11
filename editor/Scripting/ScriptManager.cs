@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 namespace StorybrewEditor.Scripting
 {
@@ -18,8 +17,8 @@ namespace StorybrewEditor.Scripting
         private string[] referencedAssemblies;
 
         private FileSystemWatcher scriptWatcher;
+        private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
         private Dictionary<string, ScriptContainer<TScript>> scriptContainers = new Dictionary<string, ScriptContainer<TScript>>();
-        private Dictionary<string, byte[]> scriptHashes = new Dictionary<string, byte[]>();
 
         public string ScriptsPath => scriptsSourcePath;
 
@@ -87,34 +86,17 @@ namespace StorybrewEditor.Scripting
 
         private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            var scriptName = Path.GetFileNameWithoutExtension(e.Name);
-
-            Program.Schedule(() =>
+            scheduler.Schedule(e.FullPath, (key) =>
             {
-                if (disposedValue) return;
+                if (disposedValue)
+                    return;
+
+                var scriptName = Path.GetFileNameWithoutExtension(e.Name);
+                Debug.Print($"{nameof(Scripting)}: {e.FullPath} {e.ChangeType}, reloading {scriptName}");
 
                 ScriptContainer<TScript> container;
                 if (scriptContainers.TryGetValue(scriptName, out container))
-                {
-                    try
-                    {
-                        var scriptHash = HashHelper.GetFileMd5Bytes(e.FullPath);
-
-                        byte[] currentScriptHash;
-                        if (scriptHashes.TryGetValue(scriptName, out currentScriptHash) && currentScriptHash.SequenceEqual(scriptHash))
-                            return;
-
-                        Debug.Print($"{nameof(Scripting)}: {e.FullPath} changed, reloading {scriptName}");
-
-                        scriptHashes[scriptName] = scriptHash;
-                        container.ReloadScript();
-                    }
-                    catch (IOException exception)
-                    {
-                        var type = exception.GetType();
-                        Debug.Print($"{nameof(Scripting)}: Waiting for {e.Name} ({exception.Message})");
-                    }
-                }
+                    container.ReloadScript();
             });
         }
 
@@ -131,9 +113,9 @@ namespace StorybrewEditor.Scripting
                     foreach (var entry in scriptContainers)
                         entry.Value.Dispose();
                 }
+                scheduler = null;
                 scriptWatcher = null;
                 scriptContainers = null;
-                scriptHashes = null;
 
                 disposedValue = true;
             }

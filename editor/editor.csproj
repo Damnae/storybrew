@@ -98,6 +98,7 @@
     <Compile Include="Graphics\Cameras\CameraIso.cs" />
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
+    <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
     <Compile Include="Util\ZipArchiveExtensions.cs" />
     <None Include="Resources\projecttemplate.zip" />
