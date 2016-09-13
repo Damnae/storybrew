@@ -34,6 +34,9 @@ namespace StorybrewCommon.Scripting
         public void AddDependency(string path)
             => context.AddDependency(path);
 
+        public void Log(string message)
+            => context.AppendLog(message);
+
         #region File loading
 
         private Dictionary<string, Bitmap> bitmaps = new Dictionary<string, Bitmap>();

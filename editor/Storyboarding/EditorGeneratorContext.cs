@@ -5,6 +5,7 @@ using StorybrewEditor.Mapset;
 using System.Collections.Generic;
 using System;
 using StorybrewEditor.Util;
+using System.Text;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -21,6 +22,9 @@ namespace StorybrewEditor.Storyboarding
 
         private EditorBeatmap beatmap;
         public override Beatmap Beatmap => beatmap;
+
+        private StringBuilder log = new StringBuilder();
+        public string Log => log.ToString();
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
@@ -42,6 +46,9 @@ namespace StorybrewEditor.Storyboarding
 
         public override void AddDependency(string path)
             => watcher.Watch(path);
+
+        public override void AppendLog(string message)
+            => log.AppendLine(message);
 
         #region Audio data
 

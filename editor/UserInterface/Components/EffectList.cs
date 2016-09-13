@@ -210,25 +210,31 @@ namespace StorybrewEditor.UserInterface.Components
 
         private static void updateStatusButton(Button button, Effect effect)
         {
-            button.Displayed = effect.Status != EffectStatus.Ready;
             button.Disabled = string.IsNullOrWhiteSpace(effect.StatusMessage);
+            button.Displayed = effect.Status != EffectStatus.Ready || !button.Disabled;
+            button.Tooltip = effect.Status.ToString();
             switch (effect.Status)
             {
                 case EffectStatus.Loading:
                 case EffectStatus.Configuring:
                 case EffectStatus.Updating:
                     button.Icon = IconFont.Spinner;
+                    button.Disabled = true;
                     break;
                 case EffectStatus.ReloadPending:
                     button.Icon = IconFont.ChainBroken;
+                    button.Disabled = true;
                     break;
                 case EffectStatus.CompilationFailed:
                 case EffectStatus.LoadingFailed:
                 case EffectStatus.ExecutionFailed:
                     button.Icon = IconFont.Bug;
                     break;
+                case EffectStatus.Ready:
+                    button.Icon = IconFont.Leaf;
+                    button.Tooltip = "Open log";
+                    break;
             }
-            button.Tooltip = effect.Status.ToString();
         }
 
         private void createScript(string name)

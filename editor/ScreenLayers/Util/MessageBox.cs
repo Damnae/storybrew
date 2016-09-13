@@ -39,11 +39,11 @@ namespace StorybrewEditor.ScreenLayers.Util
                 Padding = new FourSide(16),
                 Children = new Widget[]
                 {
-                    new Label(WidgetManager)
+                    new ScrollArea(WidgetManager, new Label(WidgetManager)
                     {
                         Text = message,
                         AnchorFrom = UiAlignment.Centre,
-                    },
+                    }),
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
@@ -94,7 +94,7 @@ namespace StorybrewEditor.ScreenLayers.Util
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);
-            mainLayout.Pack(400, 0, 1024 - 32);
+            mainLayout.Pack(400, 0, 1024 - 32, 768 - 32);
         }
     }
 }

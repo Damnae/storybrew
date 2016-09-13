@@ -115,18 +115,18 @@ namespace StorybrewEditor.Storyboarding
             catch (ScriptCompilationException e)
             {
                 Debug.Print($"Script compilation failed for {BaseName}\n{e.Message}");
-                changeStatus(EffectStatus.CompilationFailed, e.Message);
+                changeStatus(EffectStatus.CompilationFailed, e.Message, context.Log);
                 return;
             }
             catch (ScriptLoadingException e)
             {
                 Debug.Print($"Script load failed for {BaseName}\n{e.ToString()}");
-                changeStatus(EffectStatus.LoadingFailed, e.InnerException != null ? $"{e.Message}: {e.InnerException.Message}" : e.Message);
+                changeStatus(EffectStatus.LoadingFailed, e.InnerException != null ? $"{e.Message}: {e.InnerException.Message}" : e.Message, context.Log);
                 return;
             }
             catch (Exception e)
             {
-                changeStatus(EffectStatus.ExecutionFailed, $"Unexpected error during {status}:\n{e.ToString()}");
+                changeStatus(EffectStatus.ExecutionFailed, $"Unexpected error during {status}:\n{e.ToString()}", context.Log);
                 return;
             }
             finally
@@ -138,7 +138,7 @@ namespace StorybrewEditor.Storyboarding
                 }
                 context.DisposeResources();
             }
-            changeStatus(EffectStatus.Ready);
+            changeStatus(EffectStatus.Ready, null, context.Log);
 
             Program.Schedule(() =>
             {
@@ -180,7 +180,7 @@ namespace StorybrewEditor.Storyboarding
                 layer.Name = string.IsNullOrWhiteSpace(layer.Identifier) ? $"{name}" : $"{name} ({layer.Identifier})";
         }
 
-        private void changeStatus(EffectStatus status, string message = null)
+        private void changeStatus(EffectStatus status, string message = null, string log = null)
         {
             Program.Schedule(() =>
             {
@@ -200,6 +200,12 @@ namespace StorybrewEditor.Storyboarding
 
                 this.status = status;
                 statusMessage = message ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(log))
+                {
+                    if (!string.IsNullOrWhiteSpace(statusMessage))
+                        statusMessage += "\n\n";
+                    statusMessage += $"Log:\n\n{log}";
+                }
                 RaiseChanged();
 
                 statusStopwatch.Restart();

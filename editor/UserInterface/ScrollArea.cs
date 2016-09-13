@@ -6,6 +6,9 @@ namespace StorybrewEditor.UserInterface
 {
     public class ScrollArea : Widget
     {
+        public override Vector2 MinSize => Vector2.Zero;
+        public override Vector2 PreferredSize => scrollContainer.PreferredSize;
+
         private StackLayout scrollContainer;
         private bool dragged;
 
@@ -34,26 +37,30 @@ namespace StorybrewEditor.UserInterface
             OnDrag += (sender, e) =>
             {
                 if (!dragged) return;
-                scroll(e.YDelta);
+                scroll(e.XDelta, e.YDelta);
             };
             OnMouseWheel += (sender, e) =>
             {
-                scroll(e.DeltaPrecise * 64);
+                scroll(0, e.DeltaPrecise * 64);
                 return true;
             };
-        }
-
-        private void scroll(float amount)
-        {
-            var scrollableDistance = Math.Max(0, scrollContainer.Height - Height);
-            scrollContainer.Offset = new Vector2(0, Math.Max(-scrollableDistance, Math.Min(scrollContainer.Offset.Y + amount, 0)));
         }
 
         protected override void Layout()
         {
             base.Layout();
-            scrollContainer.Size = new Vector2(Size.X, scrollContainer.PreferredSize.Y);
-            scroll(0);
+            scrollContainer.Size = new Vector2(Math.Max(Size.X, scrollContainer.PreferredSize.X), scrollContainer.PreferredSize.Y);
+            scroll(0, 0);
+        }
+
+        private void scroll(float x, float y)
+        {
+            var scrollableX = Math.Max(0, scrollContainer.Width - Width);
+            var scrollableY = Math.Max(0, scrollContainer.Height - Height);
+            scrollContainer.Offset = new Vector2(
+                Math.Max(-scrollableX, Math.Min(scrollContainer.Offset.X + x, 0)), 
+                Math.Max(-scrollableY, Math.Min(scrollContainer.Offset.Y + y, 0))
+            );
         }
     }
 }
