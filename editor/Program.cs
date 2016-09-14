@@ -11,6 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StorybrewEditor
 {
@@ -213,6 +214,19 @@ namespace StorybrewEditor
                 {
                     Trace.WriteLine($"Scheduled task {action.Method} failed (scheduling not available):\n{e}");
                 }
+        }
+
+        /// <summary>
+        /// Schedule the action to run in the main thread after a delay (in milliseconds).
+        /// Exceptions will be logged.
+        /// </summary>
+        public static void Schedule(Action action, int delay)
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(delay);
+                Schedule(action);
+            });
         }
 
         /// <summary>

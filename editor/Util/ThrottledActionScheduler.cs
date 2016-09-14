@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace StorybrewEditor.Util
 {
@@ -27,24 +26,12 @@ namespace StorybrewEditor.Util
             {
                 if (scheduled.Contains(key)) return;
                 scheduled.Add(key);
-
-                queue(key, action);
             }
-        }
-
-        private void queue(string key, Func<string, bool> action)
-        {
-            ThreadPool.QueueUserWorkItem((state) =>
+            Program.Schedule(() =>
             {
-                Thread.Sleep(Delay);
-                Program.Schedule(() =>
-                {
-                    lock (scheduled)
-                        if (action(key))
-                            scheduled.Remove(key);
-                        else queue(key, action);
-                });
-            });
+                lock (scheduled) scheduled.Remove(key);
+                if (!action(key)) Schedule(key, action);
+            }, Delay);
         }
     }
 }
