@@ -63,7 +63,7 @@ namespace StorybrewCommon.Scripting
             if (!bitmaps.TryGetValue(path, out bitmap))
             {
                 context.AddDependency(path);
-                bitmaps.Add(path, bitmap = (Bitmap)Image.FromFile(path));
+                bitmaps.Add(path, bitmap = Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
             }
             return bitmap;
         }
@@ -86,7 +86,7 @@ namespace StorybrewCommon.Scripting
         {
             path = Path.GetFullPath(path);
             context.AddDependency(path);
-            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
         #endregion

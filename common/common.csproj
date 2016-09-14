@@ -121,6 +121,7 @@
     <Compile Include="Storyboarding\Util\OsbSpritePool.cs" />
     <Compile Include="Storyboarding\Util\OsbSpritePools.cs" />
     <Compile Include="Subtitles\SubtitleSet.cs" />
+    <Compile Include="Util\Misc.cs" />
     <Compile Include="Util\NamedValue.cs" />
     <Compile Include="Util\ObjectSerializer.cs" />
     <Compile Include="Util\StreamReaderExtensions.cs" />

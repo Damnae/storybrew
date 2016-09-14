@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -145,32 +146,11 @@ namespace StorybrewCommon.Subtitles
                                 using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
                                     textGraphics.DrawLine(pen, offsetX, offsetY, offsetX, offsetY + baseHeight);
                         }
-                        withRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
+                        Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
                     }
                 }
             }
             return new FontTexture(Path.Combine(directory, filename), baseWidth, baseHeight, width, height);
-        }
-
-        private static void withRetries(Action action, int timeout = 2000)
-        {
-            var sleepTime = 0;
-            while (true)
-            {
-                try
-                {
-                    action();
-                    return;
-                }
-                catch
-                {
-                    if (sleepTime >= timeout) throw;
-
-                    var retryDelay = timeout / 10;
-                    sleepTime += retryDelay;
-                    Thread.Sleep(retryDelay);
-                }
-            }
         }
     }
 }

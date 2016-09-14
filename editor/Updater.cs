@@ -1,4 +1,5 @@
 ﻿using StorybrewEditor.Util;
+using StorybrewCommon.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -60,9 +61,9 @@ namespace StorybrewEditor
             }
 
             if (File.Exists(UpdateArchivePath))
-                withRetries(() => File.Delete(UpdateArchivePath));
+                Misc.WithRetries(() => File.Delete(UpdateArchivePath));
             if (Directory.Exists(UpdateFolderPath))
-                withRetries(() => Directory.Delete(UpdateFolderPath, true));
+                Misc.WithRetries(() => Directory.Delete(UpdateFolderPath, true));
         }
 
         private static void firstRun()
@@ -113,7 +114,7 @@ namespace StorybrewEditor
                 else File.SetAttributes(destinationFilename, attributes & ~FileAttributes.ReadOnly);
             }
 
-            withRetries(() => File.Copy(sourceFilename, destinationFilename, true), 5000);
+            Misc.WithRetries(() => File.Copy(sourceFilename, destinationFilename, true), 5000);
             if (readOnly) File.SetAttributes(destinationFilename, FileAttributes.ReadOnly);
         }
 
@@ -123,27 +124,6 @@ namespace StorybrewEditor
                 if (filename.StartsWith(filter))
                     return true;
             return false;
-        }
-
-        private static void withRetries(Action action, int timeout = 2000)
-        {
-            var sleepTime = 0;
-            while (true)
-            {
-                try
-                {
-                    action();
-                    return;
-                }
-                catch
-                {
-                    if (sleepTime >= timeout) throw;
-
-                    var retryDelay = timeout / 10;
-                    sleepTime += retryDelay;
-                    Thread.Sleep(retryDelay);
-                }
-            }
         }
     }
 }
