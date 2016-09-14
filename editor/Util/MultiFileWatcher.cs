@@ -8,16 +8,20 @@ namespace StorybrewEditor.Util
     {
         private Dictionary<string, FileSystemWatcher> folderWatchers = new Dictionary<string, FileSystemWatcher>();
         private HashSet<string> watchedFilenames = new HashSet<string>();
+        private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
 
         public event FileSystemEventHandler OnFileChanged;
 
         public void Watch(string filename)
         {
             filename = Path.GetFullPath(filename);
-            if (watchedFilenames.Contains(filename)) return;
-            watchedFilenames.Add(filename);
-
             var directoryPath = Path.GetDirectoryName(filename);
+
+            lock (watchedFilenames)
+            {
+                if (watchedFilenames.Contains(filename)) return;
+                watchedFilenames.Add(filename);
+            }
 
             FileSystemWatcher watcher;
             if (!folderWatchers.TryGetValue(directoryPath, out watcher))
@@ -38,19 +42,21 @@ namespace StorybrewEditor.Util
             foreach (var folderWatcher in folderWatchers.Values)
                 folderWatcher.Dispose();
             folderWatchers.Clear();
-            watchedFilenames.Clear();
+
+            lock (watchedFilenames)
+                watchedFilenames.Clear();
         }
 
         private void watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            Program.Schedule(() =>
-            {
-                if (disposedValue) return;
-                if (!watchedFilenames.Contains(e.FullPath)) return;
+            => scheduler.Schedule(e.FullPath, (key) =>
+                {
+                    if (disposedValue) return;
 
-                OnFileChanged?.Invoke(sender, e);
-            });
-        }
+                    lock (watchedFilenames)
+                        if (!watchedFilenames.Contains(e.FullPath)) return;
+
+                    OnFileChanged?.Invoke(sender, e);
+                });
 
         #region IDisposable Support
 
@@ -65,6 +71,7 @@ namespace StorybrewEditor.Util
                 }
                 folderWatchers = null;
                 watchedFilenames = null;
+                OnFileChanged = null;
                 disposedValue = true;
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StorybrewEditor.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -35,6 +36,8 @@ namespace StorybrewEditor.Mapset
         #region Events
 
         private FileSystemWatcher fileWatcher;
+        private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
+
         public event FileSystemEventHandler OnFileChanged;
 
         private void initializeMapsetWatcher()
@@ -50,7 +53,7 @@ namespace StorybrewEditor.Mapset
         }
 
         private void mapsetFileWatcher_Changed(object sender, FileSystemEventArgs e)
-            => Program.Schedule(() =>
+            => scheduler.Schedule(e.FullPath, (key) =>
             {
                 if (disposedValue) return;
                 OnFileChanged?.Invoke(sender, e);
