@@ -88,7 +88,7 @@ namespace StorybrewEditor.Storyboarding
             try
             {
                 changeStatus(EffectStatus.Loading);
-                var script = scriptContainer.Script;
+                var script = scriptContainer.CreateScript();
 
                 changeStatus(EffectStatus.Configuring);
                 Program.RunMainThread(() =>
