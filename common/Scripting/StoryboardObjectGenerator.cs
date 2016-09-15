@@ -13,7 +13,6 @@ namespace StorybrewCommon.Scripting
 {
     public abstract class StoryboardObjectGenerator : Script
     {
-        private string identifier = Guid.NewGuid().ToString();
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
@@ -163,74 +162,70 @@ namespace StorybrewCommon.Scripting
 
         #region Configuration
 
-        public bool Configure(EffectConfig config)
+        public void UpdateConfiguration(EffectConfig config)
         {
             if (context != null) throw new InvalidOperationException();
 
-            if (config.ConfigurationTarget != identifier)
+            var remainingFieldNames = new List<string>(config.FieldNames);
+            foreach (var configurableField in configurableFields)
             {
-                var remainingFieldNames = new List<string>(config.FieldNames);
-                foreach (var configurableField in configurableFields)
+                var field = configurableField.Field;
+                var allowedValues = (NamedValue[])null;
+
+                var fieldType = field.FieldType;
+                if (fieldType.IsEnum)
                 {
-                    var field = configurableField.Field;
-                    var allowedValues = (NamedValue[])null;
+                    var enumValues = Enum.GetValues(fieldType);
+                    fieldType = Enum.GetUnderlyingType(fieldType);
 
-                    var fieldType = field.FieldType;
-                    if (fieldType.IsEnum)
+                    allowedValues = new NamedValue[enumValues.Length];
+                    for (var i = 0; i < enumValues.Length; i++)
                     {
-                        var enumValues = Enum.GetValues(fieldType);
-                        fieldType = Enum.GetUnderlyingType(fieldType);
-
-                        allowedValues = new NamedValue[enumValues.Length];
-                        for (var i = 0; i < enumValues.Length; i++)
+                        var value = enumValues.GetValue(i);
+                        allowedValues[i] = new NamedValue()
                         {
-                            var value = enumValues.GetValue(i);
-                            allowedValues[i] = new NamedValue()
-                            {
-                                Name = value.ToString(),
-                                Value = Convert.ChangeType(value, fieldType),
-                            };
-                        }
-                    }
-
-                    try
-                    {
-                        var displayName = configurableField.Attribute.DisplayName ?? field.Name;
-                        var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
-                        config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
-
-                        var value = config.GetValue(field.Name);
-                        field.SetValue(this, value);
-
-                        remainingFieldNames.Remove(field.Name);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.WriteLine($"Failed to update configuration for {field.Name} with type {fieldType}:\n{e}");
+                            Name = value.ToString(),
+                            Value = Convert.ChangeType(value, fieldType),
+                        };
                     }
                 }
-                foreach (var name in remainingFieldNames)
-                    config.RemoveField(name);
 
-                config.ConfigurationTarget = identifier;
-                return true;
-            }
-            else
-            {
-                foreach (var configurableField in configurableFields)
+                try
                 {
-                    var field = configurableField.Field;
-                    try
-                    {
-                        var value = config.GetValue(field.Name);
-                        field.SetValue(this, value);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.WriteLine($"Failed to apply configuration for {field.Name}:\n{e}");
-                    }
+                    var displayName = configurableField.Attribute.DisplayName ?? field.Name;
+                    var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
+                    config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
+
+                    var value = config.GetValue(field.Name);
+                    field.SetValue(this, value);
+
+                    remainingFieldNames.Remove(field.Name);
                 }
-                return false;
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Failed to update configuration for {field.Name} with type {fieldType}:\n{e}");
+                }
+            }
+            foreach (var name in remainingFieldNames)
+                config.RemoveField(name);
+        }
+
+        public void ApplyConfiguration(EffectConfig config)
+        {
+            if (context != null) throw new InvalidOperationException();
+
+            foreach (var configurableField in configurableFields)
+            {
+                var field = configurableField.Field;
+                try
+                {
+                    var value = config.GetValue(field.Name);
+                    field.SetValue(this, value);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Failed to apply configuration for {field.Name}:\n{e}");
+                }
             }
         }
 

@@ -8,8 +8,6 @@ namespace StorybrewCommon.Storyboarding
     {
         private Dictionary<string, ConfigField> fields = new Dictionary<string, ConfigField>();
 
-        public string ConfigurationTarget;
-
         public int FieldCount => fields.Count;
         public IEnumerable<ConfigField> Fields => fields.Values;
         public IEnumerable<ConfigField> SortedFields
