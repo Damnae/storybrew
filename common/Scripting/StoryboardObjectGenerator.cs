@@ -17,8 +17,8 @@ namespace StorybrewCommon.Scripting
         private GeneratorContext context;
 
         /// <summary>
-        /// Creates or retrieves a layer. 
-        /// The identifier will be shown in the editor as "Effect name (Identifier)". 
+        /// Creates or retrieves a layer.
+        /// The identifier will be shown in the editor as "Effect name (Identifier)".
         /// Layers will be sorted by the order in which they are first retrieved.
         /// </summary>
         protected StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
@@ -35,6 +35,11 @@ namespace StorybrewCommon.Scripting
 
         public void Log(string message)
             => context.AppendLog(message);
+
+        public void Assert(bool predicate)
+        {
+          if (!predicate) throw new Exception("Assertion failed.");
+        }
 
         #region File loading
 
@@ -68,14 +73,14 @@ namespace StorybrewCommon.Scripting
         }
 
         /// <summary>
-        /// Opens a project file in read-only mode. 
+        /// Opens a project file in read-only mode.
         /// You are responsible for disposing it.
         /// </summary>
         public Stream OpenProjectFile(string path)
             => openFile(Path.Combine(context.ProjectPath, path));
 
         /// <summary>
-        /// Opens a mapset file in read-only mode. 
+        /// Opens a mapset file in read-only mode.
         /// You are responsible for disposing it.
         /// </summary>
         public Stream OpenMapsetFile(string path)
