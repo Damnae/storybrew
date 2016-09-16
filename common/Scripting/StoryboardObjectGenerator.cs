@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace StorybrewCommon.Scripting
 {
@@ -35,6 +36,12 @@ namespace StorybrewCommon.Scripting
 
         public void Log(string message)
             => context.AppendLog(message);
+
+        public void Assert(bool condition, string message = null, [CallerLineNumber] int line = -1)
+        {
+            if (!condition)
+                throw new Exception(message != null ? $"Assertion failed line {line}: {message}" : $"Assertion failed line {line}");
+        }
 
         #region File loading
 
