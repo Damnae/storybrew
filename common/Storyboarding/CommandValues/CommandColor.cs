@@ -56,6 +56,21 @@ namespace StorybrewCommon.Storyboarding.CommandValues
             return hashCode;
         }
 
+        public Vector3 ToHSB() {
+            float h, s, b;
+            var rgbDecimals = new float[3] { (float) R / 255, (float) G / 255, (float) B / 255 };
+            var cMax = b = Math.Max(Math.Max(rgbDecimals[0], rgbDecimals[1]), rgbDecimals[2]);
+            var cMin = Math.Min(Math.Min(rgbDecimals[0], rgbDecimals[1]), rgbDecimals[2]);
+            var d = cMax - cMin;
+
+            h = d == 0 ? 0 : cMax == rgbDecimals[0] ? 60 * (((rgbDecimals[1] - rgbDecimals[2]) / d) % 6) :
+                             cMax == rgbDecimals[1] ? 60 * (((rgbDecimals[2] - rgbDecimals[0]) / d) + 2) :
+                                                      60 * (((rgbDecimals[0] - rgbDecimals[1]) / d) + 4) ;
+            s = cMax == 0 ? 0 : d / cMax;
+
+            return new Vector3(h,s,b);
+        }
+
         public string ToOsbString(ExportSettings exportSettings)
             => $"{R},{G},{B}";
 
