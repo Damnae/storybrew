@@ -11,8 +11,7 @@ using System.Reflection;
 
 namespace StorybrewCommon.Scripting
 {
-    public abstract class StoryboardObjectGenerator : Script
-    {
+    public abstract class StoryboardObjectGenerator : Script {
         private string identifier = Guid.NewGuid().ToString();
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
@@ -26,8 +25,7 @@ namespace StorybrewCommon.Scripting
 
         protected Beatmap Beatmap => context.Beatmap;
 
-        public StoryboardObjectGenerator()
-        {
+        public StoryboardObjectGenerator() {
             initializeConfigurableFields();
         }
 
@@ -36,6 +34,10 @@ namespace StorybrewCommon.Scripting
 
         public void Log(string message)
             => context.AppendLog(message);
+
+        public void Assert(bool predicate) {
+            if (!predicate) throw new Exception("Assertion failed.");
+        }
 
         #region File loading
 
