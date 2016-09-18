@@ -66,6 +66,13 @@
     <Compile Include="Animations\InterpolatingFunctions.cs" />
     <Compile Include="Animations\Keyframe.cs" />
     <Compile Include="Animations\KeyframedValue.cs" />
+    <Compile Include="Curves\BezierCurve.cs" />
+    <Compile Include="Curves\CatmullCurve.cs" />
+    <Compile Include="Curves\CircleCurve.cs" />
+    <Compile Include="Curves\CompositeCurve.cs" />
+    <Compile Include="Curves\BaseCurve.cs" />
+    <Compile Include="Curves\Curve.cs" />
+    <Compile Include="Curves\TransformedCurve.cs" />
     <Compile Include="Subtitles\FontEffect.cs" />
     <Compile Include="Subtitles\FontGenerator.cs" />
     <Compile Include="Subtitles\FontOutline.cs" />

@@ -14,7 +14,7 @@ namespace StorybrewCommon.Mapset
         public Vector2 PlayfieldPosition;
         public Vector2 Position => PlayfieldPosition + PlayfieldToStoryboardOffset;
 
-        public virtual Vector2 PlayfieldEndPosition => PlayfieldPosition;
+        public virtual Vector2 PlayfieldEndPosition => PlayfieldPositionAtTime(EndTime);
         public Vector2 EndPosition => PlayfieldEndPosition + PlayfieldToStoryboardOffset;
 
         public double StartTime;
@@ -28,7 +28,10 @@ namespace StorybrewCommon.Mapset
         public float Volume;
         public string SamplePath;
 
-        public override string ToString()
+        public virtual Vector2 PlayfieldPositionAtTime(double time) => PlayfieldPosition;
+        public Vector2 PositionAtTime(double time) => PlayfieldPositionAtTime(time) + PlayfieldToStoryboardOffset;
+
+        public override string ToString() 
             => $"{(int)StartTime}, {Flags}";
 
         public static OsuHitObject Parse(Beatmap beatmap, string line)

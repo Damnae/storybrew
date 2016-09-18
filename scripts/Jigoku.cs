@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
@@ -70,11 +71,35 @@ namespace StorybrewScripts
             var hitobjectLayer = GetLayer("HitObjects");
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                var hSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbOrigin.Centre);
+                var hSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbOrigin.Centre, hitobject.Position);
                 hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + 200, 1, 0.2);
                 hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + 200, 1, 0);
-                hSprite.Move(hitobject.StartTime, hitobject.EndTime, hitobject.Position, hitobject.EndPosition);
                 hSprite.Additive(hitobject.StartTime, hitobject.EndTime + 200);
+
+                if (hitobject is OsuSlider)
+                {
+                    var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration * 0.05;
+                    var startTime = hitobject.StartTime;
+                    while (true)
+                    {
+                        var endTime = startTime + timestep;
+
+                        bool complete = hitobject.EndTime - endTime < 5;
+                        if (complete) endTime = hitobject.EndTime;
+
+                        var startPosition = hSprite.PositionAt(startTime);
+                        hSprite.Move(startTime, endTime, startPosition, hitobject.PositionAtTime(endTime));
+
+                        var sSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbOrigin.Centre, startPosition);
+                        sSprite.Scale(startTime, 0.2);
+                        sSprite.Fade(OsbEasing.In, startTime, endTime + 200, 1, 0);
+                        sSprite.ColorHsb(startTime, 0, 1, 1);
+                        sSprite.Additive(startTime, endTime + 200);
+
+                        if (complete) break;
+                        startTime += timestep;
+                    }
+                }
             }
 
             Part1(TimePart1, TimePart2);
