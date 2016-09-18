@@ -84,8 +84,10 @@ namespace StorybrewCommon.Storyboarding
         }
 
         public void Move(OsbEasing easing, double startTime, double endTime, CommandPosition startPosition, CommandPosition endPosition) => addCommand(new MoveCommand(easing, startTime, endTime, startPosition, endPosition));
+        public void Move(OsbEasing easing, double startTime, double endTime, CommandPosition startPosition, double endX, double endY) => Move(easing, startTime, endTime, startPosition, new CommandPosition(endX, endY));
         public void Move(OsbEasing easing, double startTime, double endTime, double startX, double startY, double endX, double endY) => Move(easing, startTime, endTime, new CommandPosition(startX, startY), new CommandPosition(endX, endY));
         public void Move(double startTime, double endTime, CommandPosition startPosition, CommandPosition endPosition) => Move(OsbEasing.None, startTime, endTime, startPosition, endPosition);
+        public void Move(double startTime, double endTime, CommandPosition startPosition, double endX, double endY) => Move(OsbEasing.None, startTime, endTime, startPosition, endX, endY);
         public void Move(double startTime, double endTime, double startX, double startY, double endX, double endY) => Move(OsbEasing.None, startTime, endTime, startX, startY, endX, endY);
         public void Move(double time, CommandPosition position) => Move(OsbEasing.None, time, time, position, position);
         public void Move(double time, double x, double y) => Move(OsbEasing.None, time, time, x, y, x, y);
@@ -103,8 +105,10 @@ namespace StorybrewCommon.Storyboarding
         public void Scale(double time, CommandDecimal scale) => Scale(OsbEasing.None, time, time, scale, scale);
 
         public void ScaleVec(OsbEasing easing, double startTime, double endTime, CommandScale startScale, CommandScale endScale) => addCommand(new VScaleCommand(easing, startTime, endTime, startScale, endScale));
+        public void ScaleVec(OsbEasing easing, double startTime, double endTime, CommandScale startScale, double endX, double endY) => ScaleVec(easing, startTime, endTime, startScale, new CommandScale(endX, endY));
         public void ScaleVec(OsbEasing easing, double startTime, double endTime, double startX, double startY, double endX, double endY) => ScaleVec(easing, startTime, endTime, new CommandScale(startX, startY), new CommandScale(endX, endY));
         public void ScaleVec(double startTime, double endTime, CommandScale startScale, CommandScale endScale) => ScaleVec(OsbEasing.None, startTime, endTime, startScale, endScale);
+        public void ScaleVec(double startTime, double endTime, CommandScale startScale, double endX, double endY) => ScaleVec(OsbEasing.None, startTime, endTime, startScale, endX, endY);
         public void ScaleVec(double startTime, double endTime, double startX, double startY, double endX, double endY) => ScaleVec(OsbEasing.None, startTime, endTime, startX, startY, endX, endY);
         public void ScaleVec(double time, CommandScale scale) => ScaleVec(OsbEasing.None, time, time, scale, scale);
         public void ScaleVec(double time, double x, double y) => ScaleVec(OsbEasing.None, time, time, x, y, x, y);
@@ -118,13 +122,17 @@ namespace StorybrewCommon.Storyboarding
         public void Fade(double time, CommandDecimal opacity) => Fade(OsbEasing.None, time, time, opacity, opacity);
 
         public void Color(OsbEasing easing, double startTime, double endTime, CommandColor startColor, CommandColor endColor) => addCommand(new ColorCommand(easing, startTime, endTime, startColor, endColor));
+        public void Color(OsbEasing easing, double startTime, double endTime, CommandColor startColor, double endRed, double endGreen, double endBlue) => Color(easing, startTime, endTime, startColor, new CommandColor(endRed, endGreen, endBlue));
         public void Color(OsbEasing easing, double startTime, double endTime, double startRed, double startGreen, double startBlue, double endRed, double endGreen, double endBlue) => Color(easing, startTime, endTime, new CommandColor(startRed, startGreen, startBlue), new CommandColor(endRed, endGreen, endBlue));
         public void Color(double startTime, double endTime, CommandColor startColor, CommandColor endColor) => Color(OsbEasing.None, startTime, endTime, startColor, endColor);
+        public void Color(double startTime, double endTime, CommandColor startColor, double endRed, double endGreen, double endBlue) => Color(OsbEasing.None, startTime, endTime, startColor, endRed, endGreen, endBlue);
         public void Color(double startTime, double endTime, double startRed, double startGreen, double startBlue, double endRed, double endGreen, double endBlue) => Color(OsbEasing.None, startTime, endTime, startRed, startGreen, startBlue, endRed, endGreen, endBlue);
         public void Color(double time, CommandColor color) => Color(OsbEasing.None, time, time, color, color);
         public void Color(double time, double red, double green, double blue) => Color(OsbEasing.None, time, time, red, green, blue, red, green, blue);
 
+        public void ColorHsb(OsbEasing easing, double startTime, double endTime, CommandColor startColor, double endHue, double endSaturation, double endBrightness) => Color(easing, startTime, endTime, startColor, CommandColor.FromHsb(endHue, endSaturation, endBrightness));
         public void ColorHsb(OsbEasing easing, double startTime, double endTime, double startHue, double startSaturation, double startBrightness, double endHue, double endSaturation, double endBrightness) => Color(easing, startTime, endTime, CommandColor.FromHsb(startHue, startSaturation, startBrightness), CommandColor.FromHsb(endHue, endSaturation, endBrightness));
+        public void ColorHsb(double startTime, double endTime, CommandColor startColor, double endHue, double endSaturation, double endBrightness) => ColorHsb(OsbEasing.None, startTime, endTime, startColor, endHue, endSaturation, endBrightness);
         public void ColorHsb(double startTime, double endTime, double startHue, double startSaturation, double startBrightness, double endHue, double endSaturation, double endBrightness) => ColorHsb(OsbEasing.None, startTime, endTime, startHue, startSaturation, startBrightness, endHue, endSaturation, endBrightness);
         public void ColorHsb(double time, double hue, double saturation, double brightness) => ColorHsb(OsbEasing.None, time, time, hue, saturation, brightness, hue, saturation, brightness);
 
