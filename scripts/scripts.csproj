@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HitObjectHighlight.cs" />
     <Compile Include="Lyrics.cs" />
     <Compile Include="Spectrum.cs" />
     <Compile Include="Jigoku.cs" />
