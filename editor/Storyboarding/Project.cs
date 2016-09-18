@@ -282,12 +282,28 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
+        public void SelectBeatmap(long id, string name)
+        {
+            foreach (var beatmap in MapsetManager.Beatmaps)
+                if ((id > 0 && beatmap.Id == id) || (name.Length > 0 && beatmap.Name == name))
+                {
+                    MainBeatmap = beatmap;
+                    break;
+                }
+        }
+
         private void refreshMapset()
         {
+            var previousBeatmapId = mainBeatmap?.Id ?? -1;
+            var previousBeatmapName = mainBeatmap?.Name;
+
             mainBeatmap = null;
             mapsetManager?.Dispose();
             mapsetManager = new MapsetManager(mapsetPath);
             mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
+
+            if (previousBeatmapName != null)
+                SelectBeatmap(previousBeatmapId, previousBeatmapName);
         }
 
         private void mapsetManager_OnFileChanged(object sender, FileSystemEventArgs e)
@@ -295,6 +311,8 @@ namespace StorybrewEditor.Storyboarding
             var extension = Path.GetExtension(e.Name);
             if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
                 reloadTextures();
+            else if (extension == ".osu")
+                refreshMapset();
         }
 
         #endregion
@@ -372,14 +390,7 @@ namespace StorybrewEditor.Storyboarding
                 {
                     var mainBeatmapId = r.ReadInt64();
                     var mainBeatmapName = r.ReadString();
-
-                    foreach (var beatmap in project.MapsetManager.Beatmaps)
-                        if ((mainBeatmapId > 0 && beatmap.Id == mainBeatmapId) ||
-                            (mainBeatmapName.Length > 0 && beatmap.Name == mainBeatmapName))
-                        {
-                            project.MainBeatmap = beatmap;
-                            break;
-                        }
+                    project.SelectBeatmap(mainBeatmapId, mainBeatmapName);
                 }
 
                 var effectCount = r.ReadInt32();
