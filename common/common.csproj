@@ -66,6 +66,19 @@
     <Compile Include="Animations\InterpolatingFunctions.cs" />
     <Compile Include="Animations\Keyframe.cs" />
     <Compile Include="Animations\KeyframedValue.cs" />
+    <Compile Include="Curves\BezierCurve.cs" />
+    <Compile Include="Curves\CatmullCurve.cs" />
+    <Compile Include="Curves\CircleCurve.cs" />
+    <Compile Include="Curves\CompositeCurve.cs" />
+    <Compile Include="Curves\BaseCurve.cs" />
+    <Compile Include="Curves\Curve.cs" />
+    <Compile Include="Curves\TransformedCurve.cs" />
+    <Compile Include="Subtitles\FontEffect.cs" />
+    <Compile Include="Subtitles\FontGenerator.cs" />
+    <Compile Include="Subtitles\FontOutline.cs" />
+    <Compile Include="Subtitles\FontShadow.cs" />
+    <Compile Include="Subtitles\SrtParser.cs" />
+    <Compile Include="Subtitles\SubtitleLine.cs" />
     <Compile Include="Mapset\ControlPoint.cs" />
     <Compile Include="Mapset\Beatmap.cs" />
     <Compile Include="Mapset\OsuCircle.cs" />
@@ -74,6 +87,7 @@
     <Compile Include="Mapset\OsuSlider.cs" />
     <Compile Include="Mapset\OsuSpinner.cs" />
     <Compile Include="Storyboarding3d\StoryboardCamera.cs" />
+    <Compile Include="Storyboarding\Commands\IOffsetable.cs" />
     <Compile Include="Storyboarding3d\StoryboardObject3d.cs" />
     <Compile Include="Storyboarding3d\OsbScene3d.cs" />
     <Compile Include="Storyboarding3d\OsbContainer3d.cs" />
@@ -118,6 +132,8 @@
     <Compile Include="Scripting\Script.cs" />
     <Compile Include="Storyboarding\Util\OsbSpritePool.cs" />
     <Compile Include="Storyboarding\Util\OsbSpritePools.cs" />
+    <Compile Include="Subtitles\SubtitleSet.cs" />
+    <Compile Include="Util\Misc.cs" />
     <Compile Include="Util\NamedValue.cs" />
     <Compile Include="Util\ObjectSerializer.cs" />
     <Compile Include="Util\Pool.cs" />

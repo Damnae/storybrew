@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using StorybrewCommon.Curves;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,12 +17,45 @@ namespace StorybrewCommon.Mapset
         public IEnumerable<OsuSliderControlPoint> ControlPoints => controlPoints;
         public int ControlPointCount => controlPoints.Count;
 
-        public override double EndTime => StartTime + (1 + TravelCount) * TravelDuration;
+        public override double EndTime => StartTime + TravelCount * TravelDuration;
 
+        private Curve curve;
+
+        private Vector2 playfieldTipPosition;
+        public Vector2 PlayfieldTipPosition
+        {
+            get
+            {
+                if (curve == null) generateCurve();
+                return playfieldTipPosition;
+            }
+        }
+
+        public Vector2 TipPosition => PlayfieldTipPosition + PlayfieldToStoryboardOffset;
+
+        /// <summary>
+        /// The total distance the slider ball travels, in osu!pixels.
+        /// </summary>
         public double Length;
+
+        /// <summary>
+        /// The time it takes for the slider ball to travels across the slider's body in beats.
+        /// </summary>
         public double TravelDurationBeats;
+
+        /// <summary>
+        /// The time it takes for the slider ball to travels across the slider's body in milliseconds.
+        /// </summary>
         public double TravelDuration;
+
+        /// <summary>
+        /// How many times the slider ball travels across the slider's body.
+        /// </summary>
         public int TravelCount => nodes.Count - 1;
+
+        /// <summary>
+        /// How many times the slider ball hits a repeat.
+        /// </summary>
         public int RepeatCount => nodes.Count - 2;
 
         public SliderCurveType CurveType;
@@ -32,8 +66,120 @@ namespace StorybrewCommon.Mapset
             this.controlPoints = controlPoints;
         }
 
+        public override Vector2 PlayfieldPositionAtTime(double time)
+        {
+            if (time <= StartTime)
+                return PlayfieldPosition;
+
+            if (EndTime <= time)
+                return TravelCount % 2 == 0 ? PlayfieldPosition : PlayfieldTipPosition;
+
+            var elapsedSinceStartTime = time - StartTime;
+
+            var repeatAtTime = 1;
+            var progressDuration = elapsedSinceStartTime;
+            while (progressDuration > TravelDuration)
+            {
+                progressDuration -= TravelDuration;
+                ++repeatAtTime;
+            }
+
+            var progress = progressDuration / TravelDuration;
+            var reversed = repeatAtTime % 2 == 0;
+            if (reversed) progress = 1.0 - progress;
+
+            if (curve == null) generateCurve();
+            return curve.PositionAtDistance(Length * progress);
+        }
+
         public override string ToString()
             => $"{base.ToString()}, {CurveType}, {TravelCount}x";
+
+        private void generateCurve()
+        {
+            switch (CurveType)
+            {
+                case SliderCurveType.Catmull:
+                    if (controlPoints.Count == 1) goto case SliderCurveType.Linear;
+                    curve = generateCatmullCurve();
+                    break;
+                case SliderCurveType.Bezier:
+                    if (controlPoints.Count == 1) goto case SliderCurveType.Linear;
+                    curve = generateBezierCurve();
+                    break;
+                case SliderCurveType.Perfect:
+                    if (controlPoints.Count < 2) goto case SliderCurveType.Linear;
+                    if (controlPoints.Count > 2) goto case SliderCurveType.Bezier;
+                    curve = generateCircleCurve();
+                    break;
+                case SliderCurveType.Linear:
+                default:
+                    curve = generateLinearCurve();
+                    break;
+            }
+            playfieldTipPosition = curve.PositionAtDistance(Length);
+        }
+
+        private Curve generateCircleCurve()
+            => new CircleCurve(PlayfieldPosition, controlPoints[0].PlayfieldPosition, controlPoints[1].PlayfieldPosition);
+
+        private Curve generateBezierCurve()
+        {
+            var curves = new List<Curve>();
+
+            var curvePoints = new List<Vector2>();
+            var precision = (int)Math.Ceiling(Length);
+
+            var previousPosition = PlayfieldPosition;
+            curvePoints.Add(previousPosition);
+
+            foreach (var controlPoint in controlPoints)
+            {
+                if (controlPoint.PlayfieldPosition == previousPosition)
+                {
+                    if (curvePoints.Count > 1)
+                        curves.Add(new Curves.BezierCurve(curvePoints, precision));
+
+                    curvePoints = new List<Vector2>();
+                }
+
+                curvePoints.Add(controlPoint.PlayfieldPosition);
+                previousPosition = controlPoint.PlayfieldPosition;
+            }
+
+            if (curvePoints.Count > 1)
+                curves.Add(new Curves.BezierCurve(curvePoints, precision));
+
+            return new CompositeCurve(curves);
+        }
+
+        private Curve generateCatmullCurve()
+        {
+            List<Vector2> curvePoints = new List<Vector2>(controlPoints.Count + 1);
+            curvePoints.Add(PlayfieldPosition);
+            foreach (var controlPoint in controlPoints)
+                curvePoints.Add(controlPoint.PlayfieldPosition);
+
+            var precision = (int)Math.Ceiling(Length);
+            return new CatmullCurve(curvePoints, precision);
+        }
+
+        private Curve generateLinearCurve()
+        {
+            var curves = new List<Curve>();
+
+            var previousPoint = PlayfieldPosition;
+            foreach (var controlPoint in controlPoints)
+            {
+                curves.Add(new Curves.BezierCurve(new List<Vector2>()
+                {
+                    previousPoint,
+                    controlPoint.PlayfieldPosition,
+                }, 0));
+                previousPoint = controlPoint.PlayfieldPosition;
+            }
+            return new CompositeCurve(curves);
+        }
 
         public static OsuSlider Parse(Beatmap beatmap, string[] values, int x, int y, double startTime, HitObjectFlag flags, HitSoundAddition additions, ControlPoint timingPoint, ControlPoint controlPoint, int sampleType, int sampleAdditionsType, SampleSet sampleSet, float volume)
         {

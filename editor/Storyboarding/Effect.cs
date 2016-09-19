@@ -3,7 +3,7 @@ using System;
 
 namespace StorybrewEditor.Storyboarding
 {
-    public abstract class Effect
+    public abstract class Effect : IDisposable
     {
         private Project project;
         public Project Project => project;
@@ -34,7 +34,6 @@ namespace StorybrewEditor.Storyboarding
         /// Doesn't run on the main thread.
         /// </summary>
         public abstract void Update();
-        public abstract void Clear();
 
         // Queues an Update call
         public abstract void Refresh();
@@ -43,6 +42,30 @@ namespace StorybrewEditor.Storyboarding
         /// Used at load time to let the effect know about placeholder layers it should use.
         /// </summary>
         public abstract void AddPlaceholder(EditorStoryboardLayer layer);
+
+        #region IDisposable Support
+
+        private bool disposedValue = false;
+        public bool IsDisposed => disposedValue;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                }
+                OnChanged = null;
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 
     public enum EffectStatus

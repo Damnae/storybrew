@@ -30,36 +30,36 @@ namespace StorybrewEditor.ScreenLayers
                     new Label(WidgetManager)
                     {
                         Text = "New Project",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     projectNameTextbox = new Textbox(WidgetManager)
                     {
                         LabelText = "Project Name",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.OpenDirectory)
                     {
                         Value = OsuHelper.GetOsuSongFolder(),
                         LabelText = "Mapset Path",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Filter = ".osu files (*.osu)|*.osu",
                     },
                     new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                         Fill = true,
                         Children = new Widget[]
                         {
                             startButton = new Button(WidgetManager)
                             {
                                 Text = "Start",
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = UiAlignment.Centre,
                             },
                             cancelButton = new Button(WidgetManager)
                             {
                                 Text = "Cancel",
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = UiAlignment.Centre,
                             },
                         },
                     },

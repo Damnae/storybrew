@@ -1,5 +1,6 @@
 ﻿using StorybrewCommon.Scripting;
 using StorybrewEditor.Scripting;
+using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,6 +36,8 @@ namespace StorybrewEditor.Storyboarding
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
 
+        private MultiFileWatcher dependencyWatcher;
+
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {
             statusStopwatch.Start();
@@ -53,9 +56,6 @@ namespace StorybrewEditor.Storyboarding
 
         public override void AddPlaceholder(EditorStoryboardLayer layer)
         {
-            if (layers == null)
-                throw new InvalidOperationException();
-
             if (placeHolderLayer != null)
             {
                 layers.Remove(placeHolderLayer);
@@ -76,21 +76,35 @@ namespace StorybrewEditor.Storyboarding
         {
             if (!scriptContainer.HasScript) return;
 
-            var context = new EditorGeneratorContext(this, Project.MainBeatmap);
+            var newDependencyWatcher = new MultiFileWatcher();
+            newDependencyWatcher.OnFileChanged += (sender, e) =>
+            {
+                if (IsDisposed) return;
+                Refresh();
+            };
+
+            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, newDependencyWatcher);
+            var success = false;
             try
             {
                 changeStatus(EffectStatus.Loading);
-                var script = scriptContainer.Script;
+                bool scriptChanged;
+                var script = scriptContainer.CreateScript(out scriptChanged);
 
                 changeStatus(EffectStatus.Configuring);
                 Program.RunMainThread(() =>
                 {
-                    if (script.Configure(Config))
+                    if (scriptChanged)
+                    {
+                        script.UpdateConfiguration(Config);
                         RaiseConfigFieldsChanged();
+                    }
+                    else script.ApplyConfiguration(Config);
                 });
 
                 changeStatus(EffectStatus.Updating);
                 script.Generate(context);
+                success = true;
             }
             catch (RemotingException e)
             {
@@ -106,29 +120,43 @@ namespace StorybrewEditor.Storyboarding
             catch (ScriptCompilationException e)
             {
                 Debug.Print($"Script compilation failed for {BaseName}\n{e.Message}");
-                changeStatus(EffectStatus.CompilationFailed, e.Message);
+                changeStatus(EffectStatus.CompilationFailed, e.Message, context.Log);
                 return;
             }
             catch (ScriptLoadingException e)
             {
                 Debug.Print($"Script load failed for {BaseName}\n{e.ToString()}");
-                changeStatus(EffectStatus.LoadingFailed, e.InnerException != null ? $"{e.Message}: {e.InnerException.Message}" : e.Message);
+                changeStatus(EffectStatus.LoadingFailed, e.InnerException != null ? $"{e.Message}: {e.InnerException.Message}" : e.Message, context.Log);
                 return;
             }
             catch (Exception e)
             {
-                changeStatus(EffectStatus.ExecutionFailed, $"Unexpected error during {status}:\n{e.ToString()}");
+                changeStatus(EffectStatus.ExecutionFailed, $"Unexpected error during {status}:\n{e.ToString()}", context.Log);
                 return;
             }
             finally
             {
+                if (!success)
+                {
+                    newDependencyWatcher.Dispose();
+                    newDependencyWatcher = null;
+                }
                 context.DisposeResources();
             }
-            changeStatus(EffectStatus.Ready);
+            changeStatus(EffectStatus.Ready, null, context.Log);
 
             Program.Schedule(() =>
             {
-                if (Project.IsDisposed || layers == null)
+                if (IsDisposed)
+                {
+                    newDependencyWatcher.Dispose();
+                    return;
+                }
+
+                dependencyWatcher?.Dispose();
+                dependencyWatcher = newDependencyWatcher;
+
+                if (Project.IsDisposed)
                     return;
 
                 if (placeHolderLayer != null)
@@ -142,34 +170,22 @@ namespace StorybrewEditor.Storyboarding
             });
         }
 
-        public override void Clear()
-        {
-            if (layers == null)
-                return;
-
-            scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
-
-            foreach (var layer in layers)
-                Project.LayerManager.Remove(layer);
-            layers = null;
-        }
-
         public override void Refresh()
-            => Project.QueueEffectUpdate(this);
+        {
+            if (Project.IsDisposed) return;
+            Project.QueueEffectUpdate(this);
+        }
 
         private void scriptContainer_OnScriptChanged(object sender, EventArgs e)
             => Refresh();
 
         private void refreshLayerNames()
         {
-            if (layers == null)
-                return;
-
             foreach (var layer in layers)
                 layer.Name = string.IsNullOrWhiteSpace(layer.Identifier) ? $"{name}" : $"{name} ({layer.Identifier})";
         }
 
-        private void changeStatus(EffectStatus status, string message = null)
+        private void changeStatus(EffectStatus status, string message = null, string log = null)
         {
             Program.Schedule(() =>
             {
@@ -189,10 +205,35 @@ namespace StorybrewEditor.Storyboarding
 
                 this.status = status;
                 statusMessage = message ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(log))
+                {
+                    if (!string.IsNullOrWhiteSpace(statusMessage))
+                        statusMessage += "\n\n";
+                    statusMessage += $"Log:\n\n{log}";
+                }
                 RaiseChanged();
 
                 statusStopwatch.Restart();
             });
         }
+
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                dependencyWatcher?.Dispose();
+                scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
+                foreach (var layer in layers)
+                    Project.LayerManager.Remove(layer);
+            }
+            dependencyWatcher = null;
+            layers = null;
+
+            base.Dispose(disposing);
+        }
+
+        #endregion
     }
 }

@@ -98,8 +98,12 @@
     <Compile Include="Graphics\Cameras\CameraIso.cs" />
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
+    <Compile Include="Util\ThrottledActionScheduler.cs" />
+    <Compile Include="Util\MultiFileWatcher.cs" />
+    <Compile Include="Util\ZipArchiveExtensions.cs" />
     <None Include="Resources\projecttemplate.zip" />
     <None Include="Resources\scripttemplate.csx" />
+    <Compile Include="ScreenLayers\Test\FlowLayoutTest.cs" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
     <Compile Include="Settings.cs" />
@@ -168,6 +172,7 @@
     <Compile Include="Storyboarding\ScriptedEffect.cs" />
     <Compile Include="UserInterface\Components\EffectConfigUi.cs" />
     <Compile Include="UserInterface\Field.cs" />
+    <Compile Include="UserInterface\FlowLayout.cs" />
     <Compile Include="UserInterface\ScrollArea.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />
     <Compile Include="UserInterface\Skinning\Styles\SelectboxStyle.cs" />
@@ -184,6 +189,7 @@
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
     <Compile Include="Util\ChangedHandler.cs" />
     <Compile Include="Util\EventHelper.cs" />
+    <Compile Include="Util\GameWindowExtensions.cs" />
     <Compile Include="Util\IconFont.cs" />
     <Compile Include="Util\ListExtensions.cs" />
     <Compile Include="Util\OsuHelper.cs" />

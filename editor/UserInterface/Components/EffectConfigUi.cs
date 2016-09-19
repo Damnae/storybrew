@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
@@ -156,6 +157,23 @@ namespace StorybrewEditor.UserInterface.Components
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
                 return widget;
             }
+            else if (field.Type == typeof(bool))
+            {
+                var widget = new Selectbox(Manager)
+                {
+                    Value = field.Value,
+                    Options = new NamedValue[]
+                    {
+                        new NamedValue() { Name = true.ToString(), Value = true, },
+                        new NamedValue() { Name = false.ToString(), Value = false, },
+                    },
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
+                };
+                widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
+                return widget;
+            }
             else if (field.Type == typeof(string))
             {
                 var widget = new Textbox(Manager)
@@ -165,8 +183,11 @@ namespace StorybrewEditor.UserInterface.Components
                     AnchorTo = UiAlignment.Right,
                     CanGrow = false,
                 };
-                widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
-                widget.OnValueCommited += (sender, e) => widget.Value = effect.Config.GetValue(field.Name).ToString();
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = effect.Config.GetValue(field.Name).ToString();
+                };
                 return widget;
             }
             else if (Array.IndexOf(numberTypes, field.Type) != -1)
@@ -178,7 +199,7 @@ namespace StorybrewEditor.UserInterface.Components
                     AnchorTo = UiAlignment.Right,
                     CanGrow = false,
                 };
-                widget.OnValueChanged += (sender, e) =>
+                widget.OnValueCommited += (sender, e) =>
                 {
                     decimal decimalValue;
                     if (decimal.TryParse(widget.Value, out decimalValue))
@@ -186,8 +207,8 @@ namespace StorybrewEditor.UserInterface.Components
                         var value = Convert.ChangeType(decimalValue, field.Type);
                         setFieldValue(field, value);
                     }
+                    widget.Value = effect.Config.GetValue(field.Name).ToString();
                 };
-                widget.OnValueCommited += (sender, e) => widget.Value = effect.Config.GetValue(field.Name).ToString();
                 return widget;
             }
 

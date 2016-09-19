@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
@@ -66,16 +67,6 @@ namespace StorybrewScripts
             bg.Fade(OsbEasing.In, TimePart5 - BeatDuration * 4, TimePart5, 1, 0);
             bg.Fade(OsbEasing.Out, TimePart6, TimePart7, 0, 1);
             bg.Fade(OsbEasing.In, TimePart10 - BeatDuration * 4, TimePart10, 1, 0);
-
-            var hitobjectLayer = GetLayer("HitObjects");
-            foreach (var hitobject in Beatmap.HitObjects)
-            {
-                var hSprite = hitobjectLayer.CreateSprite("sb/pl.png", OsbOrigin.Centre);
-                hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + 200, 1, 0.2);
-                hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + 200, 1, 0);
-                hSprite.Move(hitobject.StartTime, hitobject.EndTime, hitobject.Position, hitobject.EndPosition);
-                hSprite.Additive(hitobject.StartTime, hitobject.EndTime + 200);
-            }
 
             Part1(TimePart1, TimePart2);
             Part2(TimePart2, TimePart3);

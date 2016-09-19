@@ -9,17 +9,17 @@ namespace StorybrewCommon.Storyboarding.Display
         where TValue : CommandValue
     {
         private ITypedCommand<TValue> command;
-        private double startTime;
+        private double triggerTime;
         private bool triggered;
 
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
-        public double StartTime => startTime + command.StartTime;
-        public double EndTime => startTime + command.EndTime;
+        public double StartTime => triggerTime + command.StartTime;
+        public double EndTime => triggerTime + command.EndTime;
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
-        public bool Enabled => triggered;
+        public bool Active => triggered;
 
-        public event EventHandler OnTimeChanged;
+        public event EventHandler OnStateChanged;
 
         public TriggerDecorator(ITypedCommand<TValue> command)
         {
@@ -28,24 +28,26 @@ namespace StorybrewCommon.Storyboarding.Display
 
         public void Trigger(double time)
         {
+            if (triggered) return;
+
             triggered = true;
-            if (startTime != time)
-            {
-                startTime = time;
-                OnTimeChanged?.Invoke(this, EventArgs.Empty);
-            }
+            triggerTime = time;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void UnTrigger()
         {
+            if (!triggered) return;
+
             triggered = false;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public TValue ValueAtTime(double time)
         {
             if (!triggered) throw new InvalidOperationException("Not triggered");
 
-            var commandTime = time - startTime;
+            var commandTime = time - triggerTime;
             if (commandTime < command.StartTime) return command.StartValue;
             if (command.EndTime < commandTime) return command.EndValue;
             return command.ValueAtTime(commandTime);

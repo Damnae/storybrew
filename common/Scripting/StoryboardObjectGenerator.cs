@@ -1,16 +1,19 @@
 ﻿using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Subtitles;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace StorybrewCommon.Scripting
 {
     public abstract class StoryboardObjectGenerator : Script
     {
-        private string identifier = Guid.NewGuid().ToString();
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
@@ -27,6 +30,72 @@ namespace StorybrewCommon.Scripting
         {
             initializeConfigurableFields();
         }
+
+        public void AddDependency(string path)
+            => context.AddDependency(path);
+
+        public void Log(string message)
+            => context.AppendLog(message);
+
+        public void Assert(bool condition, string message = null, [CallerLineNumber] int line = -1)
+        {
+            if (!condition)
+                throw new Exception(message != null ? $"Assertion failed line {line}: {message}" : $"Assertion failed line {line}");
+        }
+
+        #region File loading
+
+        private Dictionary<string, Bitmap> bitmaps = new Dictionary<string, Bitmap>();
+
+        /// <summary>
+        /// Returns a Bitmap from the project's directory.
+        /// Do not call Dispose, it will be disposed automatically when the script ends.
+        /// </summary>
+        public Bitmap GetProjectBitmap(string path)
+            => getBitmap(Path.Combine(context.ProjectPath, path));
+
+        /// <summary>
+        /// Returns a Bitmap from the mapset's directory.
+        /// Do not call Dispose, it will be disposed automatically when the script ends.
+        /// </summary>
+        public Bitmap GetMapsetBitmap(string path)
+            => getBitmap(Path.Combine(context.MapsetPath, path));
+
+        private Bitmap getBitmap(string path)
+        {
+            path = Path.GetFullPath(path);
+
+            Bitmap bitmap;
+            if (!bitmaps.TryGetValue(path, out bitmap))
+            {
+                context.AddDependency(path);
+                bitmaps.Add(path, bitmap = Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
+            }
+            return bitmap;
+        }
+
+        /// <summary>
+        /// Opens a project file in read-only mode. 
+        /// You are responsible for disposing it.
+        /// </summary>
+        public Stream OpenProjectFile(string path)
+            => openFile(Path.Combine(context.ProjectPath, path));
+
+        /// <summary>
+        /// Opens a mapset file in read-only mode. 
+        /// You are responsible for disposing it.
+        /// </summary>
+        public Stream OpenMapsetFile(string path)
+            => openFile(Path.Combine(context.MapsetPath, path));
+
+        private Stream openFile(string path)
+        {
+            path = Path.GetFullPath(path);
+            context.AddDependency(path);
+            return Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+        }
+
+        #endregion
 
         #region Random
 
@@ -83,93 +152,89 @@ namespace StorybrewCommon.Scripting
 
         #endregion
 
-        public bool Configure(EffectConfig config)
+        #region Subtitles
+
+        private SrtParser srtParser = new SrtParser();
+        public SubtitleSet LoadSubtitles(string path)
+        {
+            path = Path.Combine(context.ProjectPath, path);
+            context.AddDependency(path);
+            return srtParser.Parse(path);
+        }
+
+        public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
+            => new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+
+        #endregion
+
+        #region Configuration
+
+        public void UpdateConfiguration(EffectConfig config)
         {
             if (context != null) throw new InvalidOperationException();
 
-            if (config.ConfigurationTarget != identifier)
+            var remainingFieldNames = new List<string>(config.FieldNames);
+            foreach (var configurableField in configurableFields)
             {
-                var remainingFieldNames = new List<string>(config.FieldNames);
-                foreach (var configurableField in configurableFields)
+                var field = configurableField.Field;
+                var allowedValues = (NamedValue[])null;
+
+                var fieldType = field.FieldType;
+                if (fieldType.IsEnum)
                 {
-                    var field = configurableField.Field;
-                    var allowedValues = (NamedValue[])null;
+                    var enumValues = Enum.GetValues(fieldType);
+                    fieldType = Enum.GetUnderlyingType(fieldType);
 
-                    var fieldType = field.FieldType;
-                    if (fieldType.IsEnum)
+                    allowedValues = new NamedValue[enumValues.Length];
+                    for (var i = 0; i < enumValues.Length; i++)
                     {
-                        var enumValues = Enum.GetValues(fieldType);
-                        fieldType = Enum.GetUnderlyingType(fieldType);
-
-                        allowedValues = new NamedValue[enumValues.Length];
-                        for (var i = 0; i < enumValues.Length; i++)
+                        var value = enumValues.GetValue(i);
+                        allowedValues[i] = new NamedValue()
                         {
-                            var value = enumValues.GetValue(i);
-                            allowedValues[i] = new NamedValue()
-                            {
-                                Name = value.ToString(),
-                                Value = Convert.ChangeType(value, fieldType),
-                            };
-                        }
-                    }
-
-                    try
-                    {
-                        var displayName = configurableField.Attribute.DisplayName ?? field.Name;
-                        var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
-                        config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
-
-                        var value = config.GetValue(field.Name);
-                        field.SetValue(this, value);
-
-                        remainingFieldNames.Remove(field.Name);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.WriteLine($"Failed to update configuration for {field.Name} with type {fieldType}:\n{e}");
+                            Name = value.ToString(),
+                            Value = Convert.ChangeType(value, fieldType),
+                        };
                     }
                 }
-                foreach (var name in remainingFieldNames)
-                    config.RemoveField(name);
 
-                config.ConfigurationTarget = identifier;
-                return true;
-            }
-            else
-            {
-                foreach (var configurableField in configurableFields)
+                try
                 {
-                    var field = configurableField.Field;
-                    try
-                    {
-                        var value = config.GetValue(field.Name);
-                        field.SetValue(this, value);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.WriteLine($"Failed to apply configuration for {field.Name}:\n{e}");
-                    }
+                    var displayName = configurableField.Attribute.DisplayName ?? field.Name;
+                    var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
+                    config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
+
+                    var value = config.GetValue(field.Name);
+                    field.SetValue(this, value);
+
+                    remainingFieldNames.Remove(field.Name);
                 }
-                return false;
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Failed to update configuration for {field.Name} with type {fieldType}:\n{e}");
+                }
             }
+            foreach (var name in remainingFieldNames)
+                config.RemoveField(name);
         }
 
-        public void Generate(GeneratorContext context)
+        public void ApplyConfiguration(EffectConfig config)
         {
-            try
-            {
-                this.context = context;
+            if (context != null) throw new InvalidOperationException();
 
-                random = new Random(RandomSeed);
-                Generate();
-            }
-            finally
+            foreach (var configurableField in configurableFields)
             {
-                this.context = null;
+                var field = configurableField.Field;
+                try
+                {
+                    var value = config.GetValue(field.Name);
+                    field.SetValue(this, value);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Failed to apply configuration for {field.Name}:\n{e}");
+                }
             }
         }
-
-        public abstract void Generate();
 
         private void initializeConfigurableFields()
         {
@@ -184,7 +249,7 @@ namespace StorybrewCommon.Scripting
                     var configurable = attribute as ConfigurableAttribute;
                     if (configurable == null) continue;
 
-                    if (!ObjectSerializer.Supports(field.FieldType))
+                    if (!field.FieldType.IsEnum && !ObjectSerializer.Supports(field.FieldType))
                         continue;
 
                     configurableFields.Add(new ConfigurableField()
@@ -208,5 +273,28 @@ namespace StorybrewCommon.Scripting
 
             public override string ToString() => $"{Field.Name} {InitialValue}";
         }
+
+        #endregion
+
+        public void Generate(GeneratorContext context)
+        {
+            try
+            {
+                this.context = context;
+
+                random = new Random(RandomSeed);
+                Generate();
+            }
+            finally
+            {
+                this.context = null;
+
+                foreach (var bitmap in bitmaps.Values)
+                    bitmap.Dispose();
+                bitmaps.Clear();
+            }
+        }
+
+        public abstract void Generate();
     }
 }

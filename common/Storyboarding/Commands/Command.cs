@@ -4,7 +4,7 @@ using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public abstract class Command<TValue> : ITypedCommand<TValue>
+    public abstract class Command<TValue> : ITypedCommand<TValue>, IOffsetable
         where TValue : CommandValue
     {
         public string Identifier { get; set; }
@@ -13,7 +13,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public double EndTime { get; set; }
         public TValue StartValue { get; set; }
         public TValue EndValue { get; set; }
-        public bool Enabled => true;
+        public bool Active => true;
 
         protected Command(string identifier, OsbEasing easing, double startTime, double endTime, TValue startValue, TValue endValue)
         {
@@ -23,6 +23,12 @@ namespace StorybrewCommon.Storyboarding.Commands
             EndTime = endTime;
             StartValue = startValue;
             EndValue = endValue;
+        }
+
+        public void Offset(double offset)
+        {
+            StartTime += offset;
+            EndTime += offset;
         }
 
         public TValue ValueAtTime(double time)

@@ -39,18 +39,18 @@ namespace StorybrewEditor.ScreenLayers
                     actionLabel = new Label(WidgetManager)
                     {
                         Text = "Updating",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     statusLabel = new Label(WidgetManager)
                     {
                         StyleName = "small",
                         Text = downloadUrl,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                     progressBar = new ProgressBar(WidgetManager)
                     {
                         Value = 0,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorFrom = UiAlignment.Centre,
                     },
                 },
             });

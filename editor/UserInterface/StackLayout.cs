@@ -78,7 +78,7 @@ namespace StorybrewEditor.UserInterface
 
             foreach (var child in Children)
             {
-                if (child.AnchorTarget != null || child.AnchorFrom != child.AnchorTo) continue;
+                if (child.AnchorTarget != null) continue;
 
                 var childMinSize = child.MinSize;
                 var childSize = child.PreferredSize;

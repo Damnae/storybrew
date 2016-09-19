@@ -25,6 +25,7 @@ namespace StorybrewEditor.Graphics.Text
         {
             var font = getFont(fontName, fontSize, FontStyle.Regular);
             if (string.IsNullOrEmpty(text)) text = " ";
+            if (text.EndsWith("\n")) text += " ";
 
             StringAlignment horizontalAlignment;
             switch (alignment & UiAlignment.Horizontal)
@@ -122,7 +123,7 @@ namespace StorybrewEditor.Graphics.Text
             FontFamily fontFamily;
             if (!fontFamilies.TryGetValue(resourceName, out fontFamily))
             {
-                byte[] bytes = (byte[])Resources.ResourceManager.GetObject(resourceName);
+                var bytes = (byte[])Resources.ResourceManager.GetObject(resourceName);
                 if (bytes != null)
                 {
                     GCHandle pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);

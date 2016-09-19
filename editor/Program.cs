@@ -11,6 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StorybrewEditor
 {
@@ -78,10 +79,11 @@ namespace StorybrewEditor
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
             using (var window = createWindow(displayDevice))
-            using (audioManager = new AudioManager(window.WindowInfo.Handle))
+            using (audioManager = new AudioManager(window.GetWindowHandle()))
             using (var editor = new Editor(window))
             {
-                Trace.WriteLine("graphics mode: " + window.Context.GraphicsMode);
+                Trace.WriteLine($"{Environment.OSVersion} / {window.WindowInfo}");
+                Trace.WriteLine($"graphics mode: {window.Context.GraphicsMode}");
 
                 window.Icon = new Icon(typeof(Program), "icon.ico");
                 window.Resize += (sender, e) =>
@@ -212,6 +214,19 @@ namespace StorybrewEditor
                 {
                     Trace.WriteLine($"Scheduled task {action.Method} failed (scheduling not available):\n{e}");
                 }
+        }
+
+        /// <summary>
+        /// Schedule the action to run in the main thread after a delay (in milliseconds).
+        /// Exceptions will be logged.
+        /// </summary>
+        public static void Schedule(Action action, int delay)
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(delay);
+                Schedule(action);
+            });
         }
 
         /// <summary>

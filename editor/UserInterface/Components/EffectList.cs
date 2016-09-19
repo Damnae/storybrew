@@ -210,25 +210,31 @@ namespace StorybrewEditor.UserInterface.Components
 
         private static void updateStatusButton(Button button, Effect effect)
         {
-            button.Displayed = effect.Status != EffectStatus.Ready;
             button.Disabled = string.IsNullOrWhiteSpace(effect.StatusMessage);
+            button.Displayed = effect.Status != EffectStatus.Ready || !button.Disabled;
+            button.Tooltip = effect.Status.ToString();
             switch (effect.Status)
             {
                 case EffectStatus.Loading:
                 case EffectStatus.Configuring:
                 case EffectStatus.Updating:
                     button.Icon = IconFont.Spinner;
+                    button.Disabled = true;
                     break;
                 case EffectStatus.ReloadPending:
                     button.Icon = IconFont.ChainBroken;
+                    button.Disabled = true;
                     break;
                 case EffectStatus.CompilationFailed:
                 case EffectStatus.LoadingFailed:
                 case EffectStatus.ExecutionFailed:
                     button.Icon = IconFont.Bug;
                     break;
+                case EffectStatus.Ready:
+                    button.Icon = IconFont.Leaf;
+                    button.Tooltip = "Open log";
+                    break;
             }
-            button.Tooltip = effect.Status.ToString();
         }
 
         private void createScript(string name)
@@ -279,20 +285,32 @@ namespace StorybrewEditor.UserInterface.Components
             if (solutionFolder == root)
                 solutionFolder = Path.GetDirectoryName(effect.Path);
 
-            try
+            var paths = new string[] {
+                "code",
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Microsoft VS Code\bin\code"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Microsoft VS Code\bin\code"),
+            };
+            var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
+
+            foreach (var path in paths)
             {
-                Process.Start(new ProcessStartInfo()
+                try
                 {
-                    FileName = "code",
-                    Arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r",
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                });
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        FileName = path,
+                        Arguments = arguments,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                    });
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Could not open vscode with \"{path} {arguments}\":\n{e}");
+                }
             }
-            catch
-            {
-                Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing it)",
-                    () => Process.Start("https://code.visualstudio.com/"), true);
-            }
+            Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing)",
+                () => Process.Start("https://code.visualstudio.com/"), true);
         }
     }
 }

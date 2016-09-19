@@ -55,6 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Scene3dTest.cs" />
+    <Compile Include="HitObjectHighlight.cs" />
+    <Compile Include="Lyrics.cs" />
     <Compile Include="Spectrum.cs" />
     <Compile Include="Jigoku.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

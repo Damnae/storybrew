@@ -27,8 +27,10 @@ namespace StorybrewEditor.Storyboarding
 
         public const string FileFilter = "project files (*" + Extension + ")|*" + Extension;
 
-        private string projectPath;
         private ScriptManager<StoryboardObjectGenerator> scriptManager;
+
+        private string projectPath;
+        public string ProjectFolderPath => Path.GetDirectoryName(projectPath);
 
         private string commonScriptsSourcePath;
         public string CommonScriptsPath => commonScriptsSourcePath;
@@ -93,6 +95,7 @@ namespace StorybrewEditor.Storyboarding
             var referencedAssemblies = new string[]
             {
                 "System.dll",
+                "System.Drawing.dll",
                 "OpenTK.dll",
                 Assembly.GetAssembly(typeof(Script)).Location,
             };
@@ -153,7 +156,7 @@ namespace StorybrewEditor.Storyboarding
             var effect = new ScriptedEffect(this, scriptManager.Get(effectName));
 
             effects.Add(effect);
-            effect.OnChanged += Effect_OnChanged;
+            effect.OnChanged += effect_OnChanged;
             refreshEffectsStatus();
 
             OnEffectsChanged?.Invoke(this, EventArgs.Empty);
@@ -165,9 +168,9 @@ namespace StorybrewEditor.Storyboarding
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
-            effect.Clear();
             effects.Remove(effect);
-            effect.OnChanged -= Effect_OnChanged;
+            effect.Dispose();
+
             refreshEffectsStatus();
 
             OnEffectsChanged?.Invoke(this, EventArgs.Empty);
@@ -183,7 +186,7 @@ namespace StorybrewEditor.Storyboarding
             return name;
         }
 
-        private void Effect_OnChanged(object sender, EventArgs e)
+        private void effect_OnChanged(object sender, EventArgs e)
             => refreshEffectsStatus();
 
         private void refreshEffectsStatus()
@@ -279,12 +282,28 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
+        public void SelectBeatmap(long id, string name)
+        {
+            foreach (var beatmap in MapsetManager.Beatmaps)
+                if ((id > 0 && beatmap.Id == id) || (name.Length > 0 && beatmap.Name == name))
+                {
+                    MainBeatmap = beatmap;
+                    break;
+                }
+        }
+
         private void refreshMapset()
         {
+            var previousBeatmapId = mainBeatmap?.Id ?? -1;
+            var previousBeatmapName = mainBeatmap?.Name;
+
             mainBeatmap = null;
             mapsetManager?.Dispose();
             mapsetManager = new MapsetManager(mapsetPath);
             mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
+
+            if (previousBeatmapName != null)
+                SelectBeatmap(previousBeatmapId, previousBeatmapName);
         }
 
         private void mapsetManager_OnFileChanged(object sender, FileSystemEventArgs e)
@@ -292,6 +311,8 @@ namespace StorybrewEditor.Storyboarding
             var extension = Path.GetExtension(e.Name);
             if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
                 reloadTextures();
+            else if (extension == ".osu")
+                refreshMapset();
         }
 
         #endregion
@@ -351,7 +372,7 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectPath, bool withCommonScripts)
+        public static Project Load(string projectPath, bool withCommonScripts, bool updateSolution)
         {
             var project = new Project(projectPath, withCommonScripts);
             using (var stream = new FileStream(projectPath, FileMode.Open))
@@ -369,14 +390,7 @@ namespace StorybrewEditor.Storyboarding
                 {
                     var mainBeatmapId = r.ReadInt64();
                     var mainBeatmapName = r.ReadString();
-
-                    foreach (var beatmap in project.MapsetManager.Beatmaps)
-                        if ((mainBeatmapId > 0 && beatmap.Id == mainBeatmapId) ||
-                            (mainBeatmapName.Length > 0 && beatmap.Name == mainBeatmapName))
-                        {
-                            project.MainBeatmap = beatmap;
-                            break;
-                        }
+                    project.SelectBeatmap(mainBeatmapId, mainBeatmapName);
                 }
 
                 var effectCount = r.ReadInt32();
@@ -432,6 +446,7 @@ namespace StorybrewEditor.Storyboarding
                     });
                 }
             }
+            if (updateSolution) updateSolutionFiles(Path.GetDirectoryName(projectPath));
             return project;
         }
 
@@ -456,9 +471,7 @@ namespace StorybrewEditor.Storyboarding
                 throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
-            using (var stream = new MemoryStream(Resources.projecttemplate))
-            using (var zip = new ZipArchive(stream))
-                zip.ExtractToDirectory(projectFolderPath);
+            updateSolutionFiles(projectFolderPath);
 
             var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts)
             {
@@ -469,11 +482,18 @@ namespace StorybrewEditor.Storyboarding
             return project;
         }
 
+        private static void updateSolutionFiles(string projectFolderPath)
+        {
+            using (var stream = new MemoryStream(Resources.projecttemplate))
+            using (var zip = new ZipArchive(stream))
+                zip.ExtractToDirectoryOverwrite(projectFolderPath);
+        }
+
         public static string Migrate(string projectPath, string projectFolderName)
         {
             Trace.WriteLine($"Migrating project '{projectPath}' to '{projectFolderName}'");
 
-            using (var project = Load(projectPath, false))
+            using (var project = Load(projectPath, false, false))
             using (var placeholderProject = Create(projectFolderName, project.MapsetPath, false))
             {
                 var oldProjectPath = project.projectPath;

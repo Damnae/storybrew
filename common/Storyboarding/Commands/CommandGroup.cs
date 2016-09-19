@@ -6,9 +6,11 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public abstract class CommandGroup : MarshalByRefObject, ICommand
     {
+        private bool ended;
+
         public double StartTime { get; set; }
         public virtual double EndTime { get; set; }
-        public bool Enabled => true;
+        public virtual bool Active => true;
 
         private List<ICommand> commands = new List<ICommand>();
         public IEnumerable<ICommand> Commands => commands;
@@ -19,7 +21,7 @@ namespace StorybrewCommon.Storyboarding.Commands
             {
                 var commandsStartTime = double.MaxValue;
                 foreach (ICommand command in Commands)
-                    commandsStartTime = Math.Min(commandsStartTime, command.EndTime);
+                    commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
 
                 return commandsStartTime;
             }
@@ -52,7 +54,15 @@ namespace StorybrewCommon.Storyboarding.Commands
         }
 
         public void Add(ICommand command)
-            => commands.Add(command);
+        {
+            if (ended) throw new InvalidOperationException("Cannot add commands to a group after it ended");
+            commands.Add(command);
+        }
+
+        public virtual void EndGroup()
+        {
+            ended = true;
+        }
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {

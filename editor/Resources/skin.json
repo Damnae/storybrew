@@ -35,6 +35,14 @@
 			BordersOnly: true,
 			Color: [1, 0, 1],
 		},
+		"_debug_relayout":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [0, 1, 0],
+		},
 		"blueLine":
 		{
 			_type: "NinePatch",

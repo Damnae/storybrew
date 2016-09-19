@@ -22,7 +22,7 @@ namespace StorybrewEditor.Scripting
         private string compiledScriptsPath;
         private string[] referencedAssemblies;
 
-        private TScript script;
+        private ScriptProvider<TScript> scriptProvider;
         private AppDomain appDomain;
 
         private volatile int currentVersion = 0;
@@ -31,7 +31,7 @@ namespace StorybrewEditor.Scripting
         /// <summary>
         /// Returns false when Script would return null.
         /// </summary>
-        public bool HasScript => script != null || currentVersion != targetVersion;
+        public bool HasScript => scriptProvider != null || currentVersion != targetVersion;
 
         public string Name
         {
@@ -44,20 +44,6 @@ namespace StorybrewEditor.Scripting
             }
         }
 
-        public TScript Script
-        {
-            get
-            {
-                var localTargetVersion = targetVersion;
-                if (currentVersion < localTargetVersion)
-                {
-                    currentVersion = localTargetVersion;
-                    loadScript();
-                }
-                return script;
-            }
-        }
-
         public event EventHandler OnScriptChanged;
 
         public ScriptContainer(ScriptManager<TScript> manager, string scriptTypeName, string sourcePath, string compiledScriptsPath, params string[] referencedAssemblies)
@@ -67,6 +53,19 @@ namespace StorybrewEditor.Scripting
             this.sourcePath = sourcePath;
             this.compiledScriptsPath = compiledScriptsPath;
             this.referencedAssemblies = referencedAssemblies;
+        }
+
+        public TScript CreateScript(out bool scriptChanged)
+        {
+            var localTargetVersion = targetVersion;
+            if (currentVersion < localTargetVersion)
+            {
+                currentVersion = localTargetVersion;
+                loadScript();
+                scriptChanged = true;
+            }
+            else scriptChanged = false;
+            return scriptProvider.CreateScript();
         }
 
         public void ReloadScript()
@@ -106,12 +105,6 @@ namespace StorybrewEditor.Scripting
 
                 var permissions = new PermissionSet(PermissionState.Unrestricted);
 
-                //var permissions = new PermissionSet(PermissionState.None);
-                //permissions.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
-                //permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, assemblyPath));
-
-                //var fullTrustAssembly = typeof(Script).Assembly.Evidence.GetHostEvidence<StrongName>();
-
                 Debug.Print($"{nameof(Scripting)}: Loading domain {setup.ApplicationName}");
                 var scriptDomain = AppDomain.CreateDomain(setup.ApplicationName, null, setup, permissions);
                 try
@@ -120,8 +113,9 @@ namespace StorybrewEditor.Scripting
                         typeof(ScriptProvider<TScript>).Assembly.ManifestModule.FullyQualifiedName,
                         typeof(ScriptProvider<TScript>).FullName);
                     var scriptProvider = (ScriptProvider<TScript>)scriptProviderHandle.Unwrap();
+                    scriptProvider.Initialize(assemblyPath, scriptTypeName);
 
-                    script = scriptProvider.CreateScript(assemblyPath, scriptTypeName);
+                    this.scriptProvider = scriptProvider;
                 }
                 catch
                 {
@@ -150,6 +144,7 @@ namespace StorybrewEditor.Scripting
         #region IDisposable Support
 
         private bool disposedValue = false;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -160,7 +155,7 @@ namespace StorybrewEditor.Scripting
 
                 if (appDomain != null) AppDomain.Unload(appDomain);
                 appDomain = null;
-                script = null;
+                scriptProvider = null;
 
                 disposedValue = true;
             }
@@ -176,11 +171,14 @@ namespace StorybrewEditor.Scripting
 
     public class ScriptProvider<TScript> : MarshalByRefObject
     {
-        public TScript CreateScript(string assemblyPath, string typeName)
+        private Type type;
+
+        public void Initialize(string assemblyPath, string typeName)
         {
             var assembly = Assembly.LoadFrom(assemblyPath);
-            var type = assembly.GetType(typeName, true, true);
-            return (TScript)Activator.CreateInstance(type);
+            type = assembly.GetType(typeName, true, true);
         }
+
+        public TScript CreateScript() => (TScript)Activator.CreateInstance(type);
     }
 }

@@ -20,7 +20,7 @@ namespace StorybrewEditor.Storyboarding
         public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, OsbSprite sprite)
         {
             var time = project.DisplayTime * 1000;
-            if (!sprite.IsActive(time)) return;
+            if (sprite.TexturePath == null || !sprite.IsActive(time)) return;
 
             var fade = sprite.OpacityAt(time);
             if (fade < 0.00001f) return;

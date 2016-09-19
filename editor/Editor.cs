@@ -37,7 +37,7 @@ namespace StorybrewEditor
         public Editor(GameWindow window)
         {
             this.window = window;
-            FormsWindow = new FormsWindow(window.WindowInfo.Handle);
+            FormsWindow = new FormsWindow(window.GetWindowHandle());
         }
 
         public void Initialize(ScreenLayer initialLayer = null)

@@ -33,8 +33,6 @@ namespace StorybrewEditor.UserInterface
             }
         }
         private int anchoringIteration;
-        private bool needsLayout = true;
-        public bool NeedsLayout => needsLayout;
 
         private Widget anchorTarget;
         public Widget AnchorTarget
@@ -279,7 +277,13 @@ namespace StorybrewEditor.UserInterface
         protected virtual void DrawForeground(DrawContext drawContext, float actualOpacity)
         {
             foreground?.Draw(drawContext, manager.Camera, Bounds, actualOpacity);
+
+#if DEBUG
             manager.Skin.GetDrawable("debug")?.Draw(drawContext, manager.Camera, Bounds, 1);
+
+            var relayout = Math.Max(0, (lastLayoutTime + 1) - manager.ScreenLayerManager.Editor.Time);
+            if (relayout > 0) manager.Skin.GetDrawable("debug_relayout")?.Draw(drawContext, manager.Camera, Bounds, (float)relayout);
+#endif
         }
 
         #region Styling
@@ -390,6 +394,11 @@ namespace StorybrewEditor.UserInterface
 
         #region Layout / Anchoring
 
+        private bool needsLayout = true;
+        public bool NeedsLayout => needsLayout;
+
+        private double lastLayoutTime = double.MinValue;
+
         public void Pack(float width = 0, float height = 0, float maxWidth = 0, float maxHeight = 0)
         {
             var preferredSize = PreferredSize;
@@ -401,7 +410,7 @@ namespace StorybrewEditor.UserInterface
             if (maxHeight > 0 && newSize.Y > maxHeight) newSize.Y = maxHeight;
             Size = newSize;
 
-            // Labels don't know their height until they know their width
+            // Flow layouts and labels don't know their height until they know their width
             manager.RefreshAnchors();
             if (preferredSize != PreferredSize)
                 Pack(width, height, maxWidth, maxHeight);
@@ -433,6 +442,7 @@ namespace StorybrewEditor.UserInterface
 
         protected virtual void Layout()
         {
+            lastLayoutTime = manager.ScreenLayerManager.Editor.Time;
             needsLayout = false;
         }
 
