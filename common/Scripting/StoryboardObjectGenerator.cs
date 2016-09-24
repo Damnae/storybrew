@@ -25,6 +25,8 @@ namespace StorybrewCommon.Scripting
         protected StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
 
         protected Beatmap Beatmap => context.Beatmap;
+        protected string MapsetPath => context.MapsetPath;
+        protected string ProjectPath => context.ProjectPath;
 
         public StoryboardObjectGenerator()
         {
