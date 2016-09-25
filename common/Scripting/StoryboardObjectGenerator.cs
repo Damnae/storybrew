@@ -17,6 +17,9 @@ namespace StorybrewCommon.Scripting
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
+        private string identifier = Guid.NewGuid().ToString();
+        public override string Identifier => identifier;
+
         /// <summary>
         /// Creates or retrieves a layer. 
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 

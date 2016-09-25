@@ -7,6 +7,8 @@ namespace StorybrewCommon.Scripting
     /// </summary>
     public abstract class Script : MarshalByRefObject
     {
+        public abstract string Identifier { get; }
+
         /*
         public override object InitializeLifetimeService()
         {
