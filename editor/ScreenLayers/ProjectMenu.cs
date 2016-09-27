@@ -10,10 +10,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace StorybrewEditor.ScreenLayers
-{
-    public class ProjectMenu : UiScreenLayer
-    {
+namespace StorybrewEditor.ScreenLayers {
+    public class ProjectMenu : UiScreenLayer {
         private Project project;
 
         private DrawableContainer mainStoryboardContainer;
@@ -28,7 +26,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
-        private Button timeLabel;
+        private Button timeButton;
         private Button divisorButton;
         private Button audioTimeFactorButton;
         private TimelineSlider timeline;
@@ -50,27 +48,23 @@ namespace StorybrewEditor.ScreenLayers
 
         private int snapDivisor = 4;
 
-        public ProjectMenu(Project project)
-        {
+        public ProjectMenu(Project project) {
             this.project = project;
         }
 
-        public override void Load()
-        {
+        public override void Load() {
             base.Load();
 
             audio = Program.AudioManager.LoadStream(project.AudioPath);
 
-            WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager)
-            {
+            WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager) {
                 Drawable = mainStoryboardDrawable = new StoryboardDrawable(project),
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = UiAlignment.Centre,
                 AnchorTo = UiAlignment.Centre,
             });
 
-            WidgetManager.Root.Add(bottomLeftLayout = new LinearLayout(WidgetManager)
-            {
+            WidgetManager.Root.Add(bottomLeftLayout = new LinearLayout(WidgetManager) {
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = UiAlignment.BottomLeft,
                 AnchorTo = UiAlignment.BottomLeft,
@@ -79,9 +73,9 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    timeLabel = new Button(WidgetManager)
+                    timeButton = new Button(WidgetManager)
                     {
-                        StyleName = "light",
+                        StyleName = "small",
                         AnchorFrom = UiAlignment.Centre,
                         Text = "--:--:---",
                         CanGrow = false,
@@ -127,8 +121,7 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager)
-            {
+            WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager) {
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = UiAlignment.BottomRight,
                 AnchorTo = UiAlignment.BottomRight,
@@ -178,8 +171,7 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            WidgetManager.Root.Add(effectConfigUi = new EffectConfigUi(WidgetManager)
-            {
+            WidgetManager.Root.Add(effectConfigUi = new EffectConfigUi(WidgetManager) {
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = UiAlignment.TopLeft,
                 AnchorTo = UiAlignment.TopLeft,
@@ -188,24 +180,21 @@ namespace StorybrewEditor.ScreenLayers
             });
             effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
 
-            WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
-            {
+            WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi) {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = UiAlignment.BottomRight,
                 AnchorTo = UiAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
 
-            WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager)
-            {
+            WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager) {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = UiAlignment.BottomRight,
                 AnchorTo = UiAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
 
-            WidgetManager.Root.Add(statusLayout = new LinearLayout(WidgetManager)
-            {
+            WidgetManager.Root.Add(statusLayout = new LinearLayout(WidgetManager) {
                 StyleName = "tooltip",
                 AnchorTarget = bottomLeftLayout,
                 AnchorFrom = UiAlignment.BottomLeft,
@@ -229,8 +218,7 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            WidgetManager.Root.Add(previewContainer = new DrawableContainer(WidgetManager)
-            {
+            WidgetManager.Root.Add(previewContainer = new DrawableContainer(WidgetManager) {
                 StyleName = "storyboardPreview",
                 Drawable = previewDrawable = new StoryboardDrawable(project),
                 AnchorTarget = timeline,
@@ -241,11 +229,12 @@ namespace StorybrewEditor.ScreenLayers
                 Size = new Vector2(16, 9) * 16,
             });
 
-            timeLabel.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", name => {
-                float i = 0;
-                if ( float.TryParse(name, out i) ) timeline.Value = (float) i / 1000;
+            timeButton.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", value =>
+            {
+                var time = 0.0f;
+                if (float.TryParse(value, out time)) timeline.Value = time / 1000;
             });
-        
+
             timeline.MaxValue = (float)audio.Duration;
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
@@ -292,10 +281,8 @@ namespace StorybrewEditor.ScreenLayers
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
         }
 
-        public override bool OnKeyDown(KeyboardKeyEventArgs e)
-        {
-            switch (e.Key)
-            {
+        public override bool OnKeyDown(KeyboardKeyEventArgs e) {
+            switch (e.Key) {
                 case Key.Right:
                     timeline.Scroll(1);
                     return true;
@@ -304,23 +291,19 @@ namespace StorybrewEditor.ScreenLayers
                     return true;
             }
 
-            if (!e.IsRepeat)
-            {
-                switch (e.Key)
-                {
+            if (!e.IsRepeat) {
+                switch (e.Key) {
                     case Key.Space:
                         playPauseButton.Click();
                         return true;
                     case Key.S:
-                        if (e.Control)
-                        {
+                        if (e.Control) {
                             saveProject();
                             return true;
                         }
                         break;
                     case Key.C:
-                        if (e.Control)
-                        {
+                        if (e.Control) {
                             System.Windows.Forms.Clipboard.SetText(Math.Round(audio.Time * 1000).ToString());
                             return true;
                         }
@@ -330,8 +313,7 @@ namespace StorybrewEditor.ScreenLayers
             return base.OnKeyDown(e);
         }
 
-        public override bool OnMouseWheel(MouseWheelEventArgs e)
-        {
+        public override bool OnMouseWheel(MouseWheelEventArgs e) {
             timeline.Scroll(-e.DeltaPrecise);
             return true;
         }
@@ -342,8 +324,7 @@ namespace StorybrewEditor.ScreenLayers
         private void exportProject()
             => Manager.AsyncLoading("Exporting...", () => project.ExportToOsb());
 
-        public override void Update(bool isTop, bool isCovered)
-        {
+        public override void Update(bool isTop, bool isCovered) {
             base.Update(isTop, isCovered);
 
             playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
@@ -352,15 +333,14 @@ namespace StorybrewEditor.ScreenLayers
             var time = (float)audio.Time;
             timeline.SetValueSilent(time);
             if (Manager.Editor.IsFixedRateUpdate)
-                timeLabel.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
+                timeButton.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
             mainStoryboardDrawable.Time = time;
             if (previewContainer.Visible)
                 previewDrawable.Time = timeline.GetValueForPosition(Manager.Editor.InputManager.MousePosition);
         }
 
-        public override void Resize(int width, int height)
-        {
+        public override void Resize(int width, int height) {
             base.Resize(width, height);
 
             bottomLeftLayout.Pack(650);
@@ -374,11 +354,9 @@ namespace StorybrewEditor.ScreenLayers
             resizeStoryboard();
         }
 
-        private void resizeStoryboard()
-        {
+        private void resizeStoryboard() {
             var parentSize = WidgetManager.Size;
-            if (effectConfigUi.Displayed)
-            {
+            if (effectConfigUi.Displayed) {
                 mainStoryboardContainer.Offset = new Vector2(effectConfigUi.Bounds.Right / 2, 0);
                 parentSize.X -= effectConfigUi.Bounds.Right;
             }
@@ -386,8 +364,7 @@ namespace StorybrewEditor.ScreenLayers
             mainStoryboardContainer.Size = fitButton.Checked ? new Vector2(parentSize.X, (parentSize.X * 9) / 16) : parentSize;
         }
 
-        public override void Close()
-        {
+        public override void Close() {
             Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving...", () =>
             {
                 project.Save();
@@ -396,10 +373,8 @@ namespace StorybrewEditor.ScreenLayers
             () => Manager.Editor.Restart(), true);
         }
 
-        private void project_OnEffectsStatusChanged(object sender, EventArgs e)
-        {
-            switch (project.EffectsStatus)
-            {
+        private void project_OnEffectsStatusChanged(object sender, EventArgs e) {
+            switch (project.EffectsStatus) {
                 case EffectStatus.ExecutionFailed:
                     statusIcon.Icon = IconFont.Bug;
                     statusMessage.Text = "An effect failed to execute.\nClick the Effects tabs, then the bug icon to see its error message.";
@@ -421,13 +396,10 @@ namespace StorybrewEditor.ScreenLayers
         #region IDisposable Support
 
         private bool disposedValue = false;
-        protected override void Dispose(bool disposing)
-        {
+        protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
+            if (!disposedValue) {
+                if (disposing) {
                     project.OnEffectsStatusChanged -= project_OnEffectsStatusChanged;
                     project.Dispose();
                     audio.Dispose();
