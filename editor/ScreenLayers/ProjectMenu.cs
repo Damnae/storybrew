@@ -28,7 +28,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
-        private Label timeLabel;
+        private Button timeLabel;
         private Button divisorButton;
         private Button audioTimeFactorButton;
         private TimelineSlider timeline;
@@ -79,7 +79,7 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    timeLabel = new Label(WidgetManager)
+                    timeLabel = new Button(WidgetManager)
                     {
                         StyleName = "light",
                         AnchorFrom = UiAlignment.Centre,
@@ -241,6 +241,11 @@ namespace StorybrewEditor.ScreenLayers
                 Size = new Vector2(16, 9) * 16,
             });
 
+            timeLabel.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", name => {
+                float i = 0;
+                if ( float.TryParse(name, out i) ) timeline.Value = (float) i / 1000;
+            });
+        
             timeline.MaxValue = (float)audio.Duration;
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
