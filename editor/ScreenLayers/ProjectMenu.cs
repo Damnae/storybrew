@@ -28,7 +28,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
-        private Label timeLabel;
+        private Button timeButton;
         private Button divisorButton;
         private Button audioTimeFactorButton;
         private TimelineSlider timeline;
@@ -79,9 +79,9 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    timeLabel = new Label(WidgetManager)
+                    timeButton = new Button(WidgetManager)
                     {
-                        StyleName = "light",
+                        StyleName = "small",
                         AnchorFrom = UiAlignment.Centre,
                         Text = "--:--:---",
                         CanGrow = false,
@@ -241,6 +241,12 @@ namespace StorybrewEditor.ScreenLayers
                 Size = new Vector2(16, 9) * 16,
             });
 
+            timeButton.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", value =>
+            {
+                var time = 0.0f;
+                if (float.TryParse(value, out time)) timeline.Value = time / 1000;
+            });
+
             timeline.MaxValue = (float)audio.Duration;
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
@@ -347,7 +353,7 @@ namespace StorybrewEditor.ScreenLayers
             var time = (float)audio.Time;
             timeline.SetValueSilent(time);
             if (Manager.Editor.IsFixedRateUpdate)
-                timeLabel.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
+                timeButton.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
             mainStoryboardDrawable.Time = time;
             if (previewContainer.Visible)
