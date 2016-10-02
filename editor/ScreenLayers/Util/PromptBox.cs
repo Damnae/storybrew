@@ -83,6 +83,8 @@ namespace StorybrewEditor.ScreenLayers.Util
                 action?.Invoke(textbox.Value);
             };
             cancelButton.OnClick += (sender, e) => Exit();
+
+            WidgetManager.KeyboardFocus = textbox;
         }
 
         public override void Resize(int width, int height)
