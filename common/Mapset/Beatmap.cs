@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace StorybrewCommon.Mapset
@@ -34,6 +35,8 @@ namespace StorybrewCommon.Mapset
         /// Returns all timing points (red lines).
         /// </summary>
         public abstract IEnumerable<ControlPoint> TimingPoints { get; }
+
+        public abstract IEnumerable<Color4> ComboColors { get; }
 
         /// <summary>
         /// Finds the control point (red or green line) active at a specific time.

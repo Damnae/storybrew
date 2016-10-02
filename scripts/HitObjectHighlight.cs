@@ -34,8 +34,9 @@ namespace StorybrewScripts
 
                 var hSprite = hitobjectLayer.CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position);
                 hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeTime, SpriteScale, SpriteScale * 0.2);
-                hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeTime, SpriteScale, 0);
+                hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeTime, 1, 0);
                 hSprite.Additive(hitobject.StartTime, hitobject.EndTime + FadeTime);
+                hSprite.Color(hitobject.StartTime, hitobject.Color);
 
                 if (hitobject is OsuSlider)
                 {
