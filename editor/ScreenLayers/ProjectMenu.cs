@@ -304,7 +304,7 @@ namespace StorybrewEditor.ScreenLayers
                         var nextBookmark = project.MainBeatmap.Bookmarks.FirstOrDefault(bookmark => bookmark > Math.Round(timeline.Value * 1000) + 50);
                         if (nextBookmark != 0) timeline.Value = nextBookmark * 0.001f;
                     }
-                    else timeline.Scroll(1);
+                    else timeline.Scroll(e.Shift ? 4 : 1);
                     return true;
                 case Key.Left:
                     if (e.Control)
@@ -312,7 +312,7 @@ namespace StorybrewEditor.ScreenLayers
                         var prevBookmark = project.MainBeatmap.Bookmarks.LastOrDefault(bookmark => bookmark < Math.Round(timeline.Value * 1000) - 500);
                         if (prevBookmark != 0) timeline.Value = prevBookmark * 0.001f;
                     }
-                    else timeline.Scroll(-1);
+                    else timeline.Scroll(e.Shift ? -4 : -1);
                     return true;
             }
 
