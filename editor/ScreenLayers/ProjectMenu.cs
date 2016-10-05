@@ -310,7 +310,7 @@ namespace StorybrewEditor.ScreenLayers
                     if (e.Control)
                     {
                         int prevBookmark = project.MainBeatmap.Bookmarks.LastOrDefault<int>(bookmark => (bookmark < Math.Round(timeline.Value * 1000) - 500));
-                        timeline.Value = (float)prevBookmark * 0.001f;
+                        if (prevBookmark != 0) timeline.Value = (float)prevBookmark * 0.001f;
                     }
                     else timeline.Scroll(-1);
                     return true;
