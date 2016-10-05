@@ -301,16 +301,16 @@ namespace StorybrewEditor.ScreenLayers
                 case Key.Right:
                     if (e.Control)
                     {
-                        int nextBookmark = project.MainBeatmap.Bookmarks.FirstOrDefault<int>(bookmark => (bookmark > Math.Round(timeline.Value * 1000)));
-                        if (nextBookmark != 0) timeline.Value = (float)nextBookmark * 0.001f;
+                        var nextBookmark = project.MainBeatmap.Bookmarks.FirstOrDefault(bookmark => bookmark > Math.Round(timeline.Value * 1000) + 50);
+                        if (nextBookmark != 0) timeline.Value = nextBookmark * 0.001f;
                     }
                     else timeline.Scroll(1);
                     return true;
                 case Key.Left:
                     if (e.Control)
                     {
-                        int prevBookmark = project.MainBeatmap.Bookmarks.LastOrDefault<int>(bookmark => (bookmark < Math.Round(timeline.Value * 1000) - 500));
-                        if (prevBookmark != 0) timeline.Value = (float)prevBookmark * 0.001f;
+                        var prevBookmark = project.MainBeatmap.Bookmarks.LastOrDefault(bookmark => bookmark < Math.Round(timeline.Value * 1000) - 500);
+                        if (prevBookmark != 0) timeline.Value = prevBookmark * 0.001f;
                     }
                     else timeline.Scroll(-1);
                     return true;
