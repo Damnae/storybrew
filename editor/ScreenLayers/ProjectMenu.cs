@@ -9,6 +9,7 @@ using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -298,10 +299,20 @@ namespace StorybrewEditor.ScreenLayers
             switch (e.Key)
             {
                 case Key.Right:
-                    timeline.Scroll(1);
+                    if (e.Control)
+                    {
+                        int nextBookmark = project.MainBeatmap.Bookmarks.FirstOrDefault<int>(bookmark => (bookmark > Math.Round(timeline.Value * 1000)));
+                        if (nextBookmark != 0) timeline.Value = (float)nextBookmark * 0.001f;
+                    }
+                    else timeline.Scroll(1);
                     return true;
                 case Key.Left:
-                    timeline.Scroll(-1);
+                    if (e.Control)
+                    {
+                        int prevBookmark = project.MainBeatmap.Bookmarks.LastOrDefault<int>(bookmark => (bookmark < Math.Round(timeline.Value * 1000) - 500));
+                        if (prevBookmark != 0) timeline.Value = (float)prevBookmark * 0.001f;
+                    }
+                    else timeline.Scroll(-1);
                     return true;
             }
 
