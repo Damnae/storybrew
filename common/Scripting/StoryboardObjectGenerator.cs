@@ -17,6 +17,9 @@ namespace StorybrewCommon.Scripting
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
+        private string identifier = Guid.NewGuid().ToString();
+        public override string Identifier => identifier;
+
         /// <summary>
         /// Creates or retrieves a layer. 
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
@@ -25,6 +28,8 @@ namespace StorybrewCommon.Scripting
         protected StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
 
         protected Beatmap Beatmap => context.Beatmap;
+        protected string MapsetPath => context.MapsetPath;
+        protected string ProjectPath => context.ProjectPath;
 
         public StoryboardObjectGenerator()
         {

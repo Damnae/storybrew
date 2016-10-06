@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics;
 using System;
 using System.Globalization;
 
@@ -28,10 +29,17 @@ namespace StorybrewCommon.Mapset
         public float Volume;
         public string SamplePath;
 
+        public int ComboIndex = 1;
+        public int ColorIndex = 0;
+        public Color4 Color = Color4.White;
+
+        public bool NewCombo => (Flags & HitObjectFlag.NewCombo) > 0;
+        public int ComboOffset => ((int)Flags >> 4) & 7;
+
         public virtual Vector2 PlayfieldPositionAtTime(double time) => PlayfieldPosition;
         public Vector2 PositionAtTime(double time) => PlayfieldPositionAtTime(time) + PlayfieldToStoryboardOffset;
 
-        public override string ToString() 
+        public override string ToString()
             => $"{(int)StartTime}, {Flags}";
 
         public static OsuHitObject Parse(Beatmap beatmap, string line)

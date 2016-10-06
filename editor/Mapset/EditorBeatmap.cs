@@ -1,4 +1,5 @@
-﻿using StorybrewCommon.Mapset;
+﻿using OpenTK.Graphics;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,9 @@ namespace StorybrewEditor.Mapset
 
         private List<OsuHitObject> hitObjects = new List<OsuHitObject>();
         public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
+
+        private List<Color4> comboColors = new List<Color4>();
+        public override IEnumerable<Color4> ComboColors => comboColors;
 
         public EditorBeatmap(string path)
         {
@@ -95,8 +99,9 @@ namespace StorybrewEditor.Mapset
                             case "Editor": parseEditorSection(beatmap, reader); break;
                             case "Metadata": parseMetadataSection(beatmap, reader); break;
                             case "Difficulty": parseDifficultySection(beatmap, reader); break;
-                            case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
                             case "Events": parseEventsSection(beatmap, reader); break;
+                            case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
+                            case "Colours": parseColoursSection(beatmap, reader); break;
                             case "HitObjects": parseHitObjectsSection(beatmap, reader); break;
                         }
                     }
@@ -159,15 +164,42 @@ namespace StorybrewEditor.Mapset
             }
             beatmap.controlPoints.Sort();
         }
+        private static void parseColoursSection(EditorBeatmap beatmap, StreamReader reader)
+        {
+            reader.ParseKeyValueSection((key, value) =>
+            {
+                var rgb = value.Split(',');
+                beatmap.comboColors.Add(new Color4(byte.Parse(rgb[0]), byte.Parse(rgb[1]), byte.Parse(rgb[2]), 255));
+            });
+        }
         private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader) { }
         private static void parseHitObjectsSection(EditorBeatmap beatmap, StreamReader reader)
         {
+            OsuHitObject previousHitObject = null;
+            var colorIndex = 0;
+            var comboIndex = 0;
+            
             string line;
             while ((line = reader.ReadLine()) != null)
             {
                 line = line.Trim();
                 if (line.Length == 0) break;
-                beatmap.hitObjects.Add(OsuHitObject.Parse(beatmap, line));
+
+                var hitobject = OsuHitObject.Parse(beatmap, line);
+                if (hitobject.NewCombo || previousHitObject == null || (previousHitObject.Flags & HitObjectFlag.Spinner) > 0)
+                {
+                    hitobject.Flags |= HitObjectFlag.NewCombo;
+                    colorIndex = (colorIndex + 1 + hitobject.ComboOffset) % beatmap.comboColors.Count;
+                    comboIndex = 1;
+                }
+                else comboIndex++;
+
+                hitobject.ComboIndex = comboIndex;
+                hitobject.ColorIndex = colorIndex;
+                hitobject.Color = beatmap.comboColors[colorIndex];
+
+                beatmap.hitObjects.Add(hitobject);
+                previousHitObject = hitobject;
             }
         }
 

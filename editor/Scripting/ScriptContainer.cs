@@ -55,16 +55,14 @@ namespace StorybrewEditor.Scripting
             this.referencedAssemblies = referencedAssemblies;
         }
 
-        public TScript CreateScript(out bool scriptChanged)
+        public TScript CreateScript()
         {
             var localTargetVersion = targetVersion;
             if (currentVersion < localTargetVersion)
             {
                 currentVersion = localTargetVersion;
                 loadScript();
-                scriptChanged = true;
             }
-            else scriptChanged = false;
             return scriptProvider.CreateScript();
         }
 

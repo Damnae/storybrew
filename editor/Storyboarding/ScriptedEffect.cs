@@ -14,6 +14,7 @@ namespace StorybrewEditor.Storyboarding
         private List<EditorStoryboardLayer> layers;
         private EditorStoryboardLayer placeHolderLayer;
         private Stopwatch statusStopwatch = new Stopwatch();
+        private string configScriptIdentifier;
 
         private string name;
         public override string Name
@@ -88,15 +89,16 @@ namespace StorybrewEditor.Storyboarding
             try
             {
                 changeStatus(EffectStatus.Loading);
-                bool scriptChanged;
-                var script = scriptContainer.CreateScript(out scriptChanged);
+                var script = scriptContainer.CreateScript();
 
                 changeStatus(EffectStatus.Configuring);
                 Program.RunMainThread(() =>
                 {
-                    if (scriptChanged)
+                    if (script.Identifier != configScriptIdentifier)
                     {
                         script.UpdateConfiguration(Config);
+                        configScriptIdentifier = script.Identifier;
+
                         RaiseConfigFieldsChanged();
                     }
                     else script.ApplyConfiguration(Config);

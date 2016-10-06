@@ -140,36 +140,10 @@ namespace StorybrewEditor.Graphics.Textures
             try
             {
                 DrawState.BindTexture(textureId);
-                OpenTK.Graphics.OpenGL.PixelInternalFormat pixelInternalFormat;
-                OpenTK.Graphics.OpenGL.PixelFormat pixelFormat;
-                OpenTK.Graphics.OpenGL.PixelType pixelType;
 
-                switch (bitmap.PixelFormat)
-                {
-                    case System.Drawing.Imaging.PixelFormat.Format16bppArgb1555:
-                    case System.Drawing.Imaging.PixelFormat.Format16bppRgb555:
-                        pixelInternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgb5A1;
-                        pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgr;
-                        pixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedShort5551Ext;
-                        break;
-                    case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
-                        pixelInternalFormat = sRgb ? OpenTK.Graphics.OpenGL.PixelInternalFormat.Srgb8 : OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgb8;
-                        pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgr;
-                        pixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedByte;
-                        break;
-                    case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
-                    case System.Drawing.Imaging.PixelFormat.Canonical:
-                    case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
-                        pixelInternalFormat = sRgb ? OpenTK.Graphics.OpenGL.PixelInternalFormat.SrgbAlpha : OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgba;
-                        pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
-                        pixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedByte;
-                        break;
-                    default:
-                        throw new Exception("Unsupported pixel format: " + bitmap.PixelFormat);
-                }
+                var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat, bitmapData.Width, bitmapData.Height, 0, pixelFormat, pixelType, bitmapData.Scan0);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, sRgb ? PixelInternalFormat.SrgbAlpha : PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
                 GL.Finish();
                 bitmap.UnlockBits(bitmapData);
 

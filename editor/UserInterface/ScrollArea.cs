@@ -9,6 +9,9 @@ namespace StorybrewEditor.UserInterface
         public override Vector2 MinSize => Vector2.Zero;
         public override Vector2 PreferredSize => scrollContainer.PreferredSize;
 
+        public bool ScrollsVertically = true;
+        public bool ScrollsHorizontally = true;
+
         private StackLayout scrollContainer;
         private bool dragged;
 
@@ -41,7 +44,10 @@ namespace StorybrewEditor.UserInterface
             };
             OnMouseWheel += (sender, e) =>
             {
-                scroll(0, e.DeltaPrecise * 64);
+                if (ScrollsVertically)
+                    scroll(0, e.DeltaPrecise * 64);
+                else if (ScrollsHorizontally)
+                    scroll(e.DeltaPrecise * 64, 0);
                 return true;
             };
         }
@@ -49,12 +55,17 @@ namespace StorybrewEditor.UserInterface
         protected override void Layout()
         {
             base.Layout();
-            scrollContainer.Size = new Vector2(Math.Max(Size.X, scrollContainer.PreferredSize.X), scrollContainer.PreferredSize.Y);
+            var width = ScrollsHorizontally ? Math.Max(Size.X, scrollContainer.PreferredSize.X) : Size.X;
+            var height = ScrollsVertically ? Math.Max(Size.Y, scrollContainer.PreferredSize.Y) : Size.Y;
+            scrollContainer.Size = new Vector2(width, height);
             scroll(0, 0);
         }
 
         private void scroll(float x, float y)
         {
+            if (!ScrollsHorizontally) x = 0;
+            if (!ScrollsVertically) y = 0;
+
             var scrollableX = Math.Max(0, scrollContainer.Width - Width);
             var scrollableY = Math.Max(0, scrollContainer.Height - Height);
             scrollContainer.Offset = new Vector2(

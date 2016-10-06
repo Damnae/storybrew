@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.IO;
 
 namespace StorybrewEditor.Util
@@ -20,11 +21,21 @@ namespace StorybrewEditor.Util
         }
 
         public static string GetOsuFolder()
-            => Path.GetDirectoryName(GetOsuPath());
+        {
+            var osuPath = GetOsuPath();
+            if (osuPath.Length == 0)
+                return Path.GetPathRoot(Environment.SystemDirectory);
+
+            return Path.GetDirectoryName(osuPath);
+        }
 
         public static string GetOsuSongFolder()
         {
-            var osuFolder = Path.GetDirectoryName(GetOsuPath());
+            var osuPath = GetOsuPath();
+            if (osuPath.Length == 0)
+                return Path.GetPathRoot(Environment.SystemDirectory);
+
+            var osuFolder = Path.GetDirectoryName(osuPath);
             var songsFolder = Path.Combine(osuFolder, "Songs");
             return Directory.Exists(songsFolder) ? songsFolder : osuFolder;
         }
