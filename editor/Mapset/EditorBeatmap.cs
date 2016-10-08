@@ -150,13 +150,7 @@ namespace StorybrewEditor.Mapset
         }
         private static void parseTimingPointsSection(EditorBeatmap beatmap, StreamReader reader)
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                line = line.Trim();
-                if (line.Length == 0) break;
-                beatmap.controlPoints.Add(ControlPoint.Parse(line));
-            }
+            reader.ParseSectionLines(line => beatmap.controlPoints.Add(ControlPoint.Parse(line)));
             beatmap.controlPoints.Sort();
         }
         private static void parseColoursSection(EditorBeatmap beatmap, StreamReader reader)
@@ -174,12 +168,8 @@ namespace StorybrewEditor.Mapset
             var colorIndex = 0;
             var comboIndex = 0;
 
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            reader.ParseSectionLines(line =>
             {
-                line = line.Trim();
-                if (line.Length == 0) break;
-
                 var hitobject = OsuHitObject.Parse(beatmap, line);
                 if (hitobject.NewCombo || previousHitObject == null || (previousHitObject.Flags & HitObjectFlag.Spinner) > 0)
                 {
@@ -195,7 +185,7 @@ namespace StorybrewEditor.Mapset
 
                 beatmap.hitObjects.Add(hitobject);
                 previousHitObject = hitobject;
-            }
+            });
         }
 
         #endregion
