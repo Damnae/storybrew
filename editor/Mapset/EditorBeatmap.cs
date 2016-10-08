@@ -84,28 +84,23 @@ namespace StorybrewEditor.Mapset
             Trace.WriteLine($"Loading beatmap {path}");
             var beatmap = new EditorBeatmap(path);
 
-            string line;
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                while ((line = reader.ReadLine()) != null)
+                reader.ParseSections(sectionName =>
                 {
-                    line = line.Trim();
-                    if (line.StartsWith("[") && line.EndsWith("]"))
+                    switch (sectionName)
                     {
-                        var sectionName = line.Substring(1, line.Length - 2);
-                        switch (sectionName)
-                        {
-                            case "General": parseGeneralSection(beatmap, reader); break;
-                            case "Editor": parseEditorSection(beatmap, reader); break;
-                            case "Metadata": parseMetadataSection(beatmap, reader); break;
-                            case "Difficulty": parseDifficultySection(beatmap, reader); break;
-                            case "Events": parseEventsSection(beatmap, reader); break;
-                            case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
-                            case "Colours": parseColoursSection(beatmap, reader); break;
-                            case "HitObjects": parseHitObjectsSection(beatmap, reader); break;
-                        }
+                        case "General": parseGeneralSection(beatmap, reader); break;
+                        case "Editor": parseEditorSection(beatmap, reader); break;
+                        case "Metadata": parseMetadataSection(beatmap, reader); break;
+                        case "Difficulty": parseDifficultySection(beatmap, reader); break;
+                        case "Events": parseEventsSection(beatmap, reader); break;
+                        case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
+                        case "Colours": parseColoursSection(beatmap, reader); break;
+                        case "HitObjects": parseHitObjectsSection(beatmap, reader); break;
                     }
-                }
+                });
+
             return beatmap;
         }
 
@@ -178,7 +173,7 @@ namespace StorybrewEditor.Mapset
             OsuHitObject previousHitObject = null;
             var colorIndex = 0;
             var comboIndex = 0;
-            
+
             string line;
             while ((line = reader.ReadLine()) != null)
             {

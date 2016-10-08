@@ -77,6 +77,7 @@
     <Compile Include="Subtitles\FontGenerator.cs" />
     <Compile Include="Subtitles\FontOutline.cs" />
     <Compile Include="Subtitles\FontShadow.cs" />
+    <Compile Include="Subtitles\AssParser.cs" />
     <Compile Include="Subtitles\SrtParser.cs" />
     <Compile Include="Subtitles\SubtitleLine.cs" />
     <Compile Include="Mapset\ControlPoint.cs" />

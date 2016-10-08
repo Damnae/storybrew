@@ -5,6 +5,20 @@ namespace StorybrewCommon.Util
 {
     public static class StreamReaderExtensions
     {
+        public static void ParseSections(this StreamReader reader, Action<string> action)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                line = line.Trim();
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    var sectionName = line.Substring(1, line.Length - 2);
+                    action(sectionName);
+                }
+            }
+        }
+
         /// <summary>
         /// Calls the action with key and value, until it finds a blank line or the end of the file.
         /// </summary>

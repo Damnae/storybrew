@@ -160,11 +160,20 @@ namespace StorybrewCommon.Scripting
         #region Subtitles
 
         private SrtParser srtParser = new SrtParser();
+        private AssParser assParser = new AssParser();
+
         public SubtitleSet LoadSubtitles(string path)
         {
             path = Path.Combine(context.ProjectPath, path);
             context.AddDependency(path);
-            return srtParser.Parse(path);
+
+            switch (Path.GetExtension(path))
+            {
+                case ".srt": return srtParser.Parse(path);
+                case ".ssa":
+                case ".ass": return assParser.Parse(path);
+            }
+            throw new NotSupportedException($"{Path.GetExtension(path)} isn't a supported subtitle format");
         }
 
         public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
