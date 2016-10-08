@@ -1,32 +1,18 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System.Drawing;
 
 namespace StorybrewEditor.Graphics.Drawables
 {
-    public class TextDrawable : Drawable
+    public abstract class TextDrawable : Drawable
     {
-        private Texture2d texture;
-        private Vector2 textureMaxSize;
-        private float textureScaling = 1;
-        private Vector2 measuredSize;
-        private bool textureMeasured;
-
         public Vector2 MinSize => Size;
         public Vector2 PreferredSize => Size;
 
-        public Vector2 Size
-        {
-            get
-            {
-                validateMeasuredSize();
-                return measuredSize;
-            }
-        }
+        public abstract Vector2 Size { get; }
 
         private string text = string.Empty;
         public string Text
@@ -36,7 +22,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (text == value) return;
                 text = value;
-                invalidateTexture();
+                InvalidateTexture();
             }
         }
 
@@ -50,7 +36,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (fontName == value) return;
                 fontName = value;
-                invalidateTexture();
+                InvalidateTexture();
             }
         }
 
@@ -62,7 +48,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (fontSize == value) return;
                 fontSize = value;
-                invalidateTexture();
+                InvalidateTexture();
             }
         }
 
@@ -77,7 +63,7 @@ namespace StorybrewEditor.Graphics.Drawables
 
                 // Since the max size is likely to go back to the value used at the previous draw call,
                 // the texture isn't invalidated now, but right before drawing.
-                invalidateMeasuredSize();
+                InvalidateMeasuredSize();
             }
         }
 
@@ -89,7 +75,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (scaling == value) return;
                 scaling = value;
-                invalidateMeasuredSize();
+                InvalidateMeasuredSize();
             }
         }
 
@@ -101,7 +87,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (alignment == value) return;
                 alignment = value;
-                invalidateTexture();
+                InvalidateTexture();
             }
         }
 
@@ -113,7 +99,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (trimming == value) return;
                 trimming = value;
-                invalidateTexture();
+                InvalidateTexture();
             }
         }
 
@@ -122,45 +108,19 @@ namespace StorybrewEditor.Graphics.Drawables
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
-            if (textureMaxSize != maxSize || textureScaling != scaling) invalidateTexture();
-            validateTexture();
-
-            DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates)
-                .Draw(texture, bounds.Left, bounds.Top, 0, 0, 1 / scaling, 1 / scaling, 0, Color.WithOpacity(opacity));
+            if (TextureMaxSize != maxSize || TextureScaling != scaling) InvalidateTexture();
+            ValidateTexture();
+            DrawText(drawContext, camera, bounds, opacity);
         }
 
-        private void validateMeasuredSize()
-        {
-            if (textureMeasured) return;
-            textureMeasured = true;
+        protected abstract Vector2 TextureMaxSize { get; }
+        protected abstract float TextureScaling { get; }
 
-            DrawState.FontManager.CreateBitmap(text, fontName, fontSize * scaling, maxSize * scaling, Vector2.Zero, alignment, trimming, out measuredSize, true);
-            measuredSize /= scaling;
-        }
-
-        private void invalidateMeasuredSize()
-        {
-            textureMeasured = false;
-        }
-
-        private void validateTexture()
-        {
-            if (texture != null) return;
-            textureMeasured = true;
-            textureMaxSize = maxSize;
-            textureScaling = scaling;
-
-            texture = DrawState.FontManager.CreateTexture(text, fontName, fontSize * scaling, maxSize * scaling, Vector2.Zero, alignment, trimming, out measuredSize);
-            measuredSize /= scaling;
-        }
-
-        private void invalidateTexture()
-        {
-            texture?.Dispose();
-            texture = null;
-            textureMaxSize = Vector2.Zero;
-            invalidateMeasuredSize();
-        }
+        protected abstract void DrawText(DrawContext drawContext, Camera camera, Box2 bounds, float opacity);
+        protected abstract void ValidateMeasuredSize();
+        protected abstract void InvalidateMeasuredSize();
+        protected abstract void ValidateTexture();
+        protected abstract void InvalidateTexture();
 
         #region IDisposable Support
 
@@ -171,9 +131,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (disposing)
                 {
-                    texture?.Dispose();
                 }
-                texture = null;
                 disposedValue = true;
             }
         }

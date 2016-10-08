@@ -81,7 +81,7 @@ namespace StorybrewEditor.UserInterface.Components
                         FitChildren = true,
                     })
                     {
-                        //ScrollsHorizontally = false,
+                        ScrollsHorizontally = false,
                     },
                 },
             });

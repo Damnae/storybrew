@@ -14,6 +14,9 @@ namespace StorybrewEditor.Graphics.Text
 {
     public class FontManager : IDisposable
     {
+        private const bool debugFont = false;
+        private static int debugSeed = 0;
+
         private SolidBrush textBrush = new SolidBrush(Color.FromArgb(255, 255, 255, 255));
         private SolidBrush shadowBrush = new SolidBrush(Color.FromArgb(220, 0, 0, 0));
         private Dictionary<string, Font> fonts = new Dictionary<string, Font>();
@@ -71,8 +74,11 @@ namespace StorybrewEditor.Graphics.Text
                         textGraphics.SmoothingMode = SmoothingMode.HighQuality;
                         textGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-                        //var r = new Random();
-                        //textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
+                        if (debugFont)
+                        {
+                            var r = new Random(debugSeed++);
+                            textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
+                        }
 
                         textGraphics.DrawString(text, font, shadowBrush, new RectangleF(offsetX + 1, offsetY + 1, width, height), stringFormat);
                         textGraphics.DrawString(text, font, textBrush, new RectangleF(offsetX, offsetY, width, height), stringFormat);

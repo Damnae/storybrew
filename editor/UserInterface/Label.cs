@@ -9,7 +9,7 @@ namespace StorybrewEditor.UserInterface
 {
     public class Label : Widget
     {
-        private TextDrawable textDrawable = new TextDrawable();
+        private TextDrawable textDrawable;
 
         public override Vector2 MinSize => new Vector2(0, PreferredSize.Y);
         public override Vector2 PreferredSize => textDrawable.Size;
@@ -38,8 +38,13 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        public Label(WidgetManager manager) : base(manager)
+        public Label(WidgetManager manager) : this(manager, new TextSingleDrawable())
         {
+        }
+
+        public Label(WidgetManager manager, TextDrawable textDrawable) : base(manager)
+        {
+            this.textDrawable = textDrawable;
         }
 
         protected override void Dispose(bool disposing)

@@ -89,7 +89,10 @@
     <Compile Include="Graphics\Drawables\NullDrawable.cs" />
     <Compile Include="Graphics\Drawables\Sprite.cs" />
     <Compile Include="Graphics\Drawables\TextDrawable.cs" />
+    <Compile Include="Graphics\Drawables\TextMultiDrawable.cs" />
+    <Compile Include="Graphics\Drawables\TextSingleDrawable.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
+    <Compile Include="Graphics\Text\TextFont.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
     <Compile Include="Editor.cs" />

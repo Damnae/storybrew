@@ -80,7 +80,7 @@ namespace StorybrewEditor.UserInterface
                 ScaleMode = ScaleMode.Fill,
             };
 
-            Add(content = new Label(manager)
+            Add(content = new Label(manager, new TextMultiDrawable())
             {
                 AnchorFrom = UiAlignment.BottomLeft,
                 AnchorTo = UiAlignment.BottomLeft,
