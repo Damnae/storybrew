@@ -92,6 +92,9 @@
     <Compile Include="Graphics\Drawables\TextMultiDrawable.cs" />
     <Compile Include="Graphics\Drawables\TextSingleDrawable.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
+    <Compile Include="Graphics\Textures\TextureMultiAtlas2d.cs" />
+    <Compile Include="Graphics\Textures\TextureAtlas2d.cs" />
+    <Compile Include="Graphics\Textures\Texture2dSlice.cs" />
     <Compile Include="Graphics\Text\TextFontProxy.cs" />
     <Compile Include="Graphics\Text\TextFontManager.cs" />
     <Compile Include="Graphics\Text\TextFont.cs" />
@@ -134,7 +137,6 @@
     <Compile Include="Graphics\Shader.cs" />
     <Compile Include="Graphics\Textures\Texture.cs" />
     <Compile Include="Graphics\Textures\Texture2d.cs" />
-    <Compile Include="Graphics\Textures\Texture3d.cs" />
     <Compile Include="Graphics\Textures\TextureContainer.cs" />
     <Compile Include="Graphics\Textures\TextureContainerSeparate.cs" />
     <Compile Include="Graphics\Text\FontManager.cs" />

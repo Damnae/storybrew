@@ -10,7 +10,7 @@ using System.IO;
 
 namespace StorybrewEditor.Graphics.Textures
 {
-    public class Texture2d : Texture, IDisposable
+    public class Texture2d : Texture
     {
         private readonly int textureId;
         public int TextureId
@@ -22,23 +22,50 @@ namespace StorybrewEditor.Graphics.Textures
                 return textureId;
             }
         }
-        public TexturingModes TexturingMode => TexturingModes.Texturing2d;
 
-        public readonly int Width, Height;
-        public Vector2 Size => new Vector2(Width, Height);
+        public TexturingModes TexturingMode => TexturingModes.Texturing2d;
 
         private string description;
         public string Description => description;
+
+        private readonly int width, height;
+        public int Width => width;
+        public int Height => height;
+
+        public Vector2 Size => new Vector2(Width, Height);
+        
+        public Box2 UvBounds => Box2.FromTLRB(0, 0, 1, 1);
+
+        public Texture BindableTexture => this;
 
         public Texture2d(int textureId, int width, int height, string description)
         {
             this.textureId = textureId;
             this.description = description;
 
-            Width = width;
-            Height = height;
+            this.width = width;
+            this.height = height;
         }
 
+        public void Update(Bitmap bitmap, int x, int y)
+        {
+            try
+            {
+                DrawState.BindPrimaryTexture(textureId, TexturingModes.Texturing2d);
+
+                var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, bitmapData.Width, bitmapData.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
+                GL.Finish();
+                bitmap.UnlockBits(bitmapData);
+
+                DrawState.CheckError("updating texture");
+            }
+            finally
+            {
+                DrawState.UnbindTexture(textureId);
+            }
+        }
+        
         public override string ToString()
             => $"Texture2d#{textureId} {Description} ({Width}x{Height})";
 

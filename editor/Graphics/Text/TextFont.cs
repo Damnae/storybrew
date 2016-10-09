@@ -10,6 +10,7 @@ namespace StorybrewEditor.Graphics.Text
     public class TextFont : IDisposable
     {
         private Dictionary<char, Character> characters = new Dictionary<char, Character>();
+        private TextureMultiAtlas2d atlas;
 
         private string name;
         public string Name => name;
@@ -42,8 +43,10 @@ namespace StorybrewEditor.Graphics.Text
             }
             else
             {
-                var texture = DrawState.FontManager.CreateTexture(c.ToString(), name, size,
-                    Vector2.Zero, Vector2.Zero, UiAlignment.Centre, StringTrimming.None, out measuredSize);
+                atlas = atlas ?? new TextureMultiAtlas2d(512, 512, $"Font Atlas {name} {size}x");
+                var bitmap = DrawState.FontManager.CreateBitmap(c.ToString(), name, size,
+                    Vector2.Zero, Vector2.Zero, UiAlignment.Centre, StringTrimming.None, out measuredSize, false);
+                var texture = atlas.AddSlice(bitmap, $"character:{c}@{Name}:{Size}");
                 return new Character(texture, (int)measuredSize.X, (int)measuredSize.Y);
             }
         }
@@ -59,8 +62,10 @@ namespace StorybrewEditor.Graphics.Text
                 {
                     foreach (var character in characters.Values)
                         character.Texture?.Dispose();
+                    atlas?.Dispose();
                 }
                 characters = null;
+                atlas = null;
                 disposedValue = true;
             }
         }
@@ -74,8 +79,8 @@ namespace StorybrewEditor.Graphics.Text
 
         public class Character
         {
-            private Texture2d texture;
-            public Texture2d Texture => texture;
+            private Texture texture;
+            public Texture Texture => texture;
             public bool IsEmpty => texture == null;
 
             private int baseWidth;
@@ -84,7 +89,7 @@ namespace StorybrewEditor.Graphics.Text
             private int baseHeight;
             public int BaseHeight => baseHeight;
 
-            public Character(Texture2d texture, int baseWidth, int baseHeight)
+            public Character(Texture texture, int baseWidth, int baseHeight)
             {
                 this.texture = texture;
                 this.baseWidth = baseWidth;

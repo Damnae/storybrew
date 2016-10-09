@@ -52,7 +52,7 @@ namespace StorybrewEditor.Graphics.Renderers
 
         #endregion
 
-        public delegate int CustomTextureBinder(Texture2d texture);
+        public delegate int CustomTextureBinder(Texture texture);
         public CustomTextureBinder CustomTextureBind;
 
         private Shader shader;
@@ -118,7 +118,7 @@ namespace StorybrewEditor.Graphics.Renderers
         private int spritesInBatch;
         private int maxSpritesPerBatch;
 
-        private Texture2d currentTexture;
+        private Texture currentTexture;
         private int currentSamplerUnit;
         private bool rendering;
 
@@ -239,18 +239,18 @@ namespace StorybrewEditor.Graphics.Renderers
             lastFlushWasBuffered = canBuffer;
         }
 
-        public void Draw(Texture2d texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color)
+        public void Draw(Texture texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color)
             => Draw(texture, x, y, originX, originY, scaleX, scaleY, rotation, color, 0, 0, texture.Width, texture.Height);
 
-        public void Draw(Texture2d texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color, float textureX0, float textureY0, float textureX1, float textureY1)
+        public void Draw(Texture texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color, float textureX0, float textureY0, float textureX1, float textureY1)
         {
             if (!rendering) throw new InvalidOperationException("Not rendering");
             if (texture == null) throw new ArgumentNullException(nameof(texture));
 
-            if (currentTexture != texture)
+            if (currentTexture != texture.BindableTexture)
             {
                 DrawState.FlushRenderer();
-                currentTexture = texture;
+                currentTexture = texture.BindableTexture;
             }
             else if (spritesInBatch == maxSpritesPerBatch)
             {
@@ -337,13 +337,14 @@ namespace StorybrewEditor.Graphics.Renderers
             spritePrimitive.x4 = x4 + x;
             spritePrimitive.y4 = y4 + y;
 
-            var textureWidth = texture.Width;
-            var textureHeight = texture.Height;
+            var textureWidth = texture.BindableTexture.Width;
+            var textureHeight = texture.BindableTexture.Height;
+            var textureUvBounds = texture.UvBounds;
 
-            var textureU0 = textureX0 / textureWidth;
-            var textureV0 = textureY0 / textureHeight;
-            var textureU1 = textureX1 / textureWidth;
-            var textureV1 = textureY1 / textureHeight;
+            var textureU0 = textureUvBounds.Left + textureX0 / textureWidth;
+            var textureV0 = textureUvBounds.Top + textureY0 / textureHeight;
+            var textureU1 = textureUvBounds.Left + textureX1 / textureWidth;
+            var textureV1 = textureUvBounds.Top + textureY1 / textureHeight;
 
             float u0, v0, u1, v1;
             if (flipX)
