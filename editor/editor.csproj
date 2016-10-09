@@ -92,6 +92,8 @@
     <Compile Include="Graphics\Drawables\TextMultiDrawable.cs" />
     <Compile Include="Graphics\Drawables\TextSingleDrawable.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
+    <Compile Include="Graphics\Text\TextFontProxy.cs" />
+    <Compile Include="Graphics\Text\TextFontManager.cs" />
     <Compile Include="Graphics\Text\TextFont.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Graphics\Cameras\CameraIso.cs" />
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
+    <Compile Include="Util\LineBreaker.cs" />
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
     <Compile Include="Util\ZipArchiveExtensions.cs" />

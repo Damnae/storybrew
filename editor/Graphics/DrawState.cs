@@ -68,6 +68,7 @@ namespace StorybrewEditor.Graphics
             whitePixel = Texture2d.Create(Color4.White, "whitepixel");
             normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel");
             fontManager = new FontManager();
+            textFontManager = new TextFontManager();
 
             Viewport = new Rectangle(0, 0, width, height);
         }
@@ -79,6 +80,9 @@ namespace StorybrewEditor.Graphics
 
             whitePixel.Dispose();
             whitePixel = null;
+
+            textFontManager.Dispose();
+            textFontManager = null;
 
             fontManager.Dispose();
             fontManager = null;
@@ -404,6 +408,9 @@ namespace StorybrewEditor.Graphics
 
         private static FontManager fontManager;
         public static FontManager FontManager => fontManager;
+
+        private static TextFontManager textFontManager;
+        public static TextFontManager TextFontManager => textFontManager;
 
         private static Version openGlVersion;
         private static Version glslVersion;

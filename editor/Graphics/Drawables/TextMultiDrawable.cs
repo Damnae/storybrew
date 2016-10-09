@@ -4,7 +4,6 @@ using StorybrewEditor.Graphics.Text;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace StorybrewEditor.Graphics.Drawables
 {
@@ -51,6 +50,9 @@ namespace StorybrewEditor.Graphics.Drawables
                     lineHeight = Math.Max(lineHeight, character.BaseHeight * inverseScaling);
                 }
                 y += lineHeight;
+
+                if (y >= bounds.Bottom)
+                    break;
             }
         }
 
@@ -67,56 +69,50 @@ namespace StorybrewEditor.Graphics.Drawables
         private void validate()
         {
             if (lines != null) return;
-            lines = new List<string>();
 
+            updateFont();
+            splitLines();
+            measureLines();
+        }
+
+        private void updateFont()
+        {
             if (font == null || font.Name != FontName || textureFontSize != FontSize || textureScaling != Scaling)
             {
                 font?.Dispose();
-                font = new TextFont(FontName, FontSize * Scaling);
+                font = DrawState.TextFontManager.GetTextFont(FontName, FontSize, Scaling);
             }
-            textureMaxSize = MaxSize;
             textureFontSize = FontSize;
             textureScaling = Scaling;
+        }
 
-            var width = 0.0f;
-            var height = 0.0f;
-
+        private void splitLines()
+        {
             var text = Text;
             if (string.IsNullOrEmpty(text)) text = " ";
             if (text.EndsWith("\n")) text += " ";
 
-            var sb = new StringBuilder();
-            var lineWidth = 0;
-            var lineHeight = 0;
+            lines = LineBreaker.Split(text, MaxSize.X * Scaling, c => font.GetCharacter(c).BaseWidth);
+            textureMaxSize = MaxSize;
+        }
 
-            Action completeLine = () =>
+        private void measureLines()
+        {
+            var width = 0.0f;
+            var height = 0.0f;
+            foreach (var line in lines)
             {
+                var lineWidth = 0f;
+                var lineHeight = 0f;
+                foreach (var c in line)
+                {
+                    var character = font.GetCharacter(c);
+                    lineWidth += character.BaseWidth;
+                    lineHeight = Math.Max(lineHeight, character.BaseHeight);
+                }
                 width = Math.Max(width, lineWidth);
                 height += lineHeight;
-
-                lineWidth = 0;
-                lineHeight = 0;
-
-                lines.Add(sb.ToString());
-                sb.Clear();
-            };
-
-            for (var i = 0; i < text.Length; i++)
-            {
-                var c = text[i];
-                var character = font.GetCharacter(c);
-
-                if (MaxSize.X > 0 && (lineWidth + character.BaseWidth) / Scaling > MaxSize.X)
-                    completeLine();
-
-                lineWidth += character.BaseWidth;
-                lineHeight = Math.Max(lineHeight, character.BaseHeight);
-
-                sb.Append(c);
             }
-            if (sb.Length > 0)
-                completeLine();
-
             measuredSize = new Vector2(width, height) / Scaling;
         }
 

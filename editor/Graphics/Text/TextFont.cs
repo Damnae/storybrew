@@ -23,7 +23,7 @@ namespace StorybrewEditor.Graphics.Text
             this.size = size;
         }
 
-        public Character GetCharacter(char c)
+        public virtual Character GetCharacter(char c)
         {
             Character character;
             if (!characters.TryGetValue(c, out character))
