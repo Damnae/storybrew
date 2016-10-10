@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.Mapset
 {
@@ -180,6 +181,15 @@ namespace StorybrewEditor.Mapset
             var comboIndex = 0;
             
             string line;
+
+            if (!beatmap.comboColors.Any())
+            {
+                beatmap.comboColors.Add(new Color4(255, 192, 0, 255));
+                beatmap.comboColors.Add(new Color4(0, 202, 0, 255));
+                beatmap.comboColors.Add(new Color4(18, 124, 255, 255));
+                beatmap.comboColors.Add(new Color4(242, 24, 57, 255));
+            }
+
             while ((line = reader.ReadLine()) != null)
             {
                 line = line.Trim();
