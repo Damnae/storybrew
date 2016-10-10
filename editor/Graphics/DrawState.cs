@@ -68,6 +68,7 @@ namespace StorybrewEditor.Graphics
             whitePixel = Texture2d.Create(Color4.White, "whitepixel");
             normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel");
             fontManager = new FontManager();
+            textFontManager = new TextFontManager();
 
             Viewport = new Rectangle(0, 0, width, height);
         }
@@ -79,6 +80,9 @@ namespace StorybrewEditor.Graphics
 
             whitePixel.Dispose();
             whitePixel = null;
+
+            textFontManager.Dispose();
+            textFontManager = null;
 
             fontManager.Dispose();
             fontManager = null;
@@ -220,14 +224,14 @@ namespace StorybrewEditor.Graphics
         /// <param name="texture">the texture to bind</param>
         /// <param name="activate">whether to glActiveTexture the texture unit</param>
         /// <returns>the texture unit the texture is bound to</returns>
-        public static int BindTexture(Texture texture, bool activate = false)
+        public static int BindTexture(BindableTexture texture, bool activate = false)
         {
             var samplerUnit = BindTextures(texture)[0];
             if (activate) ActiveTextureUnit = samplerUnit;
             return samplerUnit;
         }
 
-        public static void UnbindTexture(Texture texture)
+        public static void UnbindTexture(BindableTexture texture)
         {
             UnbindTexture(texture.TextureId);
         }
@@ -250,7 +254,7 @@ namespace StorybrewEditor.Graphics
         /// <summary>
         /// Bind the textures in any texture unit, reusing previously bound textures when possible.
         /// </summary>
-        public static int[] BindTextures(params Texture[] textures)
+        public static int[] BindTextures(params BindableTexture[] textures)
         {
             int[] samplerIndexes = new int[textures.Length];
             int samplerCount = samplerTextureIds.Length;
@@ -404,6 +408,9 @@ namespace StorybrewEditor.Graphics
 
         private static FontManager fontManager;
         public static FontManager FontManager => fontManager;
+
+        private static TextFontManager textFontManager;
+        public static TextFontManager TextFontManager => textFontManager;
 
         private static Version openGlVersion;
         private static Version glslVersion;

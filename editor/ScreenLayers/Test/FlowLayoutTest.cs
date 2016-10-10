@@ -15,6 +15,7 @@ namespace StorybrewEditor.ScreenLayers.Test
             base.Load();
 
             WidgetManager.Root.StyleName = "panel";
+
             WidgetManager.Root.Add(flowLayout1 = new FlowLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
@@ -28,7 +29,6 @@ namespace StorybrewEditor.ScreenLayers.Test
             foreach (var word in @"Sanae from class 3-B was an ordinary girl, one you might find anywhere. But one day, her pets ran away from her when she was at the lake.".Split(' '))
                 flowLayout1.Add(new Label(WidgetManager) { Text = word, });
 
-            WidgetManager.Root.StyleName = "panel";
             WidgetManager.Root.Add(flowLayout2 = new FlowLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
@@ -57,7 +57,7 @@ namespace StorybrewEditor.ScreenLayers.Test
         public override void Update(bool isTop, bool isCovered)
         {
             base.Update(isTop, isCovered);
-            
+
             flowLayout1.Pack((float)(300 + Math.Sin(Manager.Editor.Time * 0.3) * 200));
             flowLayout2.Pack((float)(300 + Math.Sin(Manager.Editor.Time * 0.3) * 200));
             flowLayout3.Pack((float)(300 + Math.Sin(Manager.Editor.Time * 0.3) * 200), Manager.Editor.Window.Height / 2);

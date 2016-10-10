@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace StorybrewEditor.Mapset
 {
@@ -85,28 +84,23 @@ namespace StorybrewEditor.Mapset
             Trace.WriteLine($"Loading beatmap {path}");
             var beatmap = new EditorBeatmap(path);
 
-            string line;
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                while ((line = reader.ReadLine()) != null)
+                reader.ParseSections(sectionName =>
                 {
-                    line = line.Trim();
-                    if (line.StartsWith("[") && line.EndsWith("]"))
+                    switch (sectionName)
                     {
-                        var sectionName = line.Substring(1, line.Length - 2);
-                        switch (sectionName)
-                        {
-                            case "General": parseGeneralSection(beatmap, reader); break;
-                            case "Editor": parseEditorSection(beatmap, reader); break;
-                            case "Metadata": parseMetadataSection(beatmap, reader); break;
-                            case "Difficulty": parseDifficultySection(beatmap, reader); break;
-                            case "Events": parseEventsSection(beatmap, reader); break;
-                            case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
-                            case "Colours": parseColoursSection(beatmap, reader); break;
-                            case "HitObjects": parseHitObjectsSection(beatmap, reader); break;
-                        }
+                        case "General": parseGeneralSection(beatmap, reader); break;
+                        case "Editor": parseEditorSection(beatmap, reader); break;
+                        case "Metadata": parseMetadataSection(beatmap, reader); break;
+                        case "Difficulty": parseDifficultySection(beatmap, reader); break;
+                        case "Events": parseEventsSection(beatmap, reader); break;
+                        case "TimingPoints": parseTimingPointsSection(beatmap, reader); break;
+                        case "Colours": parseColoursSection(beatmap, reader); break;
+                        case "HitObjects": parseHitObjectsSection(beatmap, reader); break;
                     }
-                }
+                });
+
             return beatmap;
         }
 
@@ -156,13 +150,7 @@ namespace StorybrewEditor.Mapset
         }
         private static void parseTimingPointsSection(EditorBeatmap beatmap, StreamReader reader)
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                line = line.Trim();
-                if (line.Length == 0) break;
-                beatmap.controlPoints.Add(ControlPoint.Parse(line));
-            }
+            reader.ParseSectionLines(line => beatmap.controlPoints.Add(ControlPoint.Parse(line)));
             beatmap.controlPoints.Sort();
         }
         private static void parseColoursSection(EditorBeatmap beatmap, StreamReader reader)
@@ -179,22 +167,9 @@ namespace StorybrewEditor.Mapset
             OsuHitObject previousHitObject = null;
             var colorIndex = 0;
             var comboIndex = 0;
-            
-            string line;
 
-            if (!beatmap.comboColors.Any())
+            reader.ParseSectionLines(line =>
             {
-                beatmap.comboColors.Add(new Color4(255, 192, 0, 255));
-                beatmap.comboColors.Add(new Color4(0, 202, 0, 255));
-                beatmap.comboColors.Add(new Color4(18, 124, 255, 255));
-                beatmap.comboColors.Add(new Color4(242, 24, 57, 255));
-            }
-
-            while ((line = reader.ReadLine()) != null)
-            {
-                line = line.Trim();
-                if (line.Length == 0) break;
-
                 var hitobject = OsuHitObject.Parse(beatmap, line);
                 if (hitobject.NewCombo || previousHitObject == null || (previousHitObject.Flags & HitObjectFlag.Spinner) > 0)
                 {
@@ -210,7 +185,7 @@ namespace StorybrewEditor.Mapset
 
                 beatmap.hitObjects.Add(hitobject);
                 previousHitObject = hitobject;
-            }
+            });
         }
 
         #endregion

@@ -16,7 +16,7 @@ namespace StorybrewEditor.Graphics.Renderers
         int BufferWaitCount { get; }
         int LargestBatch { get; }
 
-        void Draw(Texture2d texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color);
-        void Draw(Texture2d texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color, float textureX0, float textureY0, float textureX1, float textureY1);
+        void Draw(Texture2dSlice texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color);
+        void Draw(Texture2dSlice texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color, float textureX0, float textureY0, float textureX1, float textureY1);
     }
 }

@@ -89,7 +89,16 @@
     <Compile Include="Graphics\Drawables\NullDrawable.cs" />
     <Compile Include="Graphics\Drawables\Sprite.cs" />
     <Compile Include="Graphics\Drawables\TextDrawable.cs" />
+    <Compile Include="Graphics\Drawables\TextMultiDrawable.cs" />
+    <Compile Include="Graphics\Drawables\TextSingleDrawable.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
+    <Compile Include="Graphics\Textures\BindableTexture.cs" />
+    <Compile Include="Graphics\Textures\TextureMultiAtlas2d.cs" />
+    <Compile Include="Graphics\Textures\TextureAtlas2d.cs" />
+    <Compile Include="Graphics\Textures\Texture2dSlice.cs" />
+    <Compile Include="Graphics\Text\TextFontProxy.cs" />
+    <Compile Include="Graphics\Text\TextFontManager.cs" />
+    <Compile Include="Graphics\Text\TextFont.cs" />
     <Compile Include="Mapset\EditorBeatmap.cs" />
     <Compile Include="Mapset\MapsetManager.cs" />
     <Compile Include="Editor.cs" />
@@ -98,6 +107,8 @@
     <Compile Include="Graphics\Cameras\CameraIso.cs" />
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
+    <Compile Include="ScreenLayers\Test\LineBreakTest.cs" />
+    <Compile Include="Util\LineBreaker.cs" />
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
     <Compile Include="Util\ZipArchiveExtensions.cs" />
@@ -128,7 +139,6 @@
     <Compile Include="Graphics\Shader.cs" />
     <Compile Include="Graphics\Textures\Texture.cs" />
     <Compile Include="Graphics\Textures\Texture2d.cs" />
-    <Compile Include="Graphics\Textures\Texture3d.cs" />
     <Compile Include="Graphics\Textures\TextureContainer.cs" />
     <Compile Include="Graphics\Textures\TextureContainerSeparate.cs" />
     <Compile Include="Graphics\Text\FontManager.cs" />

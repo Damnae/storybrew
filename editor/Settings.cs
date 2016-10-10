@@ -18,10 +18,9 @@ namespace StorybrewEditor
         {
             if (!File.Exists(SettingsFilename)) return;
 
+            var type = GetType();
             using (var stream = new FileStream(SettingsFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-            {
-                var type = GetType();
                 reader.ParseKeyValueSection((key, value) =>
                 {
                     var field = type.GetField(key);
@@ -31,7 +30,6 @@ namespace StorybrewEditor
                     var setting = (Setting)field.GetValue(this);
                     setting.Set(value);
                 });
-            }
         }
 
         public void Save()
