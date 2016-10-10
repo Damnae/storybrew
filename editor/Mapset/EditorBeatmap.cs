@@ -30,7 +30,13 @@ namespace StorybrewEditor.Mapset
         private List<OsuHitObject> hitObjects = new List<OsuHitObject>();
         public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
 
-        private List<Color4> comboColors = new List<Color4>();
+        private List<Color4> comboColors = new List<Color4>()
+        {
+            new Color4(255, 192, 0, 255),
+            new Color4(0, 202, 0, 255),
+            new Color4(18, 124, 255, 255),
+            new Color4(242, 24, 57, 255),
+        };
         public override IEnumerable<Color4> ComboColors => comboColors;
 
         public EditorBeatmap(string path)
@@ -155,6 +161,7 @@ namespace StorybrewEditor.Mapset
         }
         private static void parseColoursSection(EditorBeatmap beatmap, StreamReader reader)
         {
+            beatmap.comboColors.Clear();
             reader.ParseKeyValueSection((key, value) =>
             {
                 var rgb = value.Split(',');
@@ -164,9 +171,6 @@ namespace StorybrewEditor.Mapset
         private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader) { }
         private static void parseHitObjectsSection(EditorBeatmap beatmap, StreamReader reader)
         {
-            if (beatmap.comboColors.Count == 0)
-                addDefaultComboColors(beatmap);
-
             OsuHitObject previousHitObject = null;
             var colorIndex = 0;
             var comboIndex = 0;
@@ -189,14 +193,6 @@ namespace StorybrewEditor.Mapset
                 beatmap.hitObjects.Add(hitobject);
                 previousHitObject = hitobject;
             });
-        }
-
-        private static void addDefaultComboColors(EditorBeatmap beatmap)
-        {
-            beatmap.comboColors.Add(new Color4(255, 192, 0, 255));
-            beatmap.comboColors.Add(new Color4(0, 202, 0, 255));
-            beatmap.comboColors.Add(new Color4(18, 124, 255, 255));
-            beatmap.comboColors.Add(new Color4(242, 24, 57, 255));
         }
 
         #endregion
