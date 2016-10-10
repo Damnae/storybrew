@@ -28,7 +28,6 @@ namespace StorybrewEditor.Graphics.Text
         {
             var font = getFont(fontName, fontSize, FontStyle.Regular);
             if (string.IsNullOrEmpty(text)) text = " ";
-            if (text.EndsWith("\n")) text += " ";
 
             StringAlignment horizontalAlignment;
             switch (alignment & UiAlignment.Horizontal)
