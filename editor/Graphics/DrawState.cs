@@ -224,14 +224,14 @@ namespace StorybrewEditor.Graphics
         /// <param name="texture">the texture to bind</param>
         /// <param name="activate">whether to glActiveTexture the texture unit</param>
         /// <returns>the texture unit the texture is bound to</returns>
-        public static int BindTexture(Texture texture, bool activate = false)
+        public static int BindTexture(BindableTexture texture, bool activate = false)
         {
             var samplerUnit = BindTextures(texture)[0];
             if (activate) ActiveTextureUnit = samplerUnit;
             return samplerUnit;
         }
 
-        public static void UnbindTexture(Texture texture)
+        public static void UnbindTexture(BindableTexture texture)
         {
             UnbindTexture(texture.TextureId);
         }
@@ -254,7 +254,7 @@ namespace StorybrewEditor.Graphics
         /// <summary>
         /// Bind the textures in any texture unit, reusing previously bound textures when possible.
         /// </summary>
-        public static int[] BindTextures(params Texture[] textures)
+        public static int[] BindTextures(params BindableTexture[] textures)
         {
             int[] samplerIndexes = new int[textures.Length];
             int samplerCount = samplerTextureIds.Length;

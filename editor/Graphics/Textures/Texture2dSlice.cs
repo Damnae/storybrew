@@ -1,31 +1,32 @@
 ﻿using OpenTK;
+using System;
 
 namespace StorybrewEditor.Graphics.Textures
 {
     public class Texture2dSlice : Texture
     {
+        private string description;
+        public string Description => texture != null ? $"{description} (from {texture.Description})" : description;
+
         private Texture2d texture;
+        public BindableTexture BindableTexture => texture;
+
         private Box2 bounds;
-
-        public int TextureId => texture.TextureId;
-        public TexturingModes TexturingMode => texture.TexturingMode;
-
-        public string description;
-        public string Description => $"{description} (from {texture.Description})";
-        
-        public int Width => (int)bounds.Width;
-        public int Height => (int)bounds.Height;
-
+        public float Width => bounds.Width;
+        public float Height => bounds.Height;
+        public Vector2 Size => new Vector2(bounds.Width, bounds.Height);
         public Box2 UvBounds => Box2.FromTLRB(bounds.Top / texture.Height, bounds.Left / texture.Width, bounds.Right / texture.Width, bounds.Bottom / texture.Height);
-
-        public Texture BindableTexture => texture;
+        public Vector2 UvRatio => new Vector2(1f / texture.Width, 1f / texture.Height);
 
         public Texture2dSlice(Texture2d texture, Box2 bounds, string description)
         {
-            this.texture = texture;
+            this.texture = texture ?? this as Texture2d;
             this.bounds = bounds;
             this.description = description;
         }
+
+        public override string ToString()
+            => $"Texture2dSlice#{texture.TextureId} {Description} ({Width}x{Height})";
 
         #region IDisposable Support
 
@@ -36,17 +37,21 @@ namespace StorybrewEditor.Graphics.Textures
             {
                 if (disposing)
                 {
-                    // Do not dispose the texture, it is disposed by the atlas
-                    //texture.Dispose();
                 }
                 texture = null;
                 disposedValue = true;
             }
         }
 
+        ~Texture2dSlice()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion

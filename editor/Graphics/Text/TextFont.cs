@@ -79,8 +79,8 @@ namespace StorybrewEditor.Graphics.Text
 
         public class Character
         {
-            private Texture texture;
-            public Texture Texture => texture;
+            private Texture2dSlice texture;
+            public Texture2dSlice Texture => texture;
             public bool IsEmpty => texture == null;
 
             private int baseWidth;
@@ -89,7 +89,7 @@ namespace StorybrewEditor.Graphics.Text
             private int baseHeight;
             public int BaseHeight => baseHeight;
 
-            public Character(Texture texture, int baseWidth, int baseHeight)
+            public Character(Texture2dSlice texture, int baseWidth, int baseHeight)
             {
                 this.texture = texture;
                 this.baseWidth = baseWidth;

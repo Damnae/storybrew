@@ -1,7 +1,7 @@
-﻿using StorybrewEditor.Util;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -10,7 +10,7 @@ using System.IO;
 
 namespace StorybrewEditor.Graphics.Textures
 {
-    public class Texture2d : Texture
+    public class Texture2d : Texture2dSlice, BindableTexture
     {
         private readonly int textureId;
         public int TextureId
@@ -22,29 +22,11 @@ namespace StorybrewEditor.Graphics.Textures
                 return textureId;
             }
         }
-
         public TexturingModes TexturingMode => TexturingModes.Texturing2d;
 
-        private string description;
-        public string Description => description;
-
-        private readonly int width, height;
-        public int Width => width;
-        public int Height => height;
-
-        public Vector2 Size => new Vector2(Width, Height);
-        
-        public Box2 UvBounds => Box2.FromTLRB(0, 0, 1, 1);
-
-        public Texture BindableTexture => this;
-
-        public Texture2d(int textureId, int width, int height, string description)
+        public Texture2d(int textureId, int width, int height, string description) : base(null, Box2.FromTLRB(0, 0, width, height), description)
         {
             this.textureId = textureId;
-            this.description = description;
-
-            this.width = width;
-            this.height = height;
         }
 
         public void Update(Bitmap bitmap, int x, int y)
@@ -65,14 +47,14 @@ namespace StorybrewEditor.Graphics.Textures
                 DrawState.UnbindTexture(textureId);
             }
         }
-        
+
         public override string ToString()
             => $"Texture2d#{textureId} {Description} ({Width}x{Height})";
 
         #region IDisposable Support
 
         private bool disposedValue = false;
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
@@ -83,17 +65,7 @@ namespace StorybrewEditor.Graphics.Textures
                 GL.DeleteTexture(textureId);
                 disposedValue = true;
             }
-        }
-
-        ~Texture2d()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            base.Dispose(disposing);
         }
 
         #endregion

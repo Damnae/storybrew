@@ -92,6 +92,7 @@
     <Compile Include="Graphics\Drawables\TextMultiDrawable.cs" />
     <Compile Include="Graphics\Drawables\TextSingleDrawable.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
+    <Compile Include="Graphics\Textures\BindableTexture.cs" />
     <Compile Include="Graphics\Textures\TextureMultiAtlas2d.cs" />
     <Compile Include="Graphics\Textures\TextureAtlas2d.cs" />
     <Compile Include="Graphics\Textures\Texture2dSlice.cs" />
