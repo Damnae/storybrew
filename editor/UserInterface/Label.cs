@@ -38,7 +38,7 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        public Label(WidgetManager manager) : this(manager, new TextSingleDrawable())
+        public Label(WidgetManager manager) : this(manager, new TextMultiDrawable())
         {
         }
 

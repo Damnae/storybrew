@@ -26,7 +26,7 @@ namespace StorybrewEditor.Graphics.Textures
         }
 
         public override string ToString()
-            => $"Texture2dSlice#{texture.TextureId} {Description} ({Width}x{Height})";
+            => $"Texture2dSlice#{texture.TextureId} {description} ({Width}x{Height})";
 
         #region IDisposable Support
 

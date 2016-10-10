@@ -95,6 +95,9 @@ namespace StorybrewEditor.Graphics.Text
                 this.baseWidth = baseWidth;
                 this.baseHeight = baseHeight;
             }
+
+            public override string ToString()
+                => $"{texture} {baseWidth}x{baseHeight}";
         }
     }
 }

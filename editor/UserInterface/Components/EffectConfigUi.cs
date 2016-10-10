@@ -184,6 +184,7 @@ namespace StorybrewEditor.UserInterface.Components
                     Value = field.Value.ToString(),
                     AnchorFrom = UiAlignment.Right,
                     AnchorTo = UiAlignment.Right,
+                    AcceptMultiline = true,
                     CanGrow = false,
                 };
                 widget.OnValueCommited += (sender, e) =>
