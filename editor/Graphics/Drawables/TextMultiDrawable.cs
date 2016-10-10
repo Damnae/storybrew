@@ -44,7 +44,8 @@ namespace StorybrewEditor.Graphics.Drawables
                 foreach (var c in line)
                 {
                     var character = font.GetCharacter(c);
-                    if (!character.IsEmpty) renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
+                    if (!character.IsEmpty)
+                        renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
 
                     x += character.BaseWidth * inverseScaling;
                     lineHeight = Math.Max(lineHeight, character.BaseHeight * inverseScaling);
@@ -92,7 +93,7 @@ namespace StorybrewEditor.Graphics.Drawables
             if (string.IsNullOrEmpty(text)) text = " ";
             if (text.EndsWith("\n")) text += " ";
 
-            lines = LineBreaker.Split(text, MaxSize.X * Scaling, c => font.GetCharacter(c).BaseWidth);
+            lines = LineBreaker.Split(text, (float)Math.Ceiling(MaxSize.X * Scaling), c => font.GetCharacter(c).BaseWidth);
             textureMaxSize = MaxSize;
         }
 
