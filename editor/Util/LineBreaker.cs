@@ -15,8 +15,6 @@ namespace StorybrewEditor.Util
             int startIndex = 0, endIndex = 0, lineWidth = 0;
             Action completeLine = () =>
             {
-                lineWidth = 0;
-
                 var length = endIndex - startIndex + 1;
                 Debug.Assert(length > 0);
 
@@ -24,6 +22,7 @@ namespace StorybrewEditor.Util
 
                 startIndex = endIndex + 1;
                 endIndex = startIndex;
+                lineWidth = 0;
             };
 
             for (; endIndex < text.Length; endIndex++)
@@ -33,41 +32,38 @@ namespace StorybrewEditor.Util
 
                 if (maxWidth > 0 && endIndex > startIndex && (lineWidth + characterWidth) > maxWidth)
                 {
-                    var firstAllowed = -1;
-                    var breakIndex = endIndex;
-                    while (true)
-                    {
-                        var breakability = getBreakability(text, breakIndex);
-                        if (breakability == Breakability.Opportunity)
-                        {
-                            endIndex = breakIndex - 1;
-                            break;
-                        }
-                        else if (breakability == Breakability.Allowed && firstAllowed == -1)
-                            firstAllowed = breakIndex - 1;
-
-                        breakIndex--;
-                        if (breakIndex <= startIndex)
-                        {
-                            if (firstAllowed != -1)
-                                endIndex = firstAllowed;
-                            else
-                                endIndex--;
-                            break;
-                        }
-                    }
+                    endIndex = findBreakIndex(text, startIndex, endIndex);
                     completeLine();
                 }
 
                 lineWidth += characterWidth;
 
                 if (mustBreakAfter(text, endIndex))
+                {
                     completeLine();
+                    endIndex--;
+                }
             }
-            if (lineWidth > 0)
-                completeLine();
 
             return lines;
+        }
+
+        private static int findBreakIndex(string text, int startIndex, int endIndex)
+        {
+            var firstAllowed = -1;
+            for (var index = endIndex; index > startIndex; index--)
+            {
+                var breakability = getBreakability(text, index);
+                if (breakability == Breakability.Opportunity)
+                    return index - 1;
+                if (breakability == Breakability.Allowed && firstAllowed == -1)
+                    firstAllowed = index - 1;
+            }
+
+            if (firstAllowed != -1)
+                return firstAllowed;
+
+            return endIndex - 1;
         }
 
         // A lazy implementation of http://unicode.org/reports/tr14/
