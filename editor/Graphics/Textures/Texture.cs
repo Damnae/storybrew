@@ -1,10 +1,10 @@
-﻿
+﻿using System;
+
 namespace StorybrewEditor.Graphics.Textures
 {
-    public interface Texture
+    public interface Texture : IDisposable
     {
-        int TextureId { get; }
-        TexturingModes TexturingMode { get; }
         string Description { get; }
+        BindableTexture BindableTexture { get; }
     }
 }
