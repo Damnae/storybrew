@@ -5,7 +5,6 @@ using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
 using StorybrewCommon.Subtitles;
-using StorybrewCommon.Mapset;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
