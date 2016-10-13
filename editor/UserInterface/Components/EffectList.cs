@@ -44,7 +44,10 @@ namespace StorybrewEditor.UserInterface.Components
                     new ScrollArea(manager, effectsLayout = new LinearLayout(manager)
                     {
                         FitChildren = true,
-                    }),
+                    })
+                    {
+                        ScrollsHorizontally = false,
+                    },
                     new LinearLayout(manager)
                     {
                         Fill = true,
