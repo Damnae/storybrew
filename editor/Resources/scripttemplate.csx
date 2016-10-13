@@ -8,6 +8,7 @@ using StorybrewCommon.Subtitles;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StorybrewScripts
 {
