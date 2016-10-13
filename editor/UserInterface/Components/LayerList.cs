@@ -157,6 +157,7 @@ namespace StorybrewEditor.UserInterface.Components
                                     AnchorFrom = UiAlignment.Centre,
                                     AnchorTo = UiAlignment.Centre,
                                     CanGrow = false,
+                                    Disabled = index == 0,
                                 },
                                 moveDownButton = new Button(Manager)
                                 {
@@ -166,6 +167,7 @@ namespace StorybrewEditor.UserInterface.Components
                                     AnchorFrom = UiAlignment.Centre,
                                     AnchorTo = UiAlignment.Centre,
                                     CanGrow = false,
+                                    Disabled = index == layers.Count - 1,
                                 },
                             },
                         },
