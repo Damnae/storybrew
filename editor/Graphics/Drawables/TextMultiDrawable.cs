@@ -37,6 +37,7 @@ namespace StorybrewEditor.Graphics.Drawables
             var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
 
             var y = bounds.Top;
+            var lineHasNonSpacing = true;
             foreach (var line in lines)
             {
                 var x = bounds.Left;
@@ -45,11 +46,16 @@ namespace StorybrewEditor.Graphics.Drawables
                 {
                     var character = font.GetCharacter(c);
                     if (!character.IsEmpty)
+                    {
                         renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
+                        lineHasNonSpacing = true;
+                    }
 
-                    x += character.Width * inverseScaling;
+                    if (lineHasNonSpacing)
+                        x += character.Width * inverseScaling;
                     lineHeight = Math.Max(lineHeight, character.Height * inverseScaling);
                 }
+                lineHasNonSpacing = false;
                 y += lineHeight;
 
                 if (y >= bounds.Bottom)
