@@ -25,10 +25,19 @@ namespace StorybrewScripts
         public float FontScale = 0.5f;
 
         [Configurable]
+        public Color4 FontColor = Color4.White;
+
+        [Configurable]
         public int OutlineThickness = 3;
 
         [Configurable]
+        public Color4 OutlineColor = new Color4(50, 50, 50, 200);
+
+        [Configurable]
         public int ShadowThickness = 0;
+
+        [Configurable]
+        public Color4 ShadowColor = new Color4(0, 0, 0, 100);
 
         [Configurable]
         public float PaddingX = 0;
@@ -51,19 +60,19 @@ namespace StorybrewScripts
             {
                 FontPath = FontName,
                 FontSize = FontSize,
-                Color = Color4.White,
+                Color = FontColor,
                 Padding = new Vector2(PaddingX, PaddingY),
                 Debug = Debug,
             },
             new FontOutline()
             {
                 Thickness = OutlineThickness,
-                Color = new Color4(50, 50, 50, 200),
+                Color = OutlineColor,
             },
             new FontShadow()
             {
                 Thickness = ShadowThickness,
-                Color = new Color4(0, 0, 0, 100),
+                Color = ShadowColor,
             });
 
             var subtitles = LoadSubtitles(SubtitlesPath);
