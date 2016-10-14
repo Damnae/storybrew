@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Graphics;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,7 +7,7 @@ namespace StorybrewCommon.Util
 {
     public abstract class ObjectSerializer
     {
-        public abstract bool CanSerialize(Type type);
+        public abstract bool CanSerialize(string typeName);
         public abstract void WriteValue(BinaryWriter writer, object value);
         public abstract object ReadValue(BinaryReader reader);
 
@@ -22,35 +23,36 @@ namespace StorybrewCommon.Util
         public static object Read(BinaryReader reader)
         {
             var typeName = reader.ReadString();
-            var type = Type.GetType(typeName);
-
-            var serializer = GetSerializer(type);
-            if (serializer == null) throw new NotSupportedException($"Cannot read objects of type {typeName}");
+            var serializer = GetSerializer(typeName);
+            if (serializer == null)
+                throw new NotSupportedException($"Cannot read objects of type {typeName}");
 
             return serializer.ReadValue(reader);
         }
 
         public static void Write(BinaryWriter writer, object value)
         {
-            var type = value.GetType();
+            var typeName = value.GetType().FullName;
 
-            var serializer = GetSerializer(type);
-            if (serializer == null) throw new NotSupportedException($"Cannot write objects of type {type.FullName}");
+            var serializer = GetSerializer(typeName);
+            if (serializer == null)
+                throw new NotSupportedException($"Cannot write objects of type {typeName}");
 
-            writer.Write(type.FullName);
+            writer.Write(typeName);
             serializer.WriteValue(writer, value);
         }
 
-        public static ObjectSerializer GetSerializer(Type type)
+        public static ObjectSerializer GetSerializer(string typeName)
         {
             foreach (var serializer in serializers)
-                if (serializer.CanSerialize(type))
+                if (serializer.CanSerialize(typeName))
                     return serializer;
 
             return null;
         }
 
-        public static bool Supports(Type type) => GetSerializer(type) != null;
+        public static bool Supports(string typeName) 
+            => GetSerializer(typeName) != null;
     }
 
     public class SimpleObjectSerializer<T> : ObjectSerializer
@@ -64,8 +66,8 @@ namespace StorybrewCommon.Util
             this.write = write;
         }
 
-        public override bool CanSerialize(Type type)
-            => type == typeof(T);
+        public override bool CanSerialize(string typeName)
+            => typeName == typeof(T).FullName;
 
         public override object ReadValue(BinaryReader reader)
             => read(reader);
