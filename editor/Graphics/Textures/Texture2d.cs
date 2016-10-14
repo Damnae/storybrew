@@ -31,21 +31,14 @@ namespace StorybrewEditor.Graphics.Textures
 
         public void Update(Bitmap bitmap, int x, int y)
         {
-            try
-            {
-                DrawState.BindPrimaryTexture(textureId, TexturingModes.Texturing2d);
+            DrawState.BindPrimaryTexture(textureId, TexturingModes.Texturing2d);
 
-                var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, bitmapData.Width, bitmapData.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
-                GL.Finish();
-                bitmap.UnlockBits(bitmapData);
+            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, bitmapData.Width, bitmapData.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
+            GL.Finish();
+            bitmap.UnlockBits(bitmapData);
 
-                DrawState.CheckError("updating texture");
-            }
-            finally
-            {
-                DrawState.UnbindTexture(textureId);
-            }
+            DrawState.CheckError("updating texture");
         }
 
         public override string ToString()
