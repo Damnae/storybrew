@@ -67,7 +67,7 @@ namespace StorybrewEditor.Graphics
 
             whitePixel = Texture2d.Create(Color4.White, "whitepixel");
             normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel");
-            fontManager = new FontManager();
+            textGenerator = new TextGenerator();
             textFontManager = new TextFontManager();
 
             Viewport = new Rectangle(0, 0, width, height);
@@ -84,8 +84,8 @@ namespace StorybrewEditor.Graphics
             textFontManager.Dispose();
             textFontManager = null;
 
-            fontManager.Dispose();
-            fontManager = null;
+            textGenerator.Dispose();
+            textGenerator = null;
         }
 
         public static void CompleteFrame()
@@ -406,8 +406,8 @@ namespace StorybrewEditor.Graphics
 
         #region Utilities
 
-        private static FontManager fontManager;
-        public static FontManager FontManager => fontManager;
+        private static TextGenerator textGenerator;
+        public static TextGenerator TextGenerator => textGenerator;
 
         private static TextFontManager textFontManager;
         public static TextFontManager TextFontManager => textFontManager;

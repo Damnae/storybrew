@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 
 namespace StorybrewEditor.Graphics.Text
 {
-    public class FontManager : IDisposable
+    public class TextGenerator : IDisposable
     {
         private const bool debugFont = false;
         private static int debugSeed = 0;

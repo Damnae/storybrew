@@ -6,20 +6,24 @@ namespace StorybrewEditor.Graphics.Text
     {
         private TextFont textFont;
         private Action disposed;
-        
-        public TextFontProxy(TextFont textFont, Action disposed) : base(textFont.Name, textFont.Size)
+
+        public string Name => textFont.Name;
+        public float Size => textFont.Size;
+
+        public TextFontProxy(TextFont textFont, Action disposed)
         {
             this.textFont = textFont;
             this.disposed = disposed;
         }
 
-        public override Character GetCharacter(char c)
+        public FontCharacter GetCharacter(char c)
             => textFont.GetCharacter(c);
-        
+
         #region IDisposable Support
 
         private bool disposedValue = false;
-        protected override void Dispose(bool disposing)
+
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
@@ -29,6 +33,11 @@ namespace StorybrewEditor.Graphics.Text
                 }
                 disposedValue = true;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
 
         #endregion

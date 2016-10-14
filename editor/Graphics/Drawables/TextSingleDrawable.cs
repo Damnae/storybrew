@@ -36,7 +36,7 @@ namespace StorybrewEditor.Graphics.Drawables
             if (textureMeasured) return;
             textureMeasured = true;
 
-            DrawState.FontManager.CreateBitmap(Text, FontName, FontSize * Scaling, MaxSize * Scaling, Vector2.Zero, Alignment, Trimming, out measuredSize, true);
+            DrawState.TextGenerator.CreateBitmap(Text, FontName, FontSize * Scaling, MaxSize * Scaling, Vector2.Zero, Alignment, Trimming, out measuredSize, true);
             measuredSize /= Scaling;
         }
 
@@ -52,7 +52,7 @@ namespace StorybrewEditor.Graphics.Drawables
             textureMaxSize = MaxSize;
             textureScaling = Scaling;
 
-            texture = DrawState.FontManager.CreateTexture(Text, FontName, FontSize * Scaling, MaxSize * Scaling, Vector2.Zero, Alignment, Trimming, out measuredSize);
+            texture = DrawState.TextGenerator.CreateTexture(Text, FontName, FontSize * Scaling, MaxSize * Scaling, Vector2.Zero, Alignment, Trimming, out measuredSize);
             measuredSize /= Scaling;
         }
 

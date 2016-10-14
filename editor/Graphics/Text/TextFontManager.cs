@@ -14,13 +14,13 @@ namespace StorybrewEditor.Graphics.Text
 
             TextFont font;
             if (!fonts.TryGetValue(identifier, out font))
-                fonts.Add(identifier, font = new TextFont(fontName, fontSize * scaling));
+                fonts.Add(identifier, font = new TextFontAtlased(fontName, fontSize * scaling));
 
             int refCount;
             if (references.TryGetValue(identifier, out refCount))
-                references[identifier] = refCount + 1; 
+                references[identifier] = refCount + 1;
             else references[identifier] = 1;
-            
+
             return new TextFontProxy(font, () =>
             {
                 var remaining = --references[identifier];
