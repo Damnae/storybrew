@@ -141,6 +141,39 @@
 			Color: "@colorBgElementHover",
 			Outset: [-18, 0],
 		},
+		
+		"progressBarSmall":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorTextDisabled",
+			Outset: [-7, 0],
+		},
+		"progressBarSmallHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorText",
+			Outset: [-7, 0],
+		},
+		"progressBarSmallBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+			Outset: [-8, 0],
+		},
+		"progressBarSmallBgHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+			Outset: [-8, 0],
+		},
 
 		"previewBg":
 		{
@@ -469,22 +502,38 @@
 			{
 				Bar: "progressBar",
 				Background: "progressBarBg",
+				Height: 32,
 			},
 			"default #hover":
 			{
 				Bar: "progressBarHover",
 				Background: "progressBarBgHover",
+				Height: 32,
+			},
+			"small":
+			{
+				Bar: "progressBarSmall",
+				Background: "progressBarSmallBg",
+				Height: 16,
+			},
+			"small #hover":
+			{
+				Bar: "progressBarSmallHover",
+				Background: "progressBarSmallBgHover",
+				Height: 16,
 			},
 
 			"timeline":
 			{
 				Bar: "progressBar",
 				Background: "tooltipBg",
+				Height: 32,
 			},
 			"timeline #hover":
 			{
 				Bar: "progressBarHover",
 				Background: "tooltipBg",
+				Height: 32,
 			},
 		},
 		LinearLayout:

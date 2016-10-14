@@ -1,4 +1,6 @@
-﻿using OpenTK.Graphics;
+﻿using OpenTK;
+using OpenTK.Graphics;
+using System;
 
 namespace StorybrewEditor.Util
 {
@@ -28,6 +30,26 @@ namespace StorybrewEditor.Util
                 color.A * invBlend + otherColor.A * blend);
         }
 
-        public static Color4 WithOpacity(this Color4 color, float opacity) => new Color4(color.R, color.G, color.B, color.A * opacity);
+        public static Vector4 ToHsba(this Color4 color)
+        {
+            float r = color.R, g = color.G, b = color.B;
+            var max = Math.Max(r, Math.Max(g, b));
+            var min = Math.Min(r, Math.Min(g, b));
+            var delta = max - min;
+
+            var hue = 0f;
+            if (r == max) hue = (g - b) / delta;
+            else if (g == max) hue = 2 + (b - r) / delta;
+            else if (b == max) hue = 4 + (r - g) / delta;
+            hue /= 6;
+            if (hue < 0f) hue += 1f;
+
+            var saturation = (max <= 0) ? 0 : 1f - (min / max);
+
+            return new Vector4(hue, saturation, max, color.A);
+        }
+
+        public static Color4 WithOpacity(this Color4 color, float opacity) 
+            => new Color4(color.R, color.G, color.B, color.A * opacity);
     }
 }

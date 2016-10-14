@@ -54,6 +54,9 @@ namespace StorybrewEditor.UserInterface
             set { Value = (string)value; }
         }
 
+        public void SetValueSilent(string value)
+            => content.Text = value;
+
         private bool acceptMultiline;
         public bool AcceptMultiline
         {

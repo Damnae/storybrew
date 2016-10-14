@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
@@ -136,8 +137,8 @@ namespace StorybrewEditor.UserInterface.Components
                         {
                             StyleName = "listItem",
                             Text = field.DisplayName,
-                            AnchorFrom = UiAlignment.Left,
-                            AnchorTo = UiAlignment.Left,
+                            AnchorFrom = UiAlignment.TopLeft,
+                            AnchorTo = UiAlignment.TopLeft,
                         },
                         buildFieldEditor(field),
                     }
@@ -191,6 +192,22 @@ namespace StorybrewEditor.UserInterface.Components
                 {
                     setFieldValue(field, widget.Value);
                     widget.Value = effect.Config.GetValue(field.Name).ToString();
+                };
+                return widget;
+            }
+            else if (field.Type == typeof(Color4))
+            {
+                var widget = new HsbColorPicker(Manager)
+                {
+                    Value = (Color4)field.Value,
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
+                };
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = (Color4)effect.Config.GetValue(field.Name);
                 };
                 return widget;
             }

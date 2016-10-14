@@ -18,6 +18,22 @@ namespace StorybrewCommon.Util
             new SimpleObjectSerializer<double>(r => r.ReadDouble(), (w, v) => w.Write((double)v)),
             new SimpleObjectSerializer<string>(r => r.ReadString(), (w, v) => w.Write((string)v)),
             new SimpleObjectSerializer<bool>(r => r.ReadBoolean(), (w, v) => w.Write((bool)v)),
+            new SimpleObjectSerializer<Color4>(r =>
+            {
+                var red = r.ReadByte();
+                var green = r.ReadByte();
+                var blue = r.ReadByte();
+                var alpha = r.ReadByte();
+                return new Color4(red, green, blue, alpha);
+            },
+            (w, v) => 
+            {
+                var color = (Color4)v;
+                w.Write((byte)(color.R * 255));
+                w.Write((byte)(color.G * 255));
+                w.Write((byte)(color.B * 255));
+                w.Write((byte)(color.A * 255));
+            }),
         };
 
         public static object Read(BinaryReader reader)
