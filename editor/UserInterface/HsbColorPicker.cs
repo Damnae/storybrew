@@ -166,13 +166,15 @@ namespace StorybrewEditor.UserInterface
 
         private void updateWidgets()
         {
+            previewSprite.Color = value;
+
             var hsba = value.ToHsba();
             if (hsba.Z > 0)
             {
                 if (!float.IsNaN(hsba.X))
                 {
                     hueSlider.SetValueSilent(hsba.X);
-                    hueSlider.Tooltip = $"{hueSlider.Value * 360:F0}";
+                    hueSlider.Tooltip = $"{hueSlider.Value * 360:F0}°";
                     hueSlider.Disabled = false;
                 }
                 else
@@ -182,7 +184,7 @@ namespace StorybrewEditor.UserInterface
                 }
 
                 saturationSlider.SetValueSilent(hsba.Y);
-                saturationSlider.Tooltip = $"{saturationSlider.Value:F2}";
+                saturationSlider.Tooltip = $"{saturationSlider.Value:.%}";
                 saturationSlider.Disabled = false;
             }
             else
@@ -195,10 +197,10 @@ namespace StorybrewEditor.UserInterface
             }
 
             brightnessSlider.SetValueSilent(hsba.Z);
-            brightnessSlider.Tooltip = $"{brightnessSlider.Value:F2}";
+            brightnessSlider.Tooltip = $"{brightnessSlider.Value:.%}";
 
             alphaSlider.SetValueSilent(hsba.W);
-            alphaSlider.Tooltip = $"{alphaSlider.Value:F2}";
+            alphaSlider.Tooltip = $"{alphaSlider.Value:.%}";
 
             htmlTextbox.SetValueSilent(ColorTranslator.ToHtml(Color.FromArgb(value.ToArgb())));
         }
@@ -216,10 +218,7 @@ namespace StorybrewEditor.UserInterface
             base.DrawBackground(drawContext, actualOpacity);
 
             var bounds = Bounds;
-            var previewBounds = new Box2(bounds.Left, bounds.Top, bounds.Right, bounds.Top + previewHeight);
-
-            previewSprite.Color = value;
-            previewSprite.Draw(drawContext, Manager.Camera, previewBounds, actualOpacity);
+            previewSprite.Draw(drawContext, Manager.Camera, new Box2(bounds.Left, bounds.Top, bounds.Right, bounds.Top + previewHeight), actualOpacity);
         }
 
         protected override void Dispose(bool disposing)
