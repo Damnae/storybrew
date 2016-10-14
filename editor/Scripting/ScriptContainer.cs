@@ -168,7 +168,9 @@ namespace StorybrewEditor.Scripting
     }
 
     public class ScriptProvider<TScript> : MarshalByRefObject
+        where TScript : Script
     {
+        private string identifier = Guid.NewGuid().ToString();
         private Type type;
 
         public void Initialize(string assemblyPath, string typeName)
@@ -177,6 +179,11 @@ namespace StorybrewEditor.Scripting
             type = assembly.GetType(typeName, true, true);
         }
 
-        public TScript CreateScript() => (TScript)Activator.CreateInstance(type);
+        public TScript CreateScript()
+        {
+            var script = (TScript)Activator.CreateInstance(type);
+            script.Identifier = identifier;
+            return script;
+        }
     }
 }

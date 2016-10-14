@@ -7,7 +7,16 @@ namespace StorybrewCommon.Scripting
     /// </summary>
     public abstract class Script : MarshalByRefObject
     {
-        public abstract string Identifier { get; }
+        private string identifier;
+        public string Identifier
+        {
+            get { return identifier; }
+            set
+            {
+                if (identifier != null) throw new InvalidOperationException("This script already has an identifier");
+                identifier = value;
+            }
+        }
 
         /*
         public override object InitializeLifetimeService()
