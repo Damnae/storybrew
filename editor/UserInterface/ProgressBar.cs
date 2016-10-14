@@ -9,9 +9,10 @@ namespace StorybrewEditor.UserInterface
     public class ProgressBar : Widget, Field
     {
         private Drawable bar = NullDrawable.Instance;
+        private int preferredHeight = 32;
 
         public override Vector2 MinSize => bar.MinSize;
-        public override Vector2 PreferredSize => new Vector2(Math.Max(150, bar.PreferredSize.X), Math.Max(32, bar.PreferredSize.Y));
+        public override Vector2 PreferredSize => new Vector2(Math.Max(200, bar.PreferredSize.X), Math.Max(preferredHeight, bar.PreferredSize.Y));
 
         public float MinValue = 0;
         public float MaxValue = 1;
@@ -62,6 +63,7 @@ namespace StorybrewEditor.UserInterface
             var progressBarStyle = (ProgressBarStyle)style;
 
             bar = progressBarStyle.Bar;
+            preferredHeight = progressBarStyle.Height;
         }
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
