@@ -193,7 +193,7 @@ namespace StorybrewEditor.UserInterface
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
         {
-            base.DrawForeground(drawContext, actualOpacity);
+            base.DrawBackground(drawContext, actualOpacity);
 
             var bounds = Bounds;
             var previewBounds = new Box2(bounds.Left, bounds.Top, bounds.Right, bounds.Top + previewHeight);
