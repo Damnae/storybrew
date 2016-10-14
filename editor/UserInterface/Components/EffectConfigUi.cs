@@ -225,8 +225,12 @@ namespace StorybrewEditor.UserInterface.Components
                     decimal decimalValue;
                     if (decimal.TryParse(widget.Value, out decimalValue))
                     {
-                        var value = Convert.ChangeType(decimalValue, field.Type);
-                        setFieldValue(field, value);
+                        try
+                        {
+                            var value = Convert.ChangeType(decimalValue, field.Type);
+                            setFieldValue(field, value);
+                        }
+                        catch { }
                     }
                     widget.Value = effect.Config.GetValue(field.Name).ToString();
                 };
