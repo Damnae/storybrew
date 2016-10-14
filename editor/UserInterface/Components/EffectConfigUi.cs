@@ -80,10 +80,7 @@ namespace StorybrewEditor.UserInterface.Components
                     new ScrollArea(manager, configFieldsLayout = new LinearLayout(manager)
                     {
                         FitChildren = true,
-                    })
-                    {
-                        ScrollsHorizontally = false,
-                    },
+                    }),
                 },
             });
 

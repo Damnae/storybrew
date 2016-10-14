@@ -24,7 +24,7 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        private bool scrollsHorizontally = true;
+        private bool scrollsHorizontally;
         public bool ScrollsHorizontally
         {
             get { return scrollsHorizontally; }
