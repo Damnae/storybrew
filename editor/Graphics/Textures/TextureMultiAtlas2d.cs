@@ -33,7 +33,7 @@ namespace StorybrewEditor.Graphics.Textures
             var slice = atlas.AddSlice(bitmap, description);
             if (slice == null)
             {
-                Debug.Print($"{this.description} is full, adding an atlas");
+                Trace.WriteLine($"{this.description} is full, adding an atlas");
                 atlas = pushAtlas();
                 slice = atlas.AddSlice(bitmap, description);
             }

@@ -1,7 +1,6 @@
 ﻿using OpenTK;
 using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.UserInterface;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 

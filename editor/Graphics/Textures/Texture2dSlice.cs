@@ -6,7 +6,7 @@ namespace StorybrewEditor.Graphics.Textures
     public class Texture2dSlice : Texture
     {
         private string description;
-        public string Description => texture != null ? $"{description} (from {texture.Description})" : description;
+        public string Description => texture != this ? $"{description} (from {texture.Description})" : description;
 
         private Texture2d texture;
         public BindableTexture BindableTexture => texture;
@@ -26,7 +26,7 @@ namespace StorybrewEditor.Graphics.Textures
         }
 
         public override string ToString()
-            => $"Texture2dSlice#{texture.TextureId} {description} ({Width}x{Height})";
+            => $"Texture2dSlice#{texture.TextureId} {Description} ({Width}x{Height})";
 
         #region IDisposable Support
 

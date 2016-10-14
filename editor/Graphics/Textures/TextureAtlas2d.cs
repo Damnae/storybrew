@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace StorybrewEditor.Graphics.Textures
@@ -12,9 +13,16 @@ namespace StorybrewEditor.Graphics.Textures
         private int currentY;
         private int nextY;
 
-        public TextureAtlas2d(int width, int height, string description)
+        public float FillRatio => (texture.Width * currentY + currentX * (nextY - currentY)) / (texture.Width * texture.Height);
+
+        public TextureAtlas2d(Texture2d texture)
         {
-            texture = Texture2d.Create(new Color4(0, 0, 0, 0), description, width, height);
+            this.texture = texture;
+        }
+
+        public TextureAtlas2d(int width, int height, string description)
+            : this(Texture2d.Create(new Color4(0, 0, 0, 0), description, width, height))
+        {
         }
 
         /// <summary>

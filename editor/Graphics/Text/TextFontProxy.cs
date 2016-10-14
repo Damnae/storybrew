@@ -31,6 +31,7 @@ namespace StorybrewEditor.Graphics.Text
                 {
                     disposed();
                 }
+                textFont = null;
                 disposedValue = true;
             }
         }
