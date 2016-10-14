@@ -13,7 +13,7 @@ namespace StorybrewEditor.UserInterface
         public float Step;
 
         private bool disabled;
-        protected bool Disabled
+        public bool Disabled
         {
             get { return disabled; }
             set
@@ -66,6 +66,6 @@ namespace StorybrewEditor.UserInterface
             return value;
         }
 
-        protected override WidgetStyle Style => Manager.Skin.GetStyle<ProgressBarStyle>(BuildStyleName(!disabled && (dragged || hovered) ? "hover" : null));
+        protected override WidgetStyle Style => Manager.Skin.GetStyle<ProgressBarStyle>(BuildStyleName(disabled ? "disabled" : (dragged || hovered) ? "hover" : null));
     }
 }

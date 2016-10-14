@@ -170,17 +170,37 @@ namespace StorybrewEditor.UserInterface
             if (hsba.Z > 0)
             {
                 if (!float.IsNaN(hsba.X))
+                {
                     hueSlider.SetValueSilent(hsba.X);
-                saturationSlider.SetValueSilent(hsba.Y);
-            }
-            brightnessSlider.SetValueSilent(hsba.Z);
-            alphaSlider.SetValueSilent(hsba.W);
-            htmlTextbox.SetValueSilent(ColorTranslator.ToHtml(Color.FromArgb(value.ToArgb())));
+                    hueSlider.Tooltip = $"{hueSlider.Value * 360:F0}";
+                    hueSlider.Disabled = false;
+                }
+                else
+                {
+                    hueSlider.Tooltip = null;
+                    hueSlider.Disabled = true;
+                }
 
-            hueSlider.Tooltip = $"{hueSlider.Value * 360:F0}";
-            saturationSlider.Tooltip = $"{saturationSlider.Value:F2}";
+                saturationSlider.SetValueSilent(hsba.Y);
+                saturationSlider.Tooltip = $"{saturationSlider.Value:F2}";
+                saturationSlider.Disabled = false;
+            }
+            else
+            {
+                hueSlider.Tooltip = null;
+                hueSlider.Disabled = true;
+
+                saturationSlider.Tooltip = null;
+                saturationSlider.Disabled = true;
+            }
+
+            brightnessSlider.SetValueSilent(hsba.Z);
             brightnessSlider.Tooltip = $"{brightnessSlider.Value:F2}";
+
+            alphaSlider.SetValueSilent(hsba.W);
             alphaSlider.Tooltip = $"{alphaSlider.Value:F2}";
+
+            htmlTextbox.SetValueSilent(ColorTranslator.ToHtml(Color.FromArgb(value.ToArgb())));
         }
 
         protected override WidgetStyle Style => Manager.Skin.GetStyle<ColorPickerStyle>(BuildStyleName());
