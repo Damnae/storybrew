@@ -6,11 +6,14 @@ using System.IO.Compression;
 using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace StorybrewEditor
 {
     public class Builder
     {
+        private static string[] ignoredPaths = { @"scripts\Scene3dTest.cs" };
+
         public static void Build()
         {
             var archiveName = $"storybrew.{Program.Version.Major}.{Program.Version.Minor}.zip";
@@ -101,6 +104,11 @@ namespace StorybrewEditor
                 if (!Directory.Exists(targetPath))
                     Directory.CreateDirectory(targetPath);
                 entryName = Path.Combine(targetPath, entryName);
+            }
+            if (ignoredPaths.Contains(entryName))
+            {
+                Trace.WriteLine($"  Skipping {path}");
+                return;
             }
 
             Trace.WriteLine($"  Adding {path} -> {entryName}");
