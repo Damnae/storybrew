@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics.Drawables;
 using StorybrewEditor.UserInterface;
 
 namespace StorybrewEditor.ScreenLayers.Test
@@ -15,7 +14,7 @@ namespace StorybrewEditor.ScreenLayers.Test
 
             WidgetManager.Root.StyleName = "panel";
 
-            WidgetManager.Root.Add(label1 = new Label(WidgetManager, new TextMultiDrawable())
+            WidgetManager.Root.Add(label1 = new Label(WidgetManager)
             {
                 Text = @"Sanae from class 3-B was an ordinary girl, one you might find anywhere. But one day, her pets ran away from her when she was at the lake.",
                 AnchorTarget = WidgetManager.Root,
@@ -24,7 +23,7 @@ namespace StorybrewEditor.ScreenLayers.Test
                 Offset = new Vector2(16, -8),
             });
 
-            WidgetManager.Root.Add(label2 = new Label(WidgetManager, new TextMultiDrawable())
+            WidgetManager.Root.Add(label2 = new Label(WidgetManager)
             {
                 Text = @"三年B組のサナエさんは、どこにでもいる普通の女の子でした。ところがある日、彼女の飼っていたペットが湖で逃げてしまいました。",
                 AnchorTarget = WidgetManager.Root,

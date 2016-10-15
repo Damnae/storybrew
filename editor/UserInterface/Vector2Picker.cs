@@ -9,9 +9,9 @@ namespace StorybrewEditor.UserInterface
         private Textbox xTextbox;
         private Textbox yTextbox;
 
-        public override Vector2 MinSize => new Vector2(layout.MinSize.X, layout.MinSize.Y);
+        public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => Vector2.Zero;
-        public override Vector2 PreferredSize => new Vector2(layout.PreferredSize.X, layout.PreferredSize.Y);
+        public override Vector2 PreferredSize => layout.PreferredSize;
 
         private Vector2 value;
         public Vector2 Value

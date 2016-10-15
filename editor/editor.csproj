@@ -89,8 +89,6 @@
     <Compile Include="Graphics\Drawables\NullDrawable.cs" />
     <Compile Include="Graphics\Drawables\Sprite.cs" />
     <Compile Include="Graphics\Drawables\TextDrawable.cs" />
-    <Compile Include="Graphics\Drawables\TextMultiDrawable.cs" />
-    <Compile Include="Graphics\Drawables\TextSingleDrawable.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
     <Compile Include="Graphics\Textures\BindableTexture.cs" />
     <Compile Include="Graphics\Textures\TextureMultiAtlas2d.cs" />

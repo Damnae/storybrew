@@ -1,18 +1,36 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using StorybrewEditor.Graphics.Cameras;
+using StorybrewEditor.Graphics.Text;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace StorybrewEditor.Graphics.Drawables
 {
-    public abstract class TextDrawable : Drawable
+    public class TextDrawable : Drawable
     {
+        private List<string> lines;
+
+        private TextFont font;
+        private Vector2 textureMaxSize;
+        private float textureFontSize;
+        private float textureScaling = 1;
+        private Vector2 measuredSize;
+
         public Vector2 MinSize => Size;
         public Vector2 PreferredSize => Size;
 
-        public abstract Vector2 Size { get; }
+        public Vector2 Size
+        {
+            get
+            {
+                validate();
+                return measuredSize;
+            }
+        }
 
         private string text = string.Empty;
         public string Text
@@ -22,7 +40,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (text == value) return;
                 text = value;
-                InvalidateTexture();
+                invalidate();
             }
         }
 
@@ -36,7 +54,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (fontName == value) return;
                 fontName = value;
-                InvalidateTexture();
+                invalidate();
             }
         }
 
@@ -48,7 +66,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (fontSize == value) return;
                 fontSize = value;
-                InvalidateTexture();
+                invalidate();
             }
         }
 
@@ -60,10 +78,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (maxSize == value) return;
                 maxSize = value;
-
-                // Since the max size is likely to go back to the value used at the previous draw call,
-                // the texture isn't invalidated now, but right before drawing.
-                InvalidateMeasuredSize();
+                invalidate();
             }
         }
 
@@ -75,7 +90,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (scaling == value) return;
                 scaling = value;
-                InvalidateMeasuredSize();
+                invalidate();
             }
         }
 
@@ -87,7 +102,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (alignment == value) return;
                 alignment = value;
-                InvalidateTexture();
+                invalidate();
             }
         }
 
@@ -99,7 +114,7 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (trimming == value) return;
                 trimming = value;
-                InvalidateTexture();
+                invalidate();
             }
         }
 
@@ -108,19 +123,101 @@ namespace StorybrewEditor.Graphics.Drawables
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
-            if (TextureMaxSize != maxSize || TextureScaling != scaling) InvalidateTexture();
-            ValidateTexture();
-            DrawText(drawContext, camera, bounds, opacity);
+            if (textureMaxSize != maxSize || textureScaling != scaling) invalidate();
+            validate();
+            drawText(drawContext, camera, bounds, opacity);
         }
 
-        protected abstract Vector2 TextureMaxSize { get; }
-        protected abstract float TextureScaling { get; }
+        private void drawText(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
+        {
+            var inverseScaling = 1 / Scaling;
+            var color = Color.WithOpacity(opacity);
 
-        protected abstract void DrawText(DrawContext drawContext, Camera camera, Box2 bounds, float opacity);
-        protected abstract void ValidateMeasuredSize();
-        protected abstract void InvalidateMeasuredSize();
-        protected abstract void ValidateTexture();
-        protected abstract void InvalidateTexture();
+            var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
+            var clipRegion = DrawState.GetClipRegion(camera) ?? new Box2(DrawState.Viewport.Left, DrawState.Viewport.Top, DrawState.Viewport.Right, DrawState.Viewport.Bottom);
+
+            var y = bounds.Top;
+            var lineHasNonSpacing = true;
+            foreach (var line in lines)
+            {
+                var x = bounds.Left;
+                var lineHeight = 0f;
+                foreach (var c in line)
+                {
+                    var character = font.GetCharacter(c);
+                    if (!character.IsEmpty)
+                    {
+                        if (y + character.Height * inverseScaling >= clipRegion.Top)
+                            renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
+                        lineHasNonSpacing = true;
+                    }
+
+                    if (lineHasNonSpacing)
+                        x += character.Width * inverseScaling;
+                    lineHeight = Math.Max(lineHeight, character.Height * inverseScaling);
+                }
+                lineHasNonSpacing = false;
+                y += lineHeight;
+
+                if (y >= bounds.Bottom || y >= clipRegion.Bottom)
+                    break;
+            }
+        }
+
+        private void invalidate()
+        {
+            lines = null;
+        }
+
+        private void validate()
+        {
+            if (lines != null) return;
+
+            updateFont();
+            splitLines();
+            measureLines();
+        }
+
+        private void updateFont()
+        {
+            if (font == null || font.Name != FontName || textureFontSize != FontSize || textureScaling != Scaling)
+            {
+                font?.Dispose();
+                font = DrawState.TextFontManager.GetTextFont(FontName, FontSize, Scaling);
+            }
+            textureFontSize = FontSize;
+            textureScaling = Scaling;
+        }
+
+        private void splitLines()
+        {
+            var text = Text;
+            if (string.IsNullOrEmpty(text)) text = " ";
+            if (text.EndsWith("\n")) text += " ";
+
+            lines = LineBreaker.Split(text, (float)Math.Ceiling(MaxSize.X * Scaling), c => font.GetCharacter(c).Width);
+            textureMaxSize = MaxSize;
+        }
+
+        private void measureLines()
+        {
+            var width = 0.0f;
+            var height = 0.0f;
+            foreach (var line in lines)
+            {
+                var lineWidth = 0f;
+                var lineHeight = 0f;
+                foreach (var c in line)
+                {
+                    var character = font.GetCharacter(c);
+                    lineWidth += character.Width;
+                    lineHeight = Math.Max(lineHeight, character.Height);
+                }
+                width = Math.Max(width, lineWidth);
+                height += lineHeight;
+            }
+            measuredSize = new Vector2(width, height) / Scaling;
+        }
 
         #region IDisposable Support
 
@@ -131,7 +228,9 @@ namespace StorybrewEditor.Graphics.Drawables
             {
                 if (disposing)
                 {
+                    font?.Dispose();
                 }
+                font = null;
                 disposedValue = true;
             }
         }
