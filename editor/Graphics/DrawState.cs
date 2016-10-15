@@ -375,6 +375,19 @@ namespace StorybrewEditor.Graphics
             return Clip(clipRectangle);
         }
 
+        public static Box2? GetClipRegion(Camera camera)
+        {
+            if (!clipRegion.HasValue)
+                return null;
+
+            var bounds = camera.FromScreen(new Box2(clipRegion.Value.Left, clipRegion.Value.Top, clipRegion.Value.Right, clipRegion.Value.Bottom));
+            var clipRectangle = new Box2(
+                bounds.Left, viewport.Height - (bounds.Top + bounds.Height),
+                bounds.Right, bounds.Bottom
+            );
+            return clipRectangle;
+        }
+
         private static int programId;
         public static int ProgramId
         {

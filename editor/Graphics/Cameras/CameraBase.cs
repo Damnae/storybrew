@@ -123,6 +123,9 @@ namespace StorybrewEditor.Graphics.Cameras
             return near - direction * (near.Z / direction.Z);
         }
 
+        public Box2 FromScreen(Box2 screenBox2)
+            => new Box2(FromScreen(new Vector2(screenBox2.Left, screenBox2.Top)).Xy, FromScreen(new Vector2(screenBox2.Right, screenBox2.Bottom)).Xy);
+        
         public Vector3 ToScreen(Vector3 worldCoords)
         {
             Validate();

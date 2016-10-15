@@ -25,6 +25,7 @@ namespace StorybrewEditor.Graphics.Cameras
         Rectangle ExtendedViewport { get; }
 
         Vector3 FromScreen(Vector2 screenCoords);
+        Box2 FromScreen(Box2 screenBox2);
         Vector3 ToScreen(Vector3 worldCoords);
         Vector3 ToScreen(Vector2 worldCoords);
         Box2 ToScreen(Box2 worldBox2);

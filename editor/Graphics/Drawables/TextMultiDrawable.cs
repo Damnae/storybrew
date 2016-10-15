@@ -35,6 +35,7 @@ namespace StorybrewEditor.Graphics.Drawables
             var color = Color.WithOpacity(opacity);
 
             var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
+            var clipRegion = DrawState.GetClipRegion(camera) ?? new Box2(DrawState.Viewport.Left, DrawState.Viewport.Top, DrawState.Viewport.Right, DrawState.Viewport.Bottom);
 
             var y = bounds.Top;
             var lineHasNonSpacing = true;
@@ -47,7 +48,8 @@ namespace StorybrewEditor.Graphics.Drawables
                     var character = font.GetCharacter(c);
                     if (!character.IsEmpty)
                     {
-                        renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
+                        if (y + character.Height * inverseScaling >= clipRegion.Top)
+                            renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
                         lineHasNonSpacing = true;
                     }
 
@@ -58,7 +60,7 @@ namespace StorybrewEditor.Graphics.Drawables
                 lineHasNonSpacing = false;
                 y += lineHeight;
 
-                if (y >= bounds.Bottom)
+                if (y >= bounds.Bottom || y >= clipRegion.Bottom)
                     break;
             }
         }
