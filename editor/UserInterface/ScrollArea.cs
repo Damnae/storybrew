@@ -132,6 +132,7 @@ namespace StorybrewEditor.UserInterface
 
         protected override void DrawChildren(DrawContext drawContext, float actualOpacity)
         {
+            scroll(0, 0);
             base.DrawChildren(drawContext, actualOpacity);
         }
 
@@ -141,7 +142,6 @@ namespace StorybrewEditor.UserInterface
             var width = scrollsHorizontally ? Math.Max(Size.X, scrollContainer.PreferredSize.X) : Size.X;
             var height = scrollsVertically ? Math.Max(Size.Y, scrollContainer.PreferredSize.Y) : Size.Y;
             scrollContainer.Size = new Vector2(width, height);
-            scroll(0, 0);
         }
 
         private void scroll(float x, float y)
