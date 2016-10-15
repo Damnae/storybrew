@@ -121,6 +121,10 @@
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Storyboarding3d\DisplayableObject3d.cs" />
+    <Compile Include="Storyboarding3d\EditorOsbContainer3d.cs" />
+    <Compile Include="Storyboarding3d\EditorOsbScene3d.cs" />
+    <Compile Include="Storyboarding3d\EditorOsbSprite3d.cs" />
     <Compile Include="Storyboarding\EditorOsbAnimation.cs" />
     <Compile Include="Storyboarding\LayerManager.cs" />
     <Compile Include="Updater.cs" />

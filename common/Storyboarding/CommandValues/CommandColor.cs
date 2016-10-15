@@ -8,6 +8,8 @@ namespace StorybrewCommon.Storyboarding.CommandValues
     [Serializable]
     public struct CommandColor : CommandValue, IEquatable<CommandColor>
     {
+        public static readonly CommandColor White = new CommandColor(1, 1, 1);
+
         private readonly double r;
         private readonly double g;
         private readonly double b;

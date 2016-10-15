@@ -1,36 +1,35 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Storyboarding3d;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Textures;
+using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System.IO;
 
-namespace StorybrewEditor.Storyboarding
+namespace StorybrewEditor.Storyboarding3d
 {
-    public class EditorOsbSprite : OsbSprite, DisplayableObject
+    public class EditorOsbSprite3d : OsbSprite3d, DisplayableObject3d
     {
-        public readonly static RenderStates AlphaBlendStates = new RenderStates();
-        public readonly static RenderStates AdditiveStates = new RenderStates() { BlendingFactor = new BlendingFactorState(BlendingMode.Additive), };
-
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project)
-            => Draw(drawContext, camera, bounds, opacity, project, this);
-
-        public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, OsbSprite sprite)
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, Project project, StoryboardCamera.State cameraState, State3d parentState = null)
         {
             var time = project.DisplayTime * 1000;
-            if (sprite.TexturePath == null || !sprite.IsActive(time)) return;
+            var state3d = GetState3d(time, parentState);
+            var state2d = GetState2d(state3d, cameraState);
 
-            var fade = sprite.OpacityAt(time);
+            //if (!sprite.IsActive(time)) return;
+
+            var fade = state2d.Opacity;
             if (fade < 0.00001f) return;
 
-            var scale = (Vector2)sprite.ScaleAt(time);
+            var scale = state2d.Scale;
             if (scale.X == 0 || scale.Y == 0) return;
-            if (sprite.FlipHAt(time)) scale.X = -scale.X;
-            if (sprite.FlipVAt(time)) scale.Y = -scale.Y;
+            //if (sprite.FlipHAt(time)) scale.X = -scale.X;
+            //if (sprite.FlipVAt(time)) scale.Y = -scale.Y;
 
-            var fullPath = Path.Combine(project.MapsetPath, sprite.GetTexturePathAt(time));
+            var fullPath = Path.Combine(project.MapsetPath, GetTexturePathAt(time));
             Texture2d texture = null;
             try
             {
@@ -43,14 +42,12 @@ namespace StorybrewEditor.Storyboarding
             }
             if (texture == null) return;
 
-            var position = sprite.PositionAt(time);
-            var rotation = sprite.RotationAt(time);
-            var color = sprite.ColorAt(time);
-            var finalColor = ((Color4)color).WithOpacity(opacity * fade);
-            var additive = sprite.AdditiveAt(time);
+            var position = state2d.Position;
+            var additive = false;// sprite.AdditiveAt(time);
+            var finalColor = ((Color4)state3d.Color).WithOpacity(fade);
 
             Vector2 origin;
-            switch (sprite.Origin)
+            switch (Origin)
             {
                 default:
                 case OsbOrigin.TopLeft: origin = new Vector2(0, 0); break;
@@ -65,9 +62,9 @@ namespace StorybrewEditor.Storyboarding
             }
 
             var boundsScaling = bounds.Height / 480;
-            DrawState.Prepare(drawContext.SpriteRenderer, camera, additive ? AdditiveStates : AlphaBlendStates)
+            DrawState.Prepare(drawContext.SpriteRenderer, camera, additive ? EditorOsbSprite.AdditiveStates : EditorOsbSprite.AlphaBlendStates)
                 .Draw(texture, bounds.Left + bounds.Width * 0.5f + (position.X - 320) * boundsScaling, bounds.Top + position.Y * boundsScaling,
-                    origin.X, origin.Y, scale.X * boundsScaling, scale.Y * boundsScaling, rotation, finalColor);
+                    origin.X, origin.Y, scale.X * boundsScaling, scale.Y * boundsScaling, state2d.Rotation, finalColor);
         }
     }
 }

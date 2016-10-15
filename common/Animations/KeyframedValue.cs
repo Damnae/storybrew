@@ -3,16 +3,18 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Animations
 {
-    public class KeyframedValue<TValue>
+    public class KeyframedValue<TValue> : MarshalByRefObject
     {
         private List<Keyframe<TValue>> keyframes = new List<Keyframe<TValue>>();
         private Func<TValue, TValue, double, TValue> interpolate;
+        private TValue defaultValue;
 
-        public KeyframedValue(Func<TValue, TValue, double, TValue> interpolate)
+        public KeyframedValue(Func<TValue, TValue, double, TValue> interpolate, TValue defaultValue = default(TValue))
         {
             this.interpolate = interpolate;
+            this.defaultValue = defaultValue;
         }
-        
+
         public void Add(double time, TValue value)
         {
             Add(time, value, EasingFunctions.Linear);
@@ -21,7 +23,7 @@ namespace StorybrewCommon.Animations
         public void Add(double time, TValue value, Func<double, double> easing)
         {
             var keyframe = new Keyframe<TValue>(time, value, easing);
-            if (keyframes.Count == 0 || time > keyframes[keyframes.Count - 1].Time)
+            if (keyframes.Count == 0 || keyframes[keyframes.Count - 1].Time < time)
             {
                 keyframes.Add(keyframe);
             }
@@ -61,7 +63,7 @@ namespace StorybrewCommon.Animations
 
         public TValue ValueAt(double time)
         {
-            if (keyframes.Count == 0) return default(TValue);
+            if (keyframes.Count == 0) return defaultValue;
             if (keyframes.Count == 1) return keyframes[0].Value;
 
             int index = keyframes.BinarySearch(new Keyframe<TValue>(time));
