@@ -78,17 +78,17 @@ namespace StorybrewEditor.UserInterface
         {
             var xCommit = xTextbox.Value;
 
-            float X;
+            float x;
             try
             {
-                X = float.Parse(xCommit);
+                x = float.Parse(xCommit);
             }
             catch
             {
                 updateWidgets();
                 return;
             }
-            Value = new Vector2(X , value.Y);
+            Value = new Vector2(x , value.Y);
             OnValueCommited?.Invoke(this, EventArgs.Empty);
         }
 
@@ -96,17 +96,17 @@ namespace StorybrewEditor.UserInterface
         {
             var yCommit = yTextbox.Value;
 
-            float Y;
+            float y;
             try
             {
-                Y = float.Parse(yCommit);
+                y = float.Parse(yCommit);
             }
             catch
             {
                 updateWidgets();
                 return;
             }
-            Value = new Vector2(value.X, Y);
+            Value = new Vector2(value.X, y);
             OnValueCommited?.Invoke(this, EventArgs.Empty);
         }
 
@@ -116,25 +116,10 @@ namespace StorybrewEditor.UserInterface
             yTextbox.SetValueSilent(value.Y.ToString());
         }
 
-        protected override void ApplyStyle(WidgetStyle style)
-        {
-            base.ApplyStyle(style);
-        }
-
-        protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
-        {
-            base.DrawBackground(drawContext, actualOpacity);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
-
         protected override void Layout()
         {
             base.Layout();
-            layout.Size = new Vector2(Size.X, layout.PreferredSize.Y);
+            layout.Size = Size;
         }
     }
 }
