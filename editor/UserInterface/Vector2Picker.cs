@@ -46,12 +46,15 @@ namespace StorybrewEditor.UserInterface
                     new LinearLayout(manager)
                     {
                         Horizontal = true,
+                        FitChildren = true,
+                        Fill = true,
                         Children = new Widget[]
                         {
                             new Label(Manager)
                             {
                                 StyleName = "small",
-                                Text = "X"
+                                Text = "X",
+                                CanGrow = false,
                             },
                             xTextbox = new Textbox(manager)
                             {
@@ -62,12 +65,15 @@ namespace StorybrewEditor.UserInterface
                     new LinearLayout(manager)
                     {
                         Horizontal = true,
+                        FitChildren = true,
+                        Fill = true,
                         Children = new Widget[]
                         {
                             new Label(Manager)
                             {
                                 StyleName = "small",
-                                Text = "Y"
+                                Text = "Y",
+                                CanGrow = false,
                             },
                             yTextbox = new Textbox(manager)
                             {
@@ -97,7 +103,7 @@ namespace StorybrewEditor.UserInterface
                 updateWidgets();
                 return;
             }
-            Value = new Vector2(x , value.Y);
+            Value = new Vector2(x, value.Y);
             OnValueCommited?.Invoke(this, EventArgs.Empty);
         }
 
