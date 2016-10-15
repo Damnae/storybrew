@@ -112,6 +112,7 @@
     <Compile Include="ScreenLayers\Test\LineBreakTest.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Skinning\Styles\ColorPickerStyle.cs" />
+    <Compile Include="UserInterface\Vector2Config.cs" />
     <Compile Include="Util\LineBreaker.cs" />
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />

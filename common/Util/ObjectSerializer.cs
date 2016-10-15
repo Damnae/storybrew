@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics;
+﻿using OpenTK;
+using OpenTK.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,18 @@ namespace StorybrewCommon.Util
             new SimpleObjectSerializer<double>(r => r.ReadDouble(), (w, v) => w.Write((double)v)),
             new SimpleObjectSerializer<string>(r => r.ReadString(), (w, v) => w.Write((string)v)),
             new SimpleObjectSerializer<bool>(r => r.ReadBoolean(), (w, v) => w.Write((bool)v)),
+            new SimpleObjectSerializer<Vector2>(r =>
+            {
+                var x = r.ReadSingle();
+                var y = r.ReadSingle();
+                return new Vector2(x, y);
+            },
+            (w, v) =>
+            {
+                var vector = (Vector2) v;
+                w.Write((float)(vector.X));
+                w.Write((float)(vector.Y));
+            }),
             new SimpleObjectSerializer<Color4>(r =>
             {
                 var red = r.ReadByte();
