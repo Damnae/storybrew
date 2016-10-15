@@ -144,7 +144,7 @@
     <Compile Include="Graphics\Textures\Texture2d.cs" />
     <Compile Include="Graphics\Textures\TextureContainer.cs" />
     <Compile Include="Graphics\Textures\TextureContainerSeparate.cs" />
-    <Compile Include="Graphics\Text\FontManager.cs" />
+    <Compile Include="Graphics\Text\TextGenerator.cs" />
     <Compile Include="Graphics\VertexAttribute.cs" />
     <Compile Include="Graphics\VertexDeclaration.cs" />
     <Compile Include="Input\InputAdapter.cs" />
