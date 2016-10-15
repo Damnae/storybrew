@@ -12,6 +12,7 @@ namespace StorybrewEditor.ScreenLayers
         private List<Option> options = new List<Option>();
 
         private LinearLayout mainLayout;
+        private LinearLayout optionsLayout;
         private Button cancelButton;
 
         public override bool IsPopup => true;
@@ -69,9 +70,13 @@ namespace StorybrewEditor.ScreenLayers
                                 Icon = IconFont.TimesCircle,
                                 AnchorFrom = UiAlignment.Centre,
                                 CanGrow = false,
-                            }
+                            },
                         },
                     },
+                    new ScrollArea(WidgetManager, optionsLayout = new LinearLayout(WidgetManager)
+                    {
+                        FitChildren = true,
+                    }),
                 },
             });
             cancelButton.OnClick += (sender, e) => Exit();
@@ -79,7 +84,7 @@ namespace StorybrewEditor.ScreenLayers
             foreach (var option in options)
             {
                 Button button;
-                mainLayout.Add(button = new Button(WidgetManager)
+                optionsLayout.Add(button = new Button(WidgetManager)
                 {
                     StyleName = "small",
                     Text = option.Name,
@@ -98,7 +103,7 @@ namespace StorybrewEditor.ScreenLayers
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);
-            mainLayout.Pack(400, 0);
+            mainLayout.Pack(400, 0, 0, 600);
         }
 
         public struct Option
