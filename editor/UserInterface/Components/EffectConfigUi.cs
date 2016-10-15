@@ -192,6 +192,22 @@ namespace StorybrewEditor.UserInterface.Components
                 };
                 return widget;
             }
+            else if (field.Type == typeof(Vector2))
+            {
+                var widget = new Vector2Config(Manager)
+                {
+                    Value = (Vector2)field.Value,
+                    AnchorFrom = UiAlignment.Right,
+                    AnchorTo = UiAlignment.Right,
+                    CanGrow = false,
+                };
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = (Vector2)effect.Config.GetValue(field.Name);
+                };
+                return widget;
+            }
             else if (field.Type == typeof(Color4))
             {
                 var widget = new HsbColorPicker(Manager)
