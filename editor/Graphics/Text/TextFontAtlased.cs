@@ -43,10 +43,12 @@ namespace StorybrewEditor.Graphics.Text
             else
             {
                 atlas = atlas ?? new TextureMultiAtlas2d(512, 512, $"Font Atlas {name} {size}x");
-                var bitmap = DrawState.TextGenerator.CreateBitmap(c.ToString(), name, size,
-                    Vector2.Zero, Vector2.Zero, UiAlignment.Centre, StringTrimming.None, out measuredSize, false);
-                var texture = atlas.AddSlice(bitmap, $"character:{c}@{Name}:{Size}");
-                return new FontCharacter(texture, (int)measuredSize.X, (int)measuredSize.Y);
+                using (var bitmap = DrawState.TextGenerator.CreateBitmap(c.ToString(), name, size,
+                    Vector2.Zero, Vector2.Zero, UiAlignment.Centre, StringTrimming.None, out measuredSize, false))
+                {
+                    var texture = atlas.AddSlice(bitmap, $"character:{c}@{Name}:{Size}");
+                    return new FontCharacter(texture, (int)measuredSize.X, (int)measuredSize.Y);
+                }
             }
         }
 
