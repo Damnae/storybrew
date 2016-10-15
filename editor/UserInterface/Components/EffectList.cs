@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -101,7 +102,7 @@ namespace StorybrewEditor.UserInterface.Components
         private void refreshEffects()
         {
             effectsLayout.ClearWidgets();
-            foreach (var effect in project.Effects)
+            foreach (var effect in project.Effects.OrderBy(e => e.Name))
             {
                 Widget effectRoot;
                 Label nameLabel;
@@ -197,7 +198,11 @@ namespace StorybrewEditor.UserInterface.Components
                 effectRoot.OnDisposed += (sender, e) => ef.OnChanged -= changedHandler;
 
                 statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
-                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", (newName) => ef.Name = newName);
+                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", (newName) =>
+                {
+                    ef.Name = newName;
+                    refreshEffects();
+                });
                 editButton.OnClick += (sender, e) => openEffectEditor(ef);
                 configButton.OnClick += (sender, e) =>
                 {
