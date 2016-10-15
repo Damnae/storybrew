@@ -1,13 +1,9 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
-using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
 
 namespace StorybrewEditor.UserInterface
 {
-    public class Vector2Config : Widget, Field
+    public class Vector2Picker : Widget, Field
     {
         private LinearLayout layout;
         private Textbox xTextbox;
@@ -40,31 +36,44 @@ namespace StorybrewEditor.UserInterface
         public event EventHandler OnValueChanged;
         public event EventHandler OnValueCommited;
 
-        public Vector2Config(WidgetManager manager) : base(manager)
+        public Vector2Picker(WidgetManager manager) : base(manager)
         {
             Add(layout = new LinearLayout(manager)
             {
-                StyleName = "condensed",
                 FitChildren = true,
                 Children = new Widget[]
                 {
-                    new Label(Manager)
+                    new LinearLayout(manager)
                     {
-                        StyleName = "small",
-                        Text = "X"
+                        Horizontal = true,
+                        Children = new Widget[]
+                        {
+                            new Label(Manager)
+                            {
+                                StyleName = "small",
+                                Text = "X"
+                            },
+                            xTextbox = new Textbox(manager)
+                            {
+                                EnterCommits = true,
+                            },
+                        },
                     },
-                    xTextbox = new Textbox(manager)
+                    new LinearLayout(manager)
                     {
-                        EnterCommits = true,
-                    },
-                    new Label(Manager)
-                    {
-                        StyleName = "small",
-                        Text = "Y"
-                    },
-                    yTextbox = new Textbox(manager)
-                    {
-                        EnterCommits = true,
+                        Horizontal = true,
+                        Children = new Widget[]
+                        {
+                            new Label(Manager)
+                            {
+                                StyleName = "small",
+                                Text = "Y"
+                            },
+                            yTextbox = new Textbox(manager)
+                            {
+                                EnterCommits = true,
+                            },
+                        },
                     },
                 },
             });

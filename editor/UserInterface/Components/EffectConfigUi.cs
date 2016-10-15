@@ -194,7 +194,7 @@ namespace StorybrewEditor.UserInterface.Components
             }
             else if (field.Type == typeof(Vector2))
             {
-                var widget = new Vector2Config(Manager)
+                var widget = new Vector2Picker(Manager)
                 {
                     Value = (Vector2)field.Value,
                     AnchorFrom = UiAlignment.Right,
