@@ -43,7 +43,10 @@ namespace StorybrewEditor.ScreenLayers.Util
                     {
                         Text = message,
                         AnchorFrom = UiAlignment.Centre,
-                    }),
+                    })
+                    {
+                        ScrollsHorizontally = true,
+                    },
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
