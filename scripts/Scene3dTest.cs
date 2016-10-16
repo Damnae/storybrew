@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿#if DEBUG
+using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Scripting;
@@ -100,3 +101,4 @@ namespace StorybrewScripts
         }
     }
 }
+#endif
