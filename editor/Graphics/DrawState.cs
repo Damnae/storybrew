@@ -382,7 +382,7 @@ namespace StorybrewEditor.Graphics
 
             var bounds = camera.FromScreen(new Box2(clipRegion.Value.Left, clipRegion.Value.Top, clipRegion.Value.Right, clipRegion.Value.Bottom));
             var clipRectangle = new Box2(
-                bounds.Left, viewport.Height - (bounds.Top + bounds.Height),
+                bounds.Left, camera.ExtendedViewport.Height - (bounds.Top + bounds.Height),
                 bounds.Right, bounds.Bottom
             );
             return clipRectangle;
