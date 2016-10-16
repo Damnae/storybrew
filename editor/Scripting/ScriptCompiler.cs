@@ -41,9 +41,7 @@ namespace StorybrewEditor.Scripting
                 GenerateExecutable = false,
                 GenerateInMemory = false,
                 OutputAssembly = outputPath,
-#if DEBUG
                 IncludeDebugInformation = true,
-#endif
             };
 
             foreach (var referencedAssembly in referencedAssemblies)

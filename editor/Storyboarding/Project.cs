@@ -88,9 +88,7 @@ namespace StorybrewEditor.Storyboarding
             else
             {
                 cleanupFolder(compiledScriptsPath, "*.dll");
-#if DEBUG
                 cleanupFolder(compiledScriptsPath, "*.pdb");
-#endif
             }
             var referencedAssemblies = new string[]
             {

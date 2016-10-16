@@ -113,6 +113,14 @@ namespace StorybrewEditor
 
             Trace.WriteLine($"  Adding {path} -> {entryName}");
             var entry = archive.CreateEntryFromFile(path, entryName, CompressionLevel.Optimal);
+
+            var pathExtension = Path.GetExtension(path);
+            if (pathExtension == ".exe" || pathExtension == ".dll")
+            {
+                var pdbPath = Path.Combine(Path.GetDirectoryName(path), $"{Path.GetFileNameWithoutExtension(path)}.pdb");
+                if (File.Exists(pdbPath))
+                    addFile(archive, pdbPath, sourceDirectory);
+            }
         }
     }
 }
