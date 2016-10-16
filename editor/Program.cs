@@ -188,6 +188,8 @@ namespace StorybrewEditor
         #region Scheduling
 
         private static bool schedulingEnabled;
+        public static bool SchedulingEnabled => schedulingEnabled;
+
         private static readonly Queue<Action> scheduledActions = new Queue<Action>();
 
         public static void enableScheduling()
@@ -204,16 +206,7 @@ namespace StorybrewEditor
             if (schedulingEnabled)
                 lock (scheduledActions)
                     scheduledActions.Enqueue(action);
-            else
-                try
-                {
-                    Debug.WriteLine($"Scheduling not available for {action.Method}");
-                    action.Invoke();
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine($"Scheduled task {action.Method} failed (scheduling not available):\n{e}");
-                }
+            else throw new InvalidOperationException("Scheduling isn't enabled");
         }
 
         /// <summary>
@@ -279,7 +272,7 @@ namespace StorybrewEditor
                 try
                 {
 #endif
-                action.Invoke();
+                    action.Invoke();
 #if !DEBUG
                 }
                 catch (Exception e)
@@ -317,16 +310,18 @@ namespace StorybrewEditor
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError(crashPath, (Exception)e.ExceptionObject);
         }
 
+        private static volatile bool insideErrorHandler;
         private static void logError(string filename, Exception e)
         {
-            if (!IsMainThread)
-            {
-                Schedule(() => logError(filename, e));
-                return;
-            }
-
+            if (insideErrorHandler) return;
+            insideErrorHandler = true;
             try
             {
+                if (!IsMainThread && SchedulingEnabled)
+                {
+                    Schedule(() => logError(filename, e));
+                    return;
+                }
                 string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
                 using (StreamWriter w = new StreamWriter(logPath, true))
                 {
@@ -338,6 +333,10 @@ namespace StorybrewEditor
             catch (Exception e2)
             {
                 Trace.WriteLine(e2.Message);
+            }
+            finally
+            {
+                insideErrorHandler = false;
             }
         }
 
