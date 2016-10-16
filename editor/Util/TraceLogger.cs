@@ -18,9 +18,13 @@ namespace StorybrewEditor.Util
 
         private void log(string message)
         {
-            if (!Program.IsMainThread && Program.SchedulingEnabled)
-                Program.Schedule(() => File.AppendAllText(path, message + "\n"));
-            else File.AppendAllText(path, message + "\n");
+            try
+            {
+                if (!Program.IsMainThread && Program.SchedulingEnabled)
+                    Program.Schedule(() => File.AppendAllText(path, message + "\n"));
+                else File.AppendAllText(path, message + "\n");
+            }
+            catch { }
         }
     }
 }

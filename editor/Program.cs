@@ -2,6 +2,7 @@
 using OpenTK.Graphics;
 using StorybrewEditor.Audio;
 using StorybrewEditor.Graphics;
+using StorybrewEditor.Processes;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,12 @@ namespace StorybrewEditor
                 case "build":
                     setupLogging(null, "build.log");
                     Builder.Build();
+                    return true;
+                case "worker":
+                    if (args.Length < 2) return false;
+                    setupLogging(null, $"worker-{DateTime.UtcNow:yyyyMMddHHmmssfff}.log");
+                    enableScheduling();
+                    ProcessWorker.Run(args[1]);
                     return true;
             }
             return false;
@@ -158,7 +165,7 @@ namespace StorybrewEditor
                     windowDisplayed = true;
                 }
 
-                runScheduledTasks();
+                RunScheduledTasks();
 
                 var activeDuration = watch.Elapsed.TotalSeconds - currentTime;
                 var sleepMs = Math.Max(0, (int)(((focused ? targetFrameDuration : fixedRateUpdateDuration) - activeDuration) * 1000));
@@ -256,8 +263,10 @@ namespace StorybrewEditor
             }
         }
 
-        private static void runScheduledTasks()
+        public static void RunScheduledTasks()
         {
+            CheckMainThread();
+
             Action[] actionsToRun;
             lock (scheduledActions)
             {

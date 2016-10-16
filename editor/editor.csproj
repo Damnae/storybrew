@@ -71,6 +71,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -107,9 +108,14 @@
     <Compile Include="Graphics\Cameras\CameraIso.cs" />
     <Compile Include="Graphics\Cameras\CameraOrtho.cs" />
     <Compile Include="Graphics\Cameras\CameraPerspective.cs" />
+    <Compile Include="Processes\RemoteProcessWorkerContainer.cs" />
+    <Compile Include="Processes\RemoteProcessWorker.cs" />
     <Compile Include="ScreenLayers\Test\LineBreakTest.cs" />
     <Compile Include="Scripting\ScriptContainer.cs" />
+    <Compile Include="Scripting\ScriptContainerBase.cs" />
+    <Compile Include="Scripting\ScriptContainerProcess.cs" />
     <Compile Include="Scripting\ScriptProvider.cs" />
+    <Compile Include="Processes\ProcessWorker.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Skinning\Styles\ColorPickerStyle.cs" />
     <Compile Include="UserInterface\Vector2Picker.cs" />
