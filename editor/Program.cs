@@ -155,9 +155,12 @@ namespace StorybrewEditor
 
                 if (!window.Exists || window.IsExiting) return;
 
-                editor.Draw();
                 window.VSync = focused ? VSyncMode.Off : VSyncMode.On;
-                window.SwapBuffers();
+                if (window.WindowState != WindowState.Minimized)
+                {
+                    editor.Draw();
+                    window.SwapBuffers();
+                }
 
                 if (!windowDisplayed)
                 {
