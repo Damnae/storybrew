@@ -104,5 +104,13 @@ namespace StorybrewEditor.UserInterface
             base.DrawBackground(drawContext, actualOpacity);
             textDrawable.Draw(drawContext, Manager.Camera, TextBounds, actualOpacity);
         }
+
+        public Box2 GetCharacterBounds(int index)
+        {
+            var position = ScreenPosition;
+            var bounds = textDrawable.GetCharacterBounds(index);
+
+            return new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom);
+        }
     }
 }

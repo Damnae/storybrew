@@ -191,12 +191,11 @@ namespace StorybrewEditor.UserInterface
         {
             base.DrawForeground(drawContext, actualOpacity);
 
-            // Cursor disabled for now in multiline mode
-            if (hasFocus && !acceptMultiline)
+            if (hasFocus)
             {
-                var contentBounds = content.TextBounds;
-                var position = new Vector2(string.IsNullOrEmpty(Value) ? contentBounds.Left : contentBounds.Right, contentBounds.Top + content.TextBounds.Height * 0.2f);
-                var scale = new Vector2(Manager.PixelSize, content.TextBounds.Height * 0.6f);
+                var characterBounds = content.GetCharacterBounds(Math.Max(0, content.Text.Length - 1));
+                var position = new Vector2(string.IsNullOrEmpty(Value) ? characterBounds.Left : characterBounds.Right, characterBounds.Top + characterBounds.Height * 0.2f);
+                var scale = new Vector2(Manager.PixelSize, characterBounds.Height * 0.6f);
 
                 cursorLine.Color = Color4.White;
                 cursorLine.Draw(drawContext, Manager.Camera, new Box2(position, position + scale), actualOpacity);

@@ -18,6 +18,17 @@ namespace StorybrewEditor.Graphics.Text
         private Vector2 size;
         public Vector2 Size => size;
 
+        public IEnumerable<TextLayoutGlyph> VisibleGlyphs
+        {
+            get
+            {
+                foreach (var line in lines)
+                    foreach (var glyph in line.Glyphs)
+                        if (!glyph.Glyph.IsEmpty)
+                            yield return glyph;
+            }
+        }
+
         public TextLayout(string text, TextFont font, UiAlignment alignment, StringTrimming trimming, int maxWidth)
         {
             textLines = LineBreaker.Split(text, maxWidth, c => font.GetGlyph(c).Width);
@@ -41,7 +52,7 @@ namespace StorybrewEditor.Graphics.Text
         {
             foreach (var line in lines)
             {
-                if (line.GlyphCount < index)
+                if (index < line.GlyphCount)
                     return line.GetGlyph(index);
                 index -= line.GlyphCount;
             }

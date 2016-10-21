@@ -121,34 +121,41 @@ namespace StorybrewEditor.Graphics.Drawables
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             validate();
-            drawText(drawContext, camera, bounds, opacity);
-        }
 
-        private void drawText(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
-        {
-            var inverseScaling = 1 / Scaling;
+            var inverseScaling = 1 / scaling;
             var color = Color.WithOpacity(opacity);
 
             var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
             var clipRegion = DrawState.GetClipRegion(camera) ?? new Box2(camera.ExtendedViewport.Left, camera.ExtendedViewport.Top, camera.ExtendedViewport.Right, camera.ExtendedViewport.Bottom);
 
-            foreach (var layoutLine in textLayout.Lines)
-                foreach (var layoutGlyph in layoutLine.Glyphs)
-                {
-                    var glyph = layoutGlyph.Glyph;
-                    if (glyph.IsEmpty)
-                        continue;
+            foreach (var layoutGlyph in textLayout.VisibleGlyphs)
+            {
+                var glyph = layoutGlyph.Glyph;
+                var position = layoutGlyph.Position;
 
-                    var position = layoutGlyph.Position;
+                var y = bounds.Top + position.Y * inverseScaling;
+                if (y > clipRegion.Bottom) break;
 
-                    var x = bounds.Left + position.X * inverseScaling;
-                    var y = bounds.Top + position.Y * inverseScaling;
-                    var width = glyph.Width * inverseScaling;
-                    var height = glyph.Height * inverseScaling;
+                var height = glyph.Height * inverseScaling;
+                if (y + height < clipRegion.Top) continue;
 
-                    if (y <= clipRegion.Bottom && y + height >= clipRegion.Top)
-                        renderer.Draw(glyph.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
-                }
+                var x = bounds.Left + position.X * inverseScaling;
+                var width = glyph.Width * inverseScaling;
+
+                renderer.Draw(glyph.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
+            }
+        }
+
+        public Box2 GetCharacterBounds(int index)
+        {
+            validate();
+
+            var inverseScaling = 1 / scaling;
+            var layoutGlyph = textLayout.GetGlyph(index);
+            var glyph = layoutGlyph.Glyph;
+            var position = layoutGlyph.Position * inverseScaling;
+
+            return new Box2(position.X, position.Y, position.X + glyph.Width * inverseScaling, position.Y + glyph.Height * inverseScaling);
         }
 
         private void invalidate()
@@ -173,6 +180,7 @@ namespace StorybrewEditor.Graphics.Drawables
             var text = Text;
             if (string.IsNullOrEmpty(text)) text = " ";
             if (text.EndsWith("\n")) text += " ";
+
             textLayout = new TextLayout(text, font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * Scaling));
         }
 
