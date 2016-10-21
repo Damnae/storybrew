@@ -96,6 +96,7 @@
     <Compile Include="Graphics\Textures\TextureAtlas2d.cs" />
     <Compile Include="Graphics\Textures\Texture2dRegion.cs" />
     <Compile Include="Graphics\Text\FontGlyph.cs" />
+    <Compile Include="Graphics\Text\TextLayout.cs" />
     <Compile Include="Graphics\Text\TextFontAtlased.cs" />
     <Compile Include="Graphics\Text\TextFontProxy.cs" />
     <Compile Include="Graphics\Text\TextFontManager.cs" />

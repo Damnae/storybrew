@@ -5,20 +5,17 @@ using StorybrewEditor.Graphics.Text;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace StorybrewEditor.Graphics.Drawables
 {
     public class TextDrawable : Drawable
     {
-        private List<string> lines;
+        private TextLayout textLayout;
 
         private TextFont font;
-        private Vector2 textureMaxSize;
         private float textureFontSize;
         private float textureScaling = 1;
-        private Vector2 measuredSize;
 
         public Vector2 MinSize => Size;
         public Vector2 PreferredSize => Size;
@@ -28,7 +25,7 @@ namespace StorybrewEditor.Graphics.Drawables
             get
             {
                 validate();
-                return measuredSize;
+                return textLayout.Size;
             }
         }
 
@@ -123,7 +120,6 @@ namespace StorybrewEditor.Graphics.Drawables
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
-            if (textureMaxSize != maxSize || textureScaling != scaling) invalidate();
             validate();
             drawText(drawContext, camera, bounds, opacity);
         }
@@ -136,87 +132,48 @@ namespace StorybrewEditor.Graphics.Drawables
             var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
             var clipRegion = DrawState.GetClipRegion(camera) ?? new Box2(camera.ExtendedViewport.Left, camera.ExtendedViewport.Top, camera.ExtendedViewport.Right, camera.ExtendedViewport.Bottom);
 
-            var y = bounds.Top;
-            var lineHasNonSpacing = true;
-            foreach (var line in lines)
-            {
-                var x = bounds.Left;
-                var lineHeight = 0f;
-                foreach (var c in line)
+            foreach (var layoutLine in textLayout.Lines)
+                foreach (var layoutGlyph in layoutLine.Glyphs)
                 {
-                    var glyph = font.GetGlyph(c);
-                    if (!glyph.IsEmpty)
-                    {
-                        if (y + glyph.Height * inverseScaling >= clipRegion.Top)
-                            renderer.Draw(glyph.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
-                        lineHasNonSpacing = true;
-                    }
+                    var glyph = layoutGlyph.Glyph;
+                    if (glyph.IsEmpty)
+                        continue;
 
-                    if (lineHasNonSpacing)
-                        x += glyph.Width * inverseScaling;
-                    lineHeight = Math.Max(lineHeight, glyph.Height * inverseScaling);
+                    var position = layoutGlyph.Position;
+
+                    var x = bounds.Left + position.X * inverseScaling;
+                    var y = bounds.Top + position.Y * inverseScaling;
+                    var width = glyph.Width * inverseScaling;
+                    var height = glyph.Height * inverseScaling;
+
+                    if (y <= clipRegion.Bottom && y + height >= clipRegion.Top)
+                        renderer.Draw(glyph.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
                 }
-                lineHasNonSpacing = false;
-                y += lineHeight;
-
-                if (y > bounds.Bottom || y > clipRegion.Bottom)
-                    break;
-            }
         }
 
         private void invalidate()
         {
-            lines = null;
+            textLayout = null;
         }
 
         private void validate()
         {
-            if (lines != null) return;
+            if (textLayout != null)
+                return;
 
-            updateFont();
-            splitLines();
-            measureLines();
-        }
-
-        private void updateFont()
-        {
             if (font == null || font.Name != FontName || textureFontSize != FontSize || textureScaling != Scaling)
             {
                 font?.Dispose();
                 font = DrawState.TextFontManager.GetTextFont(FontName, FontSize, Scaling);
-            }
-            textureFontSize = FontSize;
-            textureScaling = Scaling;
-        }
 
-        private void splitLines()
-        {
+                textureFontSize = FontSize;
+                textureScaling = Scaling;
+            }
+
             var text = Text;
             if (string.IsNullOrEmpty(text)) text = " ";
             if (text.EndsWith("\n")) text += " ";
-
-            lines = LineBreaker.Split(text, (float)Math.Ceiling(MaxSize.X * Scaling), c => font.GetGlyph(c).Width);
-            textureMaxSize = MaxSize;
-        }
-
-        private void measureLines()
-        {
-            var width = 0.0f;
-            var height = 0.0f;
-            foreach (var line in lines)
-            {
-                var lineWidth = 0f;
-                var lineHeight = 0f;
-                foreach (var c in line)
-                {
-                    var glyph = font.GetGlyph(c);
-                    lineWidth += glyph.Width;
-                    lineHeight = Math.Max(lineHeight, glyph.Height);
-                }
-                width = Math.Max(width, lineWidth);
-                height += lineHeight;
-            }
-            measuredSize = new Vector2(width, height) / Scaling;
+            textLayout = new TextLayout(text, font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * Scaling));
         }
 
         #region IDisposable Support
