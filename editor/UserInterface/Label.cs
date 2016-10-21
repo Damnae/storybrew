@@ -122,5 +122,11 @@ namespace StorybrewEditor.UserInterface
 
         public int GetCharacterIndexAt(Vector2 position)
             => textDrawable.GetCharacterIndexAt(position - ScreenPosition);
+
+        public int GetCharacterIndexAbove(int index)
+            => textDrawable.GetCharacterIndexAbove(index);
+
+        public int GetCharacterIndexBelow(int index)
+            => textDrawable.GetCharacterIndexBelow(index);
     }
 }

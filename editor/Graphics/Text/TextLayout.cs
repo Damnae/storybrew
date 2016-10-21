@@ -126,6 +126,48 @@ namespace StorybrewEditor.Graphics.Text
                     action(new Box2(topLeft, bottomRight));
             }
         }
+
+        public int GetCharacterIndexAbove(int index)
+        {
+            var lineIndex = 0;
+            foreach (var line in lines)
+            {
+                if (index < line.GlyphCount)
+                {
+                    if (lineIndex == 0)
+                        return 0;
+
+                    var previousLine = lines[lineIndex - 1];
+                    return previousLine.GetGlyph(Math.Min(index, previousLine.GlyphCount - 1)).Index;
+                }
+                index -= line.GlyphCount;
+                lineIndex++;
+            }
+            throw new IndexOutOfRangeException();
+        }
+
+        public int GetCharacterIndexBelow(int index)
+        {
+            var lineIndex = 0;
+            foreach (var line in lines)
+            {
+                if (index < line.GlyphCount)
+                {
+                    var lastLineIndex = lines.Count - 1;
+                    if (lineIndex == lastLineIndex)
+                    {
+                        var lastLine = lines[lastLineIndex];
+                        return lastLine.GetGlyph(lastLine.GlyphCount - 1).Index;
+                    }
+
+                    var nextLine = lines[lineIndex + 1];
+                    return nextLine.GetGlyph(Math.Min(index, nextLine.GlyphCount - 1)).Index;
+                }
+                index -= line.GlyphCount;
+                lineIndex++;
+            }
+            throw new IndexOutOfRangeException();
+        }
     }
 
     public class TextLayoutLine

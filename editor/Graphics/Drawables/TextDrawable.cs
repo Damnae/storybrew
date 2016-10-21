@@ -172,6 +172,18 @@ namespace StorybrewEditor.Graphics.Drawables
                 action(new Box2(bounds.Left * inverseScaling, bounds.Top * inverseScaling, bounds.Right * inverseScaling, bounds.Bottom * inverseScaling)));
         }
 
+        public int GetCharacterIndexAbove(int index)
+        {
+            validate();
+            return textLayout.GetCharacterIndexAbove(index);
+        }
+
+        public int GetCharacterIndexBelow(int index)
+        {
+            validate();
+            return textLayout.GetCharacterIndexBelow(index);
+        }
+
         private void invalidate()
         {
             textLayout = null;

@@ -215,6 +215,16 @@ namespace StorybrewEditor.UserInterface
                         else if (cursorPosition < Value.Length)
                             selectionStart = ++cursorPosition;
                         break;
+                    case Key.Up:
+                        cursorPosition = content.GetCharacterIndexAbove(cursorPosition);
+                        if (!manager.ScreenLayerManager.Editor.InputManager.Shift)
+                            selectionStart = cursorPosition;
+                        break;
+                    case Key.Down:
+                        cursorPosition = content.GetCharacterIndexBelow(cursorPosition);
+                        if (!manager.ScreenLayerManager.Editor.InputManager.Shift)
+                            selectionStart = cursorPosition;
+                        break;
                     case Key.Enter:
                     case Key.KeypadEnter:
                         if (AcceptMultiline && (!EnterCommits || manager.ScreenLayerManager.Editor.InputManager.Shift))
