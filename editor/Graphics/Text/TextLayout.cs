@@ -45,13 +45,14 @@ namespace StorybrewEditor.Graphics.Text
 
             if (text.Length > 0)
             {
+                var glyphIndex = 0;
                 var width = 0.0f;
                 var height = 0.0f;
                 foreach (var textLine in textLines)
                 {
                     var line = new TextLayoutLine(this, height, alignment, lines.Count == 0);
                     foreach (var c in textLine)
-                        line.Add(font.GetGlyph(c));
+                        line.Add(font.GetGlyph(c), glyphIndex++);
                     lines.Add(line);
 
                     width = Math.Max(width, line.Width);
@@ -59,14 +60,14 @@ namespace StorybrewEditor.Graphics.Text
                 }
                 var lastLine = lines[lines.Count - 1];
                 if (lastLine.GlyphCount == 0) height += font.LineHeight;
-                lastLine.Add(new FontGlyph(null, 0, font.LineHeight));
+                lastLine.Add(new FontGlyph(null, 0, font.LineHeight), glyphIndex++);
 
                 size = new Vector2(width, height);
             }
             else
             {
                 var line = new TextLayoutLine(this, 0, alignment, lines.Count == 0);
-                line.Add(new FontGlyph(null, 0, font.LineHeight));
+                line.Add(new FontGlyph(null, 0, font.LineHeight), 0);
                 lines.Add(line);
                 size = new Vector2(0, font.LineHeight);
             }
@@ -91,7 +92,7 @@ namespace StorybrewEditor.Graphics.Text
                 var lineMatches = position.Y < line.Position.Y + line.Height;
                 foreach (var glyph in line.Glyphs)
                 {
-                    if (lineMatches && position.X < glyph.Position.X + glyph.Glyph.Width)
+                    if (lineMatches && position.X < glyph.Position.X + glyph.Glyph.Width * 0.5f)
                         return index;
 
                     index++;
@@ -100,6 +101,30 @@ namespace StorybrewEditor.Graphics.Text
                     return index - 1;
             }
             return index - 1;
+        }
+
+        public void ForTextBounds(int startIndex, int endIndex, Action<Box2> action)
+        {
+            var index = 0;
+            foreach (var line in lines)
+            {
+                var topLeft = Vector2.Zero;
+                var bottomRight = Vector2.Zero;
+                var hasBounds = false;
+                foreach (var layoutGlyph in line.Glyphs)
+                {
+                    if (!hasBounds && startIndex <= index)
+                    {
+                        topLeft = layoutGlyph.Position;
+                        hasBounds = true;
+                    }
+                    if (index < endIndex)
+                        bottomRight = layoutGlyph.Position + layoutGlyph.Glyph.Size;
+                    index++;
+                }
+                if (hasBounds)
+                    action(new Box2(topLeft, bottomRight));
+            }
         }
     }
 
@@ -135,11 +160,11 @@ namespace StorybrewEditor.Graphics.Text
             advance = advanceOnEmptyGlyph;
         }
 
-        public void Add(FontGlyph glyph)
+        public void Add(FontGlyph glyph, int glyphIndex)
         {
             if (!glyph.IsEmpty) advance = true;
 
-            glyphs.Add(new TextLayoutGlyph(this, glyph, width));
+            glyphs.Add(new TextLayoutGlyph(this, glyph, glyphIndex, width));
             if (advance) width += glyph.Width;
             height = Math.Max(height, glyph.Height);
         }
@@ -156,6 +181,9 @@ namespace StorybrewEditor.Graphics.Text
         private FontGlyph glyph;
         public FontGlyph Glyph => glyph;
 
+        private int index;
+        public int Index => index;
+
         public Vector2 Position
         {
             get
@@ -165,10 +193,11 @@ namespace StorybrewEditor.Graphics.Text
             }
         }
 
-        public TextLayoutGlyph(TextLayoutLine line, FontGlyph glyph, float x)
+        public TextLayoutGlyph(TextLayoutLine line, FontGlyph glyph, int index, float x)
         {
             this.line = line;
             this.glyph = glyph;
+            this.index = index;
             this.x = x;
         }
     }

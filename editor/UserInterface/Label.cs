@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
 using StorybrewEditor.Graphics.Drawables;
@@ -109,8 +110,14 @@ namespace StorybrewEditor.UserInterface
         {
             var position = ScreenPosition;
             var bounds = textDrawable.GetCharacterBounds(index);
-
             return new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom);
+        }
+        
+        public void ForTextBounds(int startIndex, int endIndex, Action<Box2> action)
+        {
+            var position = ScreenPosition;
+            textDrawable.ForTextBounds(startIndex, endIndex, (bounds) => 
+                action(new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom)));
         }
 
         public int GetCharacterIndexAt(Vector2 position)

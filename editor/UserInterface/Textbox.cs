@@ -17,7 +17,32 @@ namespace StorybrewEditor.UserInterface
         private bool hasFocus;
         private bool hovered;
         private bool hasCommitPending;
+
         private int cursorPosition;
+        private int selectionStart;
+        public int SelectionLeft
+        {
+            get { return Math.Min(selectionStart, cursorPosition); }
+            set
+            {
+                if (selectionStart < cursorPosition)
+                    selectionStart = value;
+                else
+                    cursorPosition = value;
+            }
+        }
+        public int SelectionRight
+        {
+            get { return Math.Max(selectionStart, cursorPosition); }
+            set
+            {
+                if (selectionStart > cursorPosition)
+                    selectionStart = value;
+                else
+                    cursorPosition = value;
+            }
+        }
+        public int SelectionLength => Math.Abs(cursorPosition - selectionStart);
 
         public override Vector2 MinSize => new Vector2(0, PreferredSize.Y);
         public override Vector2 MaxSize => new Vector2(0, PreferredSize.Y);
@@ -58,6 +83,8 @@ namespace StorybrewEditor.UserInterface
         public void SetValueSilent(string value)
         {
             content.Text = value;
+            if (selectionStart > content.Text.Length)
+                selectionStart = content.Text.Length;
             if (cursorPosition > content.Text.Length)
                 cursorPosition = content.Text.Length;
         }
@@ -86,6 +113,7 @@ namespace StorybrewEditor.UserInterface
             {
                 Texture = DrawState.WhitePixel,
                 ScaleMode = ScaleMode.Fill,
+                Color = Color4.White,
             };
 
             Add(content = new Label(manager)
@@ -127,19 +155,24 @@ namespace StorybrewEditor.UserInterface
                             manager.KeyboardFocus = null;
                         break;
                     case Key.BackSpace:
-                        if (cursorPosition > 0)
-                        {
-                            cursorPosition--;
-                            Value = Value.Remove(cursorPosition, 1);
-                        }
+                        if (selectionStart > 0 && selectionStart == cursorPosition)
+                            selectionStart--;
+                        ReplaceSelection("");
                         break;
                     case Key.Delete:
-                        if (cursorPosition < Value.Length)
-                            Value = Value.Remove(cursorPosition, 1);
+                        if (selectionStart < Value.Length && selectionStart == cursorPosition)
+                            cursorPosition++;
+                        ReplaceSelection("");
+                        break;
+                    case Key.A:
+                        SelectAll();
                         break;
                     case Key.C:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
-                            System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
+                            if (selectionStart != cursorPosition)
+                                System.Windows.Forms.Clipboard.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
+                            else
+                                System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
                         break;
                     case Key.V:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
@@ -147,33 +180,45 @@ namespace StorybrewEditor.UserInterface
                             var clipboardText = System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
                             if (!AcceptMultiline)
                                 clipboardText = clipboardText.Replace("\n", "");
-                            Value = Value.Insert(cursorPosition, clipboardText);
-                            cursorPosition += clipboardText.Length;
+                            ReplaceSelection(clipboardText);
                         }
                         break;
                     case Key.X:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
                         {
-                            System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
-                            Value = string.Empty;
-                            cursorPosition = 0;
+                            if (selectionStart == cursorPosition)
+                                SelectAll();
+
+                            System.Windows.Forms.Clipboard.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
+                            ReplaceSelection("");
                         }
                         break;
                     case Key.Left:
-                        if (cursorPosition > 0)
-                            cursorPosition--;
+                        if (manager.ScreenLayerManager.Editor.InputManager.Shift)
+                        {
+                            if (cursorPosition > 0)
+                                cursorPosition--;
+                        }
+                        else if (selectionStart != cursorPosition)
+                            SelectionRight = SelectionLeft;
+                        else if (cursorPosition > 0)
+                            cursorPosition = --selectionStart;
                         break;
                     case Key.Right:
-                        if (cursorPosition < Value.Length)
-                            cursorPosition++;
+                        if (manager.ScreenLayerManager.Editor.InputManager.Shift)
+                        {
+                            if (cursorPosition < Value.Length)
+                                cursorPosition++;
+                        }
+                        else if (selectionStart != cursorPosition)
+                            SelectionLeft = SelectionRight;
+                        else if (cursorPosition < Value.Length)
+                            selectionStart = ++cursorPosition;
                         break;
                     case Key.Enter:
                     case Key.KeypadEnter:
                         if (AcceptMultiline && (!EnterCommits || manager.ScreenLayerManager.Editor.InputManager.Shift))
-                        {
-                            Value = Value.Insert(cursorPosition, "\n");
-                            cursorPosition++;
-                        }
+                            ReplaceSelection("\n");
                         else if (EnterCommits && hasCommitPending)
                         {
                             OnValueCommited?.Invoke(this, EventArgs.Empty);
@@ -190,16 +235,18 @@ namespace StorybrewEditor.UserInterface
             OnKeyPress += (sender, e) =>
             {
                 if (!hasFocus) return false;
-
-                Value = Value.Insert(cursorPosition, e.KeyChar.ToString());
-                cursorPosition++;
+                ReplaceSelection(e.KeyChar.ToString());
                 return true;
             };
             OnClickDown += (sender, e) =>
             {
                 manager.KeyboardFocus = this;
-                cursorPosition = content.GetCharacterIndexAt(new Vector2(e.X, e.Y));
+                selectionStart = cursorPosition = content.GetCharacterIndexAt(new Vector2(e.X, e.Y));
                 return true;
+            };
+            OnDrag += (sender, e) =>
+            {
+                cursorPosition = content.GetCharacterIndexAt(new Vector2(e.X, e.Y));
             };
         }
 
@@ -220,11 +267,15 @@ namespace StorybrewEditor.UserInterface
 
             if (hasFocus)
             {
-                var characterBounds = content.GetCharacterBounds(cursorPosition);
-                var position = new Vector2(characterBounds.Left, characterBounds.Top + characterBounds.Height * 0.2f);
-                var scale = new Vector2(Manager.PixelSize, characterBounds.Height * 0.6f);
+                if (cursorPosition != selectionStart)
+                {
+                    content.ForTextBounds(SelectionLeft, SelectionRight, (selectionBounds) =>
+                        cursorLine.Draw(drawContext, Manager.Camera, selectionBounds, actualOpacity * 0.2f));
+                }
 
-                cursorLine.Color = Color4.White;
+                var bounds = content.GetCharacterBounds(cursorPosition);
+                var position = new Vector2(bounds.Left, bounds.Top + bounds.Height * 0.2f);
+                var scale = new Vector2(Manager.PixelSize, bounds.Height * 0.6f);
                 cursorLine.Draw(drawContext, Manager.Camera, new Box2(position, position + scale), actualOpacity);
             }
         }
@@ -245,6 +296,27 @@ namespace StorybrewEditor.UserInterface
             base.Layout();
             content.Size = new Vector2(Size.X, content.PreferredSize.Y);
             label.Size = new Vector2(Size.X, label.PreferredSize.Y);
+        }
+
+        public void SelectAll()
+        {
+            selectionStart = 0;
+            cursorPosition = Value.Length;
+        }
+
+        public void ReplaceSelection(string text)
+        {
+            var left = SelectionLeft;
+            var right = SelectionRight;
+
+            var newValue = Value;
+            if (left != right)
+                newValue = newValue.Remove(left, right - left);
+            newValue = newValue.Insert(left, text);
+
+            Value = newValue;
+            SelectionLeft += text.Length;
+            SelectionRight = SelectionLeft;
         }
     }
 }
