@@ -325,8 +325,7 @@ namespace StorybrewEditor.UserInterface
             newValue = newValue.Insert(left, text);
 
             Value = newValue;
-            SelectionLeft += text.Length;
-            SelectionRight = SelectionLeft;
+            cursorPosition = selectionStart = SelectionLeft + text.Length;
         }
     }
 }
