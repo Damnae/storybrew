@@ -44,6 +44,8 @@ namespace StorybrewEditor.Util
                     endIndex--;
                 }
             }
+            if (text.Length > 0 && mustBreakAfter(text, text.Length - 1, true))
+                lines.Add(string.Empty);
 
             return lines;
         }
@@ -291,16 +293,17 @@ namespace StorybrewEditor.Util
             return Breakability.Allowed;
         }
 
-        private static bool mustBreakAfter(string text, int index)
+        private static bool mustBreakAfter(string text, int index, bool ignoreLastCharacter = false)
         {
-            if (index == text.Length - 1) return true;
+            if (!ignoreLastCharacter && index == text.Length - 1)
+                return true;
 
             var c = text[index];
 
             if (causesBreakAfter.Contains(c))
                 return true;
 
-            if (c == 0x000D && text[index + 1] != 0x000A) // CARRIAGE RETURN, except before a LINE FEED
+            if (c == 0x000D && (index == text.Length - 1 || text[index + 1] != 0x000A)) // CARRIAGE RETURN, except before a LINE FEED
                 return true;
 
             return false;

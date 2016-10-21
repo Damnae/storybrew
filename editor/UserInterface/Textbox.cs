@@ -17,6 +17,7 @@ namespace StorybrewEditor.UserInterface
         private bool hasFocus;
         private bool hovered;
         private bool hasCommitPending;
+        private int cursorPosition;
 
         public override Vector2 MinSize => new Vector2(0, PreferredSize.Y);
         public override Vector2 MaxSize => new Vector2(0, PreferredSize.Y);
@@ -41,7 +42,7 @@ namespace StorybrewEditor.UserInterface
             set
             {
                 if (content.Text == value) return;
-                content.Text = value;
+                SetValueSilent(value);
 
                 if (hasFocus) hasCommitPending = true;
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
@@ -55,7 +56,11 @@ namespace StorybrewEditor.UserInterface
         }
 
         public void SetValueSilent(string value)
-            => content.Text = value;
+        {
+            content.Text = value;
+            if (cursorPosition > content.Text.Length)
+                cursorPosition = content.Text.Length;
+        }
 
         private bool acceptMultiline;
         public bool AcceptMultiline
@@ -122,8 +127,15 @@ namespace StorybrewEditor.UserInterface
                             manager.KeyboardFocus = null;
                         break;
                     case Key.BackSpace:
-                        if (Value.Length > 0)
-                            Value = Value.Substring(0, Value.Length - 1);
+                        if (cursorPosition > 0)
+                        {
+                            cursorPosition--;
+                            Value = Value.Remove(cursorPosition, 1);
+                        }
+                        break;
+                    case Key.Delete:
+                        if (cursorPosition < Value.Length)
+                            Value = Value.Remove(cursorPosition, 1);
                         break;
                     case Key.C:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
@@ -135,7 +147,8 @@ namespace StorybrewEditor.UserInterface
                             var clipboardText = System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
                             if (!AcceptMultiline)
                                 clipboardText = clipboardText.Replace("\n", "");
-                            Value += clipboardText;
+                            Value = Value.Insert(cursorPosition, clipboardText);
+                            cursorPosition += clipboardText.Length;
                         }
                         break;
                     case Key.X:
@@ -143,12 +156,24 @@ namespace StorybrewEditor.UserInterface
                         {
                             System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
                             Value = string.Empty;
+                            cursorPosition = 0;
                         }
+                        break;
+                    case Key.Left:
+                        if (cursorPosition > 0)
+                            cursorPosition--;
+                        break;
+                    case Key.Right:
+                        if (cursorPosition < Value.Length)
+                            cursorPosition++;
                         break;
                     case Key.Enter:
                     case Key.KeypadEnter:
                         if (AcceptMultiline && (!EnterCommits || manager.ScreenLayerManager.Editor.InputManager.Shift))
-                            Value += "\n";
+                        {
+                            Value = Value.Insert(cursorPosition, "\n");
+                            cursorPosition++;
+                        }
                         else if (EnterCommits && hasCommitPending)
                         {
                             OnValueCommited?.Invoke(this, EventArgs.Empty);
@@ -166,12 +191,14 @@ namespace StorybrewEditor.UserInterface
             {
                 if (!hasFocus) return false;
 
-                Value += e.KeyChar;
+                Value = Value.Insert(cursorPosition, e.KeyChar.ToString());
+                cursorPosition++;
                 return true;
             };
             OnClickDown += (sender, e) =>
             {
                 manager.KeyboardFocus = this;
+                cursorPosition = Value.Length;
                 return true;
             };
         }
@@ -193,8 +220,8 @@ namespace StorybrewEditor.UserInterface
 
             if (hasFocus)
             {
-                var characterBounds = content.GetCharacterBounds(Math.Max(0, content.Text.Length - 1));
-                var position = new Vector2(string.IsNullOrEmpty(Value) ? characterBounds.Left : characterBounds.Right, characterBounds.Top + characterBounds.Height * 0.2f);
+                var characterBounds = content.GetCharacterBounds(cursorPosition);
+                var position = new Vector2(cursorPosition > Value.Length - 1 ? characterBounds.Right : characterBounds.Left, characterBounds.Top + characterBounds.Height * 0.2f);
                 var scale = new Vector2(Manager.PixelSize, characterBounds.Height * 0.6f);
 
                 cursorLine.Color = Color4.White;

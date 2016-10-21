@@ -9,6 +9,7 @@ namespace StorybrewEditor.Graphics.Text
 
         public string Name => textFont.Name;
         public float Size => textFont.Size;
+        public int LineHeight => textFont.LineHeight;
 
         public TextFontProxy(TextFont textFont, Action disposed)
         {

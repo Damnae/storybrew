@@ -3,6 +3,7 @@ using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.UserInterface;
 using System.Collections.Generic;
 using System.Drawing;
+using System;
 
 namespace StorybrewEditor.Graphics.Text
 {
@@ -16,6 +17,7 @@ namespace StorybrewEditor.Graphics.Text
 
         private float size;
         public float Size => size;
+        public int LineHeight => GetGlyph(' ').Height;
 
         public TextFontAtlased(string name, float size)
         {

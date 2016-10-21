@@ -6,6 +6,7 @@ namespace StorybrewEditor.Graphics.Text
     {
         string Name { get; }
         float Size { get; }
+        int LineHeight { get; }
 
         FontGlyph GetGlyph(char c);
     }

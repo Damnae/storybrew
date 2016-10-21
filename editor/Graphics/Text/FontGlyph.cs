@@ -1,4 +1,5 @@
-﻿using StorybrewEditor.Graphics.Textures;
+﻿using OpenTK;
+using StorybrewEditor.Graphics.Textures;
 
 namespace StorybrewEditor.Graphics.Text
 {
@@ -13,6 +14,8 @@ namespace StorybrewEditor.Graphics.Text
 
         private int height;
         public int Height => height;
+
+        public Vector2 Size => new Vector2(width, height);
 
         public FontGlyph(Texture2dRegion texture, int width, int height)
         {

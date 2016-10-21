@@ -25,7 +25,7 @@ namespace StorybrewEditor.Graphics.Drawables
             get
             {
                 validate();
-                return textLayout.Size;
+                return text?.Length > 0 ? textLayout.Size : font.GetGlyph(' ').Size;
             }
         }
 
@@ -177,11 +177,7 @@ namespace StorybrewEditor.Graphics.Drawables
                 textureScaling = Scaling;
             }
 
-            var text = Text;
-            if (string.IsNullOrEmpty(text)) text = " ";
-            if (text.EndsWith("\n")) text += " ";
-
-            textLayout = new TextLayout(text, font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * Scaling));
+            textLayout = new TextLayout(Text ?? "", font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * Scaling));
         }
 
         #region IDisposable Support
