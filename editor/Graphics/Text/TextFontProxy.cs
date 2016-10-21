@@ -16,8 +16,8 @@ namespace StorybrewEditor.Graphics.Text
             this.disposed = disposed;
         }
 
-        public FontCharacter GetCharacter(char c)
-            => textFont.GetCharacter(c);
+        public FontGlyph GetGlyph(char c)
+            => textFont.GetGlyph(c);
 
         #region IDisposable Support
 

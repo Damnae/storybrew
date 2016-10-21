@@ -10,7 +10,7 @@ using System.IO;
 
 namespace StorybrewEditor.Graphics.Textures
 {
-    public class Texture2d : Texture2dSlice, BindableTexture
+    public class Texture2d : Texture2dRegion, BindableTexture
     {
         private readonly int textureId;
         public int TextureId

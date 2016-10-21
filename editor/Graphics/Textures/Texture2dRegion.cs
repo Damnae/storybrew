@@ -3,7 +3,7 @@ using System;
 
 namespace StorybrewEditor.Graphics.Textures
 {
-    public class Texture2dSlice : Texture
+    public class Texture2dRegion : Texture
     {
         private string description;
         public string Description => texture != this ? $"{description} (from {texture.Description})" : description;
@@ -18,7 +18,7 @@ namespace StorybrewEditor.Graphics.Textures
         public Box2 UvBounds => Box2.FromTLRB(bounds.Top / texture.Height, bounds.Left / texture.Width, bounds.Right / texture.Width, bounds.Bottom / texture.Height);
         public Vector2 UvRatio => new Vector2(1f / texture.Width, 1f / texture.Height);
 
-        public Texture2dSlice(Texture2d texture, Box2 bounds, string description)
+        public Texture2dRegion(Texture2d texture, Box2 bounds, string description)
         {
             this.texture = texture ?? this as Texture2d;
             this.bounds = bounds;
@@ -26,7 +26,7 @@ namespace StorybrewEditor.Graphics.Textures
         }
 
         public override string ToString()
-            => $"Texture2dSlice#{texture.TextureId} {Description} ({Width}x{Height})";
+            => $"Texture2dRegion#{texture.TextureId} {Description} ({Width}x{Height})";
 
         #region IDisposable Support
 
@@ -43,7 +43,7 @@ namespace StorybrewEditor.Graphics.Textures
             }
         }
 
-        ~Texture2dSlice()
+        ~Texture2dRegion()
         {
             Dispose(false);
         }

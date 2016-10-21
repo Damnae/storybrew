@@ -1,7 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using System;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace StorybrewEditor.Graphics.Textures
@@ -26,9 +25,9 @@ namespace StorybrewEditor.Graphics.Textures
         }
 
         /// <summary>
-        /// Adds a bitmap to the atlas, return the new slice or null if there isn't enough space
+        /// Adds a bitmap to the atlas, return the new region or null if there isn't enough space
         /// </summary>
-        public Texture2dSlice AddSlice(Bitmap bitmap, string description)
+        public Texture2dRegion AddRegion(Bitmap bitmap, string description)
         {
             if (currentY + bitmap.Height > texture.Height) return null;
             if (currentX + bitmap.Width > texture.Width)
@@ -39,12 +38,12 @@ namespace StorybrewEditor.Graphics.Textures
             }
 
             texture.Update(bitmap, currentX, currentY);
-            var slice = new Texture2dSlice(texture, new Box2(currentX, currentY, currentX + bitmap.Width, currentY + bitmap.Height), description);
+            var region = new Texture2dRegion(texture, new Box2(currentX, currentY, currentX + bitmap.Width, currentY + bitmap.Height), description);
 
             currentX += bitmap.Width;
             nextY = Math.Max(nextY, currentY + bitmap.Height);
 
-            return slice;
+            return region;
         }
 
         #region IDisposable Support

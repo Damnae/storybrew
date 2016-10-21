@@ -22,22 +22,22 @@ namespace StorybrewEditor.Graphics.Textures
         }
 
         /// <summary>
-        /// Adds a bitmap to the atlas and returns the new slice
+        /// Adds a bitmap to the atlas and returns the new region
         /// </summary>
-        public Texture2dSlice AddSlice(Bitmap bitmap, string description)
+        public Texture2dRegion AddRegion(Bitmap bitmap, string description)
         {
             if (bitmap.Width > width || bitmap.Height > height)
                 throw new InvalidOperationException("Bitmap doesn't fit in this atlas");
 
             var atlas = atlases.Peek();
-            var slice = atlas.AddSlice(bitmap, description);
-            if (slice == null)
+            var region = atlas.AddRegion(bitmap, description);
+            if (region == null)
             {
                 Trace.WriteLine($"{this.description} is full, adding an atlas");
                 atlas = pushAtlas();
-                slice = atlas.AddSlice(bitmap, description);
+                region = atlas.AddRegion(bitmap, description);
             }
-            return slice;
+            return region;
         }
 
         private TextureAtlas2d pushAtlas()

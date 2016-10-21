@@ -8,7 +8,7 @@ namespace StorybrewEditor.Graphics.Text
 {
     public class TextFontAtlased : TextFont
     {
-        private Dictionary<char, FontCharacter> characters = new Dictionary<char, FontCharacter>();
+        private Dictionary<char, FontGlyph> glyphs = new Dictionary<char, FontGlyph>();
         private TextureMultiAtlas2d atlas;
 
         private string name;
@@ -23,22 +23,22 @@ namespace StorybrewEditor.Graphics.Text
             this.size = size;
         }
 
-        public FontCharacter GetCharacter(char c)
+        public FontGlyph GetGlyph(char c)
         {
-            FontCharacter character;
-            if (!characters.TryGetValue(c, out character))
-                characters.Add(c, character = generateCharacter(c));
-            return character;
+            FontGlyph glyph;
+            if (!glyphs.TryGetValue(c, out glyph))
+                glyphs.Add(c, glyph = generateGlyph(c));
+            return glyph;
         }
 
-        private FontCharacter generateCharacter(char c)
+        private FontGlyph generateGlyph(char c)
         {
             Vector2 measuredSize;
             if (char.IsWhiteSpace(c))
             {
                 DrawState.TextGenerator.CreateBitmap(c.ToString(), name, size,
                     Vector2.Zero, Vector2.Zero, UiAlignment.Centre, StringTrimming.None, out measuredSize, true);
-                return new FontCharacter(null, (int)measuredSize.X, (int)measuredSize.Y);
+                return new FontGlyph(null, (int)measuredSize.X, (int)measuredSize.Y);
             }
             else
             {
@@ -46,8 +46,8 @@ namespace StorybrewEditor.Graphics.Text
                 using (var bitmap = DrawState.TextGenerator.CreateBitmap(c.ToString(), name, size,
                     Vector2.Zero, Vector2.Zero, UiAlignment.Centre, StringTrimming.None, out measuredSize, false))
                 {
-                    var texture = atlas.AddSlice(bitmap, $"character:{c}@{Name}:{Size}");
-                    return new FontCharacter(texture, (int)measuredSize.X, (int)measuredSize.Y);
+                    var texture = atlas.AddRegion(bitmap, $"glyph:{c}@{Name}:{Size}");
+                    return new FontGlyph(texture, (int)measuredSize.X, (int)measuredSize.Y);
                 }
             }
         }
@@ -61,11 +61,11 @@ namespace StorybrewEditor.Graphics.Text
             {
                 if (disposing)
                 {
-                    foreach (var character in characters.Values)
-                        character.Texture?.Dispose();
+                    foreach (var glyph in glyphs.Values)
+                        glyph.Texture?.Dispose();
                     atlas?.Dispose();
                 }
-                characters = null;
+                glyphs = null;
                 atlas = null;
                 disposedValue = true;
             }

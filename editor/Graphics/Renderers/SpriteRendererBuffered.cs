@@ -239,10 +239,10 @@ namespace StorybrewEditor.Graphics.Renderers
             lastFlushWasBuffered = canBuffer;
         }
 
-        public void Draw(Texture2dSlice texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color)
+        public void Draw(Texture2dRegion texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color)
             => Draw(texture, x, y, originX, originY, scaleX, scaleY, rotation, color, 0, 0, texture.Width, texture.Height);
 
-        public void Draw(Texture2dSlice texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color, float textureX0, float textureY0, float textureX1, float textureY1)
+        public void Draw(Texture2dRegion texture, float x, float y, float originX, float originY, float scaleX, float scaleY, float rotation, Color4 color, float textureX0, float textureY0, float textureX1, float textureY1)
         {
             if (!rendering) throw new InvalidOperationException("Not rendering");
             if (texture == null) throw new ArgumentNullException(nameof(texture));

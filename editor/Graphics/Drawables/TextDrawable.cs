@@ -144,17 +144,17 @@ namespace StorybrewEditor.Graphics.Drawables
                 var lineHeight = 0f;
                 foreach (var c in line)
                 {
-                    var character = font.GetCharacter(c);
-                    if (!character.IsEmpty)
+                    var glyph = font.GetGlyph(c);
+                    if (!glyph.IsEmpty)
                     {
-                        if (y + character.Height * inverseScaling >= clipRegion.Top)
-                            renderer.Draw(character.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
+                        if (y + glyph.Height * inverseScaling >= clipRegion.Top)
+                            renderer.Draw(glyph.Texture, x, y, 0, 0, inverseScaling, inverseScaling, 0, color);
                         lineHasNonSpacing = true;
                     }
 
                     if (lineHasNonSpacing)
-                        x += character.Width * inverseScaling;
-                    lineHeight = Math.Max(lineHeight, character.Height * inverseScaling);
+                        x += glyph.Width * inverseScaling;
+                    lineHeight = Math.Max(lineHeight, glyph.Height * inverseScaling);
                 }
                 lineHasNonSpacing = false;
                 y += lineHeight;
@@ -195,7 +195,7 @@ namespace StorybrewEditor.Graphics.Drawables
             if (string.IsNullOrEmpty(text)) text = " ";
             if (text.EndsWith("\n")) text += " ";
 
-            lines = LineBreaker.Split(text, (float)Math.Ceiling(MaxSize.X * Scaling), c => font.GetCharacter(c).Width);
+            lines = LineBreaker.Split(text, (float)Math.Ceiling(MaxSize.X * Scaling), c => font.GetGlyph(c).Width);
             textureMaxSize = MaxSize;
         }
 
@@ -209,9 +209,9 @@ namespace StorybrewEditor.Graphics.Drawables
                 var lineHeight = 0f;
                 foreach (var c in line)
                 {
-                    var character = font.GetCharacter(c);
-                    lineWidth += character.Width;
-                    lineHeight = Math.Max(lineHeight, character.Height);
+                    var glyph = font.GetGlyph(c);
+                    lineWidth += glyph.Width;
+                    lineHeight = Math.Max(lineHeight, glyph.Height);
                 }
                 width = Math.Max(width, lineWidth);
                 height += lineHeight;
