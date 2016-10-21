@@ -198,7 +198,7 @@ namespace StorybrewEditor.UserInterface
             OnClickDown += (sender, e) =>
             {
                 manager.KeyboardFocus = this;
-                cursorPosition = Value.Length;
+                cursorPosition = content.GetCharacterIndexAt(new Vector2(e.X, e.Y));
                 return true;
             };
         }
@@ -221,7 +221,7 @@ namespace StorybrewEditor.UserInterface
             if (hasFocus)
             {
                 var characterBounds = content.GetCharacterBounds(cursorPosition);
-                var position = new Vector2(cursorPosition > Value.Length - 1 ? characterBounds.Right : characterBounds.Left, characterBounds.Top + characterBounds.Height * 0.2f);
+                var position = new Vector2(characterBounds.Left, characterBounds.Top + characterBounds.Height * 0.2f);
                 var scale = new Vector2(Manager.PixelSize, characterBounds.Height * 0.6f);
 
                 cursorLine.Color = Color4.White;

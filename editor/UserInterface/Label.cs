@@ -112,5 +112,8 @@ namespace StorybrewEditor.UserInterface
 
             return new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom);
         }
+
+        public int GetCharacterIndexAt(Vector2 position)
+            => textDrawable.GetCharacterIndexAt(position - ScreenPosition);
     }
 }

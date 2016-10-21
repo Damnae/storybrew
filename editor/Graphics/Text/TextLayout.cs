@@ -18,6 +18,16 @@ namespace StorybrewEditor.Graphics.Text
         private Vector2 size;
         public Vector2 Size => size;
 
+        public IEnumerable<TextLayoutGlyph> Glyphs
+        {
+            get
+            {
+                foreach (var line in lines)
+                    foreach (var glyph in line.Glyphs)
+                        yield return glyph;
+            }
+        }
+
         public IEnumerable<TextLayoutGlyph> VisibleGlyphs
         {
             get
@@ -71,6 +81,25 @@ namespace StorybrewEditor.Graphics.Text
                 index -= line.GlyphCount;
             }
             throw new IndexOutOfRangeException();
+        }
+
+        public int GetCharacterIndexAt(Vector2 position)
+        {
+            var index = 0;
+            foreach (var line in lines)
+            {
+                var lineMatches = position.Y < line.Position.Y + line.Height;
+                foreach (var glyph in line.Glyphs)
+                {
+                    if (lineMatches && position.X < glyph.Position.X + glyph.Glyph.Width)
+                        return index;
+
+                    index++;
+                }
+                if (lineMatches)
+                    return index - 1;
+            }
+            return index - 1;
         }
     }
 

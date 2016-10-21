@@ -158,6 +158,12 @@ namespace StorybrewEditor.Graphics.Drawables
             return new Box2(position.X, position.Y, position.X + glyph.Width * inverseScaling, position.Y + glyph.Height * inverseScaling);
         }
 
+        public int GetCharacterIndexAt(Vector2 position)
+        {
+            validate();
+            return textLayout.GetCharacterIndexAt(position * scaling);
+        }
+
         private void invalidate()
         {
             textLayout = null;
