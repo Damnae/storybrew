@@ -165,7 +165,8 @@ namespace StorybrewEditor.UserInterface
                         ReplaceSelection("");
                         break;
                     case Key.A:
-                        SelectAll();
+                        if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
+                            SelectAll();
                         break;
                     case Key.C:
                         if (manager.ScreenLayerManager.Editor.InputManager.ControlOnly)
@@ -278,10 +279,8 @@ namespace StorybrewEditor.UserInterface
             if (hasFocus)
             {
                 if (cursorPosition != selectionStart)
-                {
-                    content.ForTextBounds(SelectionLeft, SelectionRight, (selectionBounds) =>
+                    content.ForTextBounds(SelectionLeft, SelectionRight, selectionBounds =>
                         cursorLine.Draw(drawContext, Manager.Camera, selectionBounds, actualOpacity * 0.2f));
-                }
 
                 var bounds = content.GetCharacterBounds(cursorPosition);
                 var position = new Vector2(bounds.Left, bounds.Top + bounds.Height * 0.2f);

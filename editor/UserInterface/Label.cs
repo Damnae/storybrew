@@ -116,7 +116,7 @@ namespace StorybrewEditor.UserInterface
         public void ForTextBounds(int startIndex, int endIndex, Action<Box2> action)
         {
             var position = ScreenPosition;
-            textDrawable.ForTextBounds(startIndex, endIndex, (bounds) => 
+            textDrawable.ForTextBounds(startIndex, endIndex, bounds => 
                 action(new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom)));
         }
 

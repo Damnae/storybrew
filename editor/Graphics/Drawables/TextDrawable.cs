@@ -168,7 +168,7 @@ namespace StorybrewEditor.Graphics.Drawables
         {
             validate();
             var inverseScaling = 1 / scaling;
-            textLayout.ForTextBounds(startIndex, endIndex, (bounds) =>
+            textLayout.ForTextBounds(startIndex, endIndex, bounds =>
                 action(new Box2(bounds.Left * inverseScaling, bounds.Top * inverseScaling, bounds.Right * inverseScaling, bounds.Bottom * inverseScaling)));
         }
 
