@@ -290,10 +290,11 @@ namespace StorybrewEditor.UserInterface.Components
             if (solutionFolder == root)
                 solutionFolder = Path.GetDirectoryName(effect.Path);
 
-            var paths = new string[] {
-                "code",
+            var paths = new string[]
+            {
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Microsoft VS Code\bin\code"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Microsoft VS Code\bin\code"),
+                "code",
             };
             var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
 
@@ -314,6 +315,7 @@ namespace StorybrewEditor.UserInterface.Components
                     Trace.WriteLine($"Could not open vscode with \"{path} {arguments}\":\n{e}");
                 }
             }
+            Trace.WriteLine($"Path: {Environment.GetEnvironmentVariable("path")}");
             Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing)",
                 () => Process.Start("https://code.visualstudio.com/"), true);
         }
