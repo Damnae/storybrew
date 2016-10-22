@@ -251,12 +251,12 @@ namespace StorybrewEditor.UserInterface
             OnClickDown += (sender, e) =>
             {
                 manager.KeyboardFocus = this;
-                selectionStart = cursorPosition = content.GetCharacterIndexAt(new Vector2(e.X, e.Y));
+                selectionStart = cursorPosition = content.GetCharacterIndexAt(Manager.Camera.FromScreen(new Vector2(e.X, e.Y)).Xy);
                 return true;
             };
             OnDrag += (sender, e) =>
             {
-                cursorPosition = content.GetCharacterIndexAt(new Vector2(e.X, e.Y));
+                cursorPosition = content.GetCharacterIndexAt(Manager.Camera.FromScreen(new Vector2(e.X, e.Y)).Xy);
             };
         }
 

@@ -14,8 +14,8 @@ namespace StorybrewEditor.Graphics.Drawables
         private TextLayout textLayout;
 
         private TextFont font;
-        private float textureFontSize;
-        private float textureScaling = 1;
+        private float currentFontSize;
+        private float currentScaling = 1;
 
         public Vector2 MinSize => Size;
         public Vector2 PreferredSize => Size;
@@ -25,7 +25,7 @@ namespace StorybrewEditor.Graphics.Drawables
             get
             {
                 validate();
-                return text?.Length > 0 ? textLayout.Size : font.GetGlyph(' ').Size;
+                return text?.Length > 0 ? textLayout.Size / scaling : font.GetGlyph(' ').Size / scaling;
             }
         }
 
@@ -194,16 +194,16 @@ namespace StorybrewEditor.Graphics.Drawables
             if (textLayout != null)
                 return;
 
-            if (font == null || font.Name != FontName || textureFontSize != FontSize || textureScaling != Scaling)
+            if (font == null || font.Name != FontName || currentFontSize != FontSize || currentScaling != Scaling)
             {
                 font?.Dispose();
                 font = DrawState.TextFontManager.GetTextFont(FontName, FontSize, Scaling);
 
-                textureFontSize = FontSize;
-                textureScaling = Scaling;
+                currentFontSize = FontSize;
+                currentScaling = Scaling;
             }
 
-            textLayout = new TextLayout(Text ?? "", font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * Scaling));
+            textLayout = new TextLayout(Text ?? "", font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * scaling));
         }
 
         #region IDisposable Support
