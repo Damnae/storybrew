@@ -3,7 +3,6 @@ using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Audio;
 using StorybrewEditor.Mapset;
 using System.Collections.Generic;
-using System;
 using StorybrewEditor.Util;
 using System.Text;
 

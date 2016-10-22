@@ -3,7 +3,6 @@ using StorybrewEditor.Graphics.Textures;
 using StorybrewEditor.UserInterface;
 using System.Collections.Generic;
 using System.Drawing;
-using System;
 
 namespace StorybrewEditor.Graphics.Text
 {

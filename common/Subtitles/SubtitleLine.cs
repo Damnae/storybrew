@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Subtitles
+﻿namespace StorybrewCommon.Subtitles
 {
     public class SubtitleLine
     {
