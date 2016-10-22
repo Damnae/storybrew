@@ -43,34 +43,26 @@ namespace StorybrewEditor.Graphics.Text
         {
             textLines = LineBreaker.Split(text, maxWidth, c => font.GetGlyph(c).Width);
 
-            if (text.Length > 0)
+            var glyphIndex = 0;
+            var width = 0.0f;
+            var height = 0.0f;
+            foreach (var textLine in textLines)
             {
-                var glyphIndex = 0;
-                var width = 0.0f;
-                var height = 0.0f;
-                foreach (var textLine in textLines)
-                {
-                    var line = new TextLayoutLine(this, height, alignment, lines.Count == 0);
-                    foreach (var c in textLine)
-                        line.Add(font.GetGlyph(c), glyphIndex++);
-                    lines.Add(line);
-
-                    width = Math.Max(width, line.Width);
-                    height += line.Height;
-                }
-                var lastLine = lines[lines.Count - 1];
-                if (lastLine.GlyphCount == 0) height += font.LineHeight;
-                lastLine.Add(new FontGlyph(null, 0, font.LineHeight), glyphIndex++);
-
-                size = new Vector2(width, height);
-            }
-            else
-            {
-                var line = new TextLayoutLine(this, 0, alignment, lines.Count == 0);
-                line.Add(new FontGlyph(null, 0, font.LineHeight), 0);
+                var line = new TextLayoutLine(this, height, alignment, lines.Count == 0);
+                foreach (var c in textLine)
+                    line.Add(font.GetGlyph(c), glyphIndex++);
                 lines.Add(line);
-                size = new Vector2(0, font.LineHeight);
+
+                width = Math.Max(width, line.Width);
+                height += line.Height;
             }
+
+            if (lines.Count == 0) lines.Add(new TextLayoutLine(this, 0, alignment, true));
+            var lastLine = lines[lines.Count - 1];
+            if (lastLine.GlyphCount == 0) height += font.LineHeight;
+            lastLine.Add(new FontGlyph(null, 0, font.LineHeight), glyphIndex++);
+
+            size = new Vector2(width, height);
         }
 
         public TextLayoutGlyph GetGlyph(int index)
