@@ -35,6 +35,7 @@ namespace StorybrewEditor.ScreenLayers
         private TimelineSlider timeline;
         private Button playPauseButton;
         private Button fitButton;
+        private Button projectFolderButton;
         private Button mapsetFolderButton;
         private Button saveButton;
         private Button exportButton;
@@ -151,6 +152,14 @@ namespace StorybrewEditor.ScreenLayers
                     {
                         StyleName = "small",
                         Text = "Layers",
+                    },
+                    projectFolderButton = new Button(WidgetManager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.FolderOpen,
+                        Tooltip = "Open project folder",
+                        AnchorFrom = UiAlignment.Centre,
+                        CanGrow = false,
                     },
                     mapsetFolderButton = new Button(WidgetManager)
                     {
@@ -282,6 +291,12 @@ namespace StorybrewEditor.ScreenLayers
             MakeTabs(
                 new Button[] { effectsButton, layersButton },
                 new Widget[] { effectsList, layersList });
+            projectFolderButton.OnClick += (sender, e) =>
+            {
+                var path = Path.GetFullPath(project.ProjectFolderPath);
+                if (Directory.Exists(path))
+                    Process.Start(path);
+            };
             mapsetFolderButton.OnClick += (sender, e) =>
             {
                 var path = Path.GetFullPath(project.MapsetPath);
