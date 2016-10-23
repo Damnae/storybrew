@@ -65,12 +65,31 @@ namespace StorybrewEditor.Util
                             }
                             else action(null, e.Error);
                         });
-                    webClient.UploadValuesAsync(new Uri(url), data);
+                    webClient.UploadValuesAsync(new Uri(url), "POST", data);
                 }
             }
             catch (Exception e)
             {
                 Program.Schedule(() => action(null, e));
+            }
+        }
+
+        public static void BlockingPost(string url, NameValueCollection data, Action<string, Exception> action)
+        {
+            try
+            {
+                using (var webClient = new WebClient())
+                {
+                    Debug.Print($"Post {url}");
+                    webClient.Headers.Add("user-agent", Program.Name);
+                    var result = webClient.UploadValues(new Uri(url), "POST", data);
+                    var response = Encoding.UTF8.GetString(result);
+                    action(response, null);
+                }
+            }
+            catch (Exception e)
+            {
+                action(null, e);
             }
         }
 

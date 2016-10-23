@@ -6,6 +6,7 @@ using StorybrewEditor.Processes;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -284,7 +285,7 @@ namespace StorybrewEditor
                 try
                 {
 #endif
-                    action.Invoke();
+                action.Invoke();
 #if !DEBUG
                 }
                 catch (Exception e)
@@ -302,6 +303,9 @@ namespace StorybrewEditor
         public const string DefaultLogPath = "logs";
 
         private static TraceLogger logger;
+        private static object errorHandlerLock = new object();
+        private static volatile bool insideErrorHandler;
+
         private static void setupLogging(string logsPath = null, string commonLogFilename = null)
         {
             logsPath = logsPath ?? DefaultLogPath;
@@ -318,38 +322,59 @@ namespace StorybrewEditor
             }
 
             logger = new TraceLogger(tracePath);
-            AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(exceptionPath, e.Exception);
-            AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError(crashPath, (Exception)e.ExceptionObject);
+            AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(null, exceptionPath, e.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError("crash", crashPath, (Exception)e.ExceptionObject);
         }
 
-        private static volatile bool insideErrorHandler;
-        private static void logError(string filename, Exception e)
+        private static void logError(string type, string filename, Exception e)
         {
-            if (insideErrorHandler) return;
-            insideErrorHandler = true;
-            try
+            lock (errorHandlerLock)
             {
-                if (!IsMainThread && SchedulingEnabled)
+                if (insideErrorHandler) return;
+                insideErrorHandler = true;
+
+                try
                 {
-                    Schedule(() => logError(filename, e));
-                    return;
+                    if (!IsMainThread && SchedulingEnabled)
+                    {
+                        Schedule(() => logError(type, filename, e));
+                        return;
+                    }
+                    var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
+                    using (StreamWriter w = new StreamWriter(logPath, true))
+                    {
+                        w.Write(DateTime.Now + " - ");
+                        w.WriteLine(e);
+                        w.WriteLine();
+                    }
+
+                    if (type != null)
+                        Report(type, e);
                 }
-                string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
-                using (StreamWriter w = new StreamWriter(logPath, true))
+                catch (Exception e2)
                 {
-                    w.Write(DateTime.Now + " - ");
-                    w.WriteLine(e);
-                    w.WriteLine();
+                    Trace.WriteLine(e2.Message);
+                }
+                finally
+                {
+                    insideErrorHandler = false;
                 }
             }
-            catch (Exception e2)
-            {
-                Trace.WriteLine(e2.Message);
-            }
-            finally
-            {
-                insideErrorHandler = false;
-            }
+        }
+
+        public static void Report(string type, Exception e)
+        {
+            NetHelper.BlockingPost("http://a-damnae.rhcloud.com/storybrew/report.php",
+                new NameValueCollection()
+                {
+                    ["reporttype"] = type,
+                    ["source"] = Settings.Id,
+                    ["version"] = Version.ToString(),
+                    ["content"] = e.ToString(),
+                },
+                (response, exception) =>
+                {
+                });
         }
 
         #endregion
