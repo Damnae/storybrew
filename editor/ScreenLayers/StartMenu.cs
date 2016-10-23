@@ -17,6 +17,10 @@ namespace StorybrewEditor.ScreenLayers
         private Button preferencesButton;
         private Button closeButton;
 
+        private LinearLayout bottomRightLayout;
+        private Button discordButton;
+        private Button wikiButton;
+
         private LinearLayout bottomLayout;
         private Button updateButton;
         private Label versionLabel;
@@ -59,6 +63,32 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
+
+            WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager)
+            {
+                AnchorTarget = WidgetManager.Root,
+                AnchorFrom = UiAlignment.BottomRight,
+                AnchorTo = UiAlignment.BottomRight,
+                Padding = new FourSide(16),
+                Horizontal = true,
+                Fill = true,
+                Children = new Widget[]
+                {
+                    discordButton = new Button(WidgetManager)
+                    {
+                        StyleName = "small",
+                        Text = "Join Discord",
+                        AnchorFrom = UiAlignment.Centre,
+                    },
+                    wikiButton = new Button(WidgetManager)
+                    {
+                        StyleName = "small",
+                        Text = "Wiki",
+                        AnchorFrom = UiAlignment.Centre,
+                    },
+                },
+            });
+
             WidgetManager.Root.Add(bottomLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
@@ -94,6 +124,8 @@ namespace StorybrewEditor.ScreenLayers
                     else openProject(projectPath);
                 });
             };
+            wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/Damnae/storybrew/wiki");
+            discordButton.OnClick += (sender, e) => Process.Start($"https://discord.gg/0qfFOucX93QDNVN7");
             closeButton.OnClick += (sender, e) => Exit();
             checkLatestVersion();
         }
@@ -103,6 +135,7 @@ namespace StorybrewEditor.ScreenLayers
             base.Resize(width, height);
             mainLayout.Pack(300);
             bottomLayout.Pack(600);
+            bottomRightLayout.Pack((1024 - bottomLayout.Width) / 2);
         }
 
         private void openProject(string projectPath)
