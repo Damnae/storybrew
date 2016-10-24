@@ -165,7 +165,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private void checkLatestVersion()
         {
-            NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases/latest", "cache/net/latestrelease", 15 * 60,
+            NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases?per_page=10&page=1", "cache/net/releases", 15 * 60,
                 (response, exception) =>
                 {
                     if (IsDisposed) return;
@@ -176,35 +176,57 @@ namespace StorybrewEditor.ScreenLayers
                     }
                     try
                     {
-                        var jsonResponse = JObject.Parse(response);
+                        var hasLatest = false;
+                        var latestVersion = Program.Version;
+                        var description = "";
+                        var downloadUrl = (string)null;
 
-                        var name = jsonResponse.Value<string>("name");
-                        var latestVersion = new Version(name);
-
-                        var authorName = jsonResponse.GetValue("author").Value<string>("login");
-
-                        var body = jsonResponse.Value<string>("body");
-                        if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
-
-                        var publishedAt = jsonResponse.Value<string>("published_at");
-                        var date = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-
-                        if (Program.Version < latestVersion)
+                        var releases = JArray.Parse(response);
+                        foreach (var release in releases.Children<JObject>())
                         {
-                            string downloadUrl = null;
-                            var assets = jsonResponse.GetValue("assets");
-                            foreach (var asset in assets)
+                            var isDraft = release.Value<bool>("draft");
+                            var isPrerelease = release.Value<bool>("prerelease");
+                            if (isDraft || isPrerelease) continue;
+
+                            var name = release.Value<string>("name");
+                            var version = new Version(name);
+                            
+                            if (!hasLatest)
                             {
-                                var downloadName = asset.Value<string>("name");
-                                if (downloadName.EndsWith(".zip"))
+                                hasLatest = true;
+                                latestVersion = version;
+                                
+                                var assets = release.GetValue("assets");
+                                foreach (var asset in assets)
                                 {
-                                    downloadUrl = asset.Value<string>("browser_download_url");
-                                    break;
+                                    var downloadName = asset.Value<string>("name");
+                                    if (downloadName.EndsWith(".zip"))
+                                    {
+                                        downloadUrl = asset.Value<string>("browser_download_url");
+                                        break;
+                                    }
                                 }
                             }
 
+                            if (Program.Version < version && description.Split('\n').Length < 25)
+                            {
+                                var publishedAt = release.Value<string>("published_at");
+                                var publishDate = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                                var authorName = release.GetValue("author").Value<string>("login");
+
+                                var body = release.Value<string>("body");
+                                if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
+                                body = body.Trim(' ', '\r', '\n');
+
+                                description += $"v{version} - {authorName}, {publishDate.ToTimeAgo()}\n{body}\n\n";
+                            }
+                            else break;
+                        }
+
+                        if (Program.Version < latestVersion)
+                        {
                             updateButton.Text = $"Version {latestVersion} available!";
-                            updateButton.Tooltip = $"What's new:\n\n{body}\n\nPublished {date.ToTimeAgo()} by {authorName}.";
+                            updateButton.Tooltip = $"What's new:\n\n{description.TrimEnd('\n')}";
                             updateButton.OnClick += (sender, e) =>
                             {
                                 if (downloadUrl != null && latestVersion >= new Version(1, 4))
