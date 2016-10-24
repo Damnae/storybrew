@@ -54,16 +54,20 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ManagedBass, Version=0.20.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ManagedBass.0.20.0\lib\ManagedBass.dll</HintPath>
+    <Reference Include="ManagedBass, Version=0.23.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.0.24.0\lib\net45\ManagedBass.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="ManagedBass.PInvoke, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.PInvoke.0.5.0\lib\net45\ManagedBass.PInvoke.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -124,6 +128,7 @@
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
     <Compile Include="Util\ZipArchiveExtensions.cs" />
+    <None Include="OpenTK.dll.config" />
     <None Include="Resources\projecttemplate.zip" />
     <None Include="Resources\scripttemplate.csx" />
     <Compile Include="ScreenLayers\Test\FlowLayoutTest.cs" />
@@ -249,7 +254,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Resources\FontAwesome.ttf" />
     <None Include="Resources\Roboto-Light.ttf" />

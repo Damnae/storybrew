@@ -113,8 +113,8 @@ namespace StorybrewEditor.Graphics.Cameras
             var deviceX = 2 * (screenCoords.X / viewport.Width) - 1;
             var deviceY = -2 * (screenCoords.Y / viewport.Height) + 1;
 
-            var near = Vector3.Transform(new Vector3(deviceX, deviceY, NearPlane), invertedProjectionView);
-            var far = Vector3.Transform(new Vector3(deviceX, deviceY, FarPlane), invertedProjectionView);
+            var near = Vector4.Transform(new Vector4(deviceX, deviceY, NearPlane, 1), invertedProjectionView).Xyz;
+            var far = Vector4.Transform(new Vector4(deviceX, deviceY, FarPlane, 1), invertedProjectionView).Xyz;
             var direction = Vector3.Normalize(far - near);
 
             // The screen ray is parallel to the world plane
@@ -130,7 +130,7 @@ namespace StorybrewEditor.Graphics.Cameras
         {
             Validate();
 
-            var devicePosition = Vector3.Transform(worldCoords, projectionView);
+            var devicePosition = Vector4.Transform(new Vector4(worldCoords, 1), projectionView);
             return new Vector3(
                 (devicePosition.X + 1) * 0.5f * viewport.Width,
                 (-devicePosition.Y + 1) * 0.5f * viewport.Height,
@@ -164,7 +164,7 @@ namespace StorybrewEditor.Graphics.Cameras
 
         public void Rotate(Vector3 axis, float angle)
         {
-            var rotation = Matrix4.CreateFromAxisAngle(axis, angle);
+            var rotation = Matrix3.CreateFromAxisAngle(axis, angle);
             Vector3.Transform(ref up, ref rotation, out up);
             Vector3.Transform(ref direction, ref rotation, out direction);
             Invalidate();
