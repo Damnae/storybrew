@@ -268,10 +268,24 @@ namespace StorybrewEditor.UserInterface
 
         protected virtual void DrawChildren(DrawContext drawContext, float actualOpacity)
         {
+#if DEBUG
+            Box2? clipRegionDebug = null;
+#endif
             using (ClipChildren ? DrawState.Clip(Bounds, Manager.Camera) : null)
+            {
                 foreach (var child in children)
                     if (child.displayed)
                         child.Draw(drawContext, actualOpacity);
+
+#if DEBUG
+                if (ClipChildren)
+                    clipRegionDebug = DrawState.GetClipRegion(Manager.Camera);
+#endif
+            }
+#if DEBUG
+            if (clipRegionDebug.HasValue)
+                Manager.Skin.GetDrawable("debug_clipregion")?.Draw(drawContext, manager.Camera, clipRegionDebug.Value, 1);
+#endif
         }
 
         protected virtual void DrawForeground(DrawContext drawContext, float actualOpacity)

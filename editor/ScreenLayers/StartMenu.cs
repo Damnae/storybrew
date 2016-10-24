@@ -63,7 +63,6 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-
             WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
@@ -124,7 +123,7 @@ namespace StorybrewEditor.ScreenLayers
                     else openProject(projectPath);
                 });
             };
-            wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/Damnae/storybrew/wiki");
+            wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
             discordButton.OnClick += (sender, e) => Process.Start($"https://discord.gg/0qfFOucX93QDNVN7");
             closeButton.OnClick += (sender, e) => Exit();
             checkLatestVersion();
