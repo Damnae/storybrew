@@ -82,7 +82,7 @@ namespace StorybrewEditor.UserInterface
 
         public void SetValueSilent(string value)
         {
-            content.Text = value;
+            content.Text = value ?? string.Empty;
             if (selectionStart > content.Text.Length)
                 selectionStart = content.Text.Length;
             if (cursorPosition > content.Text.Length)

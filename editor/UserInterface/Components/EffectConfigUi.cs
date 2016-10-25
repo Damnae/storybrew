@@ -179,7 +179,7 @@ namespace StorybrewEditor.UserInterface.Components
             {
                 var widget = new Textbox(Manager)
                 {
-                    Value = field.Value.ToString(),
+                    Value = field.Value?.ToString(),
                     AnchorFrom = UiAlignment.Right,
                     AnchorTo = UiAlignment.Right,
                     AcceptMultiline = true,
