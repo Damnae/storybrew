@@ -182,23 +182,41 @@ namespace StorybrewEditor.UserInterface
 
         private void displayTooltip(Widget tooltip)
         {
-            tooltip.Displayed = true;
-            tooltip.Offset = Vector2.Zero;
+            var rootBounds = root.Bounds;
+
+            // Attempt to show the tooltip on top of its target
+
+            var targetBounds = tooltip.AnchorTarget.Bounds;
+            var topSpace = targetBounds.Top - rootBounds.Top;
             tooltip.AnchorFrom = UiAlignment.Bottom;
             tooltip.AnchorTo = UiAlignment.Top;
-            tooltip.Pack(0, 0, 400);
+            tooltip.Pack(0, 0, 600, topSpace - 16);
+
+            // Only put it on the bottom if it doesn't fit on top
 
             var bounds = tooltip.Bounds;
-            var rootBounds = root.Bounds;
             if (bounds.Top < rootBounds.Top + 16)
             {
-                tooltip.AnchorFrom = UiAlignment.Top;
-                tooltip.AnchorTo = UiAlignment.Bottom;
+                var bottomSpace = rootBounds.Bottom - targetBounds.Bottom;
+                if (bottomSpace > topSpace)
+                {
+                    tooltip.AnchorFrom = UiAlignment.Top;
+                    tooltip.AnchorTo = UiAlignment.Bottom;
+                    tooltip.Pack(0, 0, 600, bottomSpace - 16);
+                    bounds = tooltip.Bounds;
+                }
             }
+
+            // Adjust its position
+
+            var offsetX = 0f;
             if (bounds.Right > rootBounds.Right - 16)
-                tooltip.Offset = new Vector2(rootBounds.Right - 16 - bounds.Right, 0);
+                offsetX = rootBounds.Right - 16 - bounds.Right;
             else if (bounds.Left < rootBounds.Left + 16)
-                tooltip.Offset = new Vector2(rootBounds.Left + 16 - bounds.Left, 0);
+                offsetX = rootBounds.Left + 16 - bounds.Left;
+            tooltip.Offset = new Vector2(offsetX, 0);
+
+            tooltip.Displayed = true;
         }
 
         #endregion

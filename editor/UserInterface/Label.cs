@@ -23,19 +23,21 @@ namespace StorybrewEditor.UserInterface
             get
             {
                 var position = ScreenPosition;
-                var alignment = textDrawable.Alignment;
+                var size = Size;
+                var textSize = new Vector2(Math.Min(textDrawable.Size.X, size.X), Math.Min(textDrawable.Size.Y, size.Y));
 
+                var alignment = textDrawable.Alignment;
                 if (alignment.HasFlag(UiAlignment.Right))
-                    position.X += Size.X - textDrawable.Size.X;
+                    position.X += size.X - textSize.X;
                 else if (!alignment.HasFlag(UiAlignment.Left))
-                    position.X += Size.X * 0.5f - textDrawable.Size.X * 0.5f;
+                    position.X += size.X * 0.5f - textSize.X * 0.5f;
                 if (alignment.HasFlag(UiAlignment.Bottom))
-                    position.Y += Size.Y - textDrawable.Size.Y;
+                    position.Y += size.Y - textSize.Y;
                 else if (!alignment.HasFlag(UiAlignment.Top))
-                    position.Y += Size.Y * 0.5f - textDrawable.Size.Y * 0.5f;
+                    position.Y += size.Y * 0.5f - textSize.Y * 0.5f;
 
                 position = Manager.SnapToPixel(position);
-                return new Box2(position, position + textDrawable.Size);
+                return new Box2(position, position + textSize);
             }
         }
 
@@ -103,7 +105,13 @@ namespace StorybrewEditor.UserInterface
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
         {
             base.DrawBackground(drawContext, actualOpacity);
-            textDrawable.Draw(drawContext, Manager.Camera, TextBounds, actualOpacity);
+            if (!string.IsNullOrWhiteSpace(Text))
+            {
+                textDrawable.Draw(drawContext, Manager.Camera, TextBounds, actualOpacity);
+#if DEBUG
+                Manager.Skin.GetDrawable("debug_textbounds")?.Draw(drawContext, Manager.Camera, TextBounds, 1);
+#endif
+            }
         }
 
         public Box2 GetCharacterBounds(int index)
@@ -112,11 +120,11 @@ namespace StorybrewEditor.UserInterface
             var bounds = textDrawable.GetCharacterBounds(index);
             return new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom);
         }
-        
+
         public void ForTextBounds(int startIndex, int endIndex, Action<Box2> action)
         {
             var position = ScreenPosition;
-            textDrawable.ForTextBounds(startIndex, endIndex, bounds => 
+            textDrawable.ForTextBounds(startIndex, endIndex, bounds =>
                 action(new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom)));
         }
 

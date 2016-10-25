@@ -57,6 +57,15 @@
 			Color: [0, 1, 1],
 			Outset: [1],
 		},
+		"_debug_textbounds":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [0.5, 0.5, 1],
+			Outset: [1],
+		},
 		"blueLine":
 		{
 			_type: "NinePatch",
@@ -273,6 +282,7 @@
 			{
 				FontSize: "@fontSizeSmall",
 				Background: "tooltipBg",
+				Trimming: "EllipsisCharacter",
 			},
 			"statusMessage":
 			{
@@ -347,7 +357,7 @@
 			{
 				FontName: "@lightFont",
 				FontSize: "@fontSizeNormal",
-				Trimming: "EllipsisCharacter",
+				Trimming: "None",
 				Background: "button",
 			},
 			"textboxContent #hover":
@@ -363,27 +373,6 @@
 			{
 				Background: "buttonOpen",
 				Color: "@colorTextHover",
-			},
-			
-			"textboxContentPath":
-			{
-				_parent: "textboxContent",
-				Trimming: "EllipsisPath",
-			},
-			"textboxContentPath #hover":
-			{
-				_parent: "textboxContent #hover",
-				Trimming: "EllipsisPath",
-			},
-			"textboxContentPath #hover #focus":
-			{
-				_parent: "textboxContent #hover #focus",
-				Trimming: "EllipsisPath",
-			},
-			"textboxContentPath #focus":
-			{
-				_parent: "textboxContent #focus",
-				Trimming: "EllipsisPath",
 			},
 		},
 		Button:
@@ -496,27 +485,6 @@
 			{
 				LabelStyle: "textboxLabel #focus",
 				ContentStyle: "textboxContent #focus",
-			},
-
-			"path":
-			{
-				_parent: "default",
-				ContentStyle: "textboxContentPath",
-			},
-			"path #hover":
-			{
-				_parent: "default #hover",
-				ContentStyle: "textboxContentPath #hover",
-			},
-			"path #hover #focus":
-			{
-				_parent: "default #focus",
-				ContentStyle: "textboxContentPath #hover #focus",
-			},
-			"path #focus":
-			{
-				_parent: "default #focus",
-				ContentStyle: "textboxContentPath #focus",
 			},
 		},
 		SelectBox:

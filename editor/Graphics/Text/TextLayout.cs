@@ -39,9 +39,9 @@ namespace StorybrewEditor.Graphics.Text
             }
         }
 
-        public TextLayout(string text, TextFont font, UiAlignment alignment, StringTrimming trimming, int maxWidth)
+        public TextLayout(string text, TextFont font, UiAlignment alignment, StringTrimming trimming, Vector2 maxSize)
         {
-            textLines = LineBreaker.Split(text, maxWidth, c => font.GetGlyph(c).Width);
+            textLines = LineBreaker.Split(text, (int)Math.Ceiling(maxSize.X), c => font.GetGlyph(c).Width);
 
             var glyphIndex = 0;
             var width = 0.0f;
@@ -51,8 +51,12 @@ namespace StorybrewEditor.Graphics.Text
                 var line = new TextLayoutLine(this, height, alignment, lines.Count == 0);
                 foreach (var c in textLine)
                     line.Add(font.GetGlyph(c), glyphIndex++);
-                lines.Add(line);
 
+                // trimming != StringTrimming.None && 
+                //if (maxSize.Y > 0 && height + line.Height > maxSize.Y)
+                //    break;
+                
+                lines.Add(line);
                 width = Math.Max(width, line.Width);
                 height += line.Height;
             }
@@ -73,7 +77,7 @@ namespace StorybrewEditor.Graphics.Text
                     return line.GetGlyph(index);
                 index -= line.GlyphCount;
             }
-            throw new IndexOutOfRangeException();
+            return getlastGlyph();
         }
 
         public int GetCharacterIndexAt(Vector2 position)
@@ -135,7 +139,7 @@ namespace StorybrewEditor.Graphics.Text
                 index -= line.GlyphCount;
                 lineIndex++;
             }
-            throw new IndexOutOfRangeException();
+            return getlastGlyph().Index;
         }
 
         public int GetCharacterIndexBelow(int index)
@@ -158,7 +162,13 @@ namespace StorybrewEditor.Graphics.Text
                 index -= line.GlyphCount;
                 lineIndex++;
             }
-            throw new IndexOutOfRangeException();
+            return getlastGlyph().Index;
+        }
+
+        private TextLayoutGlyph getlastGlyph()
+        {
+            var lastLine = lines[lines.Count - 1];
+            return lastLine.GetGlyph(lastLine.GlyphCount - 1);
         }
     }
 

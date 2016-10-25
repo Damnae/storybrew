@@ -134,10 +134,13 @@ namespace StorybrewEditor.Graphics.Drawables
                 var position = layoutGlyph.Position;
 
                 var y = bounds.Top + position.Y * inverseScaling;
-                if (y > clipRegion.Bottom) break;
-
                 var height = glyph.Height * inverseScaling;
-                if (y + height < clipRegion.Top) continue;
+
+                if (y > clipRegion.Bottom)// || y - height > bounds.Bottom)
+                    break;
+
+                if (y + height < clipRegion.Top)// || y < bounds.Top)
+                    continue;
 
                 var x = bounds.Left + position.X * inverseScaling;
                 var width = glyph.Width * inverseScaling;
@@ -203,7 +206,7 @@ namespace StorybrewEditor.Graphics.Drawables
                 currentScaling = Scaling;
             }
 
-            textLayout = new TextLayout(Text ?? "", font, alignment, trimming, (int)Math.Ceiling(MaxSize.X * scaling));
+            textLayout = new TextLayout(Text ?? "", font, alignment, trimming, MaxSize * scaling);
         }
 
         #region IDisposable Support

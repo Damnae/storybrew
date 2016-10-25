@@ -268,6 +268,9 @@ namespace StorybrewEditor.UserInterface
 
         protected virtual void DrawChildren(DrawContext drawContext, float actualOpacity)
         {
+            if (children.Count == 0)
+                return;
+
 #if DEBUG
             Box2? clipRegionDebug = null;
 #endif
