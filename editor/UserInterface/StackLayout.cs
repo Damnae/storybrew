@@ -88,7 +88,6 @@ namespace StorybrewEditor.UserInterface
 
                 minWidth = Math.Max(minWidth, childMinSize.X);
                 minHeight = Math.Max(minHeight, childMinSize.Y);
-
             }
             minSize = new Vector2(minWidth, minHeight);
             preferredSize = new Vector2(width, height);

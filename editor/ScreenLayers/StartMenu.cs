@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -190,12 +191,12 @@ namespace StorybrewEditor.ScreenLayers
 
                             var name = release.Value<string>("name");
                             var version = new Version(name);
-                            
+
                             if (!hasLatest)
                             {
                                 hasLatest = true;
                                 latestVersion = version;
-                                
+
                                 var assets = release.GetValue("assets");
                                 foreach (var asset in assets)
                                 {
@@ -208,7 +209,7 @@ namespace StorybrewEditor.ScreenLayers
                                 }
                             }
 
-                            if (Program.Version < version && description.Split('\n').Length < 25)
+                            if (Program.Version < version)
                             {
                                 var publishedAt = release.Value<string>("published_at");
                                 var publishDate = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
@@ -216,9 +217,14 @@ namespace StorybrewEditor.ScreenLayers
 
                                 var body = release.Value<string>("body");
                                 if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
-                                body = body.Trim(' ', '\r', '\n');
+                                body = body.Replace("\r\n", "\n").Trim(' ', '\n');
+                                body = $"v{version} - {authorName}, {publishDate.ToTimeAgo()}\n{body}\n\n";
 
-                                description += $"v{version} - {authorName}, {publishDate.ToTimeAgo()}\n{body}\n\n";
+                                var newDescription = description + body;
+                                if (description.Length > 0 && newDescription.Count(c => c == '\n') > 35)
+                                    break;
+
+                                description = newDescription;
                             }
                             else break;
                         }
