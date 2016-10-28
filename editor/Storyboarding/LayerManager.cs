@@ -1,9 +1,9 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.Util;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
 using System;
 using System.Collections.Generic;
+using BrewLib.Util;
 
 namespace StorybrewEditor.Storyboarding
 {

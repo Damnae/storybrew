@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics;
+﻿using BrewLib.Util;
+using OpenTK.Graphics;
 using System.Drawing;
 
 namespace StorybrewEditor.UserInterface.Skinning.Styles
@@ -7,7 +8,7 @@ namespace StorybrewEditor.UserInterface.Skinning.Styles
     {
         public string FontName;
         public float FontSize;
-        public UiAlignment TextAlignment;
+        public BoxAlignment TextAlignment;
         public StringTrimming Trimming;
         public Color4 Color;
     }

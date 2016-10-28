@@ -1,5 +1,5 @@
-﻿using StorybrewEditor.UserInterface;
-using StorybrewEditor.Util;
+﻿using BrewLib.Util;
+using StorybrewEditor.UserInterface;
 using System;
 using System.Collections.Generic;
 
@@ -48,8 +48,8 @@ namespace StorybrewEditor.ScreenLayers
             {
                 StyleName = "panel",
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Padding = new FourSide(16),
                 FitChildren = true,
                 Children = new Widget[]
@@ -68,7 +68,7 @@ namespace StorybrewEditor.ScreenLayers
                             {
                                 StyleName = "icon",
                                 Icon = IconFont.TimesCircle,
-                                AnchorFrom = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
                                 CanGrow = false,
                             },
                         },
@@ -88,7 +88,7 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     StyleName = "small",
                     Text = option.Name,
-                    AnchorFrom = UiAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre,
                 });
 
                 var result = option.Value;

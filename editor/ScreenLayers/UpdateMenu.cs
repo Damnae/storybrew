@@ -1,4 +1,5 @@
-﻿using StorybrewEditor.UserInterface;
+﻿using BrewLib.Util;
+using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
@@ -30,8 +31,8 @@ namespace StorybrewEditor.ScreenLayers
             {
                 StyleName = "panel",
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Padding = new FourSide(16),
                 FitChildren = true,
                 Children = new Widget[]
@@ -39,18 +40,18 @@ namespace StorybrewEditor.ScreenLayers
                     actionLabel = new Label(WidgetManager)
                     {
                         Text = "Updating",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     statusLabel = new Label(WidgetManager)
                     {
                         StyleName = "small",
                         Text = downloadUrl,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     progressBar = new ProgressBar(WidgetManager)
                     {
                         Value = 0,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                 },
             });

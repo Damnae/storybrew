@@ -1,5 +1,5 @@
-﻿using OpenTK.Graphics;
-using StorybrewEditor.Util;
+﻿using BrewLib.Util;
+using OpenTK.Graphics;
 
 namespace StorybrewEditor.UserInterface.Skinning.Styles
 {

@@ -1,5 +1,5 @@
-﻿using StorybrewEditor.UserInterface;
-using StorybrewEditor.Util;
+﻿using BrewLib.Util;
+using StorybrewEditor.UserInterface;
 using System;
 
 namespace StorybrewEditor.ScreenLayers.Util
@@ -36,8 +36,8 @@ namespace StorybrewEditor.ScreenLayers.Util
             {
                 StyleName = "panel",
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Padding = new FourSide(16),
                 Children = new Widget[]
                 {
@@ -45,29 +45,29 @@ namespace StorybrewEditor.ScreenLayers.Util
                     {
                         StyleName = "small",
                         Text = description,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     textbox = new Textbox(WidgetManager)
                     {
                         LabelText = title,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Value = initialText,
                     },
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Children = new Widget[]
                         {
                             okButton = new Button(WidgetManager)
                             {
                                 Text = "Ok",
-                                AnchorFrom = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
                             },
                             cancelButton = new Button(WidgetManager)
                             {
                                 Text = "Cancel",
-                                AnchorFrom = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
                             },
                         },
                     },

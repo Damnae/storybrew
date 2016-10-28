@@ -1,11 +1,11 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -118,13 +118,13 @@ namespace StorybrewEditor.UserInterface
 
             Add(content = new Label(manager)
             {
-                AnchorFrom = UiAlignment.BottomLeft,
-                AnchorTo = UiAlignment.BottomLeft,
+                AnchorFrom = BoxAlignment.BottomLeft,
+                AnchorTo = BoxAlignment.BottomLeft,
             });
             Add(label = new Label(manager)
             {
-                AnchorFrom = UiAlignment.TopLeft,
-                AnchorTo = UiAlignment.TopLeft,
+                AnchorFrom = BoxAlignment.TopLeft,
+                AnchorTo = BoxAlignment.TopLeft,
             });
 
             OnFocusChange += (sender, e) =>

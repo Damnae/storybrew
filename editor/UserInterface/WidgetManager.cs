@@ -1,13 +1,14 @@
 ﻿using OpenTK;
 using OpenTK.Input;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
 using BrewLib.Input;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.UserInterface.Skinning;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -188,8 +189,8 @@ namespace StorybrewEditor.UserInterface
 
             var targetBounds = tooltip.AnchorTarget.Bounds;
             var topSpace = targetBounds.Top - rootBounds.Top;
-            tooltip.AnchorFrom = UiAlignment.Bottom;
-            tooltip.AnchorTo = UiAlignment.Top;
+            tooltip.AnchorFrom = BoxAlignment.Bottom;
+            tooltip.AnchorTo = BoxAlignment.Top;
             tooltip.Pack(0, 0, 600, topSpace - 16);
 
             // Only put it on the bottom if it doesn't fit on top
@@ -200,8 +201,8 @@ namespace StorybrewEditor.UserInterface
                 var bottomSpace = rootBounds.Bottom - targetBounds.Bottom;
                 if (bottomSpace > topSpace)
                 {
-                    tooltip.AnchorFrom = UiAlignment.Top;
-                    tooltip.AnchorTo = UiAlignment.Bottom;
+                    tooltip.AnchorFrom = BoxAlignment.Top;
+                    tooltip.AnchorTo = BoxAlignment.Bottom;
                     tooltip.Pack(0, 0, 600, bottomSpace - 16);
                     bounds = tooltip.Bounds;
                 }

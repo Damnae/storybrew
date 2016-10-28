@@ -1,10 +1,10 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.Util;
 using System;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -42,8 +42,8 @@ namespace StorybrewEditor.UserInterface
             {
                 StyleName = "timelineBeatmapName",
                 Text = project.MainBeatmap.Name,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.BottomRight,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.BottomRight,
             });
             StyleName = "timeline";
 

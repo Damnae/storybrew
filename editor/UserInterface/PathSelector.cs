@@ -1,7 +1,7 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
 
 namespace StorybrewEditor.UserInterface
@@ -33,8 +33,8 @@ namespace StorybrewEditor.UserInterface
 
             Add(layout = new LinearLayout(manager)
             {
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Horizontal = true,
                 Fill = true,
                 FitChildren = true,
@@ -42,15 +42,15 @@ namespace StorybrewEditor.UserInterface
                 {
                     textbox = new Textbox(manager)
                     {
-                        AnchorFrom = UiAlignment.BottomLeft,
-                        AnchorTo = UiAlignment.BottomLeft,
+                        AnchorFrom = BoxAlignment.BottomLeft,
+                        AnchorTo = BoxAlignment.BottomLeft,
                     },
                     button = new Button(manager)
                     {
                         Icon = IconFont.FolderOpen,
                         Tooltip = "Browse",
-                        AnchorFrom = UiAlignment.BottomRight,
-                        AnchorTo = UiAlignment.BottomRight,
+                        AnchorFrom = BoxAlignment.BottomRight,
+                        AnchorTo = BoxAlignment.BottomRight,
                         CanGrow = false,
                     },
                 },

@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using StorybrewCommon.Storyboarding;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
 
 namespace StorybrewEditor.Storyboarding
 {

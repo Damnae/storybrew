@@ -1,6 +1,6 @@
-﻿using StorybrewCommon.Util;
+﻿using BrewLib.Util;
+using StorybrewCommon.Util;
 using StorybrewEditor.UserInterface;
-using StorybrewEditor.Util;
 using System;
 using System.IO;
 

@@ -1,7 +1,8 @@
 ﻿using OpenTK;
 using OpenTK.Input;
 using System;
-using StorybrewEditor.Graphics;
+using BrewLib.Graphics;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -60,36 +61,36 @@ namespace StorybrewEditor.UserInterface
             Add(scrollIndicatorTop = new Label(manager)
             {
                 StyleName = "icon",
-                Icon = Util.IconFont.ArrowCircleUp,
-                AnchorFrom = UiAlignment.TopRight,
-                AnchorTo = UiAlignment.TopRight,
+                Icon = IconFont.ArrowCircleUp,
+                AnchorFrom = BoxAlignment.TopRight,
+                AnchorTo = BoxAlignment.TopRight,
                 Hoverable = false,
                 Opacity = 0.6f,
             });
             Add(scrollIndicatorBottom = new Label(manager)
             {
                 StyleName = "icon",
-                Icon = Util.IconFont.ArrowCircleDown,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.BottomRight,
+                Icon = IconFont.ArrowCircleDown,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.BottomRight,
                 Hoverable = false,
                 Opacity = 0.6f,
             });
             Add(scrollIndicatorLeft = new Label(manager)
             {
                 StyleName = "icon",
-                Icon = Util.IconFont.ArrowCircleLeft,
-                AnchorFrom = UiAlignment.BottomLeft,
-                AnchorTo = UiAlignment.BottomLeft,
+                Icon = IconFont.ArrowCircleLeft,
+                AnchorFrom = BoxAlignment.BottomLeft,
+                AnchorTo = BoxAlignment.BottomLeft,
                 Hoverable = false,
                 Opacity = 0.6f,
             });
             Add(scrollIndicatorRight = new Label(manager)
             {
                 StyleName = "icon",
-                Icon = Util.IconFont.ArrowCircleRight,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.BottomRight,
+                Icon = IconFont.ArrowCircleRight,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.BottomRight,
                 Hoverable = false,
                 Opacity = 0.6f,
             });

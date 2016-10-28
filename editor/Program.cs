@@ -1,7 +1,8 @@
 ﻿using BrewLib.Audio;
+using BrewLib.Graphics;
+using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Graphics;
 using StorybrewEditor.Processes;
 using StorybrewEditor.Util;
 using System;

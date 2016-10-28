@@ -1,7 +1,6 @@
 ﻿using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -9,6 +8,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -58,15 +58,15 @@ namespace StorybrewEditor.UserInterface.Components
                             {
                                 StyleName = "small",
                                 Text = "Add effect",
-                                AnchorFrom = UiAlignment.Centre,
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
                             },
                             newScriptButton = new Button(Manager)
                             {
                                 StyleName = "small",
                                 Text = "New script",
-                                AnchorFrom = UiAlignment.Centre,
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
                             },
                         },
                     },
@@ -109,8 +109,8 @@ namespace StorybrewEditor.UserInterface.Components
                 Button renameButton, statusButton, configButton, editButton, removeButton;
                 effectsLayout.Add(effectRoot = new LinearLayout(Manager)
                 {
-                    AnchorFrom = UiAlignment.Centre,
-                    AnchorTo = UiAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre,
+                    AnchorTo = BoxAlignment.Centre,
                     Horizontal = true,
                     FitChildren = true,
                     Fill = true,
@@ -121,8 +121,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = IconFont.Pencil,
                             Tooltip = "Rename",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
                         new LinearLayout(Manager)
@@ -134,23 +134,23 @@ namespace StorybrewEditor.UserInterface.Components
                                 {
                                     StyleName = "listItem",
                                     Text = effect.Name,
-                                    AnchorFrom = UiAlignment.Left,
-                                    AnchorTo = UiAlignment.Left,
+                                    AnchorFrom = BoxAlignment.Left,
+                                    AnchorTo = BoxAlignment.Left,
                                 },
                                 new Label(Manager)
                                 {
                                     StyleName = "listItemSecondary",
                                     Text = $"using {effect.BaseName}",
-                                    AnchorFrom = UiAlignment.Left,
-                                    AnchorTo = UiAlignment.Left,
+                                    AnchorFrom = BoxAlignment.Left,
+                                    AnchorTo = BoxAlignment.Left,
                                 },
                             },
                         },
                         statusButton = new Button(Manager)
                         {
                             StyleName = "icon",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                             Displayed = false,
                         },
@@ -159,8 +159,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = IconFont.Gear,
                             Tooltip = "Configure",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
                         editButton = new Button(Manager)
@@ -168,8 +168,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = IconFont.PencilSquare,
                             Tooltip = "Edit script",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                             Disabled = effect.Path == null,
                         },
@@ -178,8 +178,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = IconFont.Times,
                             Tooltip = "Remove",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
                     },

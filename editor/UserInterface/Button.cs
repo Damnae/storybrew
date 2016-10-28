@@ -1,6 +1,6 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
 
 namespace StorybrewEditor.UserInterface
@@ -71,8 +71,8 @@ namespace StorybrewEditor.UserInterface
         {
             Add(label = new Label(manager)
             {
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Hoverable = false,
             });
 

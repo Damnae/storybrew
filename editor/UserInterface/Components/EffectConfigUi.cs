@@ -1,9 +1,9 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.Util;
 using System;
 
 namespace StorybrewEditor.UserInterface.Components
@@ -71,8 +71,8 @@ namespace StorybrewEditor.UserInterface.Components
                             {
                                 StyleName = "icon",
                                 Icon = IconFont.TimesCircle,
-                                AnchorFrom = UiAlignment.Centre,
-                                AnchorTo = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
                                 CanGrow = false,
                             },
                         },
@@ -124,8 +124,8 @@ namespace StorybrewEditor.UserInterface.Components
             {
                 configFieldsLayout.Add(new LinearLayout(Manager)
                 {
-                    AnchorFrom = UiAlignment.Centre,
-                    AnchorTo = UiAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre,
+                    AnchorTo = BoxAlignment.Centre,
                     Horizontal = true,
                     Fill = true,
                     Children = new Widget[]
@@ -134,8 +134,8 @@ namespace StorybrewEditor.UserInterface.Components
                         {
                             StyleName = "listItem",
                             Text = field.DisplayName,
-                            AnchorFrom = UiAlignment.TopLeft,
-                            AnchorTo = UiAlignment.TopLeft,
+                            AnchorFrom = BoxAlignment.TopLeft,
+                            AnchorTo = BoxAlignment.TopLeft,
                         },
                         buildFieldEditor(field),
                     }
@@ -151,8 +151,8 @@ namespace StorybrewEditor.UserInterface.Components
                 {
                     Value = field.Value,
                     Options = field.AllowedValues,
-                    AnchorFrom = UiAlignment.Right,
-                    AnchorTo = UiAlignment.Right,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
                     CanGrow = false,
                 };
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
@@ -168,8 +168,8 @@ namespace StorybrewEditor.UserInterface.Components
                         new NamedValue() { Name = true.ToString(), Value = true, },
                         new NamedValue() { Name = false.ToString(), Value = false, },
                     },
-                    AnchorFrom = UiAlignment.Right,
-                    AnchorTo = UiAlignment.Right,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
                     CanGrow = false,
                 };
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
@@ -180,8 +180,8 @@ namespace StorybrewEditor.UserInterface.Components
                 var widget = new Textbox(Manager)
                 {
                     Value = field.Value?.ToString(),
-                    AnchorFrom = UiAlignment.Right,
-                    AnchorTo = UiAlignment.Right,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
                     AcceptMultiline = true,
                     CanGrow = false,
                 };
@@ -197,8 +197,8 @@ namespace StorybrewEditor.UserInterface.Components
                 var widget = new Vector2Picker(Manager)
                 {
                     Value = (Vector2)field.Value,
-                    AnchorFrom = UiAlignment.Right,
-                    AnchorTo = UiAlignment.Right,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
                     CanGrow = false,
                 };
                 widget.OnValueCommited += (sender, e) =>
@@ -213,8 +213,8 @@ namespace StorybrewEditor.UserInterface.Components
                 var widget = new HsbColorPicker(Manager)
                 {
                     Value = (Color4)field.Value,
-                    AnchorFrom = UiAlignment.Right,
-                    AnchorTo = UiAlignment.Right,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
                     CanGrow = false,
                 };
                 widget.OnValueCommited += (sender, e) =>
@@ -229,8 +229,8 @@ namespace StorybrewEditor.UserInterface.Components
                 var widget = new Textbox(Manager)
                 {
                     Value = field.Value.ToString(),
-                    AnchorFrom = UiAlignment.Right,
-                    AnchorTo = UiAlignment.Right,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
                     CanGrow = false,
                 };
                 widget.OnValueCommited += (sender, e) =>
@@ -255,8 +255,8 @@ namespace StorybrewEditor.UserInterface.Components
                 StyleName = "listItem",
                 Text = field.Value.ToString(),
                 Tooltip = $"Values of type {field.Type.Name} cannot be edited",
-                AnchorFrom = UiAlignment.Right,
-                AnchorTo = UiAlignment.Right,
+                AnchorFrom = BoxAlignment.Right,
+                AnchorTo = BoxAlignment.Right,
                 CanGrow = false,
             };
         }

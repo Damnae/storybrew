@@ -1,7 +1,7 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
-using StorybrewEditor.Graphics.Textures;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
+using BrewLib.Graphics.Textures;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 
 namespace StorybrewEditor.UserInterface

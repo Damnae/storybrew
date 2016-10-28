@@ -1,9 +1,9 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
+using BrewLib.Graphics;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -136,13 +136,13 @@ namespace StorybrewEditor.UserInterface
                     if (maxSize.Y > 0 && childHeight > maxSize.Y) childHeight = maxSize.Y;
 
                     var verticalOffset = 0f;
-                    var verticalAlignment = child.AnchorFrom & UiAlignment.Vertical;
+                    var verticalAlignment = child.AnchorFrom & BoxAlignment.Vertical;
                     switch (verticalAlignment)
                     {
-                        case UiAlignment.Centre: verticalOffset = line.Height * 0.5f; break;
-                        case UiAlignment.Bottom: verticalOffset = line.Height; break;
+                        case BoxAlignment.Centre: verticalOffset = line.Height * 0.5f; break;
+                        case BoxAlignment.Bottom: verticalOffset = line.Height; break;
                     }
-                    var anchor = verticalAlignment | UiAlignment.Left;
+                    var anchor = verticalAlignment | BoxAlignment.Left;
                     PlaceChildren(child, new Vector2(x, y + verticalOffset), new Vector2(item.Width, childHeight), anchor);
                     x += item.Width + spacing;
                 }
@@ -150,12 +150,12 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        protected virtual void PlaceChildren(Widget widget, Vector2 offset, Vector2 size, UiAlignment anchor)
+        protected virtual void PlaceChildren(Widget widget, Vector2 offset, Vector2 size, BoxAlignment anchor)
         {
             widget.Offset = offset;
             widget.Size = size;
             widget.AnchorFrom = anchor;
-            widget.AnchorTo = UiAlignment.TopLeft;
+            widget.AnchorTo = BoxAlignment.TopLeft;
         }
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)

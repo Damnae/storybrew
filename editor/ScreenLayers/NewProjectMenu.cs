@@ -1,4 +1,5 @@
-﻿using StorybrewEditor.Storyboarding;
+﻿using BrewLib.Util;
+using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System.IO;
@@ -21,8 +22,8 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(mainLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Padding = new FourSide(16),
                 FitChildren = true,
                 Children = new Widget[]
@@ -30,36 +31,36 @@ namespace StorybrewEditor.ScreenLayers
                     new Label(WidgetManager)
                     {
                         Text = "New Project",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     projectNameTextbox = new Textbox(WidgetManager)
                     {
                         LabelText = "Project Name",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.OpenDirectory)
                     {
                         Value = OsuHelper.GetOsuSongFolder(),
                         LabelText = "Mapset Path",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Filter = ".osu files (*.osu)|*.osu",
                     },
                     new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Fill = true,
                         Children = new Widget[]
                         {
                             startButton = new Button(WidgetManager)
                             {
                                 Text = "Start",
-                                AnchorFrom = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
                             },
                             cancelButton = new Button(WidgetManager)
                             {
                                 Text = "Cancel",
-                                AnchorFrom = UiAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre,
                             },
                         },
                     },

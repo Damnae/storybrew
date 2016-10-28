@@ -1,4 +1,4 @@
-﻿using StorybrewEditor.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Input;
 using System;
 using OpenTK.Input;

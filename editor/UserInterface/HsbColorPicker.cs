@@ -1,11 +1,11 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
 using System.Drawing;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {

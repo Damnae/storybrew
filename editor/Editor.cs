@@ -1,12 +1,12 @@
-﻿using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
+﻿using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
 using BrewLib.Input;
+using BrewLib.Util;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Skinning;
-using StorybrewEditor.Util;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -42,8 +42,8 @@ namespace StorybrewEditor
 
         public void Initialize(ScreenLayer initialLayer = null)
         {
-            DrawState.Initialize(window.Width, window.Height);
-            drawContext = new DrawContext();
+            DrawState.Initialize(Resources.ResourceManager, window.Width, window.Height);
+            drawContext = new DrawContext(Resources.ResourceManager);
 
             try
             {
@@ -101,8 +101,8 @@ namespace StorybrewEditor
             overlay.Root.Add(overlayTop = new LinearLayout(overlay)
             {
                 AnchorTarget = overlay.Root,
-                AnchorFrom = UiAlignment.Top,
-                AnchorTo = UiAlignment.Top,
+                AnchorFrom = BoxAlignment.Top,
+                AnchorTo = BoxAlignment.Top,
                 Horizontal = true,
                 Opacity = 0,
                 Displayed = false,
@@ -111,7 +111,7 @@ namespace StorybrewEditor
                     statsLabel = new Label(overlay)
                     {
                         StyleName = "small",
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
                         Displayed = Program.Settings.ShowStats,
                     },
                 }
@@ -121,8 +121,8 @@ namespace StorybrewEditor
             overlay.Root.Add(altOverlayTop = new LinearLayout(overlay)
             {
                 AnchorTarget = overlay.Root,
-                AnchorFrom = UiAlignment.Top,
-                AnchorTo = UiAlignment.Top,
+                AnchorFrom = BoxAlignment.Top,
+                AnchorTo = BoxAlignment.Top,
                 Horizontal = true,
                 Opacity = 0,
                 Displayed = false,
@@ -132,12 +132,12 @@ namespace StorybrewEditor
                     {
                         StyleName = "icon",
                         Icon = IconFont.VolumeUp,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
                     },
                     volumeSlider = new Slider(overlay)
                     {
                         Step = 0.01f,
-                        AnchorTo = UiAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
                     },
                 }
             });

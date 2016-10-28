@@ -1,4 +1,4 @@
-﻿using StorybrewEditor.Graphics.Drawables;
+﻿using BrewLib.Graphics.Drawables;
 
 namespace StorybrewEditor.UserInterface.Skinning.Styles
 {

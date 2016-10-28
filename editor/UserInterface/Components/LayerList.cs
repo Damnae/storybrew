@@ -1,8 +1,8 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.Util;
 using System;
 
 namespace StorybrewEditor.UserInterface.Components
@@ -94,8 +94,8 @@ namespace StorybrewEditor.UserInterface.Components
                 Button moveUpButton, moveDownButton, diffSpecificButton, osbLayerButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
                 {
-                    AnchorFrom = UiAlignment.Centre,
-                    AnchorTo = UiAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre,
+                    AnchorTo = BoxAlignment.Centre,
                     Horizontal = true,
                     FitChildren = true,
                     Fill = true,
@@ -110,15 +110,15 @@ namespace StorybrewEditor.UserInterface.Components
                                 {
                                     StyleName = "listItem",
                                     Text = layer.Name,
-                                    AnchorFrom = UiAlignment.Left,
-                                    AnchorTo = UiAlignment.Left,
+                                    AnchorFrom = BoxAlignment.Left,
+                                    AnchorTo = BoxAlignment.Left,
                                 },
                                 effectNameLabel = new Label(Manager)
                                 {
                                     StyleName = "listItemSecondary",
                                     Text = $"using {effect.BaseName}",
-                                    AnchorFrom = UiAlignment.Left,
-                                    AnchorTo = UiAlignment.Left,
+                                    AnchorFrom = BoxAlignment.Left,
+                                    AnchorTo = BoxAlignment.Left,
                                 },
                             },
                         },
@@ -127,8 +127,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = layer.DiffSpecific ? IconFont.FileO : IconFont.FilesO,
                             Tooltip = layer.DiffSpecific ? "Diff. specific\n(exports to .osu)" : "All diffs\n(exports to .osb)",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
                         osbLayerButton = new Button(Manager)
@@ -136,8 +136,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = IconFont.ThLarge,
                             Tooltip = "Osb Layer",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
                         new LinearLayout(Manager)
@@ -151,8 +151,8 @@ namespace StorybrewEditor.UserInterface.Components
                                     StyleName = "icon",
                                     Icon = IconFont.AngleUp,
                                     Tooltip = "Up",
-                                    AnchorFrom = UiAlignment.Centre,
-                                    AnchorTo = UiAlignment.Centre,
+                                    AnchorFrom = BoxAlignment.Centre,
+                                    AnchorTo = BoxAlignment.Centre,
                                     CanGrow = false,
                                     Disabled = index == 0,
                                 },
@@ -161,8 +161,8 @@ namespace StorybrewEditor.UserInterface.Components
                                     StyleName = "icon",
                                     Icon = IconFont.AngleDown,
                                     Tooltip = "Down",
-                                    AnchorFrom = UiAlignment.Centre,
-                                    AnchorTo = UiAlignment.Centre,
+                                    AnchorFrom = BoxAlignment.Centre,
+                                    AnchorTo = BoxAlignment.Centre,
                                     CanGrow = false,
                                     Disabled = index == layers.Count - 1,
                                 },
@@ -173,8 +173,8 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = layer.Visible ? IconFont.Eye : IconFont.EyeSlash,
                             Tooltip = "Show/Hide",
-                            AnchorFrom = UiAlignment.Centre,
-                            AnchorTo = UiAlignment.Centre,
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
                             Checkable = true,
                             Checked = layer.Visible,
                             CanGrow = false,

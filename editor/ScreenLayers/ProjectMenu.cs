@@ -1,11 +1,11 @@
 ﻿using BrewLib.Audio;
+using BrewLib.Util;
 using OpenTK;
 using OpenTK.Input;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;
 using StorybrewEditor.UserInterface.Drawables;
-using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -67,15 +67,15 @@ namespace StorybrewEditor.ScreenLayers
             {
                 Drawable = mainStoryboardDrawable = new StoryboardDrawable(project),
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
             });
 
             WidgetManager.Root.Add(bottomLeftLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.BottomLeft,
-                AnchorTo = UiAlignment.BottomLeft,
+                AnchorFrom = BoxAlignment.BottomLeft,
+                AnchorTo = BoxAlignment.BottomLeft,
                 Padding = new FourSide(16, 8, 16, 16),
                 Horizontal = true,
                 Fill = true,
@@ -84,7 +84,7 @@ namespace StorybrewEditor.ScreenLayers
                     timeButton = new Button(WidgetManager)
                     {
                         StyleName = "small",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Text = "--:--:---",
                         CanGrow = false,
                     },
@@ -93,7 +93,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "small",
                         Text = $"1/{snapDivisor}",
                         Tooltip = "Snap divisor",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                     audioTimeFactorButton = new Button(WidgetManager)
@@ -101,12 +101,12 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "small",
                         Text = $"{audio.TimeFactor:P0}",
                         Tooltip = "Audio speed",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                     timeline = new TimelineSlider(WidgetManager, project)
                     {
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         SnapDivisor = snapDivisor,
                     },
                     playPauseButton = new Button(WidgetManager)
@@ -114,7 +114,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.Play,
                         Tooltip = "Play/Pause\nShortcut: Space",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                     fitButton = new Button(WidgetManager)
@@ -122,7 +122,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.Desktop,
                         Tooltip = "Fit/Fill",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                         Checkable = true,
                     },
@@ -132,8 +132,8 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.BottomRight,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.BottomRight,
                 Padding = new FourSide(16, 16, 16, 8),
                 Horizontal = true,
                 Fill = true,
@@ -158,7 +158,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.FolderOpen,
                         Tooltip = "Open project folder",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                     mapsetFolderButton = new Button(WidgetManager)
@@ -166,7 +166,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.FolderOpen,
                         Tooltip = "Open mapset folder",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                     saveButton = new Button(WidgetManager)
@@ -174,7 +174,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.Save,
                         Tooltip = "Save project\nShortcut: Ctrl-S",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                     exportButton = new Button(WidgetManager)
@@ -182,7 +182,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "icon",
                         Icon = IconFont.PuzzlePiece,
                         Tooltip = "Export to .osb",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
                 },
@@ -191,8 +191,8 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(effectConfigUi = new EffectConfigUi(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.TopLeft,
-                AnchorTo = UiAlignment.TopLeft,
+                AnchorFrom = BoxAlignment.TopLeft,
+                AnchorTo = BoxAlignment.TopLeft,
                 Offset = new Vector2(16, 16),
                 Displayed = false,
             });
@@ -201,16 +201,16 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
             {
                 AnchorTarget = bottomRightLayout,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.TopRight,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
 
             WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager)
             {
                 AnchorTarget = bottomRightLayout,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.TopRight,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
 
@@ -218,8 +218,8 @@ namespace StorybrewEditor.ScreenLayers
             {
                 StyleName = "tooltip",
                 AnchorTarget = bottomLeftLayout,
-                AnchorFrom = UiAlignment.BottomLeft,
-                AnchorTo = UiAlignment.TopLeft,
+                AnchorFrom = BoxAlignment.BottomLeft,
+                AnchorTo = BoxAlignment.TopLeft,
                 Offset = new Vector2(16, 0),
                 Horizontal = true,
                 Hoverable = false,
@@ -229,12 +229,12 @@ namespace StorybrewEditor.ScreenLayers
                     statusIcon = new Label(WidgetManager)
                     {
                         StyleName = "icon",
-                        AnchorFrom = UiAlignment.Left,
+                        AnchorFrom = BoxAlignment.Left,
                         CanGrow = false,
                     },
                     statusMessage = new Label(WidgetManager)
                     {
-                        AnchorFrom = UiAlignment.Left,
+                        AnchorFrom = BoxAlignment.Left,
                     },
                 },
             });
@@ -244,8 +244,8 @@ namespace StorybrewEditor.ScreenLayers
                 StyleName = "storyboardPreview",
                 Drawable = previewDrawable = new StoryboardDrawable(project),
                 AnchorTarget = timeline,
-                AnchorFrom = UiAlignment.Bottom,
-                AnchorTo = UiAlignment.Top,
+                AnchorFrom = BoxAlignment.Bottom,
+                AnchorTo = BoxAlignment.Top,
                 Hoverable = false,
                 Displayed = false,
                 Size = new Vector2(16, 9) * 16,

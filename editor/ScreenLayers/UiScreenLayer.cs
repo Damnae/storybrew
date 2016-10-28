@@ -1,6 +1,6 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
 using StorybrewEditor.UserInterface;
 using System;
 

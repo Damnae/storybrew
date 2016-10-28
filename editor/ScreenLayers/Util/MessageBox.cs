@@ -1,5 +1,5 @@
-﻿using StorybrewEditor.UserInterface;
-using StorybrewEditor.Util;
+﻿using BrewLib.Util;
+using StorybrewEditor.UserInterface;
 using System;
 
 namespace StorybrewEditor.ScreenLayers.Util
@@ -34,15 +34,15 @@ namespace StorybrewEditor.ScreenLayers.Util
             {
                 StyleName = "panel",
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Padding = new FourSide(16),
                 Children = new Widget[]
                 {
                     new ScrollArea(WidgetManager, new Label(WidgetManager)
                     {
                         Text = message,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     })
                     {
                         ScrollsHorizontally = true,
@@ -50,7 +50,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                 },
             });
@@ -58,7 +58,7 @@ namespace StorybrewEditor.ScreenLayers.Util
             var yesButton = new Button(WidgetManager)
             {
                 Text = noAction != null ? "Yes" : "Ok",
-                AnchorFrom = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
             };
             yesButton.OnClick += (sender, e) =>
             {
@@ -72,7 +72,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                 var noButton = new Button(WidgetManager)
                 {
                     Text = "No",
-                    AnchorFrom = UiAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre,
                 };
                 noButton.OnClick += (sender, e) =>
                 {
@@ -87,7 +87,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                 var cancelButton = new Button(WidgetManager)
                 {
                     Text = "Cancel",
-                    AnchorFrom = UiAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre,
                 };
                 cancelButton.OnClick += (sender, e) => Exit();
                 buttonsLayout.Add(cancelButton);

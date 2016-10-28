@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using BrewLib.Util;
+using Newtonsoft.Json.Linq;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
@@ -34,8 +35,8 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(mainLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Centre,
-                AnchorTo = UiAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
                 Padding = new FourSide(16),
                 FitChildren = true,
                 Children = new Widget[]
@@ -43,23 +44,23 @@ namespace StorybrewEditor.ScreenLayers
                     newProjectButton = new Button(WidgetManager)
                     {
                         Text = "New project",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     openProjectButton = new Button(WidgetManager)
                     {
                         Text = "Open project",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     preferencesButton = new Button(WidgetManager)
                     {
                         Text = "Preferences",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Disabled = true,
                     },
                     closeButton = new Button(WidgetManager)
                     {
                         Text = "Close",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                 },
             });
@@ -67,8 +68,8 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.BottomRight,
-                AnchorTo = UiAlignment.BottomRight,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.BottomRight,
                 Padding = new FourSide(16),
                 Horizontal = true,
                 Fill = true,
@@ -78,13 +79,13 @@ namespace StorybrewEditor.ScreenLayers
                     {
                         StyleName = "small",
                         Text = "Join Discord",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                     wikiButton = new Button(WidgetManager)
                     {
                         StyleName = "small",
                         Text = "Wiki",
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                 },
             });
@@ -92,21 +93,21 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Root.Add(bottomLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Bottom,
-                AnchorTo = UiAlignment.Bottom,
+                AnchorFrom = BoxAlignment.Bottom,
+                AnchorTo = BoxAlignment.Bottom,
                 Padding = new FourSide(16),
                 Children = new Widget[]
                 {
                     updateButton = new Button(WidgetManager)
                     {
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                         Displayed = false,
                     },
                     versionLabel = new Label(WidgetManager)
                     {
                         StyleName = "small",
                         Text = Program.FullName,
-                        AnchorFrom = UiAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre,
                     },
                 },
             });

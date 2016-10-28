@@ -1,13 +1,13 @@
 ﻿using OpenTK;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding3d;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
 using StorybrewEditor.Storyboarding3d;
-using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using BrewLib.Util;
 
 namespace StorybrewEditor.Storyboarding
 {

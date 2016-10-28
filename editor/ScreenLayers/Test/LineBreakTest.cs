@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using StorybrewEditor.UserInterface;
 
 namespace StorybrewEditor.ScreenLayers.Test
@@ -18,8 +19,8 @@ namespace StorybrewEditor.ScreenLayers.Test
             {
                 Text = @"Sanae from class 3-B was an ordinary girl, one you might find anywhere. But one day, her pets ran away from her when she was at the lake.",
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.BottomLeft,
-                AnchorTo = UiAlignment.Left,
+                AnchorFrom = BoxAlignment.BottomLeft,
+                AnchorTo = BoxAlignment.Left,
                 Offset = new Vector2(16, -8),
             });
 
@@ -27,8 +28,8 @@ namespace StorybrewEditor.ScreenLayers.Test
             {
                 Text = @"三年B組のサナエさんは、どこにでもいる普通の女の子でした。ところがある日、彼女の飼っていたペットが湖で逃げてしまいました。",
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.TopLeft,
-                AnchorTo = UiAlignment.Left,
+                AnchorFrom = BoxAlignment.TopLeft,
+                AnchorTo = BoxAlignment.Left,
                 Offset = new Vector2(16, 8),
             });
         }

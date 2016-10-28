@@ -1,13 +1,13 @@
 ﻿using OpenTK;
 using OpenTK.Input;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -46,8 +46,8 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        private UiAlignment anchorFrom = UiAlignment.TopLeft;
-        public UiAlignment AnchorFrom
+        private BoxAlignment anchorFrom = BoxAlignment.TopLeft;
+        public BoxAlignment AnchorFrom
         {
             get { return anchorFrom; }
             set
@@ -58,8 +58,8 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        private UiAlignment anchorTo = UiAlignment.TopLeft;
-        public UiAlignment AnchorTo
+        private BoxAlignment anchorTo = BoxAlignment.TopLeft;
+        public BoxAlignment AnchorTo
         {
             get { return anchorTo; }
             set
@@ -476,24 +476,24 @@ namespace StorybrewEditor.UserInterface
                     actualAnchorTarget.UpdateAnchoring(iteration, false);
                     screenPosition = actualAnchorTarget.screenPosition + offset;
 
-                    if (anchorFrom.HasFlag(UiAlignment.Right))
+                    if (anchorFrom.HasFlag(BoxAlignment.Right))
                         screenPosition.X -= size.X;
-                    else if (!anchorFrom.HasFlag(UiAlignment.Left))
+                    else if (!anchorFrom.HasFlag(BoxAlignment.Left))
                         screenPosition.X -= size.X * 0.5f;
 
-                    if (anchorFrom.HasFlag(UiAlignment.Bottom))
+                    if (anchorFrom.HasFlag(BoxAlignment.Bottom))
                         screenPosition.Y -= size.Y;
-                    else if (!anchorFrom.HasFlag(UiAlignment.Top))
+                    else if (!anchorFrom.HasFlag(BoxAlignment.Top))
                         screenPosition.Y -= size.Y * 0.5f;
 
-                    if (anchorTo.HasFlag(UiAlignment.Right))
+                    if (anchorTo.HasFlag(BoxAlignment.Right))
                         screenPosition.X += actualAnchorTarget.Size.X;
-                    else if (!anchorTo.HasFlag(UiAlignment.Left))
+                    else if (!anchorTo.HasFlag(BoxAlignment.Left))
                         screenPosition.X += actualAnchorTarget.Size.X * 0.5f;
 
-                    if (anchorTo.HasFlag(UiAlignment.Bottom))
+                    if (anchorTo.HasFlag(BoxAlignment.Bottom))
                         screenPosition.Y += actualAnchorTarget.Size.Y;
-                    else if (!anchorTo.HasFlag(UiAlignment.Top))
+                    else if (!anchorTo.HasFlag(BoxAlignment.Top))
                         screenPosition.Y += actualAnchorTarget.Size.Y * 0.5f;
                 }
                 else screenPosition = offset;
@@ -626,24 +626,5 @@ namespace StorybrewEditor.UserInterface
         #endregion
 
         public override string ToString() => $"{GetType().Name} {StyleName} #{Id} {Width}x{Height}";
-    }
-
-    [Flags]
-    public enum UiAlignment
-    {
-        Centre = 0,
-
-        Top = 1,
-        Bottom = 2,
-        Right = 4,
-        Left = 8,
-
-        TopLeft = Top | Left,
-        TopRight = Top | Right,
-        BottomLeft = Bottom | Left,
-        BottomRight = Bottom | Right,
-
-        Vertical = Top | Bottom,
-        Horizontal = Left | Right,
     }
 }

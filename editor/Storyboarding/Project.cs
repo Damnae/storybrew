@@ -2,9 +2,9 @@
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.Graphics.Textures;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Textures;
 using StorybrewEditor.Mapset;
 using StorybrewEditor.Scripting;
 using StorybrewEditor.Util;
@@ -16,6 +16,7 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using BrewLib.Util;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -123,7 +124,7 @@ namespace StorybrewEditor.Storyboarding
         private void reloadTextures()
         {
             textureContainer?.Dispose();
-            textureContainer = new TextureContainerSeparate(false);
+            textureContainer = new TextureContainerSeparate(null);
         }
 
         #endregion

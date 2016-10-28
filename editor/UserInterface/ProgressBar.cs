@@ -1,6 +1,6 @@
 ﻿using OpenTK;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Drawables;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 

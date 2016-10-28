@@ -1,6 +1,6 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using StorybrewEditor.UserInterface;
-using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -53,8 +53,8 @@ namespace StorybrewEditor.ScreenLayers.Util
             WidgetManager.Root.Add(mainLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Bottom,
-                AnchorTo = UiAlignment.Bottom,
+                AnchorFrom = BoxAlignment.Bottom,
+                AnchorTo = BoxAlignment.Bottom,
                 Offset = new Vector2(0, -64),
                 Padding = new FourSide(16),
                 FitChildren = true,

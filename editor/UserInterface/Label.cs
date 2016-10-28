@@ -1,10 +1,10 @@
 ﻿using System;
 using OpenTK;
-using StorybrewEditor.Graphics;
-using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.Graphics.Drawables;
+using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Drawables;
 using StorybrewEditor.UserInterface.Skinning.Styles;
-using StorybrewEditor.Util;
+using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -27,13 +27,13 @@ namespace StorybrewEditor.UserInterface
                 var textSize = new Vector2(Math.Min(textDrawable.Size.X, size.X), Math.Min(textDrawable.Size.Y, size.Y));
 
                 var alignment = textDrawable.Alignment;
-                if (alignment.HasFlag(UiAlignment.Right))
+                if (alignment.HasFlag(BoxAlignment.Right))
                     position.X += size.X - textSize.X;
-                else if (!alignment.HasFlag(UiAlignment.Left))
+                else if (!alignment.HasFlag(BoxAlignment.Left))
                     position.X += size.X * 0.5f - textSize.X * 0.5f;
-                if (alignment.HasFlag(UiAlignment.Bottom))
+                if (alignment.HasFlag(BoxAlignment.Bottom))
                     position.Y += size.Y - textSize.Y;
-                else if (!alignment.HasFlag(UiAlignment.Top))
+                else if (!alignment.HasFlag(BoxAlignment.Top))
                     position.Y += size.Y * 0.5f - textSize.Y * 0.5f;
 
                 position = Manager.SnapToPixel(position);

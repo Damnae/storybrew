@@ -1,5 +1,5 @@
-﻿using StorybrewEditor.UserInterface;
-using StorybrewEditor.Util;
+﻿using BrewLib.Util;
+using StorybrewEditor.UserInterface;
 using System;
 
 namespace StorybrewEditor.ScreenLayers.Test
@@ -19,8 +19,8 @@ namespace StorybrewEditor.ScreenLayers.Test
             WidgetManager.Root.Add(flowLayout1 = new FlowLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.TopLeft,
-                AnchorTo = UiAlignment.TopLeft,
+                AnchorFrom = BoxAlignment.TopLeft,
+                AnchorTo = BoxAlignment.TopLeft,
                 Padding = new FourSide(16),
                 Spacing = 10,
                 //FitChildren = true,
@@ -32,8 +32,8 @@ namespace StorybrewEditor.ScreenLayers.Test
             WidgetManager.Root.Add(flowLayout2 = new FlowLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.TopRight,
-                AnchorTo = UiAlignment.TopRight,
+                AnchorFrom = BoxAlignment.TopRight,
+                AnchorTo = BoxAlignment.TopRight,
                 Padding = new FourSide(16),
                 //FitChildren = true,
                 //Fill = true,
@@ -44,8 +44,8 @@ namespace StorybrewEditor.ScreenLayers.Test
             WidgetManager.Root.Add(flowLayout3 = new FlowLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
-                AnchorFrom = UiAlignment.Bottom,
-                AnchorTo = UiAlignment.Bottom,
+                AnchorFrom = BoxAlignment.Bottom,
+                AnchorTo = BoxAlignment.Bottom,
                 Padding = new FourSide(16),
                 //FitChildren = true,
                 //Fill = true,
