@@ -2,7 +2,7 @@
 using ManagedBass.Fx;
 using System;
 
-namespace StorybrewEditor.Audio
+namespace BrewLib.Audio
 {
     public class AudioStream : IDisposable
     {
@@ -91,7 +91,7 @@ namespace StorybrewEditor.Audio
 
         public void UpdateVolume()
         {
-            Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Program.Settings.Volume);
+            Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Manager.Volume);
         }
 
         private void updateTimeFactor()

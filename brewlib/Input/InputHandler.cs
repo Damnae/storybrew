@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Input;
 
-namespace StorybrewEditor.Input
+namespace BrewLib.Input
 {
     public interface InputHandler
     {

@@ -2,7 +2,7 @@
 using OpenTK.Input;
 using System;
 
-namespace StorybrewEditor.Input
+namespace BrewLib.Input
 {
     public class InputManager : IDisposable
     {

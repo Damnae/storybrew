@@ -54,14 +54,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ManagedBass, Version=0.23.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ManagedBass.0.24.0\lib\net45\ManagedBass.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ManagedBass.PInvoke, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ManagedBass.PInvoke.0.5.0\lib\net45\ManagedBass.PInvoke.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -84,9 +76,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\AudioManager.cs" />
-    <Compile Include="Audio\AudioStream.cs" />
-    <Compile Include="Audio\FftStream.cs" />
     <Compile Include="Builder.cs" />
     <Compile Include="Graphics\Drawables\CompositeDrawable.cs" />
     <Compile Include="Graphics\Drawables\Drawable.cs" />
@@ -165,10 +154,6 @@
     <Compile Include="Graphics\Text\TextGenerator.cs" />
     <Compile Include="Graphics\VertexAttribute.cs" />
     <Compile Include="Graphics\VertexDeclaration.cs" />
-    <Compile Include="Input\InputAdapter.cs" />
-    <Compile Include="Input\InputDispatcher.cs" />
-    <Compile Include="Input\InputHandler.cs" />
-    <Compile Include="Input\InputManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -261,18 +246,16 @@
     <None Include="Resources\skin.json" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\brewlib\brewlib.csproj">
+      <Project>{a4f7cc21-b769-424b-ab59-89e93d781762}</Project>
+      <Name>brewlib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\common\common.csproj">
       <Project>{f0edccec-4b64-4ce8-801f-1377e3384dc4}</Project>
       <Name>common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bass.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="bass_fx.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="icon.ico" />
     <Content Include="Resources\ui-line.png" />
     <Content Include="Resources\ui-rounded-borders.png" />

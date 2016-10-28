@@ -2,13 +2,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace StorybrewEditor.Audio
+namespace BrewLib.Audio
 {
     public class AudioManager : IDisposable
     {
         private List<AudioStream> audioStreams = new List<AudioStream>();
 
         private float volume = 1;
+        public float Volume
+        {
+            get { return volume; }
+            set
+            {
+                if (volume == value) return;
+
+                volume = value;
+                foreach (var audio in audioStreams)
+                    audio.UpdateVolume();
+            }
+        }
 
         public AudioManager(IntPtr windowHandle)
         {
@@ -16,9 +28,6 @@ namespace StorybrewEditor.Audio
             Bass.PlaybackBufferLength = 100;
             Bass.NetBufferLength = 500;
             Bass.UpdatePeriod = 10;
-
-            updateVolume();
-            Program.Settings.Volume.OnValueChanged += (sender, e) => updateVolume();
         }
 
         public AudioStream LoadStream(string path)
@@ -31,16 +40,6 @@ namespace StorybrewEditor.Audio
         public void NotifyDisposed(AudioStream audio)
         {
             audioStreams.Remove(audio);
-        }
-
-        private void updateVolume()
-        {
-            var newVolume = Program.Settings.Volume;
-            if (volume == newVolume) return;
-
-            volume = newVolume;
-            foreach (var audio in audioStreams)
-                audio.UpdateVolume();
         }
 
         #region IDisposable Support

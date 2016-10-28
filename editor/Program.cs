@@ -1,6 +1,6 @@
-﻿using OpenTK;
+﻿using BrewLib.Audio;
+using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Audio;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Processes;
 using StorybrewEditor.Util;
@@ -87,7 +87,7 @@ namespace StorybrewEditor
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
 
             using (var window = createWindow(displayDevice))
-            using (audioManager = new AudioManager(window.GetWindowHandle()))
+            using (audioManager = createAudioManager(window))
             using (var editor = new Editor(window))
             {
                 Trace.WriteLine($"{Environment.OSVersion} / {window.WindowInfo}");
@@ -123,6 +123,16 @@ namespace StorybrewEditor
                 if (windowWidth >= displayDevice.Width) windowWidth = 800;
             }
             return new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags);
+        }
+
+        private static AudioManager createAudioManager(GameWindow window)
+        {
+            var audioManager = new AudioManager(window.GetWindowHandle());
+
+            audioManager.Volume = Settings.Volume;
+            Settings.Volume.OnValueChanged += (sender, e) => audioManager.Volume = Settings.Volume;
+
+            return audioManager;
         }
 
         private static void runMainLoop(GameWindow window, Editor editor, double fixedRateUpdateDuration, double targetFrameDuration)

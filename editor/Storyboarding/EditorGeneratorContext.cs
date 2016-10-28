@@ -1,10 +1,10 @@
 ﻿using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
-using StorybrewEditor.Audio;
 using StorybrewEditor.Mapset;
 using System.Collections.Generic;
 using StorybrewEditor.Util;
 using System.Text;
+using BrewLib.Audio;
 
 namespace StorybrewEditor.Storyboarding
 {

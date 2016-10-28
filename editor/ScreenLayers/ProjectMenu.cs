@@ -1,6 +1,6 @@
-﻿using OpenTK;
+﻿using BrewLib.Audio;
+using OpenTK;
 using OpenTK.Input;
-using StorybrewEditor.Audio;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;

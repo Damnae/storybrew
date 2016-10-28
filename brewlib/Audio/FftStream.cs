@@ -1,7 +1,7 @@
 ﻿using ManagedBass;
 using System;
 
-namespace StorybrewEditor.Audio
+namespace BrewLib.Audio
 {
     public class FftStream : IDisposable
     {

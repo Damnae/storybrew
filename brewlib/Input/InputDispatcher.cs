@@ -2,7 +2,7 @@
 using OpenTK.Input;
 using System.Collections.Generic;
 
-namespace StorybrewEditor.Input
+namespace BrewLib.Input
 {
     public class InputDispatcher : InputHandler
     {

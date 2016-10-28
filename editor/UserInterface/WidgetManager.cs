@@ -2,7 +2,7 @@
 using OpenTK.Input;
 using StorybrewEditor.Graphics;
 using StorybrewEditor.Graphics.Cameras;
-using StorybrewEditor.Input;
+using BrewLib.Input;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.UserInterface.Skinning;
 using System;
