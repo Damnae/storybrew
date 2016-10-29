@@ -10,7 +10,7 @@ namespace BrewLib.Graphics.Cameras
 
         Rectangle Viewport { get; set; }
         Vector3 Position { get; set; }
-        Vector3 Direction { get; set; }
+        Vector3 Forward { get; set; }
         Vector3 Up { get; set; }
         float NearPlane { get; }
         float FarPlane { get; }

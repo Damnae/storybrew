@@ -85,7 +85,7 @@ namespace BrewLib.Graphics.Cameras
 
             Position = new Vector3(zoom * orthoViewport.Width / 2.0f, zoom * orthoViewport.Height / 2.0f, 0);
             Up = new Vector3(0, yDown ? -1 : 1, 0);
-            Direction = new Vector3(0, 0, yDown ? 1 : -1);
+            Forward = new Vector3(0, 0, yDown ? 1 : -1);
 
             projection = Matrix4.CreateOrthographicOffCenter(
                 zoom * -orthoViewport.Width / 2.0f,
@@ -93,7 +93,7 @@ namespace BrewLib.Graphics.Cameras
                 zoom * -(orthoViewport.Height / 2),
                 zoom * orthoViewport.Height / 2,
                 NearPlane, FarPlane);
-            view = Matrix4.LookAt(Position, Position + Direction, Up);
+            view = Matrix4.LookAt(Position, Position + Forward, Up);
         }
     }
 }

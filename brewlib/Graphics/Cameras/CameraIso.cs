@@ -29,8 +29,8 @@ namespace BrewLib.Graphics.Cameras
             var screenViewport = Viewport;
 
             var distanceSqrt = (float)Math.Sqrt(1 / 3f);
-            Direction = new Vector3(distanceSqrt, -distanceSqrt, -distanceSqrt);
-            Position = target - Direction;
+            Forward = new Vector3(distanceSqrt, -distanceSqrt, -distanceSqrt);
+            Position = target - Forward;
             Up = new Vector3(0, 0, 1);
 
             internalViewport = extendedViewport = screenViewport;
@@ -40,7 +40,7 @@ namespace BrewLib.Graphics.Cameras
                 -(screenViewport.Height / 2),
                 screenViewport.Height / 2,
                 NearPlane, FarPlane);
-            view = Matrix4.LookAt(Position, Position + Direction, Up);
+            view = Matrix4.LookAt(Position, Position + Forward, Up);
         }
     }
 }

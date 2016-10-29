@@ -70,14 +70,14 @@ namespace BrewLib.Graphics.Cameras
             }
         }
 
-        private Vector3 direction = new Vector3(0, -1, 0);
-        public Vector3 Direction
+        private Vector3 forward = new Vector3(0, -1, 0);
+        public Vector3 Forward
         {
-            get { return direction; }
+            get { return forward; }
             set
             {
-                if (direction == value) return;
-                direction = value;
+                if (forward == value) return;
+                forward = value;
                 Invalidate();
             }
         }
@@ -125,7 +125,7 @@ namespace BrewLib.Graphics.Cameras
 
         public Box2 FromScreen(Box2 screenBox2)
             => new Box2(FromScreen(new Vector2(screenBox2.Left, screenBox2.Top)).Xy, FromScreen(new Vector2(screenBox2.Right, screenBox2.Bottom)).Xy);
-        
+
         public Vector3 ToScreen(Vector3 worldCoords)
         {
             Validate();
@@ -146,17 +146,17 @@ namespace BrewLib.Graphics.Cameras
 
         public void LookAt(Vector3 target)
         {
-            var newDirection = (target - position).Normalized();
-            if (newDirection != Vector3.Zero)
+            var newForward = (target - position).Normalized();
+            if (newForward != Vector3.Zero)
             {
-                var dot = Vector3.Dot(newDirection, up);
+                var dot = Vector3.Dot(newForward, up);
                 if (Math.Abs(dot - 1) < 0.000000001f)
-                    up = direction * -1;
+                    up = forward * -1;
                 else if (Math.Abs(dot + 1) < 0.000000001f)
-                    up = direction;
+                    up = forward;
 
-                direction = newDirection;
-                up = Vector3.Cross(Vector3.Cross(direction, up).Normalized(), direction).Normalized();
+                forward = newForward;
+                up = Vector3.Cross(Vector3.Cross(forward, up).Normalized(), forward).Normalized();
 
                 Invalidate();
             }
@@ -166,7 +166,7 @@ namespace BrewLib.Graphics.Cameras
         {
             var rotation = Matrix3.CreateFromAxisAngle(axis, angle);
             Vector3.Transform(ref up, ref rotation, out up);
-            Vector3.Transform(ref direction, ref rotation, out direction);
+            Vector3.Transform(ref forward, ref rotation, out forward);
             Invalidate();
         }
 

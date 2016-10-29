@@ -33,7 +33,7 @@ namespace BrewLib.Graphics.Cameras
 
             internalViewport = extendedViewport = screenViewport;
             projection = Matrix4.CreatePerspectiveFieldOfView(fovRadians, aspect, NearPlane, FarPlane);
-            view = Matrix4.LookAt(Position, Position + Direction, Up);
+            view = Matrix4.LookAt(Position, Position + Forward, Up);
         }
     }
 }
