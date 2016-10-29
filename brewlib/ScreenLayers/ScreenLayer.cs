@@ -1,9 +1,9 @@
 ﻿using BrewLib.Graphics;
 using BrewLib.Input;
-using System;
 using OpenTK.Input;
+using System;
 
-namespace StorybrewEditor.ScreenLayers
+namespace BrewLib.ScreenLayers
 {
     public abstract class ScreenLayer : InputAdapter, IDisposable
     {
@@ -64,10 +64,8 @@ namespace StorybrewEditor.ScreenLayers
         {
         }
 
-        public virtual void Update(bool isTopFocus, bool isCovered)
+        public virtual void Update(bool isTopFocus, bool isCovered, double timeElapsed)
         {
-            var delta = Manager.Editor.TimeDelta;
-
             if (!hasStarted && !isExiting && !isCovered)
             {
                 OnStart();
@@ -80,7 +78,7 @@ namespace StorybrewEditor.ScreenLayers
                     OnTransitionOut();
 
                 CurrentState = State.FadinOut;
-                if (!updateTransition(delta, TransitionOutDuration, -1))
+                if (!updateTransition(timeElapsed, TransitionOutDuration, -1))
                 {
                     OnHidden();
                     Manager.Remove(this);
@@ -88,7 +86,7 @@ namespace StorybrewEditor.ScreenLayers
             }
             else if (isCovered)
             {
-                if (updateTransition(delta, TransitionOutDuration, -1))
+                if (updateTransition(timeElapsed, TransitionOutDuration, -1))
                 {
                     if (CurrentState != State.FadinOut)
                         OnTransitionOut();
@@ -104,7 +102,7 @@ namespace StorybrewEditor.ScreenLayers
             }
             else
             {
-                if (updateTransition(delta, TransitionInDuration, 1))
+                if (updateTransition(timeElapsed, TransitionInDuration, 1))
                 {
                     if (CurrentState != State.FadingIn)
                         OnTransitionIn();

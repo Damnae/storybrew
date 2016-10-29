@@ -1,4 +1,5 @@
-﻿using StorybrewEditor.ScreenLayers.Util;
+﻿using BrewLib.ScreenLayers;
+using StorybrewEditor.ScreenLayers.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,7 @@ namespace StorybrewEditor.ScreenLayers
                     ShowNewFolderButton = true,
                     SelectedPath = initialValue,
                 })
-                    if (dialog.ShowDialog(screenLayerManager.Editor.FormsWindow) == System.Windows.Forms.DialogResult.OK)
+                    if (dialog.ShowDialog(screenLayerManager.GetContext<Editor>().FormsWindow) == System.Windows.Forms.DialogResult.OK)
                     {
                         var path = dialog.SelectedPath;
                         Program.Schedule(() => callback.Invoke(path));
@@ -38,7 +39,7 @@ namespace StorybrewEditor.ScreenLayers
                     Filter = filter,
                     InitialDirectory = initialDirectory != null ? Path.GetFullPath(initialDirectory) : string.Empty,
                 })
-                    if (dialog.ShowDialog(screenLayerManager.Editor.FormsWindow) == System.Windows.Forms.DialogResult.OK)
+                    if (dialog.ShowDialog(screenLayerManager.GetContext<Editor>().FormsWindow) == System.Windows.Forms.DialogResult.OK)
                     {
                         var path = dialog.FileName;
                         Program.Schedule(() => callback.Invoke(path));
@@ -60,7 +61,7 @@ namespace StorybrewEditor.ScreenLayers
                     DefaultExt = extension,
                     Filter = filter,
                 })
-                    if (dialog.ShowDialog(screenLayerManager.Editor.FormsWindow) == System.Windows.Forms.DialogResult.OK)
+                    if (dialog.ShowDialog(screenLayerManager.GetContext<Editor>().FormsWindow) == System.Windows.Forms.DialogResult.OK)
                     {
                         var path = dialog.FileName;
                         Program.Schedule(() => callback.Invoke(path));

@@ -54,13 +54,14 @@ namespace StorybrewEditor.ScreenLayers.Test
                 flowLayout3.Add(new Label(WidgetManager) { Text = letter.ToString(), });
         }
 
-        public override void Update(bool isTop, bool isCovered)
+        public override void Update(bool isTop, bool isCovered, double timeElapsed)
         {
-            base.Update(isTop, isCovered);
+            base.Update(isTop, isCovered, timeElapsed);
 
-            flowLayout1.Pack((float)(300 + Math.Sin(Manager.Editor.Time * 0.3) * 200));
-            flowLayout2.Pack((float)(300 + Math.Sin(Manager.Editor.Time * 0.3) * 200));
-            flowLayout3.Pack((float)(300 + Math.Sin(Manager.Editor.Time * 0.3) * 200), Manager.Editor.Window.Height / 2);
+            var editor = Manager.GetContext<Editor>();
+            flowLayout1.Pack((float)(300 + Math.Sin(editor.Time * 0.3) * 200));
+            flowLayout2.Pack((float)(300 + Math.Sin(editor.Time * 0.3) * 200));
+            flowLayout3.Pack((float)(300 + Math.Sin(editor.Time * 0.3) * 200), editor.Window.Height / 2);
         }
     }
 }

@@ -369,21 +369,21 @@ namespace StorybrewEditor.ScreenLayers
         private void exportProject()
             => Manager.AsyncLoading("Exporting...", () => project.ExportToOsb());
 
-        public override void Update(bool isTop, bool isCovered)
+        public override void Update(bool isTop, bool isCovered, double timeElapsed)
         {
-            base.Update(isTop, isCovered);
+            base.Update(isTop, isCovered, timeElapsed);
 
             playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
             audio.Volume = WidgetManager.Root.Opacity;
 
             var time = (float)audio.Time;
             timeline.SetValueSilent(time);
-            if (Manager.Editor.IsFixedRateUpdate)
+            if (Manager.GetContext<Editor>().IsFixedRateUpdate)
                 timeButton.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
             mainStoryboardDrawable.Time = time;
             if (previewContainer.Visible)
-                previewDrawable.Time = timeline.GetValueForPosition(Manager.Editor.InputManager.MousePosition);
+                previewDrawable.Time = timeline.GetValueForPosition(Manager.GetContext<Editor>().InputManager.MousePosition);
         }
 
         public override void Resize(int width, int height)
@@ -418,9 +418,9 @@ namespace StorybrewEditor.ScreenLayers
             Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving...", () =>
             {
                 project.Save();
-                Program.Schedule(() => Manager.Editor.Restart());
+                Program.Schedule(() => Manager.GetContext<Editor>().Restart());
             }),
-            () => Manager.Editor.Restart(), true);
+            () => Manager.GetContext<Editor>().Restart(), true);
         }
 
         private void project_OnEffectsStatusChanged(object sender, EventArgs e)

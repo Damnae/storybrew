@@ -1,14 +1,14 @@
-﻿using OpenTK;
-using OpenTK.Input;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Input;
-using StorybrewEditor.ScreenLayers;
+using BrewLib.ScreenLayers;
+using BrewLib.Util;
+using OpenTK;
+using OpenTK.Input;
 using StorybrewEditor.UserInterface.Skinning;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -88,7 +88,7 @@ namespace StorybrewEditor.UserInterface
         public readonly Skin Skin;
 
         public WidgetManager(ScreenLayerManager screenLayerManager)
-            : this(screenLayerManager, screenLayerManager.Editor.InputManager, screenLayerManager.Editor.Skin)
+            : this(screenLayerManager, screenLayerManager.GetContext<Editor>().InputManager, screenLayerManager.GetContext<Editor>().Skin)
         {
         }
 

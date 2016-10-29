@@ -1,6 +1,7 @@
-﻿using OpenTK;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
+using BrewLib.ScreenLayers;
+using OpenTK;
 using StorybrewEditor.UserInterface;
 using System;
 
@@ -31,11 +32,11 @@ namespace StorybrewEditor.ScreenLayers
             base.Resize(width, height);
         }
 
-        public override void Update(bool isTop, bool isCovered)
+        public override void Update(bool isTop, bool isCovered, double timeElapsed)
         {
-            base.Update(isTop, isCovered);
+            base.Update(isTop, isCovered, timeElapsed);
 
-            if (Manager.Editor.IsFixedRateUpdate)
+            if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {
                 var targetOpacity = (isTop ? 1f : 0.3f);
                 if (Math.Abs(opacity - targetOpacity) <= 0.07f) opacity = targetOpacity;

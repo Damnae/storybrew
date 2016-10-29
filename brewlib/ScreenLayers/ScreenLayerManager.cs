@@ -1,15 +1,18 @@
-﻿using OpenTK.Graphics;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Input;
+using OpenTK;
+using OpenTK.Graphics;
 using System;
 using System.Collections.Generic;
 
-namespace StorybrewEditor.ScreenLayers
+namespace BrewLib.ScreenLayers
 {
     public class ScreenLayerManager : IDisposable
     {
-        private Editor editor;
-        public Editor Editor => editor;
+        private GameWindow window;
+
+        private object context;
+        public T GetContext<T>() => (T)context;
 
         private List<ScreenLayer> layers = new List<ScreenLayer>();
         private List<ScreenLayer> updateQueue = new List<ScreenLayer>();
@@ -21,11 +24,12 @@ namespace StorybrewEditor.ScreenLayers
 
         public Color4 BackgroundColor => Color4.Black;
 
-        public ScreenLayerManager(Editor editor)
+        public ScreenLayerManager(GameWindow window, object context)
         {
-            this.editor = editor;
+            this.window = window;
+            this.context = context;
 
-            editor.Window.Resize += window_Resize;
+            window.Resize += window_Resize;
         }
 
         public void Add(ScreenLayer layer)
@@ -34,8 +38,8 @@ namespace StorybrewEditor.ScreenLayers
             layers.Add(layer);
             layer.Load();
 
-            var width = Math.Max(1, editor.Window.Width);
-            var height = Math.Max(1, editor.Window.Height);
+            var width = Math.Max(1, window.Width);
+            var height = Math.Max(1, window.Height);
             layer.Resize(width, height);
         }
 
@@ -84,9 +88,9 @@ namespace StorybrewEditor.ScreenLayers
             }
         }
 
-        public void Update()
+        public void Update(double timeElapsed)
         {
-            var active = editor.Window.Focused;
+            var active = window.Focused;
             if (!active) changeFocus(null);
 
             updateQueue.Clear();
@@ -114,7 +118,7 @@ namespace StorybrewEditor.ScreenLayers
                     }
                 }
 
-                layer.Update(top, covered);
+                layer.Update(top, covered, timeElapsed);
 
                 if (!layer.IsPopup)
                     covered = true;
@@ -126,7 +130,7 @@ namespace StorybrewEditor.ScreenLayers
             removedLayers.Clear();
 
             if (layers.Count == 0)
-                editor.Window.Exit();
+                window.Exit();
         }
 
         public void Draw(DrawContext drawContext)
@@ -159,8 +163,8 @@ namespace StorybrewEditor.ScreenLayers
 
         private void window_Resize(object sender, EventArgs e)
         {
-            var width = editor.Window.Width;
-            var height = editor.Window.Height;
+            var width = window.Width;
+            var height = window.Height;
 
             if (width == 0 || height == 0) return;
 
@@ -183,7 +187,7 @@ namespace StorybrewEditor.ScreenLayers
                         var layer = layers[i];
                         layer.Dispose();
                     }
-                    editor.Window.Resize -= window_Resize;
+                    window.Resize -= window_Resize;
                 }
                 disposedValue = true;
             }

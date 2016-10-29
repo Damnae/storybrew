@@ -111,6 +111,8 @@
     <Compile Include="Input\InputHandler.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScreenLayers\ScreenLayer.cs" />
+    <Compile Include="ScreenLayers\ScreenLayerManager.cs" />
     <Compile Include="Util\ActionDisposable.cs" />
     <Compile Include="Util\ChangedHandler.cs" />
     <Compile Include="Util\ColorExtensions.cs" />

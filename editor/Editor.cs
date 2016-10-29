@@ -1,6 +1,7 @@
 ﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Input;
+using BrewLib.ScreenLayers;
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -58,7 +59,7 @@ namespace StorybrewEditor
             var inputDispatcher = new InputDispatcher();
             InputManager = new InputManager(window, inputDispatcher);
 
-            ScreenLayerManager = new ScreenLayerManager(this);
+            ScreenLayerManager = new ScreenLayerManager(window, this);
             inputDispatcher.Add(createOverlay(ScreenLayerManager));
             inputDispatcher.Add(ScreenLayerManager.InputHandler);
 
@@ -205,7 +206,7 @@ namespace StorybrewEditor
             this.isFixedRateUpdate = isFixedRateUpdate;
 
             updateOverlay();
-            ScreenLayerManager.Update();
+            ScreenLayerManager.Update(delta);
         }
 
         public void Draw()

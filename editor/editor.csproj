@@ -121,8 +121,6 @@
     <Compile Include="ScreenLayers\ProjectMenu.cs" />
     <Compile Include="ScreenLayers\Util\PromptBox.cs" />
     <Compile Include="ScreenLayers\Util\MessageBox.cs" />
-    <Compile Include="ScreenLayers\ScreenLayer.cs" />
-    <Compile Include="ScreenLayers\ScreenLayerManager.cs" />
     <Compile Include="ScreenLayers\UiScreenLayer.cs" />
     <Compile Include="Storyboarding\EditorGeneratorContext.cs" />
     <Compile Include="Scripting\ScriptCompilationException.cs" />

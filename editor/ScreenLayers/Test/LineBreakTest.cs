@@ -34,12 +34,12 @@ namespace StorybrewEditor.ScreenLayers.Test
             });
         }
 
-        public override void Update(bool isTop, bool isCovered)
+        public override void Update(bool isTop, bool isCovered, double timeElapsed)
         {
-            base.Update(isTop, isCovered);
+            base.Update(isTop, isCovered, timeElapsed);
 
-            label1.Pack(Manager.Editor.InputManager.Mouse.X - label1.Bounds.Left);
-            label2.Pack(Manager.Editor.InputManager.Mouse.X - label2.Bounds.Left);
+            label1.Pack(Manager.GetContext<Editor>().InputManager.Mouse.X - label1.Bounds.Left);
+            label2.Pack(Manager.GetContext<Editor>().InputManager.Mouse.X - label2.Bounds.Left);
         }
     }
 }

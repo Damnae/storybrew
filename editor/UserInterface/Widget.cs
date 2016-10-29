@@ -298,7 +298,7 @@ namespace StorybrewEditor.UserInterface
 #if DEBUG
             manager.Skin.GetDrawable("debug")?.Draw(drawContext, manager.Camera, Bounds, 1);
 
-            var relayout = Math.Max(0, (lastLayoutTime + 1) - manager.ScreenLayerManager.Editor.Time);
+            var relayout = Math.Max(0, (lastLayoutTime + 1) - manager.ScreenLayerManager.GetContext<Editor>().Time);
             if (relayout > 0) manager.Skin.GetDrawable("debug_relayout")?.Draw(drawContext, manager.Camera, Bounds, (float)relayout);
 #endif
         }
@@ -459,7 +459,7 @@ namespace StorybrewEditor.UserInterface
 
         protected virtual void Layout()
         {
-            lastLayoutTime = manager.ScreenLayerManager.Editor.Time;
+            lastLayoutTime = manager.ScreenLayerManager.GetContext<Editor>().Time;
             needsLayout = false;
         }
 
