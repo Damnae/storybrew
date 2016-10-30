@@ -34,7 +34,6 @@ namespace BrewLib.Graphics.Text
 
         public Bitmap CreateBitmap(string text, string fontName, float fontSize, Vector2 maxSize, Vector2 padding, BoxAlignment alignment, StringTrimming trimming, out Vector2 textureSize, bool measureOnly)
         {
-            var font = getFont(fontName, fontSize, FontStyle.Regular);
             if (string.IsNullOrEmpty(text)) text = " ";
 
             StringAlignment horizontalAlignment;
@@ -61,6 +60,9 @@ namespace BrewLib.Graphics.Text
                 stringFormat.LineAlignment = verticalAlignment;
                 stringFormat.Trimming = trimming;
                 stringFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.NoClip; // | StringFormatFlags.LineLimit
+
+                var dpiScale = 96f / graphics.DpiY;
+                var font = getFont(fontName, fontSize * dpiScale, FontStyle.Regular);
 
                 var measuredSize = graphics.MeasureString(text, font, new SizeF(maxSize.X, maxSize.Y), stringFormat);
                 var width = (int)(measuredSize.Width + padding.X * 2 + 1);

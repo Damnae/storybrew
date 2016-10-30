@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace StorybrewEditor
 {
@@ -116,14 +117,30 @@ namespace StorybrewEditor
 #else
             var contextFlags = GraphicsContextFlags.ForwardCompatible;
 #endif
+            var primaryScreenArea = Screen.PrimaryScreen.WorkingArea;
+
             int windowWidth = 1366, windowHeight = 768;
-            if (windowHeight >= displayDevice.Height)
+            if (windowHeight >= primaryScreenArea.Height)
             {
                 windowWidth = 1024;
                 windowHeight = 600;
-                if (windowWidth >= displayDevice.Width) windowWidth = 800;
+                if (windowWidth >= primaryScreenArea.Width) windowWidth = 800;
             }
-            return new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags);
+            var window = new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, DisplayDevice.Default, 1, 0, contextFlags);
+            Trace.WriteLine($"Window dpi scale: {window.Height / (float)windowHeight}");
+
+            window.Location = new Point(
+                (int)(primaryScreenArea.Left + (primaryScreenArea.Width - window.Size.Width) * 0.5f),
+                (int)(primaryScreenArea.Top + (primaryScreenArea.Height - window.Size.Height) * 0.5f)
+            );
+            if (window.Location.X < 0 || window.Location.Y < 0)
+            {
+                window.Location = Point.Empty;
+                window.Size = primaryScreenArea.Size;
+                window.WindowState = WindowState.Maximized;
+            }
+
+            return window;
         }
 
         private static AudioManager createAudioManager(GameWindow window)

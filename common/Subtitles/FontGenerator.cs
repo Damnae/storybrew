@@ -102,8 +102,9 @@ namespace StorybrewCommon.Subtitles
                     fontFamily = fontCollection.Families[0];
                 }
 
+                var dpiScale = 96f / graphics.DpiY;
                 var fontStyle = FontStyle.Regular;
-                using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize, fontStyle) : new Font(fontPath, description.FontSize, fontStyle))
+                using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize * dpiScale, fontStyle) : new Font(fontPath, description.FontSize * dpiScale, fontStyle))
                 {
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
                     width = baseWidth = (int)(measuredSize.Width + 1 + description.Padding.X * 2);
