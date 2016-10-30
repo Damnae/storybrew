@@ -135,7 +135,7 @@ namespace StorybrewEditor
             );
             if (window.Location.X < 0 || window.Location.Y < 0)
             {
-                window.Location = Point.Empty;
+                window.Location = primaryScreenArea.Location;
                 window.Size = primaryScreenArea.Size;
                 window.WindowState = WindowState.Maximized;
             }
