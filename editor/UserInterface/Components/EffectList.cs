@@ -206,8 +206,12 @@ namespace StorybrewEditor.UserInterface.Components
                 editButton.OnClick += (sender, e) => openEffectEditor(ef);
                 configButton.OnClick += (sender, e) =>
                 {
-                    effectConfigUi.Effect = ef;
-                    effectConfigUi.Displayed = true;
+                    if (!effectConfigUi.Displayed || effectConfigUi.Effect != ef)
+                    {
+                        effectConfigUi.Effect = ef;
+                        effectConfigUi.Displayed = true;
+                    }
+                    else effectConfigUi.Displayed = false;
                 };
                 removeButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Remove {ef.Name}?", () => project.Remove(ef), true);
             }
