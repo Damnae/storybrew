@@ -375,6 +375,9 @@ namespace StorybrewEditor
 
         public static void Report(string type, Exception e)
         {
+#if DEBUG
+            return;
+#endif
             NetHelper.BlockingPost("http://a-damnae.rhcloud.com/storybrew/report.php",
                 new NameValueCollection()
                 {
