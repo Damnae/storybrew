@@ -24,9 +24,24 @@ namespace StorybrewEditor.Mapset
         private List<int> bookmarks = new List<int>();
         public override IEnumerable<int> Bookmarks => bookmarks;
 
-        private double sliderMultiplier;
+        private double hpDrainRate = 5;
+        public override double HpDrainRate => hpDrainRate;
+
+        private double circleSize = 5;
+        public override double CircleSize => circleSize;
+
+        private double overallDifficulty = 5;
+        public override double OverallDifficulty => overallDifficulty;
+
+        private double approachRate = 5;
+        public override double ApproachRate => approachRate;
+
+        private double sliderMultiplier = 1;
         public override double SliderMultiplier => sliderMultiplier;
 
+        private double sliderTickRate = 1;
+        public override double SliderTickRate => sliderTickRate;
+        
         private List<OsuHitObject> hitObjects = new List<OsuHitObject>();
         public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
 
@@ -150,7 +165,12 @@ namespace StorybrewEditor.Mapset
             {
                 switch (key)
                 {
+                    case "HPDrainRate": beatmap.hpDrainRate = double.Parse(value, CultureInfo.InvariantCulture); break;
+                    case "CircleSize": beatmap.circleSize = double.Parse(value, CultureInfo.InvariantCulture); break;
+                    case "OverallDifficulty":  beatmap.overallDifficulty = double.Parse(value, CultureInfo.InvariantCulture); break;
+                    case "ApproachRate": beatmap.approachRate = double.Parse(value, CultureInfo.InvariantCulture); break;
                     case "SliderMultiplier": beatmap.sliderMultiplier = double.Parse(value, CultureInfo.InvariantCulture); break;
+                    case "SliderTickRate": beatmap.sliderTickRate = double.Parse(value, CultureInfo.InvariantCulture); break;
                 }
             });
         }

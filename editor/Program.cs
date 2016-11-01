@@ -350,6 +350,8 @@ namespace StorybrewEditor
             }
 
             logger = new TraceLogger(tracePath);
+            Trace.WriteLine($"{FullName}\n");
+
             AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(null, exceptionPath, e.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError("crash", crashPath, (Exception)e.ExceptionObject);
         }

@@ -17,7 +17,12 @@ namespace StorybrewCommon.Mapset
         public abstract string Name { get; }
         public abstract long Id { get; }
 
+        public abstract double HpDrainRate { get; }
+        public abstract double CircleSize { get; }
+        public abstract double OverallDifficulty { get; }
+        public abstract double ApproachRate { get; }
         public abstract double SliderMultiplier { get; }
+        public abstract double SliderTickRate { get; }
 
         public abstract IEnumerable<OsuHitObject> HitObjects { get; }
 
