@@ -1,14 +1,14 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Linq;
-using BrewLib.Util;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -306,6 +306,9 @@ namespace StorybrewEditor.UserInterface.Components
             {
                 try
                 {
+                    if (path != "code" && !File.Exists(path))
+                        continue;
+
                     Process.Start(new ProcessStartInfo()
                     {
                         FileName = path,
