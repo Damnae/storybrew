@@ -6,6 +6,7 @@ namespace StorybrewEditor.Util
     public class TraceLogger : TraceListener
     {
         private string path;
+        private static object logLock = new object();
 
         public TraceLogger(string path)
         {
@@ -20,9 +21,8 @@ namespace StorybrewEditor.Util
         {
             try
             {
-                if (!Program.IsMainThread && Program.SchedulingEnabled)
-                    Program.Schedule(() => File.AppendAllText(path, message + "\n"));
-                else File.AppendAllText(path, message + "\n");
+                lock (logLock)
+                    File.AppendAllText(path, message + "\n");
             }
             catch { }
         }

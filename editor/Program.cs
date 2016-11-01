@@ -363,11 +363,6 @@ namespace StorybrewEditor
 
                 try
                 {
-                    if (!IsMainThread && SchedulingEnabled)
-                    {
-                        Schedule(() => logError(type, filename, e));
-                        return;
-                    }
                     var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
                     using (StreamWriter w = new StreamWriter(logPath, true))
                     {
