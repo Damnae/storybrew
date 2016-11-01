@@ -1,10 +1,11 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Textures;
+using BrewLib.Util;
+using OpenTK;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
-using BrewLib.Graphics;
-using BrewLib.Graphics.Cameras;
-using BrewLib.Graphics.Textures;
 using StorybrewEditor.Mapset;
 using StorybrewEditor.Scripting;
 using StorybrewEditor.Util;
@@ -16,7 +17,6 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using BrewLib.Util;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -519,7 +519,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 osuPath = MainBeatmap.Path;
                 osbPath = getOsbPath();
-                localLayers = new List<EditorStoryboardLayer>(layerManager.Layers);
+                localLayers = new List<EditorStoryboardLayer>(layerManager.FindLayers(l => l.Visible));
             });
 
             var exportSettings = new ExportSettings();
