@@ -12,6 +12,7 @@ namespace StorybrewEditor
         public readonly Setting<float> Volume = new Setting<float>(0.1f);
         public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
+        public readonly Setting<bool> VerboseVsCode = new Setting<bool>(false);
 
         public const string SettingsFilename = "settings.cfg";
 

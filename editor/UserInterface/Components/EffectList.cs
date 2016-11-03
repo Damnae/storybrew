@@ -3,6 +3,7 @@ using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -294,37 +295,44 @@ namespace StorybrewEditor.UserInterface.Components
             if (solutionFolder == root)
                 solutionFolder = Path.GetDirectoryName(effect.Path);
 
-            var paths = new string[]
+            var paths = new List<string>()
             {
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Microsoft VS Code\bin\code"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Microsoft VS Code\bin\code"),
-                "code",
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft VS Code", "bin", "code"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code", "bin", "code"),
             };
+            foreach (var path in Environment.GetEnvironmentVariable("path").Split(';'))
+                paths.Add(Path.Combine(path, "code"));
+
             var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
+            if (Program.Settings.VerboseVsCode)
+                arguments += " --verbose";
 
             foreach (var path in paths)
             {
                 try
                 {
-                    if (path != "code" && !File.Exists(path))
+                    if (!File.Exists(path))
+                    {
+                        Trace.WriteLine($"vscode not found at \"{path}\"");
                         continue;
+                    }
 
-                    Process.Start(new ProcessStartInfo()
+                    Trace.WriteLine($"Opening vscode with \"{path} {arguments}\"");
+                    var process = Process.Start(new ProcessStartInfo()
                     {
                         FileName = path,
                         Arguments = arguments,
-                        WindowStyle = ProcessWindowStyle.Hidden,
+                        WindowStyle = Program.Settings.VerboseVsCode ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden,
                     });
                     return;
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine($"Could not open vscode with \"{path} {arguments}\":\n{e}");
+                    Trace.WriteLine($"Could not open vscode:\n{e}");
                 }
             }
-            Trace.WriteLine($"Path: {Environment.GetEnvironmentVariable("path")}");
             Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing)",
-                () => Process.Start("https://code.visualstudio.com/"), true);
+                    () => Process.Start("https://code.visualstudio.com/"), true);
         }
     }
 }
