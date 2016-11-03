@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using StorybrewEditor.Util;
 using System.Text;
 using BrewLib.Audio;
+using System.IO;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -51,21 +52,31 @@ namespace StorybrewEditor.Storyboarding
 
         #region Audio data
 
-        private FftStream audioStream;
-        protected FftStream AudioStream => audioStream ?? (audioStream = new FftStream(effect.Project.AudioPath));
+        private Dictionary<string, FftStream> fftAudioStreams = new Dictionary<string, FftStream>();
+        private FftStream getFftStream(string path)
+        {
+            path = Path.GetFullPath(path);
 
+            FftStream audioStream;
+            if (!fftAudioStreams.TryGetValue(path, out audioStream))
+                fftAudioStreams[path] = audioStream = new FftStream(effect.Project.AudioPath);
+
+            return audioStream;
+        }
+        
         public override double AudioDuration
-            => AudioStream.Duration * 1000;
+            => getFftStream(effect.Project.AudioPath).Duration * 1000;
 
-        public override float[] GetFft(double time)
-            => AudioStream.GetFft(time * 0.001);
+        public override float[] GetFft(double time, string path = null)
+            => getFftStream(path ?? effect.Project.AudioPath).GetFft(time * 0.001);
 
         #endregion
 
         public void DisposeResources()
         {
-            audioStream?.Dispose();
-            audioStream = null;
+            foreach (var audioStream in fftAudioStreams.Values)
+                audioStream.Dispose();
+            fftAudioStreams = null;
         }
     }
 }

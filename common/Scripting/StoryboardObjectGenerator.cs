@@ -120,16 +120,16 @@ namespace StorybrewCommon.Scripting
         /// Returns the Fast Fourier Transform of the song at a certain time, with the default amount of magnitudes.
         /// Useful to make spectrum effets.
         /// </summary>
-        public float[] GetFft(double time)
-            => context.GetFft(time);
+        public float[] GetFft(double time, string path = null)
+            => context.GetFft(time, path);
 
         /// <summary>
         /// Returns the Fast Fourier Transform of the song at a certain time, with the specified amount of magnitudes.
         /// Useful to make spectrum effets.
         /// </summary>
-        public float[] GetFft(double time, int magnitudes)
+        public float[] GetFft(double time, int magnitudes, string path = null)
         {
-            var fft = GetFft(time);
+            var fft = GetFft(time, path);
             var resultFft = new float[magnitudes];
 
             if (magnitudes == fft.Length)
