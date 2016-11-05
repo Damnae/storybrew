@@ -61,6 +61,7 @@
     <Compile Include="Spectrum.cs" />
     <Compile Include="Jigoku.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tetris.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\common\common.csproj">
