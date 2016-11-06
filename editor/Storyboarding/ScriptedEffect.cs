@@ -30,7 +30,7 @@ namespace StorybrewEditor.Storyboarding
         }
 
         public override string BaseName => scriptContainer.Name;
-        public override string Path => scriptContainer.SourcePath;
+        public override string Path => scriptContainer.MainSourcePath;
 
         private EffectStatus status = EffectStatus.Initializing;
         public override EffectStatus Status => status;

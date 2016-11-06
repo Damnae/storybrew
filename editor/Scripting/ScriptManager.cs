@@ -13,20 +13,23 @@ namespace StorybrewEditor.Scripting
         private string scriptsNamespace;
         private string scriptsSourcePath;
         private string commonScriptsPath;
+        private string scriptsLibraryPath;
         private string compiledScriptsPath;
         private string[] referencedAssemblies;
 
         private FileSystemWatcher scriptWatcher;
+        private FileSystemWatcher libraryWatcher;
         private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
         private Dictionary<string, ScriptContainer<TScript>> scriptContainers = new Dictionary<string, ScriptContainer<TScript>>();
 
         public string ScriptsPath => scriptsSourcePath;
 
-        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string compiledScriptsPath, params string[] referencedAssemblies)
+        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string scriptsLibraryPath, string compiledScriptsPath, params string[] referencedAssemblies)
         {
             this.scriptsNamespace = scriptsNamespace;
             this.scriptsSourcePath = scriptsSourcePath;
             this.commonScriptsPath = commonScriptsPath;
+            this.scriptsLibraryPath = scriptsLibraryPath;
             this.referencedAssemblies = referencedAssemblies;
             this.compiledScriptsPath = compiledScriptsPath;
 
@@ -39,6 +42,16 @@ namespace StorybrewEditor.Scripting
             scriptWatcher.Changed += scriptWatcher_Changed;
             scriptWatcher.Renamed += scriptWatcher_Changed;
             scriptWatcher.EnableRaisingEvents = true;
+
+            libraryWatcher = new FileSystemWatcher()
+            {
+                Filter = "*.cs",
+                Path = scriptsLibraryPath,
+                IncludeSubdirectories = true,
+            };
+            libraryWatcher.Changed += libraryWatcher_Changed;
+            libraryWatcher.Renamed += libraryWatcher_Changed;
+            libraryWatcher.EnableRaisingEvents = true;
         }
 
         public ScriptContainer<TScript> Get(string scriptName)
@@ -62,8 +75,8 @@ namespace StorybrewEditor.Scripting
                 }
             }
 
-            scriptContainer = new ScriptContainerAppDomain<TScript>(this, scriptTypeName, sourcePath, compiledScriptsPath, referencedAssemblies);
-            //scriptContainer = new ScriptContainerProcess<TScript>(this, scriptTypeName, sourcePath, compiledScriptsPath, referencedAssemblies);
+            scriptContainer = new ScriptContainerAppDomain<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
+            //scriptContainer = new ScriptContainerProcess<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             scriptContainers.Add(scriptName, scriptContainer);
             return scriptContainer;
         }
@@ -97,6 +110,18 @@ namespace StorybrewEditor.Scripting
 
                 ScriptContainer<TScript> container;
                 if (scriptContainers.TryGetValue(scriptName, out container))
+                    container.ReloadScript();
+            });
+        }
+
+        private void libraryWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            scheduler.Schedule(e.FullPath, (key) =>
+            {
+                if (disposedValue)
+                    return;
+
+                foreach (var container in scriptContainers.Values)
                     container.ReloadScript();
             });
         }

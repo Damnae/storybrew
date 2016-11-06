@@ -10,8 +10,8 @@ namespace StorybrewEditor.Scripting
     {
         private RemoteProcessWorkerContainer workerProcess;
 
-        public ScriptContainerProcess(ScriptManager<TScript> manager, string scriptTypeName, string sourcePath, string compiledScriptsPath, params string[] referencedAssemblies)
-            : base(manager, scriptTypeName, sourcePath, compiledScriptsPath, referencedAssemblies)
+        public ScriptContainerProcess(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, params string[] referencedAssemblies)
+            : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies)
         {
         }
 
@@ -22,7 +22,7 @@ namespace StorybrewEditor.Scripting
             try
             {
                 var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid().ToString()}.dll");
-                ScriptCompiler.Compile(SourcePath, assemblyPath, ReferencedAssemblies);
+                ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
 
                 workerProcess?.Dispose();
                 workerProcess = new RemoteProcessWorkerContainer();

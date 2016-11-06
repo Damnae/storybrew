@@ -33,11 +33,14 @@ namespace StorybrewEditor.Storyboarding
         private string projectPath;
         public string ProjectFolderPath => Path.GetDirectoryName(projectPath);
 
+        private string scriptsSourcePath;
+        public string ScriptsPath => scriptsSourcePath;
+
         private string commonScriptsSourcePath;
         public string CommonScriptsPath => commonScriptsSourcePath;
 
-        private string scriptsSourcePath;
-        public string ScriptsPath => scriptsSourcePath;
+        private string scriptsLibraryPath;
+        public string ScriptsLibraryPath => scriptsLibraryPath;
 
         private TextureContainer textureContainer;
         public TextureContainer TextureContainer => textureContainer;
@@ -81,7 +84,11 @@ namespace StorybrewEditor.Storyboarding
                         Directory.CreateDirectory(commonScriptsSourcePath);
                 }
             }
-            Trace.WriteLine($"Scripts path - project:{scriptsSourcePath}, common:{commonScriptsSourcePath}");
+            scriptsLibraryPath = Path.Combine(scriptsSourcePath, "scriptslibrary");
+            if (!Directory.Exists(scriptsLibraryPath))
+                Directory.CreateDirectory(scriptsLibraryPath);
+
+            Trace.WriteLine($"Scripts path - project:{scriptsSourcePath}, common:{commonScriptsSourcePath}, library:{scriptsLibraryPath}");
 
             var compiledScriptsPath = Path.GetFullPath("cache/scripts");
             if (!Directory.Exists(compiledScriptsPath))
@@ -99,7 +106,7 @@ namespace StorybrewEditor.Storyboarding
                 "OpenTK.dll",
                 Assembly.GetAssembly(typeof(Script)).Location,
             };
-            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, compiledScriptsPath, referencedAssemblies);
+            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
             OnMainBeatmapChanged += (sender, e) =>

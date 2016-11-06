@@ -8,7 +8,7 @@ namespace StorybrewEditor.Scripting
     {
         string Name { get; }
         string ScriptTypeName { get; }
-        string SourcePath { get; }
+        string MainSourcePath { get; }
         bool HasScript { get; }
 
         event EventHandler OnScriptChanged;

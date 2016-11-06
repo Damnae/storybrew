@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -10,7 +11,7 @@ namespace StorybrewEditor.Scripting
     {
         private static int nextId;
 
-        public static void Compile(string sourcePath, string outputPath, params string[] referencedAssemblies)
+        public static void Compile(string[] sourcePaths, string outputPath, params string[] referencedAssemblies)
         {
             var setup = new AppDomainSetup()
             {
@@ -18,7 +19,7 @@ namespace StorybrewEditor.Scripting
                 ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
             };
 
-            Debug.Print($"{nameof(Scripting)}: Compiling {sourcePath}");
+            Debug.Print($"{nameof(Scripting)}: Compiling {string.Join(", ", sourcePaths)}");
             var compilerDomain = AppDomain.CreateDomain(setup.ApplicationName, null, setup);
             try
             {
@@ -26,7 +27,7 @@ namespace StorybrewEditor.Scripting
                     typeof(ScriptCompiler).Assembly.ManifestModule.FullyQualifiedName,
                     typeof(ScriptCompiler).FullName);
 
-                compiler.compile(sourcePath, outputPath, referencedAssemblies);
+                compiler.compile(sourcePaths, outputPath, referencedAssemblies);
             }
             finally
             {
@@ -34,7 +35,7 @@ namespace StorybrewEditor.Scripting
             }
         }
 
-        private void compile(string sourcePath, string outputPath, params string[] referencedAssemblies)
+        private void compile(string[] sourcePaths, string outputPath, params string[] referencedAssemblies)
         {
             var parameters = new CompilerParameters()
             {
@@ -49,19 +50,22 @@ namespace StorybrewEditor.Scripting
 
             using (var codeProvider = CodeDomProvider.CreateProvider("csharp"))
             {
-                var results = codeProvider.CompileAssemblyFromFile(parameters, sourcePath);
+                var results = codeProvider.CompileAssemblyFromFile(parameters, sourcePaths);
 
                 var errors = results.Errors;
                 if (errors.Count > 0)
                 {
-                    var sourceLines = File.ReadAllText(sourcePath).Split('\n');
-                    var message = new StringBuilder();
+                    var sourceLines = new Dictionary<string, string[]>();
+                    foreach (var sourcePath in sourcePaths)
+                        sourceLines[sourcePath.ToLowerInvariant()] = File.ReadAllText(sourcePath).Split('\n');
+
+                    var message = new StringBuilder("Compilation error\n\n");
                     for (var i = 0; i < errors.Count; i++)
                     {
                         var error = errors[i];
-                        message.AppendLine($"(Line {error.Line}) {error.ErrorText}");
+                        message.AppendLine($"{error.FileName}, line {error.Line}: {error.ErrorText}");
                         if (i == errors.Count - 1 || error.Line != errors[i + 1].Line)
-                            message.AppendLine(sourceLines[error.Line - 1]);
+                            message.AppendLine(sourceLines[error.FileName.ToLowerInvariant()][error.Line - 1]);
                     }
                     throw new ScriptCompilationException(message.ToString());
                 }

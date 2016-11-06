@@ -1,5 +1,7 @@
 ﻿using StorybrewCommon.Scripting;
 using System;
+using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.Scripting
 {
@@ -36,8 +38,23 @@ namespace StorybrewEditor.Scripting
         private string scriptTypeName;
         public string ScriptTypeName => scriptTypeName;
 
-        private string sourcePath;
-        public string SourcePath => sourcePath;
+        private string mainSourcePath;
+        public string MainSourcePath => mainSourcePath;
+
+        private string libraryFolder;
+        public string LibraryFolder => libraryFolder;
+
+        public string[] SourcePaths
+        {
+            get
+            {
+                if (libraryFolder == null || !Directory.Exists(libraryFolder))
+                    return new[] { MainSourcePath };
+
+                return Directory.GetFiles(libraryFolder, "*.cs", SearchOption.AllDirectories)
+                    .Concat(new[] { MainSourcePath }).ToArray();
+            }
+        }
 
         /// <summary>
         /// Returns false when Script would return null.
@@ -46,11 +63,12 @@ namespace StorybrewEditor.Scripting
 
         public event EventHandler OnScriptChanged;
 
-        public ScriptContainerBase(ScriptManager<TScript> manager, string scriptTypeName, string sourcePath, string compiledScriptsPath, params string[] referencedAssemblies)
+        public ScriptContainerBase(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, params string[] referencedAssemblies)
         {
             this.manager = manager;
             this.scriptTypeName = scriptTypeName;
-            this.sourcePath = sourcePath;
+            this.mainSourcePath = mainSourcePath;
+            this.libraryFolder = libraryFolder;
             this.compiledScriptsPath = compiledScriptsPath;
             this.referencedAssemblies = referencedAssemblies;
         }
