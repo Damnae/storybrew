@@ -6,6 +6,9 @@ namespace BrewLib.Graphics.Cameras
 {
     public abstract class CameraBase : Camera
     {
+        public static Vector3 DefaultForward = new Vector3(0, -1, 0);
+        public static Vector3 DefaultUp = new Vector3(0, 0, 1);
+
         private Rectangle internalViewport;
         private Rectangle extendedViewport;
         public Rectangle InternalViewport { get { Validate(); return internalViewport; } }
@@ -70,7 +73,7 @@ namespace BrewLib.Graphics.Cameras
             }
         }
 
-        private Vector3 forward = new Vector3(0, -1, 0);
+        private Vector3 forward = DefaultForward;
         public Vector3 Forward
         {
             get { return forward; }
@@ -82,7 +85,7 @@ namespace BrewLib.Graphics.Cameras
             }
         }
 
-        private Vector3 up = new Vector3(0, 0, 1);
+        private Vector3 up = DefaultUp;
         public Vector3 Up
         {
             get { return up; }

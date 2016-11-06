@@ -8,7 +8,8 @@ namespace BrewLib.Graphics.Renderers.PrimitiveStreamers
     /// <summary>
     /// [requires: v2.0]
     /// </summary>
-    public class PrimitiveStreamerVbo<TPrimitive> : PrimitiveStreamer<TPrimitive> where TPrimitive : struct
+    public class PrimitiveStreamerVbo<TPrimitive> : PrimitiveStreamer<TPrimitive> 
+        where TPrimitive : struct
     {
         protected VertexDeclaration vertexDeclaration;
         private int primitiveSize;

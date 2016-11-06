@@ -133,7 +133,7 @@ namespace BrewLib.Graphics
         {
             Renderer = renderer;
             renderer.Camera = camera;
-            renderStates.Apply();
+            renderStates?.Apply();
             return renderer;
         }
 

@@ -7,7 +7,7 @@ namespace BrewLib.Graphics.Renderers
 {
     public interface SpriteRenderer : Renderer, IDisposable
     {
-        Shader Shader { get; set; }
+        Shader Shader { get; }
         Matrix4 TransformMatrix { get; set; }
 
         int RenderedSpriteCount { get; }

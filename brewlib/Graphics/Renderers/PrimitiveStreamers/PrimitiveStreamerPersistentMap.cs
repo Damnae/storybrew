@@ -13,7 +13,8 @@ namespace BrewLib.Graphics.Renderers.PrimitiveStreamers
     /// [include requirements for GpuCommandSync]
     /// [include requirements for PrimitiveStreamerVao]
     /// </summary>
-    public class PrimitiveStreamerPersistentMap<TPrimitive> : PrimitiveStreamerVao<TPrimitive>, PrimitiveStreamer<TPrimitive> where TPrimitive : struct
+    public class PrimitiveStreamerPersistentMap<TPrimitive> : PrimitiveStreamerVao<TPrimitive>, PrimitiveStreamer<TPrimitive> 
+        where TPrimitive : struct
     {
         private GpuCommandSync commandSync;
         private int vertexBufferSize;
@@ -75,7 +76,7 @@ namespace BrewLib.Graphics.Renderers.PrimitiveStreamers
                 expandVertexBuffer();
             }
 
-            GCHandle pinnedVertexData = GCHandle.Alloc(primitives, GCHandleType.Pinned);
+            var pinnedVertexData = GCHandle.Alloc(primitives, GCHandleType.Pinned);
             try
             {
                 Native.CopyMemory(bufferPointer + bufferOffset, pinnedVertexData.AddrOfPinnedObject(), (uint)vertexDataSize);

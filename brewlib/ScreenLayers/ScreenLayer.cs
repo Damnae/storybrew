@@ -74,10 +74,10 @@ namespace BrewLib.ScreenLayers
 
             if (isExiting)
             {
-                if (CurrentState != State.FadinOut)
+                if (CurrentState != State.FadingOut)
                     OnTransitionOut();
 
-                CurrentState = State.FadinOut;
+                CurrentState = State.FadingOut;
                 if (!updateTransition(timeElapsed, TransitionOutDuration, -1))
                 {
                     OnHidden();
@@ -88,9 +88,9 @@ namespace BrewLib.ScreenLayers
             {
                 if (updateTransition(timeElapsed, TransitionOutDuration, -1))
                 {
-                    if (CurrentState != State.FadinOut)
+                    if (CurrentState != State.FadingOut)
                         OnTransitionOut();
-                    CurrentState = State.FadinOut;
+                    CurrentState = State.FadingOut;
 
                 }
                 else
@@ -121,29 +121,12 @@ namespace BrewLib.ScreenLayers
         {
         }
 
-        public virtual void OnStart()
-        {
-        }
-
-        public virtual void OnTransitionIn()
-        {
-        }
-
-        public virtual void OnTransitionOut()
-        {
-        }
-
-        public virtual void OnActive()
-        {
-        }
-
-        public virtual void OnHidden()
-        {
-        }
-
-        public virtual void OnExit()
-        {
-        }
+        public virtual void OnStart() { }
+        public virtual void OnTransitionIn() { }
+        public virtual void OnTransitionOut() { }
+        public virtual void OnActive() { }
+        public virtual void OnHidden() { }
+        public virtual void OnExit() { }
 
         public virtual void Close()
         {
@@ -223,7 +206,7 @@ namespace BrewLib.ScreenLayers
             Hidden,
             FadingIn,
             Active,
-            FadinOut
+            FadingOut
         }
     }
 }

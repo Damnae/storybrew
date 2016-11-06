@@ -8,7 +8,8 @@ namespace BrewLib.Graphics.Renderers.PrimitiveStreamers
     /// [requires: v2.0]
     /// [requires: v3.0 or ARB_vertex_array_object|VERSION_3_0]
     /// </summary>
-    public abstract class PrimitiveStreamerVao<TPrimitive> : PrimitiveStreamer<TPrimitive> where TPrimitive : struct
+    public abstract class PrimitiveStreamerVao<TPrimitive> : PrimitiveStreamer<TPrimitive> 
+        where TPrimitive : struct
     {
         protected int minRenderableVertexCount;
         protected VertexDeclaration vertexDeclaration;

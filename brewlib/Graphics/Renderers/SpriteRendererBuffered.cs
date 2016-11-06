@@ -57,31 +57,13 @@ namespace BrewLib.Graphics.Renderers
 
         private Shader shader;
         private bool ownsShader;
-        public Shader Shader
+        public Shader Shader => ownsShader ? null : shader;
+
+        private Action flushAction;
+        public Action FlushAction
         {
-            get { return ownsShader ? null : shader; }
-            set
-            {
-                if (shader != null && (shader == value || (ownsShader && value == null)))
-                    return;
-
-                if (rendering)
-                {
-                    DrawState.FlushRenderer();
-                    primitiveStreamer.Unbind();
-                    shader.End();
-                }
-
-                if (ownsShader) shader?.Dispose();
-                ownsShader = value == null;
-                shader = ownsShader ? CreateDefaultShader() : value;
-
-                if (rendering)
-                {
-                    shader.Begin();
-                    primitiveStreamer.Bind(shader);
-                }
-            }
+            get { return flushAction; }
+            set { flushAction = value; }
         }
 
         private PrimitiveStreamer<SpritePrimitive> primitiveStreamer;
@@ -130,7 +112,7 @@ namespace BrewLib.Graphics.Renderers
         public int BufferWaitCount => primitiveStreamer.BufferWaitCount;
         public int LargestBatch { get; private set; }
 
-        public SpriteRendererBuffered(Shader shader = null, int maxSpritesPerBatch = 4096, int primitiveBufferSize = 0) :
+        public SpriteRendererBuffered(Shader shader = null, Action flushAction = null, int maxSpritesPerBatch = 4096, int primitiveBufferSize = 0) :
             this((vertexDeclaration, minRenderableVertexCount) =>
             {
                 if (PrimitiveStreamerPersistentMap<SpritePrimitive>.HasCapabilities())
@@ -141,17 +123,24 @@ namespace BrewLib.Graphics.Renderers
                     return new PrimitiveStreamerVbo<SpritePrimitive>(vertexDeclaration);
                 throw new NotSupportedException();
 
-            }, shader, maxSpritesPerBatch, primitiveBufferSize)
+            }, shader, flushAction, maxSpritesPerBatch, primitiveBufferSize)
         {
         }
 
-        public SpriteRendererBuffered(CreatePrimitiveStreamerDelegate<SpritePrimitive> createPrimitiveStreamer, Shader shader = null, int maxSpritesPerBatch = 4096, int primitiveBufferSize = 0)
+        public SpriteRendererBuffered(CreatePrimitiveStreamerDelegate<SpritePrimitive> createPrimitiveStreamer, Shader shader = null, Action flushAction = null, int maxSpritesPerBatch = 4096, int primitiveBufferSize = 0)
         {
+            if (shader == null)
+            {
+                shader = CreateDefaultShader();
+                ownsShader = true;
+            }
+
             this.maxSpritesPerBatch = maxSpritesPerBatch;
+            this.flushAction = flushAction;
+            this.shader = shader;
 
             var primitiveBatchSize = Math.Max(maxSpritesPerBatch, primitiveBufferSize / (VertexPerSprite * VertexDeclaration.VertexSize));
             primitiveStreamer = createPrimitiveStreamer(VertexDeclaration, primitiveBatchSize * VertexPerSprite);
-            Shader = shader;
 
             spriteArray = new SpritePrimitive[maxSpritesPerBatch];
             Trace.WriteLine($"Initialized {nameof(SpriteRenderer)} using {primitiveStreamer.GetType().Name}");
@@ -222,6 +211,8 @@ namespace BrewLib.Graphics.Renderers
                     GL.Uniform1(shader.GetUniformLocation(TextureUniformName), currentSamplerUnit);
                 }
                 GL.UniformMatrix4(shader.GetUniformLocation(CombinedMatrixUniformName), false, ref combinedMatrix);
+
+                flushAction?.Invoke();
             }
 
             primitiveStreamer.Render(PrimitiveType.Quads, spriteArray, spritesInBatch, spritesInBatch * VertexPerSprite, canBuffer);

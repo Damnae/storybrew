@@ -8,7 +8,8 @@ namespace BrewLib.Graphics.Renderers.PrimitiveStreamers
     /// [requires: v1.5]
     /// [include requirements for PrimitiveStreamerVao]
     /// </summary>
-    public class PrimitiveStreamerBufferData<TPrimitive> : PrimitiveStreamerVao<TPrimitive> where TPrimitive : struct
+    public class PrimitiveStreamerBufferData<TPrimitive> : PrimitiveStreamerVao<TPrimitive> 
+        where TPrimitive : struct
     {
 
         public PrimitiveStreamerBufferData(VertexDeclaration vertexDeclaration, int minRenderableVertexCount, ushort[] indexes = null)

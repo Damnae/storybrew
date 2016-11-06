@@ -6,7 +6,7 @@ namespace BrewLib.Graphics.Cameras
 {
     public class CameraIso : CameraBase
     {
-        private Vector3 target = new Vector3();
+        private Vector3 target = Vector3.Zero;
         public Vector3 Target
         {
             get { return target; }
