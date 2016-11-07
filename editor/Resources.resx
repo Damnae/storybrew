@@ -142,4 +142,16 @@
   <data name="projecttemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\projecttemplate.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="skin_constants" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\skin_constants.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="skin_drawables" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\skin_drawables.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="skin_drawables_debug" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\skin_drawables_debug.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="skin_styles" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\skin_styles.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

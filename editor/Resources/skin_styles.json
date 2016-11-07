@@ -1,0 +1,361 @@
+﻿{
+	styles:
+	{
+		Widget:
+		{
+			"default":
+			{
+			},
+			"storyboardPreview":
+			{
+				Background: "previewBg",
+				Foreground: "previewFg",
+			},
+		},
+		Label:
+		{
+			"default":
+			{
+				FontName: "@mainFont",
+				FontSize: "@fontSizeNormal",
+				TextAlignment: "TopLeft",
+				Trimming: "None",
+				Color: "@colorText",
+			},
+			"listHeader":
+			{
+				FontSize: "@fontSizeSmall",
+				Color: "@colorTextSecondary",
+				TextAlignment: "Right",
+			},
+			"listItem":
+			{
+				FontSize: "@fontSizeSmall",
+				TextAlignment: "Left",
+			},
+			"listItemSecondary":
+			{
+				_parent: "listItem",
+				FontSize: "@fontSizeVerySmall",
+				Color: "@colorTextSecondary",
+			},
+			"icon":
+			{
+				FontName: "@iconFont",
+			},
+			"light":
+			{
+				FontName: "@lightFont",
+			},
+			"tooltip":
+			{
+				FontSize: "@fontSizeSmall",
+				Background: "tooltipBg",
+				Trimming: "EllipsisCharacter",
+			},
+			"statusMessage":
+			{
+				Background: "tooltipBg",
+			},
+			"timelineBeatmapName":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeSmall",
+				TextAlignment: "BottomRight",
+				Trimming: "EllipsisCharacter",
+			},
+			"small":
+			{
+				FontSize: "@fontSizeSmall",
+			},
+
+			"buttonLabel":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeNormal",
+				TextAlignment: "Centre",
+			},
+			"buttonLabel #disabled":
+			{
+				Color: "@colorTextDisabled",
+			},
+			"buttonLabel #hover":
+			{
+				Color: "@colorTextHover",
+			},
+
+			"buttonLabelSmall":
+			{
+				_parent: "buttonLabel",
+				FontSize: "@fontSizeSmall",
+			},
+			"buttonLabelSmall #disabled":
+			{
+				_parent: "buttonLabel #disabled",
+				FontSize: "@fontSizeSmall",
+			},
+			"buttonLabelSmall #hover":
+			{
+				_parent: "buttonLabel #hover",
+				FontSize: "@fontSizeSmall",
+			},
+			
+			"buttonLabelIcon":
+			{
+				_parent: "buttonLabel",
+				FontName: "@iconFont",
+			},
+			"buttonLabelIcon #disabled":
+			{
+				_parent: "buttonLabel #disabled",
+				FontName: "@iconFont",
+			},
+			"buttonLabelIcon #hover":
+			{
+				_parent: "buttonLabel #hover",
+				FontName: "@iconFont",
+			},
+
+			"textboxLabel":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeSmall",
+			},
+
+			"textboxContent":
+			{
+				FontName: "@lightFont",
+				FontSize: "@fontSizeNormal",
+				Trimming: "None",
+				Background: "button",
+			},
+			"textboxContent #hover":
+			{
+				Background: "buttonHover",
+				Color: "@colorTextHover",
+			},
+			"textboxContent #hover #focus":
+			{
+				Background: "buttonOpen",
+			},
+			"textboxContent #focus":
+			{
+				Background: "buttonOpen",
+				Color: "@colorTextHover",
+			},
+		},
+		Button:
+		{
+			"default":
+			{
+				Padding: ["@paddingQuarter", "@padding"],
+				LabelStyle: "buttonLabel",
+				LabelOffset: [0, 0],
+				Background: "button",
+			},
+			"default #disabled":
+			{
+				LabelStyle: "buttonLabel #disabled",
+				Background: "buttonDisabled",
+			},
+			"default #hover":
+			{
+				LabelStyle: "buttonLabel #hover",
+				Background: "buttonHover",
+			},
+			"default #hover #pressed":
+			{
+				LabelStyle: "buttonLabel #hover #pressed",
+				LabelOffset: [0, 1],
+				Background: "buttonDown",
+			},
+			"default #pressed":
+			{
+				LabelStyle: "buttonLabel #pressed",
+				LabelOffset: [0, 1],
+				Background: "buttonDown",
+			},
+
+			"small":
+			{
+				_parent: "default",
+				LabelStyle: "buttonLabelSmall",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #disabled":
+			{
+				_parent: "default #disabled",
+				LabelStyle: "buttonLabelSmall #disabled",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #hover":
+			{
+				_parent: "default #hover",
+				LabelStyle: "buttonLabelSmall #hover",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #hover #pressed":
+			{
+				_parent: "default #hover #pressed",
+				LabelStyle: "buttonLabelSmall #hover #pressed",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+			"small #pressed":
+			{
+				_parent: "default #pressed",
+				LabelStyle: "buttonLabelSmall #pressed",
+				Padding: ["@paddingQuarter", "@paddingHalf"],
+			},
+
+			"icon":
+			{
+				LabelStyle: "buttonLabelIcon",
+				LabelOffset: [0, 0],
+				Background: "",
+				Padding: [0],
+			},
+			"icon #disabled":
+			{
+				LabelStyle: "buttonLabelIcon #disabled",
+			},
+			"icon #hover":
+			{
+				LabelStyle: "buttonLabelIcon #hover",
+			},
+			"icon #hover #pressed":
+			{
+				LabelStyle: "buttonLabelIcon #hover #pressed",
+				LabelOffset: [0, 1],
+			},
+			"icon #pressed":
+			{
+				LabelStyle: "buttonLabelIcon #pressed",
+				LabelOffset: [0, 1],
+			},
+		},
+		Textbox:
+		{
+			"default":
+			{
+				LabelStyle: "textboxLabel",
+				ContentStyle: "textboxContent",
+			},
+			"default #hover":
+			{
+				LabelStyle: "textboxLabel #hover",
+				ContentStyle: "textboxContent #hover",
+			},
+			"default #hover #focus":
+			{
+				LabelStyle: "textboxLabel #hover #focus",
+				ContentStyle: "textboxContent #hover #focus",
+			},
+			"default #focus":
+			{
+				LabelStyle: "textboxLabel #focus",
+				ContentStyle: "textboxContent #focus",
+			},
+		},
+		SelectBox:
+		{
+			"default":
+			{
+				ButtonStyle: "small",
+			},
+		},
+		ProgressBar:
+		{	
+			"default":
+			{
+				Bar: "progressBar",
+				Background: "progressBarBg",
+				Height: 32,
+			},
+			"default #hover":
+			{
+				Bar: "progressBarHover",
+				Background: "progressBarBgHover",
+				Height: 32,
+			},
+			"default #disabled":
+			{
+				Bar: "progressBarDisabled",
+				Background: "progressBarBg",
+				Height: 32,
+			},
+			"small":
+			{
+				Bar: "progressBarSmall",
+				Background: "progressBarSmallBg",
+				Height: 16,
+			},
+			"small #hover":
+			{
+				Bar: "progressBarSmallHover",
+				Background: "progressBarSmallBgHover",
+				Height: 16,
+			},
+			"small #disabled":
+			{
+				Bar: "progressBarSmallDisabled",
+				Background: "progressBarSmallBg",
+				Height: 16,
+			},
+
+			"timeline":
+			{
+				Bar: "progressBar",
+				Background: "tooltipBg",
+				Height: 32,
+			},
+			"timeline #hover":
+			{
+				Bar: "progressBarHover",
+				Background: "tooltipBg",
+				Height: 32,
+			},
+		},
+		LinearLayout:
+		{
+			"default":
+			{
+				Spacing: "@spacing",
+			},
+			"condensed":
+			{
+				Spacing: 0,
+			},
+			"pathSelectorPanel":
+			{
+				Spacing: "@spacing",
+			},
+			"panel":
+			{
+				Background: "plainBg",
+			},
+			"tooltip":
+			{
+				Background: "tooltipBg",
+			},
+		},
+		StackLayout:
+		{
+			"default":
+			{
+			},
+			"panel":
+			{
+				Background: "plainBg",
+			},
+		},
+		PathSelector:
+		{
+			"default":
+			{
+				LinearLayoutStyle: "pathSelectorPanel",
+				TextboxStyle: "path",
+				ButtonStyle: "icon",
+			},
+		},
+	}
+}

@@ -179,6 +179,10 @@
     <None Include="Resources\FontAwesome.ttf" />
     <None Include="Resources\Roboto-Light.ttf" />
     <None Include="Resources\Roboto-Regular.ttf" />
+    <None Include="Resources\skin_styles.json" />
+    <None Include="Resources\skin_drawables_debug.json" />
+    <None Include="Resources\skin_drawables.json" />
+    <None Include="Resources\skin_constants.json" />
     <None Include="Resources\skin.json" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,39 @@
+﻿{
+	drawables:
+	{
+		"_debug":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [1, 0, 1],
+		},
+		"_debug_relayout":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [0, 1, 0],
+		},
+		"_debug_clipregion":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [0, 1, 1],
+			Outset: [1],
+		},
+		"_debug_textbounds":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			BordersOnly: true,
+			Color: [0.5, 0.5, 1],
+			Outset: [1],
+		},
+	}
+}

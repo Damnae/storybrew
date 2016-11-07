@@ -16,13 +16,12 @@ namespace StorybrewEditor.UserInterface.Skinning
     public class Skin : IDisposable
     {
         public readonly TextureContainer TextureContainer;
-
-        private Dictionary<string, Drawable> drawables = new Dictionary<string, Drawable>();
-        private Dictionary<Type, Dictionary<string, WidgetStyle>> stylesPerType = new Dictionary<Type, Dictionary<string, WidgetStyle>>();
-
         public Func<string, Type> ResolveDrawableType;
         public Func<string, Type> ResolveWidgetType;
         public Func<string, Type> ResolveStyleType;
+
+        private Dictionary<string, Drawable> drawables = new Dictionary<string, Drawable>();
+        private Dictionary<Type, Dictionary<string, WidgetStyle>> stylesPerType = new Dictionary<Type, Dictionary<string, WidgetStyle>>();
 
         public Skin(TextureContainer textureContainer)
         {
@@ -95,6 +94,15 @@ namespace StorybrewEditor.UserInterface.Skinning
         #region Loading
 
         public void Load(string filename, ResourceManager resourceManager = null)
+            => Load(loadJson(filename, resourceManager), resourceManager);
+
+        public void Load(JObject data, ResourceManager resourceManager = null)
+        {
+            loadDrawables(data["drawables"]);
+            loadStyles(data["styles"]);
+        }
+
+        private JObject loadJson(string filename, ResourceManager resourceManager)
         {
             byte[] data;
             if (File.Exists(filename))
@@ -105,13 +113,25 @@ namespace StorybrewEditor.UserInterface.Skinning
                 data = resourceManager?.GetObject(filename) as byte[];
             }
             if (data == null) throw new FileNotFoundException(filename);
-            Load(data.ToJObject());
+            return resolveIncludes(data.ToJObject(), resourceManager);
         }
 
-        public void Load(JObject data)
+        private JObject resolveIncludes(JObject data, ResourceManager resourceManager)
         {
-            loadDrawables(data["drawables"]);
-            loadStyles(data["styles"]);
+            var mergedData = data;
+            if (data["include"] != null)
+                foreach (var include in data["include"])
+                {
+                    var path = include.Value<string>();
+                    var includedData = loadJson(path, resourceManager);
+                    includedData.Merge(mergedData, new JsonMergeSettings()
+                    {
+                        MergeArrayHandling = MergeArrayHandling.Union,
+                        MergeNullValueHandling = MergeNullValueHandling.Merge,
+                    });
+                    mergedData = includedData;
+                }
+            return mergedData;
         }
 
         private void loadDrawables(JToken data)

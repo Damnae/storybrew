@@ -1,0 +1,172 @@
+﻿{
+	include: 
+	[
+		"skin_drawables_debug.json",
+	],
+	drawables:
+	{
+		"blueLine":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			Color: [0.2, 0.3, 0.5],
+			Outset: [-1],
+			BordersOnly: true,
+		},
+		"plainBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBg",
+		},
+		"tooltipBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorTooltip",
+			Outset: [2, 4],
+		},
+
+		"button":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+		},
+		"buttonDisabled":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+		},
+		"buttonHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+		},
+		"buttonDown":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+		},
+		"buttonOpen":
+		[
+			"button",
+			{
+				_type: "NinePatch",
+				Texture: "ui-rounded-borders.png",
+				Borders: [3, 5, 5, 3],
+				Color: "@colorBgElementHover",
+				BordersOnly: true,
+				Outset: [2],
+			},
+		],
+		
+		"progressBar":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorProgress",
+			Outset: [-17, 0],
+		},
+		"progressBarHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorProgressHover",
+			Outset: [-17, 0],
+		},
+		"progressBarDisabled":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorProgressDisabled",
+			Outset: [-17, 0],
+		},
+		"progressBarBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+			Outset: [-18, 0],
+		},
+		"progressBarBgHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+			Outset: [-18, 0],
+		},
+		
+		"progressBarSmall":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorProgress",
+			Outset: [-7, 0],
+		},
+		"progressBarSmallHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorProgressHover",
+			Outset: [-7, 0],
+		},
+		"progressBarSmallDisabled":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorProgressDisabled",
+			Outset: [-7, 0],
+		},
+		"progressBarSmallBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElement",
+			Outset: [-8, 0],
+		},
+		"progressBarSmallBgHover":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorBgElementHover",
+			Outset: [-8, 0],
+		},
+
+		"previewBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "Black",
+		},
+		"previewFg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			Color: [0.2, 0.3, 0.5, 0.2],
+			Outset: [-1],
+		},
+	}
+}

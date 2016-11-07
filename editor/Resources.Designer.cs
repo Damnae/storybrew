@@ -121,6 +121,46 @@ namespace StorybrewEditor {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] skin_constants {
+            get {
+                object obj = ResourceManager.GetObject("skin_constants", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] skin_drawables {
+            get {
+                object obj = ResourceManager.GetObject("skin_drawables", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] skin_drawables_debug {
+            get {
+                object obj = ResourceManager.GetObject("skin_drawables_debug", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] skin_styles {
+            get {
+                object obj = ResourceManager.GetObject("skin_styles", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ui_line {
