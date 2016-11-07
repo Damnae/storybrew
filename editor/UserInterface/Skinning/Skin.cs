@@ -1,15 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using BrewLib.Graphics.Drawables;
+using BrewLib.Graphics.Textures;
+using BrewLib.Util;
+using Newtonsoft.Json.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using BrewLib.Graphics.Drawables;
-using BrewLib.Graphics.Textures;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using BrewLib.Util;
-using System.Reflection;
+using System.Resources;
 
 namespace StorybrewEditor.UserInterface.Skinning
 {
@@ -19,6 +19,10 @@ namespace StorybrewEditor.UserInterface.Skinning
 
         private Dictionary<string, Drawable> drawables = new Dictionary<string, Drawable>();
         private Dictionary<Type, Dictionary<string, WidgetStyle>> stylesPerType = new Dictionary<Type, Dictionary<string, WidgetStyle>>();
+
+        public Func<string, Type> ResolveDrawableType;
+        public Func<string, Type> ResolveWidgetType;
+        public Func<string, Type> ResolveStyleType;
 
         public Skin(TextureContainer textureContainer)
         {
@@ -90,31 +94,27 @@ namespace StorybrewEditor.UserInterface.Skinning
 
         #region Loading
 
-        public static Skin Load(string filename, TextureContainer textureContainer)
+        public void Load(string filename, ResourceManager resourceManager = null)
         {
             byte[] data;
-
             if (File.Exists(filename))
                 data = File.ReadAllBytes(filename);
             else
             {
                 filename = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
-                data = Resources.ResourceManager.GetObject(filename) as byte[];
+                data = resourceManager?.GetObject(filename) as byte[];
             }
-
-            if (data == null) return null;
-            return Load(data.ToJObject(), textureContainer);
+            if (data == null) throw new FileNotFoundException(filename);
+            Load(data.ToJObject());
         }
 
-        public static Skin Load(JObject data, TextureContainer textureContainer)
+        public void Load(JObject data)
         {
-            var skin = new Skin(textureContainer);
-            loadDrawables(skin, data["drawables"]);
-            loadStyles(skin, data["styles"]);
-            return skin;
+            loadDrawables(data["drawables"]);
+            loadStyles(data["styles"]);
         }
 
-        private static void loadDrawables(Skin skin, JToken data)
+        private void loadDrawables(JToken data)
         {
             if (data == null) return;
 
@@ -123,8 +123,8 @@ namespace StorybrewEditor.UserInterface.Skinning
                 var drawableName = drawableData.GetName();
                 try
                 {
-                    var drawable = loadDrawable(drawableData.First, skin);
-                    skin.drawables.Add(drawableName, drawable);
+                    var drawable = loadDrawable(drawableData.First);
+                    drawables.Add(drawableName, drawable);
                 }
                 catch (TypeLoadException)
                 {
@@ -137,7 +137,7 @@ namespace StorybrewEditor.UserInterface.Skinning
             }
         }
 
-        private static Drawable loadDrawable(JToken data, Skin skin)
+        private Drawable loadDrawable(JToken data)
         {
             if (data.Type == JTokenType.String)
             {
@@ -145,7 +145,7 @@ namespace StorybrewEditor.UserInterface.Skinning
                 if (string.IsNullOrEmpty(value))
                     return NullDrawable.Instance;
 
-                var drawable = skin.GetDrawable(value);
+                var drawable = GetDrawable(value);
                 if (drawable == NullDrawable.Instance)
                     throw new InvalidDataException($"Referenced drawable '{value}' must be defined before '{data.Path}'");
                 return drawable;
@@ -155,7 +155,7 @@ namespace StorybrewEditor.UserInterface.Skinning
                 var composite = new CompositeDrawable();
                 foreach (var arrayDrawableData in data)
                 {
-                    var drawable = loadDrawable(arrayDrawableData, skin);
+                    var drawable = loadDrawable(arrayDrawableData);
                     composite.Drawables.Add(drawable);
                 }
                 return composite;
@@ -167,17 +167,16 @@ namespace StorybrewEditor.UserInterface.Skinning
                     throw new InvalidDataException($"Drawable '{data.Path}' must declare a type");
 
                 var drawableTypeName = drawableTypeData.Value<string>();
-                var drawableFullTypeName = $"{nameof(BrewLib)}.{nameof(BrewLib.Graphics)}.{nameof(BrewLib.Graphics.Drawables)}.{drawableTypeName}";
-                var drawableType = Assembly.GetAssembly(typeof(Drawable)).GetType(drawableFullTypeName, true, true);
+                var drawableType = ResolveDrawableType(drawableTypeName);
                 var drawable = (Drawable)Activator.CreateInstance(drawableType);
 
-                parseFields(drawable, data, null, skin);
+                parseFields(drawable, data, null);
 
                 return drawable;
             }
         }
 
-        private static void loadStyles(Skin skin, JToken data)
+        private void loadStyles(JToken data)
         {
             if (data == null) return;
 
@@ -186,12 +185,12 @@ namespace StorybrewEditor.UserInterface.Skinning
                 var styleTypeName = styleTypeData.GetName();
                 try
                 {
-                    var widgetType = Type.GetType($"{nameof(StorybrewEditor)}.{nameof(UserInterface)}.{styleTypeName}", true, true);
-                    var styleType = Type.GetType($"{nameof(StorybrewEditor)}.{nameof(UserInterface)}.{nameof(Skinning)}.{nameof(Styles)}.{styleTypeName}Style", true, true);
+                    var widgetType = ResolveWidgetType(styleTypeName);
+                    var styleType = ResolveStyleType($"{styleTypeName}Style");
 
                     Dictionary<string, WidgetStyle> styles;
-                    if (!skin.stylesPerType.TryGetValue(styleType, out styles))
-                        skin.stylesPerType.Add(styleType, styles = new Dictionary<string, WidgetStyle>());
+                    if (!stylesPerType.TryGetValue(styleType, out styles))
+                        stylesPerType.Add(styleType, styles = new Dictionary<string, WidgetStyle>());
 
                     WidgetStyle defaultStyle = null;
                     foreach (var styleData in styleTypeData.First)
@@ -208,7 +207,7 @@ namespace StorybrewEditor.UserInterface.Skinning
                                 if (!styles.TryGetValue(implicitParentStyleName, out parentStyle) && styleTypeData.First[implicitParentStyleName] != null)
                                     throw new InvalidDataException($"Implicit parent style '{implicitParentStyleName}' style must be defined before '{styleName}'");
 
-                                parentStyle = skin.GetStyle(styleType, implicitParentStyleName);
+                                parentStyle = GetStyle(styleType, implicitParentStyleName);
                             }
 
                             var parentData = styleData.First["_parent"];
@@ -217,7 +216,7 @@ namespace StorybrewEditor.UserInterface.Skinning
                             if (parentData != null && !styles.TryGetValue(parentData.Value<string>(), out parentStyle))
                                 throw new InvalidDataException($"Parent style '{parentData.Value<string>()}' style must be defined before '{styleName}'");
 
-                            parseFields(style, styleData.First, parentStyle, skin);
+                            parseFields(style, styleData.First, parentStyle);
 
                             if (defaultStyle == null)
                                 if (styleName == "default") defaultStyle = style;
@@ -246,7 +245,7 @@ namespace StorybrewEditor.UserInterface.Skinning
             }
         }
 
-        private static void parseFields(object skinnable, JToken data, object parent, Skin skin)
+        private void parseFields(object skinnable, JToken data, object parent)
         {
             var type = skinnable.GetType();
             while (type != typeof(object))
@@ -261,7 +260,7 @@ namespace StorybrewEditor.UserInterface.Skinning
                         var parser = getFieldParser(fieldType);
                         if (parser != null)
                         {
-                            var value = parser.Invoke(fieldData, skin);
+                            var value = parser.Invoke(fieldData, this);
                             field.SetValue(skinnable, value);
                         }
                         else Trace.WriteLine($"Skin - No parser for {fieldType}");
@@ -337,7 +336,7 @@ namespace StorybrewEditor.UserInterface.Skinning
             [typeof(int)] = (data, skin) => data.Value<int>(),
             [typeof(bool)] = (data, skin) => data.Value<bool>(),
             [typeof(Texture2d)] = (data, skin) => skin.TextureContainer.Get(data.Value<string>()),
-            [typeof(Drawable)] = (data, skin) => loadDrawable(data, skin),
+            [typeof(Drawable)] = (data, skin) => skin.loadDrawable(data),
             [typeof(Vector2)] = (data, skin) =>
             {
                 if (data.Type == JTokenType.Array)

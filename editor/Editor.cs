@@ -1,5 +1,6 @@
 ﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Drawables;
 using BrewLib.Input;
 using BrewLib.ScreenLayers;
 using BrewLib.Util;
@@ -12,6 +13,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 
 namespace StorybrewEditor
 {
@@ -48,7 +50,16 @@ namespace StorybrewEditor
 
             try
             {
-                Skin = Skin.Load("skin.json", drawContext.TextureContainer);
+                var drawablesNamespace = $"{nameof(BrewLib)}.{nameof(BrewLib.Graphics)}.{nameof(BrewLib.Graphics.Drawables)}";
+                var widgetsNamespace = $"{nameof(StorybrewEditor)}.{nameof(UserInterface)}";
+                var stylesNamespace = $"{widgetsNamespace}.{nameof(UserInterface.Skinning)}.{nameof(UserInterface.Skinning.Styles)}";
+                Skin = new Skin(drawContext.TextureContainer)
+                {
+                    ResolveDrawableType = (drawableTypeName) => Assembly.GetAssembly(typeof(Drawable)).GetType($"{drawablesNamespace}.{drawableTypeName}", true, true),
+                    ResolveWidgetType = (widgetTypeName) => Type.GetType($"{widgetsNamespace}.{widgetTypeName}", true, true),
+                    ResolveStyleType = (styleTypeName) => Type.GetType($"{stylesNamespace}.{styleTypeName}", true, true),
+                };
+                Skin.Load("skin.json", Resources.ResourceManager);
             }
             catch (Exception e)
             {
