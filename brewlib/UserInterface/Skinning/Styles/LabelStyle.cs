@@ -2,7 +2,7 @@
 using OpenTK.Graphics;
 using System.Drawing;
 
-namespace StorybrewEditor.UserInterface.Skinning.Styles
+namespace BrewLib.UserInterface.Skinning.Styles
 {
     public class LabelStyle : WidgetStyle
     {

@@ -1,5 +1,6 @@
 ﻿using BrewLib.Graphics;
 using BrewLib.Input;
+using BrewLib.Time;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
@@ -10,6 +11,9 @@ namespace BrewLib.ScreenLayers
     public class ScreenLayerManager : IDisposable
     {
         private GameWindow window;
+
+        private TimeSource timeSource;
+        public TimeSource TimeSource => timeSource;
 
         private object context;
         public T GetContext<T>() => (T)context;
@@ -24,9 +28,10 @@ namespace BrewLib.ScreenLayers
 
         public Color4 BackgroundColor => Color4.Black;
 
-        public ScreenLayerManager(GameWindow window, object context)
+        public ScreenLayerManager(GameWindow window, TimeSource timeSource, object context)
         {
             this.window = window;
+            this.timeSource = timeSource;
             this.context = context;
 
             window.Resize += window_Resize;

@@ -1,4 +1,6 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.UserInterface;
+using BrewLib.UserInterface.Skinning.Styles;
+using BrewLib.Util;
 using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.UserInterface.Skinning.Styles;

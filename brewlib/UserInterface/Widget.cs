@@ -1,15 +1,15 @@
-﻿using OpenTK;
-using OpenTK.Input;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Drawables;
-using StorybrewEditor.UserInterface.Skinning.Styles;
+using BrewLib.UserInterface.Skinning.Styles;
+using BrewLib.Util;
+using OpenTK;
+using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using BrewLib.Util;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class Widget : IDisposable
     {
@@ -298,7 +298,7 @@ namespace StorybrewEditor.UserInterface
 #if DEBUG
             manager.Skin.GetDrawable("debug")?.Draw(drawContext, manager.Camera, Bounds, 1);
 
-            var relayout = Math.Max(0, (lastLayoutTime + 1) - manager.ScreenLayerManager.GetContext<Editor>().Time);
+            var relayout = Math.Max(0, (lastLayoutTime + 1) - manager.ScreenLayerManager.TimeSource.Current);
             if (relayout > 0) manager.Skin.GetDrawable("debug_relayout")?.Draw(drawContext, manager.Camera, Bounds, (float)relayout);
 #endif
         }
@@ -459,7 +459,7 @@ namespace StorybrewEditor.UserInterface
 
         protected virtual void Layout()
         {
-            lastLayoutTime = manager.ScreenLayerManager.GetContext<Editor>().Time;
+            lastLayoutTime = manager.ScreenLayerManager.TimeSource.Current;
             needsLayout = false;
         }
 

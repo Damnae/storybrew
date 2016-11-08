@@ -1,12 +1,12 @@
-﻿using System;
-using OpenTK;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Drawables;
-using StorybrewEditor.UserInterface.Skinning.Styles;
+using BrewLib.UserInterface.Skinning.Styles;
 using BrewLib.Util;
+using OpenTK;
+using System;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class Label : Widget
     {

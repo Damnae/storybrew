@@ -1,17 +1,17 @@
 ﻿using BrewLib.Graphics.Drawables;
 using BrewLib.Graphics.Textures;
+using BrewLib.UserInterface.Skinning.Styles;
 using BrewLib.Util;
 using Newtonsoft.Json.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Resources;
 
-namespace StorybrewEditor.UserInterface.Skinning
+namespace BrewLib.UserInterface.Skinning
 {
     public class Skin : IDisposable
     {
@@ -98,6 +98,7 @@ namespace StorybrewEditor.UserInterface.Skinning
 
         public void Load(JObject data, ResourceManager resourceManager = null)
         {
+            //File.WriteAllText("_skin_debug.json", data.ToString());
             loadDrawables(data["drawables"]);
             loadStyles(data["styles"]);
         }

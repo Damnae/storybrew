@@ -1,7 +1,7 @@
 ﻿using OpenTK.Input;
 using System;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class ClickBehavior : IDisposable
     {

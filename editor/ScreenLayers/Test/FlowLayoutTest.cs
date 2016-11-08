@@ -1,4 +1,5 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.UserInterface;
+using BrewLib.Util;
 using StorybrewEditor.UserInterface;
 using System;
 
@@ -59,9 +60,9 @@ namespace StorybrewEditor.ScreenLayers.Test
             base.Update(isTop, isCovered, timeElapsed);
 
             var editor = Manager.GetContext<Editor>();
-            flowLayout1.Pack((float)(300 + Math.Sin(editor.Time * 0.3) * 200));
-            flowLayout2.Pack((float)(300 + Math.Sin(editor.Time * 0.3) * 200));
-            flowLayout3.Pack((float)(300 + Math.Sin(editor.Time * 0.3) * 200), editor.Window.Height / 2);
+            flowLayout1.Pack((float)(300 + Math.Sin(editor.TimeSource.Current * 0.3) * 200));
+            flowLayout2.Pack((float)(300 + Math.Sin(editor.TimeSource.Current * 0.3) * 200));
+            flowLayout3.Pack((float)(300 + Math.Sin(editor.TimeSource.Current * 0.3) * 200), editor.Window.Height / 2);
         }
     }
 }

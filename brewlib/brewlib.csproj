@@ -52,6 +52,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -113,6 +114,33 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenLayers\ScreenLayer.cs" />
     <Compile Include="ScreenLayers\ScreenLayerManager.cs" />
+    <Compile Include="Time\Clock.cs" />
+    <Compile Include="Time\TimeSource.cs" />
+    <Compile Include="UserInterface\Button.cs" />
+    <Compile Include="UserInterface\ClickBehavior.cs" />
+    <Compile Include="UserInterface\DrawableContainer.cs" />
+    <Compile Include="UserInterface\Field.cs" />
+    <Compile Include="UserInterface\FlowLayout.cs" />
+    <Compile Include="UserInterface\Image.cs" />
+    <Compile Include="UserInterface\Label.cs" />
+    <Compile Include="UserInterface\LinearLayout.cs" />
+    <Compile Include="UserInterface\ProgressBar.cs" />
+    <Compile Include="UserInterface\ScrollArea.cs" />
+    <Compile Include="UserInterface\Skinning\Skin.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\ButtonStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\ImageStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\LabelStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\LinearLayoutStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\ProgressBarStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\StackLayoutStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\TextboxStyle.cs" />
+    <Compile Include="UserInterface\Skinning\Styles\WidgetStyle.cs" />
+    <Compile Include="UserInterface\Slider.cs" />
+    <Compile Include="UserInterface\StackLayout.cs" />
+    <Compile Include="UserInterface\Textbox.cs" />
+    <Compile Include="UserInterface\Widget.cs" />
+    <Compile Include="UserInterface\WidgetEvent.cs" />
+    <Compile Include="UserInterface\WidgetManager.cs" />
     <Compile Include="Util\ActionDisposable.cs" />
     <Compile Include="Util\ChangedHandler.cs" />
     <Compile Include="Util\ColorExtensions.cs" />
@@ -145,6 +173,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

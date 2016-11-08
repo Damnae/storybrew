@@ -3,6 +3,9 @@ using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Drawables;
 using BrewLib.Input;
 using BrewLib.ScreenLayers;
+using BrewLib.Time;
+using BrewLib.UserInterface;
+using BrewLib.UserInterface.Skinning;
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -23,12 +26,10 @@ namespace StorybrewEditor
         public GameWindow Window => window;
         public readonly FormsWindow FormsWindow;
 
-        private double time;
-        private double delta;
-        private bool isFixedRateUpdate;
+        private Clock clock = new Clock();
+        public TimeSource TimeSource => clock;
 
-        public double Time => time;
-        public double TimeDelta => delta;
+        private bool isFixedRateUpdate;
         public bool IsFixedRateUpdate => isFixedRateUpdate;
 
         private DrawContext drawContext;
@@ -50,14 +51,17 @@ namespace StorybrewEditor
 
             try
             {
-                var drawablesNamespace = $"{nameof(BrewLib)}.{nameof(BrewLib.Graphics)}.{nameof(BrewLib.Graphics.Drawables)}";
-                var widgetsNamespace = $"{nameof(StorybrewEditor)}.{nameof(UserInterface)}";
-                var stylesNamespace = $"{widgetsNamespace}.{nameof(UserInterface.Skinning)}.{nameof(UserInterface.Skinning.Styles)}";
+                var brewLibAssembly = Assembly.GetAssembly(typeof(Drawable));
                 Skin = new Skin(drawContext.TextureContainer)
                 {
-                    ResolveDrawableType = (drawableTypeName) => Assembly.GetAssembly(typeof(Drawable)).GetType($"{drawablesNamespace}.{drawableTypeName}", true, true),
-                    ResolveWidgetType = (widgetTypeName) => Type.GetType($"{widgetsNamespace}.{widgetTypeName}", true, true),
-                    ResolveStyleType = (styleTypeName) => Type.GetType($"{stylesNamespace}.{styleTypeName}", true, true),
+                    ResolveDrawableType = (drawableTypeName) =>
+                        brewLibAssembly.GetType($"{nameof(BrewLib)}.{nameof(BrewLib.Graphics)}.{nameof(BrewLib.Graphics.Drawables)}.{drawableTypeName}", true, true),
+                    ResolveWidgetType = (widgetTypeName) =>
+                        Type.GetType($"{nameof(StorybrewEditor)}.{nameof(UserInterface)}.{widgetTypeName}", false, true) ??
+                        brewLibAssembly.GetType($"{nameof(BrewLib)}.{nameof(UserInterface)}.{widgetTypeName}", true, true),
+                    ResolveStyleType = (styleTypeName) =>
+                        Type.GetType($"{nameof(StorybrewEditor)}.{nameof(UserInterface)}.{nameof(UserInterface.Skinning)}.{nameof(UserInterface.Skinning.Styles)}.{styleTypeName}", false, true) ??
+                        brewLibAssembly.GetType($"{nameof(BrewLib)}.{nameof(UserInterface)}.{nameof(UserInterface.Skinning)}.{nameof(UserInterface.Skinning.Styles)}.{styleTypeName}", true, true),
                 };
                 Skin.Load("skin.json", Resources.ResourceManager);
             }
@@ -70,7 +74,7 @@ namespace StorybrewEditor
             var inputDispatcher = new InputDispatcher();
             InputManager = new InputManager(window, inputDispatcher);
 
-            ScreenLayerManager = new ScreenLayerManager(window, this);
+            ScreenLayerManager = new ScreenLayerManager(window, clock, this);
             inputDispatcher.Add(createOverlay(ScreenLayerManager));
             inputDispatcher.Add(ScreenLayerManager.InputHandler);
 
@@ -100,7 +104,7 @@ namespace StorybrewEditor
 
         private WidgetManager createOverlay(ScreenLayerManager screenLayerManager)
         {
-            return overlay = new WidgetManager(screenLayerManager)
+            return overlay = new WidgetManager(screenLayerManager, InputManager, Skin)
             {
                 Camera = overlayCamera = new CameraOrtho(),
             };
@@ -212,12 +216,11 @@ namespace StorybrewEditor
 
         public void Update(double time, bool isFixedRateUpdate)
         {
-            delta = time - this.time;
-            this.time = time;
             this.isFixedRateUpdate = isFixedRateUpdate;
+            clock.Current = time;
 
             updateOverlay();
-            ScreenLayerManager.Update(delta);
+            ScreenLayerManager.Update(clock.Delta);
         }
 
         public void Draw()

@@ -1,9 +1,9 @@
-﻿using OpenTK;
+﻿using BrewLib.UserInterface.Skinning.Styles;
+using OpenTK;
 using OpenTK.Input;
-using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class Slider : ProgressBar
     {

@@ -1,13 +1,13 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics;
+using BrewLib.Graphics.Drawables;
+using BrewLib.UserInterface.Skinning.Styles;
+using BrewLib.Util;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using BrewLib.Graphics;
-using BrewLib.Graphics.Drawables;
-using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
-using BrewLib.Util;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class Textbox : Widget, Field
     {
@@ -148,7 +148,7 @@ namespace StorybrewEditor.UserInterface
             {
                 if (!hasFocus) return false;
 
-                var editor = manager.ScreenLayerManager.GetContext<Editor>();
+                var inputManager = manager.InputManager;
                 switch (e.Key)
                 {
                     case Key.Escape:
@@ -166,18 +166,18 @@ namespace StorybrewEditor.UserInterface
                         ReplaceSelection("");
                         break;
                     case Key.A:
-                        if (editor.InputManager.ControlOnly)
+                        if (inputManager.ControlOnly)
                             SelectAll();
                         break;
                     case Key.C:
-                        if (editor.InputManager.ControlOnly)
+                        if (inputManager.ControlOnly)
                             if (selectionStart != cursorPosition)
                                 System.Windows.Forms.Clipboard.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
                             else
                                 System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
                         break;
                     case Key.V:
-                        if (editor.InputManager.ControlOnly)
+                        if (inputManager.ControlOnly)
                         {
                             var clipboardText = System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
                             if (!AcceptMultiline)
@@ -186,7 +186,7 @@ namespace StorybrewEditor.UserInterface
                         }
                         break;
                     case Key.X:
-                        if (editor.InputManager.ControlOnly)
+                        if (inputManager.ControlOnly)
                         {
                             if (selectionStart == cursorPosition)
                                 SelectAll();
@@ -196,7 +196,7 @@ namespace StorybrewEditor.UserInterface
                         }
                         break;
                     case Key.Left:
-                        if (editor.InputManager.Shift)
+                        if (inputManager.Shift)
                         {
                             if (cursorPosition > 0)
                                 cursorPosition--;
@@ -207,7 +207,7 @@ namespace StorybrewEditor.UserInterface
                             cursorPosition = --selectionStart;
                         break;
                     case Key.Right:
-                        if (editor.InputManager.Shift)
+                        if (inputManager.Shift)
                         {
                             if (cursorPosition < Value.Length)
                                 cursorPosition++;
@@ -219,27 +219,27 @@ namespace StorybrewEditor.UserInterface
                         break;
                     case Key.Up:
                         cursorPosition = content.GetCharacterIndexAbove(cursorPosition);
-                        if (!manager.ScreenLayerManager.GetContext<Editor>().InputManager.Shift)
+                        if (!inputManager.Shift)
                             selectionStart = cursorPosition;
                         break;
                     case Key.Down:
                         cursorPosition = content.GetCharacterIndexBelow(cursorPosition);
-                        if (!editor.InputManager.Shift)
+                        if (!inputManager.Shift)
                             selectionStart = cursorPosition;
                         break;
                     case Key.Home:
                         cursorPosition = 0;
-                        if (!editor.InputManager.Shift)
+                        if (!inputManager.Shift)
                             selectionStart = cursorPosition;
                         break;
                     case Key.End:
                         cursorPosition = Value.Length;
-                        if (!editor.InputManager.Shift)
+                        if (!inputManager.Shift)
                             selectionStart = cursorPosition;
                         break;
                     case Key.Enter:
                     case Key.KeypadEnter:
-                        if (AcceptMultiline && (!EnterCommits || editor.InputManager.Shift))
+                        if (AcceptMultiline && (!EnterCommits || inputManager.Shift))
                             ReplaceSelection("\n");
                         else if (EnterCommits && hasCommitPending)
                         {

@@ -5,6 +5,7 @@ using BrewLib.Graphics.Drawables;
 using StorybrewEditor.Storyboarding;
 using System;
 using BrewLib.Util;
+using BrewLib.UserInterface;
 
 namespace StorybrewEditor.UserInterface
 {

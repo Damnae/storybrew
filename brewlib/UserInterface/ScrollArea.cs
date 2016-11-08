@@ -1,10 +1,10 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics;
+using BrewLib.Util;
+using OpenTK;
 using OpenTK.Input;
 using System;
-using BrewLib.Graphics;
-using BrewLib.Util;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class ScrollArea : Widget
     {

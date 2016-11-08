@@ -1,8 +1,8 @@
-﻿using OpenTK;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Drawables;
+using OpenTK;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class DrawableContainer : Widget
     {

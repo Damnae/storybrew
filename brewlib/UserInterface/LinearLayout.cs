@@ -1,10 +1,10 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.UserInterface.Skinning.Styles;
+using BrewLib.Util;
 using OpenTK;
-using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 using System.Collections.Generic;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class LinearLayout : Widget
     {

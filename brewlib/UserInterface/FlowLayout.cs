@@ -1,11 +1,11 @@
-﻿using OpenTK;
-using BrewLib.Graphics;
-using StorybrewEditor.UserInterface.Skinning.Styles;
+﻿using BrewLib.Graphics;
+using BrewLib.UserInterface.Skinning.Styles;
+using BrewLib.Util;
+using OpenTK;
 using System;
 using System.Collections.Generic;
-using BrewLib.Util;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class FlowLayout : Widget
     {

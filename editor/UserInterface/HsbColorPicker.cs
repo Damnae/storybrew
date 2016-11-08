@@ -6,6 +6,8 @@ using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 using System.Drawing;
 using BrewLib.Util;
+using BrewLib.UserInterface;
+using BrewLib.UserInterface.Skinning.Styles;
 
 namespace StorybrewEditor.UserInterface
 {

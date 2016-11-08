@@ -1,6 +1,6 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.UserInterface;
+using BrewLib.Util;
 using StorybrewCommon.Util;
-using StorybrewEditor.UserInterface;
 using System;
 using System.IO;
 
@@ -93,4 +93,21 @@ namespace StorybrewEditor
 
         public override string ToString() => value.ToString();
     }
+
+    public static class SettingsExtensions
+    {
+        public static void BindToSetting<T>(this Button button, Setting<T> setting, Action changedAction)
+        {
+            button.OnValueChanged += (sender, e) => setting.Set(button.Checked);
+            EventHandler handler;
+            setting.OnValueChanged += handler = (sender, e) =>
+            {
+                button.Checked = (bool)Convert.ChangeType((T)setting, typeof(bool));
+                changedAction();
+            };
+            button.OnDisposed += (sender, e) => setting.OnValueChanged -= handler;
+            handler(button, EventArgs.Empty);
+        }
+    }
+
 }

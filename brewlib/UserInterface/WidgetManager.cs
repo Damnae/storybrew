@@ -2,19 +2,20 @@
 using BrewLib.Graphics.Cameras;
 using BrewLib.Input;
 using BrewLib.ScreenLayers;
+using BrewLib.UserInterface.Skinning;
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Input;
-using StorybrewEditor.UserInterface.Skinning;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class WidgetManager : InputHandler, IDisposable
     {
         private InputManager inputManager;
+        public InputManager InputManager => inputManager;
 
         private ScreenLayerManager screenLayerManager;
         public ScreenLayerManager ScreenLayerManager => screenLayerManager;
@@ -86,11 +87,6 @@ namespace StorybrewEditor.UserInterface
         }
 
         public readonly Skin Skin;
-
-        public WidgetManager(ScreenLayerManager screenLayerManager)
-            : this(screenLayerManager, screenLayerManager.GetContext<Editor>().InputManager, screenLayerManager.GetContext<Editor>().Skin)
-        {
-        }
 
         public WidgetManager(ScreenLayerManager screenLayerManager, InputManager inputManager, Skin skin)
         {

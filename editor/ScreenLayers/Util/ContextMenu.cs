@@ -1,4 +1,5 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.UserInterface;
+using BrewLib.Util;
 using StorybrewEditor.UserInterface;
 using System;
 using System.Collections.Generic;

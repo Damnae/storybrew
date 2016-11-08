@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class WidgetEvent
     {

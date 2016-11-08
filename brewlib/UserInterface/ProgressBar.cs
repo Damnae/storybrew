@@ -1,10 +1,10 @@
-﻿using OpenTK;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Drawables;
-using StorybrewEditor.UserInterface.Skinning.Styles;
+using BrewLib.UserInterface.Skinning.Styles;
+using OpenTK;
 using System;
 
-namespace StorybrewEditor.UserInterface
+namespace BrewLib.UserInterface
 {
     public class ProgressBar : Widget, Field
     {

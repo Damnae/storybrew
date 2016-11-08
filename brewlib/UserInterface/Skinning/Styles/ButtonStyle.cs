@@ -1,7 +1,7 @@
 ﻿using BrewLib.Util;
 using OpenTK;
 
-namespace StorybrewEditor.UserInterface.Skinning.Styles
+namespace BrewLib.UserInterface.Skinning.Styles
 {
     public class ButtonStyle : WidgetStyle
     {
