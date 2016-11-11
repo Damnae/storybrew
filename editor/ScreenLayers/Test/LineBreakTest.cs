@@ -35,9 +35,9 @@ namespace StorybrewEditor.ScreenLayers.Test
             });
         }
 
-        public override void Update(bool isTop, bool isCovered, double timeElapsed)
+        public override void Update(bool isTop, bool isCovered)
         {
-            base.Update(isTop, isCovered, timeElapsed);
+            base.Update(isTop, isCovered);
 
             label1.Pack(Manager.GetContext<Editor>().InputManager.Mouse.X - label1.Bounds.Left);
             label2.Pack(Manager.GetContext<Editor>().InputManager.Mouse.X - label2.Bounds.Left);

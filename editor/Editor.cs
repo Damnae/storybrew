@@ -220,7 +220,7 @@ namespace StorybrewEditor
             clock.Current = time;
 
             updateOverlay();
-            ScreenLayerManager.Update(clock.Delta);
+            ScreenLayerManager.Update();
         }
 
         public void Draw()

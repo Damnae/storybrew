@@ -55,9 +55,9 @@ namespace StorybrewEditor.ScreenLayers.Test
                 flowLayout3.Add(new Label(WidgetManager) { Text = letter.ToString(), });
         }
 
-        public override void Update(bool isTop, bool isCovered, double timeElapsed)
+        public override void Update(bool isTop, bool isCovered)
         {
-            base.Update(isTop, isCovered, timeElapsed);
+            base.Update(isTop, isCovered);
 
             var editor = Manager.GetContext<Editor>();
             flowLayout1.Pack((float)(300 + Math.Sin(editor.TimeSource.Current * 0.3) * 200));

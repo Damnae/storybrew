@@ -93,7 +93,7 @@ namespace BrewLib.ScreenLayers
             }
         }
 
-        public void Update(double timeElapsed)
+        public void Update()
         {
             var active = window.Focused;
             if (!active) changeFocus(null);
@@ -123,7 +123,7 @@ namespace BrewLib.ScreenLayers
                     }
                 }
 
-                layer.Update(top, covered, timeElapsed);
+                layer.Update(top, covered);
 
                 if (!layer.IsPopup)
                     covered = true;

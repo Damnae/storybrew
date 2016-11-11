@@ -35,9 +35,9 @@ namespace StorybrewEditor.ScreenLayers
             base.Resize(width, height);
         }
 
-        public override void Update(bool isTop, bool isCovered, double timeElapsed)
+        public override void Update(bool isTop, bool isCovered)
         {
-            base.Update(isTop, isCovered, timeElapsed);
+            base.Update(isTop, isCovered);
 
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {

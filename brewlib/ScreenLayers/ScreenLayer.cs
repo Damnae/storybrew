@@ -64,7 +64,7 @@ namespace BrewLib.ScreenLayers
         {
         }
 
-        public virtual void Update(bool isTopFocus, bool isCovered, double timeElapsed)
+        public virtual void Update(bool isTopFocus, bool isCovered)
         {
             if (!hasStarted && !isExiting && !isCovered)
             {
@@ -78,7 +78,7 @@ namespace BrewLib.ScreenLayers
                     OnTransitionOut();
 
                 CurrentState = State.FadingOut;
-                if (!updateTransition(timeElapsed, TransitionOutDuration, -1))
+                if (!updateTransition(Manager.TimeSource.Elapsed, TransitionOutDuration, -1))
                 {
                     OnHidden();
                     Manager.Remove(this);
@@ -86,7 +86,7 @@ namespace BrewLib.ScreenLayers
             }
             else if (isCovered)
             {
-                if (updateTransition(timeElapsed, TransitionOutDuration, -1))
+                if (updateTransition(Manager.TimeSource.Elapsed, TransitionOutDuration, -1))
                 {
                     if (CurrentState != State.FadingOut)
                         OnTransitionOut();
@@ -102,7 +102,7 @@ namespace BrewLib.ScreenLayers
             }
             else
             {
-                if (updateTransition(timeElapsed, TransitionInDuration, 1))
+                if (updateTransition(Manager.TimeSource.Elapsed, TransitionInDuration, 1))
                 {
                     if (CurrentState != State.FadingIn)
                         OnTransitionIn();

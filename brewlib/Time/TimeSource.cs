@@ -7,7 +7,7 @@ namespace BrewLib.Time
         public abstract double Current { get; set; }
         public abstract double Previous { get; }
 
-        public double Delta => Current - Previous;
+        public double Elapsed => Current - Previous;
 
         public event EventHandler Changed;
         protected void NotifyTimeChanged()

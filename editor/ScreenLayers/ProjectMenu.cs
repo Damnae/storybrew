@@ -370,9 +370,9 @@ namespace StorybrewEditor.ScreenLayers
         private void exportProject()
             => Manager.AsyncLoading("Exporting...", () => project.ExportToOsb());
 
-        public override void Update(bool isTop, bool isCovered, double timeElapsed)
+        public override void Update(bool isTop, bool isCovered)
         {
-            base.Update(isTop, isCovered, timeElapsed);
+            base.Update(isTop, isCovered);
 
             playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
             audio.Volume = WidgetManager.Root.Opacity;
