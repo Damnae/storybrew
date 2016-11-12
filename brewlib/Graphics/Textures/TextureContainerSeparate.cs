@@ -6,12 +6,14 @@ namespace BrewLib.Graphics.Textures
     public class TextureContainerSeparate : TextureContainer
     {
         private ResourceManager resourceManager;
+        private TextureOptions textureOptions;
 
         private Dictionary<string, Texture2d> textures = new Dictionary<string, Texture2d>();
 
-        public TextureContainerSeparate(ResourceManager resourceManager = null)
+        public TextureContainerSeparate(ResourceManager resourceManager = null, TextureOptions textureOptions = null)
         {
             this.resourceManager = resourceManager;
+            this.textureOptions = textureOptions;
         }
 
         public void Dispose()
@@ -21,14 +23,12 @@ namespace BrewLib.Graphics.Textures
             textures.Clear();
         }
 
-        public Texture2d Get(string filename, bool sRgb = false)
+        public Texture2d Get(string filename)
         {
-            // todo: srgb isn't cached
-
             Texture2d texture;
             if (!textures.TryGetValue(filename, out texture))
             {
-                texture = Texture2d.Load(filename, sRgb, resourceManager);
+                texture = Texture2d.Load(filename, resourceManager, textureOptions);
                 textures.Add(filename, texture);
             }
             return texture;

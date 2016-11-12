@@ -12,12 +12,14 @@ namespace BrewLib.Graphics.Textures
         private int width;
         private int height;
         private string description;
+        private TextureOptions textureOptions;
 
-        public TextureMultiAtlas2d(int width, int height, string description)
+        public TextureMultiAtlas2d(int width, int height, string description, TextureOptions textureOptions = null)
         {
             this.width = width;
             this.height = height;
             this.description = description;
+            this.textureOptions = textureOptions;
             pushAtlas();
         }
 
@@ -42,7 +44,7 @@ namespace BrewLib.Graphics.Textures
 
         private TextureAtlas2d pushAtlas()
         {
-            var atlas = new TextureAtlas2d(width, height, $"{description} #{atlases.Count + 1}");
+            var atlas = new TextureAtlas2d(width, height, $"{description} #{atlases.Count + 1}", textureOptions);
             atlases.Push(atlas);
             return atlas;
         }

@@ -1,7 +1,7 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using BrewLib.Util;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -64,17 +64,26 @@ namespace BrewLib.Graphics.Textures
 
         #endregion
 
-        public static Texture2d Load(string filename, bool sRgb = false, ResourceManager resourceManager = null)
+        public static Texture2d Load(string filename, ResourceManager resourceManager = null, TextureOptions textureOptions = null)
         {
+            try
+            {
+                textureOptions = textureOptions ?? TextureOptions.Load(TextureOptions.GetOptionsFilename(filename), resourceManager);
+            }
+            catch (FileNotFoundException)
+            {
+                Trace.WriteLine($"No texture options for {filename}");
+            }
+
             if (File.Exists(filename))
                 using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    return Load(stream, filename, sRgb);
+                    return Load(stream, filename, textureOptions);
 
             if (resourceManager == null) return null;
             var resourceName = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
 
             using (var bitmap = resourceManager.GetObject(resourceName) as Bitmap)
-                if (bitmap != null) return Load(bitmap, $"file:{filename}", sRgb);
+                if (bitmap != null) return Load(bitmap, $"file:{filename}", textureOptions);
                 else
                 {
                     Trace.WriteLine($"Texture not found: {filename} / {resourceName}");
@@ -82,36 +91,33 @@ namespace BrewLib.Graphics.Textures
                 }
         }
 
-        public static Texture2d Load(Stream stream, string filename, bool sRgb = false)
+        public static Texture2d Load(Stream stream, string filename, TextureOptions textureOptions = null)
         {
             using (var bitmap = (Bitmap)Image.FromStream(stream, false, false))
-                return Load(bitmap, $"file:{filename}", sRgb);
+                return Load(bitmap, $"file:{filename}", textureOptions);
         }
 
-        public static Texture2d Create(Color4 color, string description, int width = 1, int height = 1)
+        public static Texture2d Create(Color4 color, string description, int width = 1, int height = 1, TextureOptions textureOptions = null)
         {
+            textureOptions = textureOptions ?? TextureOptions.Default;
+
             var textureId = GL.GenTexture();
             try
             {
-                DrawState.BindTexture(textureId);
-                var pixelInternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgba;
-                var pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
-                var pixelType = OpenTK.Graphics.OpenGL.PixelType.UnsignedByte;
-
                 var data = new int[width * height];
                 for (int i = 0; i < width * height; i++)
                     data[i] = color.ToRgba();
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat, width, height, 0, pixelFormat, pixelType, data);
-
+                DrawState.BindTexture(textureId);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
+                if (textureOptions.GenerateMipmaps)
+                {
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                    GL.Finish();
+                }
                 DrawState.CheckError("specifying texture");
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-
-                DrawState.CheckError("setting texture parameters");
+                textureOptions.ApplyParameters(TextureTarget.Texture2D);
             }
             catch (Exception)
             {
@@ -123,11 +129,12 @@ namespace BrewLib.Graphics.Textures
             return new Texture2d(textureId, width, height, description);
         }
 
-        public static Texture2d Load(Bitmap bitmap, string description, bool sRgb = false)
+        public static Texture2d Load(Bitmap bitmap, string description, TextureOptions textureOptions = null)
         {
             if (bitmap == null) throw new ArgumentNullException(nameof(bitmap));
 
-            sRgb &= DrawState.ColorCorrected;
+            textureOptions = textureOptions ?? TextureOptions.Default;
+            var sRgb = textureOptions.Srgb && DrawState.ColorCorrected;
 
             var textureId = GL.GenTexture();
             try
@@ -137,17 +144,13 @@ namespace BrewLib.Graphics.Textures
                 var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 GL.TexImage2D(TextureTarget.Texture2D, 0, sRgb ? PixelInternalFormat.SrgbAlpha : PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
+                if (textureOptions.GenerateMipmaps)
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
                 GL.Finish();
                 bitmap.UnlockBits(bitmapData);
-
                 DrawState.CheckError("specifying texture");
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-
-                DrawState.CheckError("setting texture parameters");
+                textureOptions.ApplyParameters(TextureTarget.Texture2D);
             }
             catch (Exception)
             {

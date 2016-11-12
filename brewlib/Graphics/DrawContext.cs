@@ -1,28 +1,47 @@
-﻿using BrewLib.Graphics.Renderers;
-using BrewLib.Graphics.Textures;
-using System;
-using System.Resources;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BrewLib.Graphics
 {
     public class DrawContext : IDisposable
     {
-        public TextureContainer TextureContainer { get; private set; }
-        public SpriteRenderer SpriteRenderer { get; private set; }
+        private Dictionary<Type, object> references = new Dictionary<Type, object>();
+        private List<IDisposable> disposables = new List<IDisposable>();
 
-        public DrawContext(ResourceManager resourceManager = null)
+        public T Get<T>() => (T)references[typeof(T)];
+
+        public void Register<T>(T obj, bool dispose = false)
         {
-            TextureContainer = new TextureContainerSeparate(resourceManager);
-            SpriteRenderer = new SpriteRendererBuffered();
+            references.Add(typeof(T), obj);
+
+            var disposable = obj as IDisposable;
+            if (dispose && disposable != null)
+                disposables.Add(disposable);
+        }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach (var disposable in disposables)
+                        disposable.Dispose();
+                }
+                references = null;
+                disposables = null;
+                disposedValue = true;
+            }
         }
 
         public void Dispose()
         {
-            SpriteRenderer.Dispose();
-            SpriteRenderer = null;
-
-            TextureContainer.Dispose();
-            TextureContainer = null;
+            Dispose(true);
         }
+
+        #endregion
     }
 }

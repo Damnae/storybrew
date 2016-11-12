@@ -55,5 +55,11 @@ namespace BrewLib.Util
                     return hWnd;
             return IntPtr.Zero;
         }
+
+        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int memcmp(byte[] b1, byte[] b2, long count);
+
+        public static bool ArrayEquals(byte[] b1, byte[] b2)
+            => b1.Length == b2.Length && memcmp(b1, b2, b1.Length) == 0;
     }
 }

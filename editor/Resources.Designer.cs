@@ -171,12 +171,32 @@ namespace StorybrewEditor {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] ui_line_opt {
+            get {
+                object obj = ResourceManager.GetObject("ui_line_opt", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ui_rounded_borders {
             get {
                 object obj = ResourceManager.GetObject("ui_rounded_borders", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] ui_rounded_borders_opt {
+            get {
+                object obj = ResourceManager.GetObject("ui_rounded_borders_opt", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

@@ -1,8 +1,9 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using BrewLib.Graphics.Cameras;
+﻿using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Renderers;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace BrewLib.Graphics.Drawables
 {
@@ -39,7 +40,7 @@ namespace BrewLib.Graphics.Drawables
             var verticalScale = (y2 - y1) / (Borders.Bottom - Borders.Top);
 
             var color = Color.WithOpacity(opacity);
-            var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
+            var renderer = DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, RenderStates);
 
             // Center
             if (!BordersOnly && horizontalScale > 0 && verticalScale > 0)

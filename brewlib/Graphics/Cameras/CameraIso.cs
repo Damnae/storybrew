@@ -31,7 +31,7 @@ namespace BrewLib.Graphics.Cameras
             var distanceSqrt = (float)Math.Sqrt(1 / 3f);
             Forward = new Vector3(distanceSqrt, -distanceSqrt, -distanceSqrt);
             Position = target - Forward;
-            Up = new Vector3(0, 0, 1);
+            Up = DefaultUp;
 
             internalViewport = extendedViewport = screenViewport;
             projection = Matrix4.CreateOrthographicOffCenter(

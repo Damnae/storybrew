@@ -19,8 +19,8 @@ namespace BrewLib.Graphics.Textures
             this.texture = texture;
         }
 
-        public TextureAtlas2d(int width, int height, string description)
-            : this(Texture2d.Create(new Color4(0, 0, 0, 0), description, width, height))
+        public TextureAtlas2d(int width, int height, string description, TextureOptions textureOptions = null)
+            : this(Texture2d.Create(new Color4(0, 0, 0, 0), description, width, height, textureOptions))
         {
         }
 

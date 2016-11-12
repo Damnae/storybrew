@@ -154,4 +154,10 @@
   <data name="skin_styles" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\skin_styles.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="ui_line_opt" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\ui-line-opt.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ui_rounded_borders_opt" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\ui-rounded-borders-opt.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

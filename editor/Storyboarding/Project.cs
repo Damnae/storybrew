@@ -131,7 +131,7 @@ namespace StorybrewEditor.Storyboarding
         private void reloadTextures()
         {
             textureContainer?.Dispose();
-            textureContainer = new TextureContainerSeparate(null);
+            textureContainer = new TextureContainerSeparate(null, TextureOptions.Default);
         }
 
         #endregion

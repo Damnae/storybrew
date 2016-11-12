@@ -1,6 +1,8 @@
 ﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Drawables;
+using BrewLib.Graphics.Renderers;
+using BrewLib.Graphics.Textures;
 using BrewLib.Input;
 using BrewLib.ScreenLayers;
 using BrewLib.Time;
@@ -10,8 +12,6 @@ using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using StorybrewEditor.ScreenLayers;
-using StorybrewEditor.UserInterface;
-using StorybrewEditor.UserInterface.Skinning;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -47,12 +47,14 @@ namespace StorybrewEditor
         public void Initialize(ScreenLayer initialLayer = null)
         {
             DrawState.Initialize(Resources.ResourceManager, window.Width, window.Height);
-            drawContext = new DrawContext(Resources.ResourceManager);
+            drawContext = new DrawContext();
+            drawContext.Register<TextureContainer>(new TextureContainerSeparate(Resources.ResourceManager), true);
+            drawContext.Register<SpriteRenderer>(new SpriteRendererBuffered(), true);
 
             try
             {
                 var brewLibAssembly = Assembly.GetAssembly(typeof(Drawable));
-                Skin = new Skin(drawContext.TextureContainer)
+                Skin = new Skin(drawContext.Get<TextureContainer>())
                 {
                     ResolveDrawableType = (drawableTypeName) =>
                         brewLibAssembly.GetType($"{nameof(BrewLib)}.{nameof(BrewLib.Graphics)}.{nameof(BrewLib.Graphics.Drawables)}.{drawableTypeName}", true, true),
@@ -68,7 +70,7 @@ namespace StorybrewEditor
             catch (Exception e)
             {
                 Trace.WriteLine($"Failed to load skin: {e}");
-                Skin = new Skin(drawContext.TextureContainer);
+                Skin = new Skin(drawContext.Get<TextureContainer>());
             }
 
             var inputDispatcher = new InputDispatcher();
@@ -235,7 +237,7 @@ namespace StorybrewEditor
 
         public string GetStats()
         {
-            var spriteRenderer = drawContext.SpriteRenderer;
+            var spriteRenderer = drawContext.Get<SpriteRenderer>();
 
             return string.Format("Sprite - t:{0}k f:{1:0.0}k b:{2} w:{3} lb:{4}",
                 spriteRenderer.RenderedSpriteCount / 1000, spriteRenderer.FlushedBufferCount / 1000f, spriteRenderer.DiscardedBufferCount, spriteRenderer.BufferWaitCount, spriteRenderer.LargestBatch);

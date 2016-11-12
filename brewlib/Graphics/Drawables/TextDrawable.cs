@@ -1,4 +1,5 @@
 ﻿using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Renderers;
 using BrewLib.Graphics.Text;
 using BrewLib.Util;
 using OpenTK;
@@ -124,7 +125,7 @@ namespace BrewLib.Graphics.Drawables
             var inverseScaling = 1 / scaling;
             var color = Color.WithOpacity(opacity);
 
-            var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
+            var renderer = DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, RenderStates);
             var clipRegion = DrawState.GetClipRegion(camera) ?? new Box2(camera.ExtendedViewport.Left, camera.ExtendedViewport.Top, camera.ExtendedViewport.Right, camera.ExtendedViewport.Bottom);
 
             foreach (var layoutGlyph in textLayout.VisibleGlyphs)

@@ -8,37 +8,150 @@ namespace BrewLib.Graphics.RenderTargets
 {
     public class RenderTarget : IDisposable
     {
-        public Texture2d Texture { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-
-        private RenderbufferStorage? renderBufferType;
-
         private int textureId = -1;
         private int frameBufferId = -1;
         private int renderBufferId = -1;
         private bool started;
+        private bool valid;
 
         private int previousFrameBufferId;
         private Rectangle previousViewport;
 
-        public RenderTarget(RenderbufferStorage? renderBufferType = null)
+        private Texture2d texture;
+        public Texture2d Texture
         {
-            this.renderBufferType = renderBufferType;
+            get
+            {
+                validate();
+                return texture;
+            }
+        }
+
+        private int width;
+        public int Width
+        {
+            get { return width; }
+            set
+            {
+                if (width == value) return;
+                invalidate();
+                width = value;
+            }
+        }
+        private int height;
+        public int Height
+        {
+            get { return height; }
+            set
+            {
+                if (height == value) return;
+                invalidate();
+                height = value;
+            }
+        }
+
+        private PixelInternalFormat internalFormat;
+        public PixelInternalFormat InternalFormat
+        {
+            get { return internalFormat; }
+            set
+            {
+                if (internalFormat == value) return;
+                invalidate();
+                internalFormat = value;
+            }
+        }
+        private PixelFormat pixelFormat;
+        public PixelFormat PixelFormat
+        {
+            get { return pixelFormat; }
+            set
+            {
+                if (pixelFormat == value) return;
+                invalidate();
+                pixelFormat = value;
+            }
+        }
+        private PixelType pixelType;
+        public PixelType PixelType
+        {
+            get { return pixelType; }
+            set
+            {
+                if (pixelType == value) return;
+                invalidate();
+                pixelType = value;
+            }
+        }
+
+        private RenderbufferStorage? renderBufferType;
+        public RenderbufferStorage? RenderBufferType
+        {
+            get { return renderBufferType; }
+            set
+            {
+                if (renderBufferType == value) return;
+                invalidate();
+                renderBufferType = value;
+            }
+        }
+
+        private TextureMinFilter textureMinFilter = TextureMinFilter.Linear;
+        public TextureMinFilter TextureMinFilter
+        {
+            get { return textureMinFilter; }
+            set
+            {
+                if (textureMinFilter == value) return;
+                invalidate();
+                textureMinFilter = value;
+            }
+        }
+
+        private TextureMagFilter textureMagFilter = TextureMagFilter.Linear;
+        public TextureMagFilter TextureMagFilter
+        {
+            get { return textureMagFilter; }
+            set
+            {
+                if (textureMagFilter == value) return;
+                invalidate();
+                textureMagFilter = value;
+            }
+        }
+
+        public RenderTarget(RenderbufferStorage? renderBufferType = null)
+            : this(0, 0)
+        {
         }
 
         public RenderTarget(int width, int height, RenderbufferStorage? renderBufferType = null)
+            : this(width, height, DrawState.ColorCorrected ? PixelInternalFormat.SrgbAlpha : PixelInternalFormat.Rgba, PixelFormat.Rgba, PixelType.UnsignedByte, renderBufferType)
         {
+        }
+
+        public RenderTarget(PixelInternalFormat internalFormat, PixelFormat pixelFormat, PixelType pixelType, RenderbufferStorage? renderBufferType = null)
+            : this(0, 0, internalFormat, pixelFormat, pixelType, renderBufferType)
+        {
+        }
+
+        public RenderTarget(int width, int height, PixelInternalFormat internalFormat, PixelFormat pixelFormat, PixelType pixelType, RenderbufferStorage? renderBufferType = null)
+        {
+            this.width = width;
+            this.height = height;
+            this.internalFormat = internalFormat;
+            this.pixelFormat = pixelFormat;
+            this.pixelType = pixelType;
             this.renderBufferType = renderBufferType;
-            initialize(width, height);
         }
 
         public void Begin(bool clear = true)
         {
             if (started) throw new InvalidOperationException("Already started");
-            if (textureId == -1) throw new InvalidOperationException("Not initialized");
 
             DrawState.FlushRenderer();
+
+            validate();
 
             previousViewport = DrawState.Viewport;
 
@@ -47,24 +160,16 @@ namespace BrewLib.Graphics.RenderTargets
             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
             DrawState.CheckError("binding fbo");
 
-            DrawState.Viewport = new Rectangle(0, 0, Width, Height);
+            DrawState.Viewport = new Rectangle(0, 0, width, height);
 
             if (clear)
             {
+                // XXX need GL.DepthMask(true); to clear depth, but setting it here may cause issues with renderstate cache
                 GL.ClearColor(0, 0, 0, 0);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             }
 
             started = true;
-        }
-
-        public void Resize(int width, int height)
-        {
-            if (started) throw new InvalidOperationException("Can't resize while started");
-            if (width == Width && height == Height) return;
-
-            clear();
-            initialize(width, height);
         }
 
         public void End()
@@ -102,18 +207,32 @@ namespace BrewLib.Graphics.RenderTargets
             clear();
         }
 
-        private void initialize(int width, int height)
+        private void invalidate()
         {
-            Width = width;
-            Height = height;
+            if (started) throw new InvalidOperationException("Cannot change the rendertarget while started");
+            if (!valid) return;
 
+            valid = false;
+            clear();
+        }
+
+        private void validate()
+        {
+            if (valid) return;
+
+            valid = true;
+            initialize();
+        }
+
+        private void initialize()
+        {
             textureId = GL.GenTexture();
-            Texture = new Texture2d(textureId, width, height, "rendertarget");
+            texture = new Texture2d(textureId, width, height, "rendertarget");
 
             DrawState.BindPrimaryTexture(textureId);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, pixelType, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)textureMagFilter);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)textureMinFilter);
 
             GL.GetInteger(GetPName.FramebufferBinding, out previousFrameBufferId);
 
@@ -126,7 +245,7 @@ namespace BrewLib.Graphics.RenderTargets
             {
                 renderBufferId = GL.GenRenderbuffer();
                 GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderBufferId);
-                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, renderBufferType.Value, Width, Height);
+                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, renderBufferType.Value, width, height);
 
                 switch (renderBufferType.Value)
                 {
@@ -177,8 +296,8 @@ namespace BrewLib.Graphics.RenderTargets
                 renderBufferId = -1;
             }
 
-            Texture?.Dispose();
-            Texture = null;
+            texture?.Dispose();
+            texture = null;
         }
     }
 }

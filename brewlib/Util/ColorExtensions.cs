@@ -6,19 +6,18 @@ namespace BrewLib.Util
 {
     public static class ColorExtensions
     {
+        public static Color4 Multiply(this Color4 lhs, Color4 rhs) 
+            => new Color4(lhs.R * rhs.R, lhs.G * rhs.G, lhs.B * rhs.B, lhs.A * rhs.A);
+
         public static int ToRgba(this Color4 color)
-        {
-            return ((int)(color.A * 255) << 24) | ((int)(color.B * 255) << 16) | ((int)(color.G * 255) << 8) | (int)(color.R * 255);
-        }
+            => ((int)(color.A * 255) << 24) | ((int)(color.B * 255) << 16) | ((int)(color.G * 255) << 8) | (int)(color.R * 255);
 
         public static Color4 ToColor4(this int color)
-        {
-            return new Color4(
+            => new Color4(
                 (byte)(color & 0xFF),
                 (byte)((color >> 8) & 0xFF),
                 (byte)((color >> 16) & 0xFF),
                 (byte)(color >> 24));
-        }
 
         public static Color4 Lerp(this Color4 color, Color4 otherColor, float blend)
         {

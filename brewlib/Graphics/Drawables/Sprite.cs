@@ -1,4 +1,5 @@
 ﻿using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Renderers;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
 using OpenTK;
@@ -22,7 +23,7 @@ namespace BrewLib.Graphics.Drawables
         {
             if (Texture == null) return;
 
-            var renderer = DrawState.Prepare(drawContext.SpriteRenderer, camera, RenderStates);
+            var renderer = DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, RenderStates);
             var color = Color.WithOpacity(opacity);
 
             float textureX0 = 0;

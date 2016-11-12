@@ -85,6 +85,7 @@
     <Compile Include="Graphics\Renderers\Renderer.cs" />
     <Compile Include="Graphics\Renderers\SpriteRenderer.cs" />
     <Compile Include="Graphics\Renderers\SpriteRendererBuffered.cs" />
+    <Compile Include="Graphics\Renderers\SpriteRendererBuffered_DefaultShaderText.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
     <Compile Include="Graphics\RenderTargets\MultiRenderTarget.cs" />
     <Compile Include="Graphics\RenderTargets\RenderTarget.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Graphics\Textures\TextureContainer.cs" />
     <Compile Include="Graphics\Textures\TextureContainerSeparate.cs" />
     <Compile Include="Graphics\Textures\TextureMultiAtlas2d.cs" />
+    <Compile Include="Graphics\Textures\TextureOptions.cs" />
     <Compile Include="Graphics\Text\FontGlyph.cs" />
     <Compile Include="Graphics\Text\TextFont.cs" />
     <Compile Include="Graphics\Text\TextFontAtlased.cs" />

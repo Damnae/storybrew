@@ -82,6 +82,11 @@
     <Compile Include="Editor.cs" />
     <Compile Include="Processes\RemoteProcessWorkerContainer.cs" />
     <Compile Include="Processes\RemoteProcessWorker.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ScreenLayers\Test\LineBreakTest.cs" />
     <Compile Include="Scripting\ScriptContainer.cs" />
     <Compile Include="Scripting\ScriptContainerBase.cs" />
@@ -112,11 +117,6 @@
     <Compile Include="UserInterface\Drawables\StoryboardDrawable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="ScreenLayers\Util\LoadingScreen.cs" />
     <Compile Include="ScreenLayers\NewProjectMenu.cs" />
     <Compile Include="ScreenLayers\StartMenu.cs" />
@@ -154,6 +154,8 @@
     <None Include="Resources\FontAwesome.ttf" />
     <None Include="Resources\Roboto-Light.ttf" />
     <None Include="Resources\Roboto-Regular.ttf" />
+    <None Include="Resources\ui-rounded-borders-opt.json" />
+    <None Include="Resources\ui-line-opt.json" />
     <None Include="Resources\skin_styles.json" />
     <None Include="Resources\skin_drawables_debug.json" />
     <None Include="Resources\skin_drawables.json" />

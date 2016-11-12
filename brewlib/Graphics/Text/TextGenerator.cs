@@ -68,8 +68,8 @@ namespace BrewLib.Graphics.Text
                 var width = (int)(measuredSize.Width + padding.X * 2 + 1);
                 var height = (int)(measuredSize.Height + padding.Y * 2 + 1);
 
-                float offsetX = padding.X;
-                float offsetY = padding.Y;
+                var offsetX = padding.X;
+                var offsetY = padding.Y;
 
                 textureSize = new Vector2(width, height);
                 if (measureOnly) return null;

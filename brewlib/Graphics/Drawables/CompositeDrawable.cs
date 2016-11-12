@@ -1,5 +1,5 @@
-﻿using OpenTK;
-using BrewLib.Graphics.Cameras;
+﻿using BrewLib.Graphics.Cameras;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 

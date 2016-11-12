@@ -121,10 +121,6 @@ namespace BrewLib.Graphics
 
         public int GetUniformLocation(string name, int index = -1, string field = null)
         {
-#if DEBUG
-            if (!started) throw new InvalidOperationException("Not started, most likely an due to an attempt to set the uniform on the wrong shader");
-#endif
-
             var identifier = GetUniformIdentifier(name, index, field);
 
             Property<ActiveUniformType> property;

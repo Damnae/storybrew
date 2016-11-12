@@ -1,18 +1,18 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using BrewLib.Graphics.Cameras;
+﻿using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Renderers;
 using BrewLib.Graphics.Text;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Resources;
+using System.Runtime.InteropServices;
 
 namespace BrewLib.Graphics
 {
@@ -67,7 +67,7 @@ namespace BrewLib.Graphics
             CheckError("initializing openGL context");
 
             whitePixel = Texture2d.Create(Color4.White, "whitepixel");
-            normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel");
+            normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel", 1, 1, new TextureOptions() { Srgb = false, });
             textGenerator = new TextGenerator(resourceManager);
             textFontManager = new TextFontManager();
 
