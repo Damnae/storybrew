@@ -185,6 +185,7 @@ namespace BrewLib.UserInterface
 
             var targetBounds = tooltip.AnchorTarget.Bounds;
             var topSpace = targetBounds.Top - rootBounds.Top;
+            tooltip.Offset = Vector2.Zero;
             tooltip.AnchorFrom = BoxAlignment.Bottom;
             tooltip.AnchorTo = BoxAlignment.Top;
             tooltip.Pack(0, 0, 600, topSpace - 16);

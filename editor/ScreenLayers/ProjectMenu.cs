@@ -87,6 +87,7 @@ namespace StorybrewEditor.ScreenLayers
                         StyleName = "small",
                         AnchorFrom = BoxAlignment.Centre,
                         Text = "--:--:---",
+                        Tooltip = "Current time\nCtrl-C to copy",
                         CanGrow = false,
                     },
                     divisorButton = new Button(WidgetManager)
