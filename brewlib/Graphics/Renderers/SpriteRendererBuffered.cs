@@ -1,5 +1,7 @@
 ﻿using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Renderers.PrimitiveStreamers;
+using BrewLib.Graphics.Shaders;
+using BrewLib.Graphics.Shaders.Snippets;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
 using OpenTK;
@@ -17,11 +19,37 @@ namespace BrewLib.Graphics.Renderers
         public const string CombinedMatrixUniformName = "u_combinedMatrix";
         public const string TextureUniformName = "u_texture";
 
-        public static readonly VertexDeclaration VertexDeclaration = 
+        public static readonly VertexDeclaration VertexDeclaration =
             new VertexDeclaration(VertexAttribute.CreatePosition2d(), VertexAttribute.CreateDiffuseCoord(0), VertexAttribute.CreateColor(true));
 
         public delegate int CustomTextureBinder(BindableTexture texture);
         public CustomTextureBinder CustomTextureBind;
+
+        #region Default Shader
+
+        public static Shader CreateDefaultShader()
+        {
+            var sb = new ShaderBuilder(VertexDeclaration);
+
+            var combinedMatrix = sb.AddUniform(CombinedMatrixUniformName, "mat4");
+            var texture = sb.AddUniform(TextureUniformName, "sampler2D");
+
+            var color = sb.AddVarying("vec4");
+            var textureCoord = sb.AddVarying("vec2");
+
+            sb.VertexShader = new Sequence(
+                new Assign(color, sb.VertexDeclaration.GetAttribute(AttributeUsage.Color)),
+                new Assign(textureCoord, sb.VertexDeclaration.GetAttribute(AttributeUsage.DiffuseMapCoord)),
+                new Assign(sb.GlPosition, () => $"{combinedMatrix.Ref} * vec4({sb.VertexDeclaration.GetAttribute(AttributeUsage.Position).Name}, 0, 1)")
+            );
+            sb.FragmentShader = new Sequence(
+                new Assign(sb.GlFragColor, () => $"{color.Ref} * texture2D({texture.Ref}, {textureCoord.Ref})")
+            );
+
+            return sb.Build();
+        }
+
+        #endregion
 
         private Shader shader;
         private bool ownsShader;

@@ -145,7 +145,6 @@
     <Compile Include="Util\AsyncActionQueue.cs" />
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
     <Compile Include="Util\OsuHelper.cs" />
-    <Compile Include="Util\TraceLogger.cs" />
     <Compile Include="Util\NetHelper.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -85,12 +85,23 @@
     <Compile Include="Graphics\Renderers\Renderer.cs" />
     <Compile Include="Graphics\Renderers\SpriteRenderer.cs" />
     <Compile Include="Graphics\Renderers\SpriteRendererBuffered.cs" />
-    <Compile Include="Graphics\Renderers\SpriteRendererBuffered_DefaultShaderText.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
     <Compile Include="Graphics\RenderTargets\MultiRenderTarget.cs" />
     <Compile Include="Graphics\RenderTargets\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTargets\RenderTexture.cs" />
     <Compile Include="Graphics\Shader.cs" />
+    <Compile Include="Graphics\Shaders\ProgramScope.cs" />
+    <Compile Include="Graphics\Shaders\ShaderBuilder.cs" />
+    <Compile Include="Graphics\Shaders\ShaderContext.cs" />
+    <Compile Include="Graphics\Shaders\ShaderFieldVariable.cs" />
+    <Compile Include="Graphics\Shaders\ShaderPartScope.cs" />
+    <Compile Include="Graphics\Shaders\ShaderSnippet.cs" />
+    <Compile Include="Graphics\Shaders\ShaderType.cs" />
+    <Compile Include="Graphics\Shaders\ShaderVariable.cs" />
+    <Compile Include="Graphics\Shaders\Snippets\Assign.cs" />
+    <Compile Include="Graphics\Shaders\Snippets\CustomSnippet.cs" />
+    <Compile Include="Graphics\Shaders\Snippets\Sequence.cs" />
+    <Compile Include="Graphics\Shaders\Snippets\TextureSampling.cs" />
     <Compile Include="Graphics\Textures\BindableTexture.cs" />
     <Compile Include="Graphics\Textures\Texture.cs" />
     <Compile Include="Graphics\Textures\Texture2d.cs" />
@@ -161,6 +172,7 @@
     <Compile Include="Util\ScaleMode.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\BoxAlignment.cs" />
+    <Compile Include="Util\TraceLogger.cs" />
     <Compile Include="Util\ZipArchiveExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

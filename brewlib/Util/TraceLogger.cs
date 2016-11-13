@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 
-namespace StorybrewEditor.Util
+namespace BrewLib.Util
 {
     public class TraceLogger : TraceListener
     {
