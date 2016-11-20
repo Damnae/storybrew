@@ -41,7 +41,7 @@ namespace StorybrewEditor.Mapset
 
         private double sliderTickRate = 1;
         public override double SliderTickRate => sliderTickRate;
-        
+
         private List<OsuHitObject> hitObjects = new List<OsuHitObject>();
         public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
 
@@ -167,7 +167,7 @@ namespace StorybrewEditor.Mapset
                 {
                     case "HPDrainRate": beatmap.hpDrainRate = double.Parse(value, CultureInfo.InvariantCulture); break;
                     case "CircleSize": beatmap.circleSize = double.Parse(value, CultureInfo.InvariantCulture); break;
-                    case "OverallDifficulty":  beatmap.overallDifficulty = double.Parse(value, CultureInfo.InvariantCulture); break;
+                    case "OverallDifficulty": beatmap.overallDifficulty = double.Parse(value, CultureInfo.InvariantCulture); break;
                     case "ApproachRate": beatmap.approachRate = double.Parse(value, CultureInfo.InvariantCulture); break;
                     case "SliderMultiplier": beatmap.sliderMultiplier = double.Parse(value, CultureInfo.InvariantCulture); break;
                     case "SliderTickRate": beatmap.sliderTickRate = double.Parse(value, CultureInfo.InvariantCulture); break;
@@ -198,10 +198,15 @@ namespace StorybrewEditor.Mapset
             reader.ParseSectionLines(line =>
             {
                 var hitobject = OsuHitObject.Parse(beatmap, line);
+
                 if (hitobject.NewCombo || previousHitObject == null || (previousHitObject.Flags & HitObjectFlag.Spinner) > 0)
                 {
                     hitobject.Flags |= HitObjectFlag.NewCombo;
-                    colorIndex = (colorIndex + 1 + hitobject.ComboOffset) % beatmap.comboColors.Count;
+
+                    var colorIncrement = hitobject.ComboOffset;
+                    if ((hitobject.Flags & HitObjectFlag.Spinner) == 0)
+                        colorIncrement++;
+                    colorIndex = (colorIndex + colorIncrement) % beatmap.comboColors.Count;
                     comboIndex = 1;
                 }
                 else comboIndex++;
