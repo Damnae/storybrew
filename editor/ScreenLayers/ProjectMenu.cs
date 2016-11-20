@@ -350,7 +350,7 @@ namespace StorybrewEditor.ScreenLayers
                     case Key.C:
                         if (e.Control)
                         {
-                            System.Windows.Forms.Clipboard.SetText(Math.Round(audio.Time * 1000).ToString());
+                            System.Windows.Forms.Clipboard.SetText(((int)(audio.Time * 1000)).ToString());
                             return true;
                         }
                         break;
