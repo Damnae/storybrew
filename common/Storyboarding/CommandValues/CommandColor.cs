@@ -93,6 +93,9 @@ namespace StorybrewCommon.Storyboarding.CommandValues
         public static implicit operator CommandColor(Color4 obj)
             => new CommandColor(obj.R, obj.G, obj.B);
 
+        public static implicit operator CommandColor(Color obj)
+            => new CommandColor(obj.R / 255.0, obj.G / 255.0, obj.B / 255.0);
+
         public static CommandColor FromRgb(byte r, byte g, byte b)
             => new CommandColor(r / 255.0, g / 255.0, b / 255.0);
 

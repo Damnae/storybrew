@@ -28,8 +28,8 @@ namespace StorybrewCommon.Util
             (w, v) =>
             {
                 var vector = (Vector2) v;
-                w.Write((float)(vector.X));
-                w.Write((float)(vector.Y));
+                w.Write(vector.X);
+                w.Write(vector.Y);
             }),
             new SimpleObjectSerializer<Color4>(r =>
             {
