@@ -361,7 +361,8 @@ namespace StorybrewEditor.ScreenLayers
 
         public override bool OnMouseWheel(MouseWheelEventArgs e)
         {
-            timeline.Scroll(-e.DeltaPrecise);
+            var inputManager = Manager.GetContext<Editor>().InputManager;
+            timeline.Scroll(-e.DeltaPrecise * (inputManager.Shift ? 4 : 1));
             return true;
         }
 
