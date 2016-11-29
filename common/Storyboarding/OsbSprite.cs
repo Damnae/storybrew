@@ -15,7 +15,17 @@ namespace StorybrewCommon.Storyboarding
         private List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
 
-        public string TexturePath = "";
+        public string texturePath = "";
+        public string TexturePath
+        {
+            get { return texturePath; }
+            set
+            {
+                if (texturePath == value) return;
+                new FileInfo(value);
+                texturePath = value;
+            }
+        }
         public virtual string GetTexturePathAt(double time)
             => TexturePath;
 
