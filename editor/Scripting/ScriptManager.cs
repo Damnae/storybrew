@@ -100,7 +100,7 @@ namespace StorybrewEditor.Scripting
 
         private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            scheduler.Schedule(e.FullPath, (key) =>
+            scheduler?.Schedule(e.FullPath, (key) =>
             {
                 if (disposedValue)
                     return;
@@ -116,7 +116,7 @@ namespace StorybrewEditor.Scripting
 
         private void libraryWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            scheduler.Schedule(e.FullPath, (key) =>
+            scheduler?.Schedule(e.FullPath, (key) =>
             {
                 if (disposedValue)
                     return;
@@ -136,6 +136,7 @@ namespace StorybrewEditor.Scripting
                 if (disposing)
                 {
                     scriptWatcher.Dispose();
+                    libraryWatcher.Dispose();
                     foreach (var entry in scriptContainers)
                         entry.Value.Dispose();
                 }
