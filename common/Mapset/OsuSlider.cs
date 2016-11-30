@@ -209,14 +209,15 @@ namespace StorybrewCommon.Mapset
             {
                 var nodeStartTime = startTime + i * travelDuration;
                 var nodeControlPoint = beatmap.GetTimingPointAt((int)nodeStartTime);
-
-                var node = new OsuSliderNode();
-                node.SampleType = nodeControlPoint.SampleType;
-                node.SampleAdditionsType = nodeControlPoint.SampleType;
-                node.SampleSet = nodeControlPoint.SampleSet;
-                node.Volume = nodeControlPoint.Volume;
-                node.Additions = additions;
-                sliderNodes.Add(node);
+                sliderNodes.Add(new OsuSliderNode()
+                {
+                    Time = nodeStartTime,
+                    SampleType = nodeControlPoint.SampleType,
+                    SampleAdditionsType = nodeControlPoint.SampleType,
+                    SampleSet = nodeControlPoint.SampleSet,
+                    Volume = nodeControlPoint.Volume,
+                    Additions = additions,
+                });
             }
             if (values.Length > 8)
             {
@@ -282,6 +283,7 @@ namespace StorybrewCommon.Mapset
     [Serializable]
     public class OsuSliderNode
     {
+        public double Time;
         public HitSoundAddition Additions;
         public int SampleType;
         public int SampleAdditionsType;
