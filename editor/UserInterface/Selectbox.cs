@@ -55,8 +55,10 @@ namespace StorybrewEditor.UserInterface
             Add(button = new Button(manager));
             button.OnClick += (sender, e) =>
             {
-                if (options == null) return;
-                else if(options.Length > 2) Manager.ScreenLayerManager.ShowContextMenu("Select a value", (NamedValue optionValue) => Value = optionValue.Value, options);
+                if (options == null)
+                    return;
+                else if (options.Length > 2)
+                    Manager.ScreenLayerManager.ShowContextMenu("Select a value", (NamedValue optionValue) => Value = optionValue.Value, options);
                 else
                 {
                     var optionFound = false;

@@ -8,9 +8,6 @@ namespace StorybrewCommon.Util
         public string Name;
         public object Value;
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 }
