@@ -2,6 +2,7 @@
 using BrewLib.UserInterface.Skinning.Styles;
 using OpenTK;
 using StorybrewCommon.Util;
+using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 
@@ -55,20 +56,24 @@ namespace StorybrewEditor.UserInterface
             button.OnClick += (sender, e) =>
             {
                 if (options == null) return;
-                var optionFound = false;
-                foreach (var option in options)
+                else if(options.Length > 2) Manager.ScreenLayerManager.ShowContextMenu("Select a value", (NamedValue optionValue) => Value = optionValue.Value, options);
+                else
                 {
-                    if (optionFound)
+                    var optionFound = false;
+                    foreach (var option in options)
                     {
-                        Value = option.Value;
-                        optionFound = false;
-                        break;
+                        if (optionFound)
+                        {
+                            Value = option.Value;
+                            optionFound = false;
+                            break;
+                        }
+                        else if (option.Value.Equals(value))
+                            optionFound = true;
                     }
-                    else if (option.Value.Equals(value))
-                        optionFound = true;
+                    if (optionFound)
+                        Value = options[0].Value;
                 }
-                if (optionFound)
-                    Value = options[0].Value;
             };
         }
 
