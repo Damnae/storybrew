@@ -59,6 +59,9 @@ namespace BrewLib.Graphics.Cameras
             this.virtualHeight = virtualHeight;
             this.yDown = yDown;
 
+            Up = new Vector3(0, yDown ? -1 : 1, 0);
+            Forward = new Vector3(0, 0, yDown ? 1 : -1);
+
             NearPlane = -1;
             FarPlane = 1;
         }
@@ -73,27 +76,18 @@ namespace BrewLib.Graphics.Cameras
                 var scale = screenViewport.Height == 0 ? 1.0 : (double)virtualHeight / screenViewport.Height;
                 orthoViewport.Width = (int)Math.Round(screenViewport.Width * scale);
                 orthoViewport.Height = virtualHeight;
-                orthoViewport.X -= (orthoViewport.Width - virtualWidth) / 2;
+                if (virtualWidth > 0) orthoViewport.X += (orthoViewport.Width - virtualWidth) / 2;
 
-                internalViewport = new Rectangle(0, 0, virtualWidth, virtualHeight);
+                internalViewport = new Rectangle(0, 0, virtualWidth > 0 ? virtualWidth : orthoViewport.Width, virtualHeight);
             }
-            else
-            {
-                internalViewport = screenViewport;
-            }
+            else internalViewport = screenViewport;
             extendedViewport = orthoViewport;
 
-            Position = new Vector3(zoom * orthoViewport.Width / 2.0f, zoom * orthoViewport.Height / 2.0f, 0);
-            Up = new Vector3(0, yDown ? -1 : 1, 0);
-            Forward = new Vector3(0, 0, yDown ? 1 : -1);
-
-            projection = Matrix4.CreateOrthographicOffCenter(
-                zoom * -orthoViewport.Width / 2.0f,
-                zoom * (orthoViewport.Width / 2),
-                zoom * -(orthoViewport.Height / 2),
-                zoom * orthoViewport.Height / 2,
-                NearPlane, FarPlane);
-            view = Matrix4.LookAt(Position, Position + Forward, Up);
+            projection =
+                Matrix4.CreateTranslation(orthoViewport.X - extendedViewport.Width * 0.5f, orthoViewport.Y - (yDown ? -extendedViewport.Height : extendedViewport.Height) * 0.5f, 0) *
+                Matrix4.CreateOrthographic(extendedViewport.Width, extendedViewport.Height, NearPlane, FarPlane);
+            view =
+                Matrix4.LookAt(Position, Position + Forward, Up);
         }
     }
 }

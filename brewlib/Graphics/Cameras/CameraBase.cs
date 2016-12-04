@@ -61,7 +61,7 @@ namespace BrewLib.Graphics.Cameras
             }
         }
 
-        private Vector3 position = new Vector3();
+        private Vector3 position = Vector3.Zero;
         public Vector3 Position
         {
             get { return position; }
