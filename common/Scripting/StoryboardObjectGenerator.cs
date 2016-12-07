@@ -14,6 +14,9 @@ namespace StorybrewCommon.Scripting
 {
     public abstract class StoryboardObjectGenerator : Script
     {
+        private static StoryboardObjectGenerator current;
+        public static StoryboardObjectGenerator Current => current;
+
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
 
@@ -292,12 +295,16 @@ namespace StorybrewCommon.Scripting
 
         public void Generate(GeneratorContext context)
         {
+            if (current != null) throw new InvalidOperationException();
             try
             {
                 this.context = context;
 
                 random = new Random(RandomSeed);
+
+                current = this;
                 Generate();
+                current = null;
             }
             finally
             {
