@@ -129,6 +129,50 @@ namespace StorybrewEditor.Storyboarding
             return true;
         }
 
+        public bool MoveToBack(EditorStoryboardLayer layer)
+        {
+            var index = layers.IndexOf(layer);
+            if(index != -1)
+            {
+                if (index == 0) return false;
+                else
+                {
+                    while(index > 0 && layer.CompareTo(layers[index - 1]) == 0)
+                    {
+                        var otherLayer = layers[index - 1];
+                        layers[index - 1] = layer;
+                        layers[index] = otherLayer;
+                        --index;
+                    }
+                }
+            }
+            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
+            OnLayersChanged?.Invoke(this, EventArgs.Empty);
+            return true;
+        }
+
+        public bool MoveToFront(EditorStoryboardLayer layer)
+        {
+            var index = layers.IndexOf(layer);
+            if (index != -1)
+            {
+                if (index == layers.Count - 1) return false;
+                else
+                {
+                    while (index < layers.Count - 1 && layer.CompareTo(layers[index + 1]) == 0)
+                    {
+                        var otherLayer = layers[index + 1];
+                        layers[index + 1] = layer;
+                        layers[index] = otherLayer;
+                        ++index;
+                    }
+                }
+            }
+            else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
+            OnLayersChanged?.Invoke(this, EventArgs.Empty);
+            return true;
+        }
+
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             foreach (var layer in Layers)
