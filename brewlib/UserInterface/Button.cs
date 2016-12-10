@@ -2,6 +2,7 @@
 using BrewLib.Util;
 using OpenTK;
 using System;
+using System.Globalization;
 
 namespace BrewLib.UserInterface
 {
@@ -55,7 +56,7 @@ namespace BrewLib.UserInterface
         public object FieldValue
         {
             get { return Checked; }
-            set { Checked = (bool)Convert.ChangeType(value, typeof(bool)); }
+            set { Checked = (bool)Convert.ChangeType(value, typeof(bool), CultureInfo.InvariantCulture); }
         }
 
         public bool Disabled

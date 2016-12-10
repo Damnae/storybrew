@@ -2,6 +2,7 @@
 using BrewLib.Util;
 using StorybrewCommon.Util;
 using System;
+using System.Globalization;
 using System.IO;
 
 namespace StorybrewEditor
@@ -74,7 +75,7 @@ namespace StorybrewEditor
             this.value = value;
             OnValueChanged?.Invoke(this, EventArgs.Empty);
         }
-        public void Set(object value) => Set((T)Convert.ChangeType(value, typeof(T)));
+        public void Set(object value) => Set((T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture));
 
         public void Bind(Field field, Action changedAction)
         {
@@ -91,7 +92,13 @@ namespace StorybrewEditor
 
         public static implicit operator T(Setting<T> setting) => setting.value;
 
-        public override string ToString() => value.ToString();
+        public override string ToString()
+        {
+            if (typeof(T).GetInterface(nameof(IConvertible)) != null)
+                return Convert.ToString(value, CultureInfo.InvariantCulture);
+
+            return value.ToString();
+        }
     }
 
     public static class SettingsExtensions
@@ -109,5 +116,4 @@ namespace StorybrewEditor
             handler(button, EventArgs.Empty);
         }
     }
-
 }

@@ -3,6 +3,7 @@ using BrewLib.Graphics.Drawables;
 using BrewLib.UserInterface.Skinning.Styles;
 using OpenTK;
 using System;
+using System.Globalization;
 
 namespace BrewLib.UserInterface
 {
@@ -33,7 +34,7 @@ namespace BrewLib.UserInterface
         public object FieldValue
         {
             get { return Value; }
-            set { Value = (float)Convert.ChangeType(value, typeof(float)); }
+            set { Value = (float)Convert.ChangeType(value, typeof(float), CultureInfo.InvariantCulture); }
         }
 
         public void SetValueSilent(float value)

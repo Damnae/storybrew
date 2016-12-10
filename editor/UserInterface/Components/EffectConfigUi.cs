@@ -6,6 +6,7 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
 using System;
+using System.Globalization;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -225,28 +226,24 @@ namespace StorybrewEditor.UserInterface.Components
                 };
                 return widget;
             }
-            else if (Array.IndexOf(numberTypes, field.Type) != -1)
+            else if (field.Type.GetInterface(nameof(IConvertible)) != null)
             {
                 var widget = new Textbox(Manager)
                 {
-                    Value = field.Value.ToString(),
+                    Value = Convert.ToString(field.Value, CultureInfo.InvariantCulture),
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
                     CanGrow = false,
                 };
                 widget.OnValueCommited += (sender, e) =>
                 {
-                    decimal decimalValue;
-                    if (decimal.TryParse(widget.Value, out decimalValue))
+                    try
                     {
-                        try
-                        {
-                            var value = Convert.ChangeType(decimalValue, field.Type);
-                            setFieldValue(field, value);
-                        }
-                        catch { }
+                        var value = Convert.ChangeType(widget.Value, field.Type, CultureInfo.InvariantCulture);
+                        setFieldValue(field, value);
                     }
-                    widget.Value = effect.Config.GetValue(field.Name).ToString();
+                    catch { }
+                    widget.Value = Convert.ToString(effect.Config.GetValue(field.Name), CultureInfo.InvariantCulture);
                 };
                 return widget;
             }
@@ -267,19 +264,5 @@ namespace StorybrewEditor.UserInterface.Components
             if (effect.Config.SetValue(field.Name, value))
                 effect.Refresh();
         }
-
-        private static readonly Type[] numberTypes = new Type[] {
-                typeof(sbyte),
-                typeof(byte),
-                typeof(short),
-                typeof(ushort),
-                typeof(int),
-                typeof(uint),
-                typeof(long),
-                typeof(ulong),
-                typeof(float),
-                typeof(double),
-                typeof(decimal),
-            };
     }
 }

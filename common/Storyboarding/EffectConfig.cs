@@ -1,6 +1,7 @@
 ﻿using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace StorybrewCommon.Storyboarding
 {
@@ -91,7 +92,7 @@ namespace StorybrewCommon.Storyboarding
 
             try
             {
-                return Convert.ChangeType(value, newType);
+                return Convert.ChangeType(value, newType, CultureInfo.InvariantCulture);
             }
             catch
             {

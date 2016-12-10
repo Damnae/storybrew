@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -209,7 +210,7 @@ namespace StorybrewCommon.Scripting
                         allowedValues[i] = new NamedValue()
                         {
                             Name = value.ToString(),
-                            Value = Convert.ChangeType(value, fieldType),
+                            Value = Convert.ChangeType(value, fieldType, CultureInfo.InvariantCulture),
                         };
                     }
                 }
@@ -217,7 +218,7 @@ namespace StorybrewCommon.Scripting
                 try
                 {
                     var displayName = configurableField.Attribute.DisplayName ?? field.Name;
-                    var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
+                    var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType, CultureInfo.InvariantCulture);
                     config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
 
                     var value = config.GetValue(field.Name);
