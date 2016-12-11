@@ -86,7 +86,7 @@ namespace StorybrewEditor
             Updater.NotifyEditorRun();
 
             settings = new Settings();
-            var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.Default);
+            var displayDevice = findDisplayDevice();
 
             using (var window = createWindow(displayDevice))
             using (audioManager = createAudioManager(window))
@@ -107,6 +107,31 @@ namespace StorybrewEditor
 
                 settings.Save();
             }
+        }
+
+        private static DisplayDevice findDisplayDevice()
+        {
+            try
+            {
+                // Can throw ArgumentOutOfRangeException with OpenTK.Platform.SDL2
+                return DisplayDevice.GetDisplay(DisplayIndex.Default);
+            }
+            catch (Exception e1)
+            {
+                Trace.WriteLine($"Failed to use the default display device: {e1}");
+
+                var deviceIndex = 0;
+                while (deviceIndex <= (int)DisplayIndex.Sixth)
+                    try
+                    {
+                        return DisplayDevice.GetDisplay((DisplayIndex)deviceIndex);
+                    }
+                    catch (Exception e2)
+                    {
+                        Trace.WriteLine($"Failed to use display device #{deviceIndex}: {e2}");
+                    }
+            }
+            throw new InvalidOperationException("Failed to find a display device");
         }
 
         private static GameWindow createWindow(DisplayDevice displayDevice)
@@ -313,7 +338,7 @@ namespace StorybrewEditor
                 try
                 {
 #endif
-                action.Invoke();
+                    action.Invoke();
 #if !DEBUG
                 }
                 catch (Exception e)
