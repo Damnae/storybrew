@@ -19,7 +19,11 @@ namespace StorybrewEditor
 
         public Settings()
         {
-            if (!File.Exists(SettingsFilename)) return;
+            if (!File.Exists(SettingsFilename))
+            {
+                Save();
+                return;
+            }
 
             var type = GetType();
             using (var stream = new FileStream(SettingsFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
