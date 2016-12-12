@@ -129,6 +129,7 @@ namespace StorybrewEditor
                     catch (Exception e2)
                     {
                         Trace.WriteLine($"Failed to use display device #{deviceIndex}: {e2}");
+                        deviceIndex++;
                     }
             }
             throw new InvalidOperationException("Failed to find a display device");
