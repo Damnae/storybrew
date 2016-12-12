@@ -2,6 +2,7 @@
 using BrewLib.Util;
 using StorybrewCommon.Util;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
@@ -34,8 +35,15 @@ namespace StorybrewEditor
                     if (field == null || !field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
                         return;
 
-                    var setting = (Setting)field.GetValue(this);
-                    setting.Set(value);
+                    try
+                    {
+                        var setting = (Setting)field.GetValue(this);
+                        setting.Set(value);
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLine($"Failed to load setting {key} with value {value}: {e}");
+                    }
                 });
         }
 
