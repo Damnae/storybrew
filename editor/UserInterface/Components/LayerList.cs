@@ -92,7 +92,7 @@ namespace StorybrewEditor.UserInterface.Components
 
                 Widget layerRoot;
                 Label nameLabel, effectNameLabel;
-                Button moveUpButton, moveDownButton, moveToBackButton, moveToFrontButton, diffSpecificButton, osbLayerButton, showHideButton;
+                Button moveUpButton, moveDownButton, moveToTopButton, moveToBottomButton, diffSpecificButton, osbLayerButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
                 {
                     AnchorFrom = BoxAlignment.Centre,
@@ -175,21 +175,21 @@ namespace StorybrewEditor.UserInterface.Components
                             CanGrow = false,
                             Children = new Widget[]
                             {
-                                moveToBackButton = new Button(Manager)
+                                moveToTopButton = new Button(Manager)
                                 {
                                     StyleName = "icon",
                                     Icon = IconFont.AngleDoubleUp,
-                                    Tooltip = "Move to Back\n(of current Osb Layer)",
+                                    Tooltip = "Move to top",
                                     AnchorFrom = BoxAlignment.Centre,
                                     AnchorTo = BoxAlignment.Centre,
                                     CanGrow = false,
                                     Disabled = index == 0,
                                 },
-                                moveToFrontButton = new Button(Manager)
+                                moveToBottomButton = new Button(Manager)
                                 {
                                     StyleName = "icon",
                                     Icon = IconFont.AngleDoubleDown,
-                                    Tooltip = "Move to Front\n(of current Osb Layer)",
+                                    Tooltip = "Move to bottom",
                                     AnchorFrom = BoxAlignment.Centre,
                                     AnchorTo = BoxAlignment.Centre,
                                     CanGrow = false,
@@ -232,8 +232,8 @@ namespace StorybrewEditor.UserInterface.Components
 
                 moveUpButton.OnClick += (sender, e) => layerManager.MoveUp(la);
                 moveDownButton.OnClick += (sender, e) => layerManager.MoveDown(la);
-                moveToBackButton.OnClick += (sender, e) => layerManager.MoveToBack(la);
-                moveToFrontButton.OnClick += (sender, e) => layerManager.MoveToFront(la);
+                moveToTopButton.OnClick += (sender, e) => layerManager.MoveToTop(la);
+                moveToBottomButton.OnClick += (sender, e) => layerManager.MoveToBottom(la);
                 diffSpecificButton.OnClick += (sender, e) => la.DiffSpecific = !la.DiffSpecific;
                 osbLayerButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer => la.OsbLayer = selectedOsbLayer, Project.OsbLayers);
                 showHideButton.OnValueChanged += (sender, e) => la.Visible = showHideButton.Checked;

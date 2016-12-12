@@ -129,15 +129,15 @@ namespace StorybrewEditor.Storyboarding
             return true;
         }
 
-        public bool MoveToBack(EditorStoryboardLayer layer)
+        public bool MoveToTop(EditorStoryboardLayer layer)
         {
             var index = layers.IndexOf(layer);
-            if(index != -1)
+            if (index != -1)
             {
                 if (index == 0) return false;
                 else
                 {
-                    while(index > 0 && layer.CompareTo(layers[index - 1]) == 0)
+                    while (index > 0 && layer.CompareTo(layers[index - 1]) == 0)
                     {
                         var otherLayer = layers[index - 1];
                         layers[index - 1] = layer;
@@ -151,7 +151,7 @@ namespace StorybrewEditor.Storyboarding
             return true;
         }
 
-        public bool MoveToFront(EditorStoryboardLayer layer)
+        public bool MoveToBottom(EditorStoryboardLayer layer)
         {
             var index = layers.IndexOf(layer);
             if (index != -1)
