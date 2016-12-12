@@ -64,6 +64,32 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
+        public string OsbPath
+        {
+            get
+            {
+                checkMapsetPath();
+
+                // Find the correct osb filename from .osu files
+                var regex = new Regex(@"^(.+ - .+ \(.+\)) \[.+\].osu$");
+                foreach (var osuFilePath in Directory.GetFiles(MapsetPath, "*.osu", SearchOption.TopDirectoryOnly))
+                {
+                    var osuFilename = Path.GetFileName(osuFilePath);
+
+                    Match match;
+                    if ((match = regex.Match(osuFilename)).Success)
+                        return Path.Combine(MapsetPath, $"{match.Groups[1].Value}.osb");
+                }
+
+                // Use an existing osb
+                foreach (var osbFilePath in Directory.GetFiles(MapsetPath, "*.osb", SearchOption.TopDirectoryOnly))
+                    return osbFilePath;
+
+                // Whatever
+                return Path.Combine(MapsetPath, "storyboard.osb");
+            }
+        }
+
         private LayerManager layerManager = new LayerManager();
         public LayerManager LayerManager => layerManager;
 
@@ -326,7 +352,9 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 3;
+        public const int Version = 4;
+
+        public bool OwnsOsb;
 
         public void Save()
         {
@@ -341,6 +369,8 @@ namespace StorybrewEditor.Storyboarding
                 w.Write(MapsetPath);
                 w.Write(MainBeatmap.Id);
                 w.Write(MainBeatmap.Name);
+
+                w.Write(OwnsOsb);
 
                 w.Write(effects.Count);
                 foreach (var effect in effects)
@@ -399,6 +429,8 @@ namespace StorybrewEditor.Storyboarding
                     var mainBeatmapName = r.ReadString();
                     project.SelectBeatmap(mainBeatmapId, mainBeatmapName);
                 }
+
+                project.OwnsOsb = version >= 4 ? r.ReadBoolean() : true;
 
                 var effectCount = r.ReadInt32();
                 for (int effectIndex = 0; effectIndex < effectCount; effectIndex++)
@@ -525,7 +557,12 @@ namespace StorybrewEditor.Storyboarding
             Program.RunMainThread(() =>
             {
                 osuPath = MainBeatmap.Path;
-                osbPath = getOsbPath();
+                osbPath = OsbPath;
+
+                if (!OwnsOsb && File.Exists(osbPath))
+                    File.Copy(osbPath, $"{osbPath}.bak");
+                OwnsOsb = true;
+
                 localLayers = new List<EditorStoryboardLayer>(layerManager.FindLayers(l => l.Visible));
             });
 
@@ -591,29 +628,6 @@ namespace StorybrewEditor.Storyboarding
                 writer.WriteLine("//Storyboard Sound Samples");
                 stream.Commit();
             }
-        }
-
-        private string getOsbPath()
-        {
-            checkMapsetPath();
-
-            // Find the correct osb filename from .osu files
-            var regex = new Regex(@"^(.+ - .+ \(.+\)) \[.+\].osu$");
-            foreach (var osuFilePath in Directory.GetFiles(MapsetPath, "*.osu", SearchOption.TopDirectoryOnly))
-            {
-                var osuFilename = Path.GetFileName(osuFilePath);
-
-                Match match;
-                if ((match = regex.Match(osuFilename)).Success)
-                    return Path.Combine(MapsetPath, $"{match.Groups[1].Value}.osb");
-            }
-
-            // Use an existing osb
-            foreach (var osbFilePath in Directory.GetFiles(MapsetPath, "*.osb", SearchOption.TopDirectoryOnly))
-                return osbFilePath;
-
-            // Whatever
-            return Path.Combine(MapsetPath, "storyboard.osb");
         }
 
         private void checkMapsetPath()
