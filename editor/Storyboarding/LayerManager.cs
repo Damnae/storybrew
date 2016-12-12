@@ -135,15 +135,12 @@ namespace StorybrewEditor.Storyboarding
             if (index != -1)
             {
                 if (index == 0) return false;
-                else
+                while (index > 0 && layer.CompareTo(layers[index - 1]) == 0)
                 {
-                    while (index > 0 && layer.CompareTo(layers[index - 1]) == 0)
-                    {
-                        var otherLayer = layers[index - 1];
-                        layers[index - 1] = layer;
-                        layers[index] = otherLayer;
-                        --index;
-                    }
+                    var otherLayer = layers[index - 1];
+                    layers[index - 1] = layer;
+                    layers[index] = otherLayer;
+                    --index;
                 }
             }
             else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
@@ -157,15 +154,12 @@ namespace StorybrewEditor.Storyboarding
             if (index != -1)
             {
                 if (index == layers.Count - 1) return false;
-                else
+                while (index < layers.Count - 1 && layer.CompareTo(layers[index + 1]) == 0)
                 {
-                    while (index < layers.Count - 1 && layer.CompareTo(layers[index + 1]) == 0)
-                    {
-                        var otherLayer = layers[index + 1];
-                        layers[index + 1] = layer;
-                        layers[index] = otherLayer;
-                        ++index;
-                    }
+                    var otherLayer = layers[index + 1];
+                    layers[index + 1] = layer;
+                    layers[index] = otherLayer;
+                    ++index;
                 }
             }
             else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
