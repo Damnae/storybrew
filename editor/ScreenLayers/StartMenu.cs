@@ -127,7 +127,7 @@ namespace StorybrewEditor.ScreenLayers
                 });
             };
             wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
-            discordButton.OnClick += (sender, e) => Process.Start($"https://discord.gg/0qfFOucX93QDNVN7");
+            discordButton.OnClick += (sender, e) => Process.Start(Program.DiscordUrl);
             closeButton.OnClick += (sender, e) => Exit();
             checkLatestVersion();
         }

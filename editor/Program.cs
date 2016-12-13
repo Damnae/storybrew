@@ -25,6 +25,7 @@ namespace StorybrewEditor
         public const string Repository = "Damnae/storybrew";
         public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public static string FullName => $"{Name} {Version} ({Repository})";
+        public static string DiscordUrl = $"https://discord.gg/0qfFOucX93QDNVN7";
 
         public static AudioManager audioManager;
         public static Settings settings;
@@ -378,11 +379,11 @@ namespace StorybrewEditor
             logger = new TraceLogger(tracePath);
             Trace.WriteLine($"{FullName}\n");
 
-            AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(null, exceptionPath, e.Exception);
-            AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError("crash", crashPath, (Exception)e.ExceptionObject);
+            AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(e.Exception, exceptionPath, null, false);
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError((Exception)e.ExceptionObject, crashPath, "crash", true);
         }
 
-        private static void logError(string type, string filename, Exception e)
+        private static void logError(Exception e, string filename, string reportType, bool show)
         {
             lock (errorHandlerLock)
             {
@@ -399,8 +400,14 @@ namespace StorybrewEditor
                         w.WriteLine();
                     }
 
-                    if (type != null)
-                        Report(type, e);
+                    if (reportType != null)
+                        Report(reportType, e);
+
+                    if (show)
+                    {
+                        var result = MessageBox.Show($"An error occured:\n\n{e.Message} ({e.GetType().Name})\n\nClick Ok if you want to receive and invitation to a Discord server where you can get help with this problem.", FullName, MessageBoxButtons.OKCancel);
+                        if (result == DialogResult.OK) Process.Start(DiscordUrl);
+                    }
                 }
                 catch (Exception e2)
                 {
