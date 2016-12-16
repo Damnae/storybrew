@@ -437,14 +437,16 @@ namespace BrewLib.Graphics
             var openGlVersionString = GL.GetString(StringName.Version);
             openGlVersion = new Version(openGlVersionString.Split(' ')[0]);
 
+            rendererName = GL.GetString(StringName.Renderer);
+            rendererVendor = GL.GetString(StringName.Vendor);
+
+            if (!HasCapabilities(2, 0)) throw new NotSupportedException($"This application requires at least OpenGL 2.0 (version {openGlVersion} found)\n{rendererName} ({rendererVendor})");
+
             var glslVersionString = GL.GetString(StringName.ShadingLanguageVersion);
             glslVersion = string.IsNullOrEmpty(glslVersionString) ? new Version() : new Version(glslVersionString.Split(' ')[0]);
 
             var extensionsString = GL.GetString(StringName.Extensions);
             supportedExtensions = extensionsString.Split(' ');
-
-            rendererName = GL.GetString(StringName.Renderer);
-            rendererVendor = GL.GetString(StringName.Vendor);
 
             CheckError("retrieving openGL version");
 
