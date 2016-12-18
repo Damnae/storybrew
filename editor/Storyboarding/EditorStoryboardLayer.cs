@@ -1,13 +1,13 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
+using BrewLib.Util;
+using OpenTK;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding3d;
-using BrewLib.Graphics;
-using BrewLib.Graphics.Cameras;
 using StorybrewEditor.Storyboarding3d;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using BrewLib.Util;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -90,10 +90,6 @@ namespace StorybrewEditor.Storyboarding
         }
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin)
-            => CreateSprite(path, origin, OsbSprite.DefaultPosition);
-
-        [Obsolete]
-        public override OsbSprite CreateSprite(string path, OsbLayer layer, OsbOrigin origin)
             => CreateSprite(path, origin, OsbSprite.DefaultPosition);
 
         public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition)
