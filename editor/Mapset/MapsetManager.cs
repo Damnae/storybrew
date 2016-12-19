@@ -1,6 +1,7 @@
 ﻿using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace StorybrewEditor.Mapset
@@ -47,6 +48,7 @@ namespace StorybrewEditor.Mapset
                 Path = path,
                 IncludeSubdirectories = true,
             };
+            fileWatcher.Created += mapsetFileWatcher_Changed;
             fileWatcher.Changed += mapsetFileWatcher_Changed;
             fileWatcher.Renamed += mapsetFileWatcher_Changed;
             fileWatcher.EnableRaisingEvents = true;
@@ -56,6 +58,10 @@ namespace StorybrewEditor.Mapset
             => scheduler.Schedule(e.FullPath, (key) =>
             {
                 if (disposedValue) return;
+
+                if (Path.GetExtension(e.Name) == ".osu")
+                    Trace.WriteLine($"Watched mapset file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
+
                 OnFileChanged?.Invoke(sender, e);
             });
 

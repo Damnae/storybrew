@@ -296,7 +296,7 @@ namespace StorybrewCommon.Scripting
 
         public void Generate(GeneratorContext context)
         {
-            if (current != null) throw new InvalidOperationException();
+            if (current != null) throw new InvalidOperationException("A script is already running in this domain");
             try
             {
                 this.context = context;
@@ -305,11 +305,11 @@ namespace StorybrewCommon.Scripting
 
                 current = this;
                 Generate();
-                current = null;
             }
             finally
             {
                 this.context = null;
+                current = null;
 
                 foreach (var bitmap in bitmaps.Values)
                     bitmap.Dispose();

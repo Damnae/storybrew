@@ -140,8 +140,13 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (!success)
                 {
-                    newDependencyWatcher.Dispose();
-                    newDependencyWatcher = null;
+                    if (dependencyWatcher != null)
+                    {
+                        dependencyWatcher.Watch(newDependencyWatcher.WatchedFilenames);
+                        newDependencyWatcher.Dispose();
+                        newDependencyWatcher = null;
+                    }
+                    else dependencyWatcher = newDependencyWatcher;
                 }
                 context.DisposeResources();
             }

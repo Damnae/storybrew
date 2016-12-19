@@ -39,6 +39,7 @@ namespace StorybrewEditor.Scripting
                 Path = scriptsSourcePath,
                 IncludeSubdirectories = false,
             };
+            scriptWatcher.Created += scriptWatcher_Changed;
             scriptWatcher.Changed += scriptWatcher_Changed;
             scriptWatcher.Renamed += scriptWatcher_Changed;
             scriptWatcher.EnableRaisingEvents = true;
@@ -49,6 +50,7 @@ namespace StorybrewEditor.Scripting
                 Path = scriptsLibraryPath,
                 IncludeSubdirectories = true,
             };
+            libraryWatcher.Created += libraryWatcher_Changed;
             libraryWatcher.Changed += libraryWatcher_Changed;
             libraryWatcher.Renamed += libraryWatcher_Changed;
             libraryWatcher.EnableRaisingEvents = true;
@@ -106,11 +108,13 @@ namespace StorybrewEditor.Scripting
                     return;
 
                 var scriptName = Path.GetFileNameWithoutExtension(e.Name);
-                Debug.Print($"{nameof(Scripting)}: {e.FullPath} {e.ChangeType}, reloading {scriptName}");
 
                 ScriptContainer<TScript> container;
                 if (scriptContainers.TryGetValue(scriptName, out container))
+                {
+                    Trace.WriteLine($"Watched script file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
                     container.ReloadScript();
+                }
             });
         }
 
@@ -121,6 +125,7 @@ namespace StorybrewEditor.Scripting
                 if (disposedValue)
                     return;
 
+                Trace.WriteLine($"Watched library file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
                 foreach (var container in scriptContainers.Values)
                     container.ReloadScript();
             });
