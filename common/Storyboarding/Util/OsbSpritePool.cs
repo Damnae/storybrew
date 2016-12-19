@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding.Util
 {
-    public class OsbSpritePool
+    public class OsbSpritePool : IDisposable
     {
         private StoryboardLayer layer;
         private string path;
         private OsbOrigin origin;
-        private bool additive;
+        private Action<OsbSprite, double, double> finalizeSprite;
 
         private List<PooledSprite> pooledSprites = new List<PooledSprite>();
 
@@ -16,16 +17,25 @@ namespace StorybrewCommon.Storyboarding.Util
             this.layer = layer;
             this.path = path;
             this.origin = origin;
-            this.additive = additive;
+
+            finalizeSprite = (sprite, startTime, endTime) => sprite.Additive(startTime, endTime);
+        }
+
+        public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite = null)
+        {
+            this.layer = layer;
+            this.path = path;
+            this.origin = origin;
+            this.finalizeSprite = finalizeSprite;
         }
 
         public void Clear()
         {
-            if (additive)
-                foreach (PooledSprite pooledSprite in pooledSprites)
+            if (finalizeSprite != null)
+                foreach (var pooledSprite in pooledSprites)
                 {
                     var sprite = pooledSprite.Sprite;
-                    sprite.Additive(sprite.CommandsStartTime, (int)pooledSprite.EndTime);
+                    finalizeSprite(sprite, sprite.CommandsStartTime, pooledSprite.EndTime);
                 }
 
             pooledSprites.Clear();
@@ -42,8 +52,11 @@ namespace StorybrewCommon.Storyboarding.Util
         {
             var result = (PooledSprite)null;
             foreach (var pooledSprite in pooledSprites)
-                if (pooledSprite.EndTime < startTime && (result == null || pooledSprite.Sprite.CommandsStartTime < result.Sprite.CommandsStartTime))
+                if (pooledSprite.EndTime < startTime
+                    && (result == null || pooledSprite.Sprite.CommandsStartTime < result.Sprite.CommandsStartTime))
+                {
                     result = pooledSprite;
+                }
 
             if (result != null)
             {
@@ -68,5 +81,28 @@ namespace StorybrewCommon.Storyboarding.Util
                 EndTime = endTime;
             }
         }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Clear();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }
