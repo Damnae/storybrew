@@ -12,6 +12,8 @@ namespace StorybrewCommon.Storyboarding.Util
 
         private List<PooledSprite> pooledSprites = new List<PooledSprite>();
 
+        public int MaxPoolDuration = 60000;
+
         public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, bool additive)
         {
             this.layer = layer;
@@ -53,6 +55,7 @@ namespace StorybrewCommon.Storyboarding.Util
             var result = (PooledSprite)null;
             foreach (var pooledSprite in pooledSprites)
                 if (pooledSprite.EndTime < startTime
+                    && startTime < pooledSprite.Sprite.CommandsStartTime + MaxPoolDuration
                     && (result == null || pooledSprite.Sprite.CommandsStartTime < result.Sprite.CommandsStartTime))
                 {
                     result = pooledSprite;
