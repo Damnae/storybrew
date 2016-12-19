@@ -43,6 +43,7 @@ namespace StorybrewEditor.Util
                 watcher.Created += watcher_Changed;
                 watcher.Changed += watcher_Changed;
                 watcher.Renamed += watcher_Changed;
+                watcher.Error += (sender, e) => Trace.WriteLine($"Watcher error: {e.GetException()}");
                 watcher.EnableRaisingEvents = true;
             }
         }

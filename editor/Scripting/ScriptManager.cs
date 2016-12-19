@@ -42,6 +42,7 @@ namespace StorybrewEditor.Scripting
             scriptWatcher.Created += scriptWatcher_Changed;
             scriptWatcher.Changed += scriptWatcher_Changed;
             scriptWatcher.Renamed += scriptWatcher_Changed;
+            scriptWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (script): {e.GetException()}");
             scriptWatcher.EnableRaisingEvents = true;
 
             libraryWatcher = new FileSystemWatcher()
@@ -53,6 +54,7 @@ namespace StorybrewEditor.Scripting
             libraryWatcher.Created += libraryWatcher_Changed;
             libraryWatcher.Changed += libraryWatcher_Changed;
             libraryWatcher.Renamed += libraryWatcher_Changed;
+            libraryWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (library): {e.GetException()}");
             libraryWatcher.EnableRaisingEvents = true;
         }
 
