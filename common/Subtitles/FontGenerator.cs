@@ -45,6 +45,7 @@ namespace StorybrewCommon.Subtitles
         public int FontSize = 76;
         public Color4 Color = new Color4(0, 0, 0, 100);
         public Vector2 Padding = Vector2.Zero;
+        public FontStyle FontStyle = FontStyle.Regular;
         public bool Debug;
     }
 
@@ -103,7 +104,7 @@ namespace StorybrewCommon.Subtitles
                 }
 
                 var dpiScale = 96f / graphics.DpiY;
-                var fontStyle = FontStyle.Regular;
+                var fontStyle = description.FontStyle;
                 using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize * dpiScale, fontStyle) : new Font(fontPath, description.FontSize * dpiScale, fontStyle))
                 {
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
