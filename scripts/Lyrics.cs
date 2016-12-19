@@ -4,6 +4,7 @@ using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Subtitles;
 using System;
+using System.Drawing;
 
 namespace StorybrewScripts
 {
@@ -26,6 +27,9 @@ namespace StorybrewScripts
 
         [Configurable]
         public Color4 FontColor = Color4.White;
+
+        [Configurable]
+        public FontStyle FontStyle = FontStyle.Regular;
 
         [Configurable]
         public int OutlineThickness = 3;
@@ -62,6 +66,7 @@ namespace StorybrewScripts
                 FontSize = FontSize,
                 Color = FontColor,
                 Padding = new Vector2(PaddingX, PaddingY),
+                FontStyle = FontStyle,
                 Debug = Debug,
             },
             new FontOutline()
