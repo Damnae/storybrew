@@ -304,15 +304,7 @@ namespace StorybrewEditor.ScreenLayers
             {
                 var path = Path.GetFullPath(project.MapsetPath);
                 if (e == MouseButton.Right || !Directory.Exists(path))
-                {
-                    var initialDirectory = Directory.Exists(path) ? path : OsuHelper.GetOsuSongFolder();
-                    Manager.OpenFilePicker("Pick a new mapset location", "", initialDirectory, ".osu files (*.osu)|*.osu", (newPath) =>
-                    {
-                        if (!Directory.Exists(newPath) && File.Exists(newPath))
-                            project.MapsetPath = Path.GetDirectoryName(newPath);
-                        else Manager.ShowMessage("Invalid mapset path.");
-                    });
-                }
+                    changeMapsetFolder();
                 else Process.Start(path);
             };
             saveButton.OnClick += (sender, e) => saveProject();
@@ -320,6 +312,9 @@ namespace StorybrewEditor.ScreenLayers
 
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
+
+            if (!Directory.Exists(project.MapsetPath))
+                Manager.ShowMessage($"The mapset folder cannot be found.\n{project.MapsetPath}\n\nPlease select a new one.", () => changeMapsetFolder(), true);
         }
 
         public override bool OnKeyDown(KeyboardKeyEventArgs e)
@@ -375,6 +370,20 @@ namespace StorybrewEditor.ScreenLayers
             var inputManager = Manager.GetContext<Editor>().InputManager;
             timeline.Scroll(-e.DeltaPrecise * (inputManager.Shift ? 4 : 1));
             return true;
+        }
+
+        private void changeMapsetFolder()
+        {
+            var initialDirectory = Path.GetFullPath(project.MapsetPath);
+            if (!Directory.Exists(initialDirectory))
+                initialDirectory = OsuHelper.GetOsuSongFolder();
+
+            Manager.OpenFilePicker("Pick a new mapset location", "", initialDirectory, ".osu files (*.osu)|*.osu", (newPath) =>
+            {
+                if (!Directory.Exists(newPath) && File.Exists(newPath))
+                    project.MapsetPath = Path.GetDirectoryName(newPath);
+                else Manager.ShowMessage("Invalid mapset path.");
+            });
         }
 
         private void saveProject()
