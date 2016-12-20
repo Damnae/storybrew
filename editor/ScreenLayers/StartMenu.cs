@@ -2,7 +2,6 @@
 using BrewLib.Util;
 using Newtonsoft.Json.Linq;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;

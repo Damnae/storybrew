@@ -49,7 +49,9 @@ namespace StorybrewEditor.Storyboarding
         {
             get
             {
-                checkMapsetPath();
+                if (!Directory.Exists(MapsetPath))
+                    return null;
+
                 foreach (var beatmap in mapsetManager.Beatmaps)
                 {
                     var path = Path.Combine(MapsetPath, beatmap.AudioFilename);
@@ -68,7 +70,8 @@ namespace StorybrewEditor.Storyboarding
         {
             get
             {
-                checkMapsetPath();
+                if (!Directory.Exists(MapsetPath))
+                    return Path.Combine(ProjectFolderPath, "storyboard.osb");
 
                 // Find the correct osb filename from .osu files
                 var regex = new Regex(@"^(.+ - .+ \(.+\)) \[.+\].osu$");
@@ -313,6 +316,7 @@ namespace StorybrewEditor.Storyboarding
                 MainBeatmap = beatmap;
                 return;
             }
+            MainBeatmap = new EditorBeatmap(null);
         }
 
         public void SelectBeatmap(long id, string name)
@@ -332,6 +336,7 @@ namespace StorybrewEditor.Storyboarding
 
             mainBeatmap = null;
             mapsetManager?.Dispose();
+
             mapsetManager = new MapsetManager(mapsetPath);
             mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
 
@@ -568,48 +573,52 @@ namespace StorybrewEditor.Storyboarding
 
             var exportSettings = new ExportSettings();
 
-            Debug.Print($"Exporting diff specific events to {osuPath}");
-            using (var stream = new SafeWriteStream(osuPath))
-            using (var writer = new StreamWriter(stream, Encoding.UTF8))
-            using (var fileStream = new FileStream(osuPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new StreamReader(fileStream, Encoding.UTF8))
+            if (!string.IsNullOrEmpty(osuPath))
             {
-                string line;
-                var inEvents = false;
-                var inStoryboard = false;
-                while ((line = reader.ReadLine()) != null)
+
+                Debug.Print($"Exporting diff specific events to {osuPath}");
+                using (var stream = new SafeWriteStream(osuPath))
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                using (var fileStream = new FileStream(osuPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var reader = new StreamReader(fileStream, Encoding.UTF8))
                 {
-                    var trimmedLine = line.Trim();
-                    if (!inEvents && trimmedLine == "[Events]")
-                        inEvents = true;
-                    else if (trimmedLine.Length == 0)
-                        inEvents = false;
-
-                    if (inEvents)
+                    string line;
+                    var inEvents = false;
+                    var inStoryboard = false;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        if (trimmedLine.StartsWith("//Storyboard Layer"))
-                        {
-                            if (!inStoryboard)
-                            {
-                                foreach (var osbLayer in OsbLayers)
-                                {
-                                    writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
-                                    foreach (var layer in localLayers)
-                                        if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
-                                            layer.WriteOsbSprites(writer, exportSettings);
-                                }
-                                inStoryboard = true;
-                            }
-                        }
-                        else if (inStoryboard && trimmedLine.StartsWith("//"))
-                            inStoryboard = false;
+                        var trimmedLine = line.Trim();
+                        if (!inEvents && trimmedLine == "[Events]")
+                            inEvents = true;
+                        else if (trimmedLine.Length == 0)
+                            inEvents = false;
 
-                        if (inStoryboard)
-                            continue;
+                        if (inEvents)
+                        {
+                            if (trimmedLine.StartsWith("//Storyboard Layer"))
+                            {
+                                if (!inStoryboard)
+                                {
+                                    foreach (var osbLayer in OsbLayers)
+                                    {
+                                        writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
+                                        foreach (var layer in localLayers)
+                                            if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
+                                                layer.WriteOsbSprites(writer, exportSettings);
+                                    }
+                                    inStoryboard = true;
+                                }
+                            }
+                            else if (inStoryboard && trimmedLine.StartsWith("//"))
+                                inStoryboard = false;
+
+                            if (inStoryboard)
+                                continue;
+                        }
+                        writer.WriteLine(line);
                     }
-                    writer.WriteLine(line);
+                    stream.Commit();
                 }
-                stream.Commit();
             }
 
             Debug.Print($"Exporting osb to {osbPath}");

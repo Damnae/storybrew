@@ -28,6 +28,9 @@ namespace StorybrewEditor.Mapset
 
         private void loadBeatmaps()
         {
+            if (!Directory.Exists(path))
+                return;
+
             foreach (var beatmapPath in Directory.GetFiles(path, "*.osu", SearchOption.TopDirectoryOnly))
                 beatmaps.Add(EditorBeatmap.Load(beatmapPath));
         }
@@ -43,6 +46,9 @@ namespace StorybrewEditor.Mapset
 
         private void initializeMapsetWatcher()
         {
+            if (!Directory.Exists(path))
+                return;
+
             fileWatcher = new FileSystemWatcher()
             {
                 Path = path,
@@ -77,7 +83,7 @@ namespace StorybrewEditor.Mapset
             {
                 if (disposing)
                 {
-                    fileWatcher.Dispose();
+                    fileWatcher?.Dispose();
                 }
                 fileWatcher = null;
                 disposedValue = true;

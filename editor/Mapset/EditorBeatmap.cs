@@ -15,7 +15,7 @@ namespace StorybrewEditor.Mapset
 
         public string AudioFilename { get; set; }
 
-        private string name;
+        private string name = string.Empty;
         public override string Name => name;
 
         private long id;
@@ -36,7 +36,7 @@ namespace StorybrewEditor.Mapset
         private double approachRate = 5;
         public override double ApproachRate => approachRate;
 
-        private double sliderMultiplier = 1;
+        private double sliderMultiplier = 1.4;
         public override double SliderMultiplier => sliderMultiplier;
 
         private double sliderTickRate = 1;
@@ -87,7 +87,7 @@ namespace StorybrewEditor.Mapset
                     closestTimingPoint = controlPoint;
                 else break;
             }
-            return closestTimingPoint;
+            return closestTimingPoint ?? ControlPoint.Default;
         }
 
         public override ControlPoint GetControlPointAt(int time)

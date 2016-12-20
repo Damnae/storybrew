@@ -6,16 +6,18 @@ namespace StorybrewCommon.Mapset
     [Serializable]
     public class ControlPoint : IComparable<ControlPoint>
     {
+        public static readonly ControlPoint Default = new ControlPoint();
+
         public double Offset;
-        public int BeatPerMeasure;
-        public int SampleType;
-        public SampleSet SampleSet;
-        public float Volume;
+        public int BeatPerMeasure = 4;
+        public int SampleType = 1;
+        public SampleSet SampleSet = SampleSet.Normal;
+        public float Volume = 100;
         public bool IsInherited;
         public bool IsKiai;
         public bool OmitFirstBarLine;
 
-        private double beatDurationSV;
+        private double beatDurationSV = 60000 / 120;
         public double BeatDuration
         {
             get

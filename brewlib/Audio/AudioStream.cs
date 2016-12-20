@@ -1,6 +1,7 @@
 ﻿using ManagedBass;
 using ManagedBass.Fx;
 using System;
+using System.Diagnostics;
 
 namespace BrewLib.Audio
 {
@@ -16,11 +17,13 @@ namespace BrewLib.Audio
         {
             get
             {
+                if (stream == 0) return 0;
                 var position = Bass.ChannelGetPosition(stream, PositionFlags.Bytes);
                 return Bass.ChannelBytes2Seconds(stream, position);
             }
             set
             {
+                if (stream == 0) return;
                 var position = Bass.ChannelSeconds2Bytes(stream, value);
                 Bass.ChannelSetPosition(stream, position);
             }
@@ -33,10 +36,12 @@ namespace BrewLib.Audio
         {
             get
             {
+                if (stream == 0) return false;
                 return Bass.ChannelIsActive(stream) == PlaybackState.Playing;
             }
             set
             {
+                if (stream == 0) return;
                 if (value) Bass.ChannelPlay(stream, false);
                 else Bass.ChannelPause(stream);
             }
@@ -78,6 +83,11 @@ namespace BrewLib.Audio
             this.path = path;
 
             decodeStream = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Prescan);
+            if (decodeStream == 0)
+            {
+                Trace.WriteLine($"Failed to load audio stream ({path}): {Bass.LastError}");
+                return;
+            }
             stream = BassFx.TempoCreate(decodeStream, BassFlags.Default);
 
             Bass.ChannelSetAttribute(stream, ChannelAttribute.TempoUseQuickAlgorithm, 1);
@@ -91,11 +101,13 @@ namespace BrewLib.Audio
 
         public void UpdateVolume()
         {
+            if (stream == 0) return;
             Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume * Manager.Volume);
         }
 
         private void updateTimeFactor()
         {
+            if (stream == 0) return;
             Bass.ChannelSetAttribute(stream, ChannelAttribute.Tempo, (int)((timeFactor - 1) * 100));
         }
 
@@ -109,11 +121,16 @@ namespace BrewLib.Audio
                 if (disposing)
                 {
                 }
-                Bass.StreamFree(stream);
-                stream = 0;
-                Bass.StreamFree(decodeStream);
-                decodeStream = 0;
-
+                if (stream != 0)
+                {
+                    Bass.StreamFree(stream);
+                    stream = 0;
+                }
+                if (decodeStream != 0)
+                {
+                    Bass.StreamFree(decodeStream);
+                    decodeStream = 0;
+                }
                 disposedValue = true;
                 if (disposing) Manager.NotifyDisposed(this);
             }
