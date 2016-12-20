@@ -7,6 +7,7 @@ using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;
 using StorybrewEditor.UserInterface.Drawables;
+using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -167,7 +168,7 @@ namespace StorybrewEditor.ScreenLayers
                     {
                         StyleName = "icon",
                         Icon = IconFont.FolderOpen,
-                        Tooltip = "Open mapset folder",
+                        Tooltip = "Open mapset folder\n(Right click to change)",
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
@@ -302,12 +303,22 @@ namespace StorybrewEditor.ScreenLayers
             mapsetFolderButton.OnClick += (sender, e) =>
             {
                 var path = Path.GetFullPath(project.MapsetPath);
-                if (Directory.Exists(path))
-                    Process.Start(path);
+                if (e == MouseButton.Right || !Directory.Exists(path))
+                {
+                    var initialDirectory = Directory.Exists(path) ? path : OsuHelper.GetOsuSongFolder();
+                    Manager.OpenFilePicker("Pick a new mapset location", "", initialDirectory, ".osu files (*.osu)|*.osu", (newPath) =>
+                    {
+                        if (!Directory.Exists(newPath) && File.Exists(newPath))
+                            project.MapsetPath = Path.GetDirectoryName(newPath);
+                        else Manager.ShowMessage("Invalid mapset path.");
+                    });
+                }
+                else Process.Start(path);
             };
             saveButton.OnClick += (sender, e) => saveProject();
             exportButton.OnClick += (sender, e) => exportProject();
 
+            project.OnMapsetPathChanged += project_OnMapsetPathChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
         }
 
@@ -424,6 +435,22 @@ namespace StorybrewEditor.ScreenLayers
                 Program.Schedule(() => Manager.GetContext<Editor>().Restart());
             }),
             () => Manager.GetContext<Editor>().Restart(), true);
+        }
+
+        private void project_OnMapsetPathChanged(object sender, EventArgs e)
+        {
+            var previousAudio = audio;
+
+            audio = Program.AudioManager.LoadStream(project.AudioPath);
+            timeline.MaxValue = (float)audio.Duration;
+
+            if (previousAudio != null)
+            {
+                audio.Time = previousAudio.Time;
+                audio.TimeFactor = previousAudio.TimeFactor;
+                audio.Playing = previousAudio.Playing;
+                previousAudio.Dispose();
+            }
         }
 
         private void project_OnEffectsStatusChanged(object sender, EventArgs e)

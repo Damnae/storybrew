@@ -271,9 +271,13 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mapsetPath == value) return;
                 mapsetPath = value;
+
+                OnMapsetPathChanged?.Invoke(this, EventArgs.Empty);
                 refreshMapset();
             }
         }
+
+        public event EventHandler OnMapsetPathChanged;
 
         private MapsetManager mapsetManager;
         public MapsetManager MapsetManager => mapsetManager;

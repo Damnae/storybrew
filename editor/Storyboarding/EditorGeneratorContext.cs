@@ -1,11 +1,12 @@
-﻿using StorybrewCommon.Mapset;
+﻿using BrewLib.Audio;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Mapset;
-using System.Collections.Generic;
 using StorybrewEditor.Util;
-using System.Text;
-using BrewLib.Audio;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -18,7 +19,16 @@ namespace StorybrewEditor.Storyboarding
         public override string ProjectPath => projectPath;
 
         private string mapsetPath;
-        public override string MapsetPath => mapsetPath;
+        public override string MapsetPath
+        {
+            get
+            {
+                if (!Directory.Exists(mapsetPath))
+                    throw new InvalidOperationException($"The mapset folder at '{mapsetPath}' doesn't exist");
+
+                return mapsetPath;
+            }
+        }
 
         private EditorBeatmap beatmap;
         public override Beatmap Beatmap => beatmap;

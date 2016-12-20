@@ -3,6 +3,7 @@ using BrewLib.Util;
 using OpenTK;
 using System;
 using System.Globalization;
+using OpenTK.Input;
 
 namespace BrewLib.UserInterface
 {
@@ -65,7 +66,7 @@ namespace BrewLib.UserInterface
             set { clickBehavior.Disabled = value; }
         }
 
-        public event EventHandler OnClick;
+        public event EventHandler<MouseButton> OnClick;
         public event EventHandler OnValueChanged;
 
         public Button(WidgetManager manager) : base(manager)
@@ -79,15 +80,15 @@ namespace BrewLib.UserInterface
 
             clickBehavior = new ClickBehavior(this);
             clickBehavior.OnStateChanged += (sender, e) => RefreshStyle();
-            clickBehavior.OnClick += (sender, e) => Click();
+            clickBehavior.OnClick += (sender, e) => Click(e.Button);
         }
 
-        public void Click()
+        public void Click(MouseButton button = MouseButton.Left)
         {
-            if (isCheckable)
+            if (isCheckable && button == MouseButton.Left)
                 Checked = !Checked;
 
-            OnClick?.Invoke(this, EventArgs.Empty);
+            OnClick?.Invoke(this, button);
         }
 
         protected override void Dispose(bool disposing)
