@@ -59,6 +59,7 @@ namespace StorybrewEditor.Mapset
             fileWatcher.Renamed += mapsetFileWatcher_Changed;
             fileWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (mapset): {e.GetException()}");
             fileWatcher.EnableRaisingEvents = true;
+            Trace.WriteLine($"Watching (mapset): {path}");
         }
 
         private void mapsetFileWatcher_Changed(object sender, FileSystemEventArgs e)

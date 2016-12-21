@@ -44,6 +44,7 @@ namespace StorybrewEditor.Scripting
             scriptWatcher.Renamed += scriptWatcher_Changed;
             scriptWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (script): {e.GetException()}");
             scriptWatcher.EnableRaisingEvents = true;
+            Trace.WriteLine($"Watching (script): {scriptsSourcePath}");
 
             libraryWatcher = new FileSystemWatcher()
             {
@@ -56,6 +57,7 @@ namespace StorybrewEditor.Scripting
             libraryWatcher.Renamed += libraryWatcher_Changed;
             libraryWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (library): {e.GetException()}");
             libraryWatcher.EnableRaisingEvents = true;
+            Trace.WriteLine($"Watching (library): {scriptsLibraryPath}");
         }
 
         public ScriptContainer<TScript> Get(string scriptName)

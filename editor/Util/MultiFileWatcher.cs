@@ -45,7 +45,9 @@ namespace StorybrewEditor.Util
                 watcher.Renamed += watcher_Changed;
                 watcher.Error += (sender, e) => Trace.WriteLine($"Watcher error: {e.GetException()}");
                 watcher.EnableRaisingEvents = true;
+                Trace.WriteLine($"Watching folder: {directoryPath}");
             }
+            Trace.WriteLine($"Watching file: {filename}");
         }
 
         public void Clear()
@@ -59,7 +61,9 @@ namespace StorybrewEditor.Util
         }
 
         private void watcher_Changed(object sender, FileSystemEventArgs e)
-            => scheduler.Schedule(e.FullPath, (key) =>
+        {
+            Trace.WriteLine($"File {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
+            scheduler.Schedule(e.FullPath, (key) =>
                 {
                     if (disposedValue) return;
 
@@ -69,6 +73,7 @@ namespace StorybrewEditor.Util
                     Trace.WriteLine($"Watched file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
                     OnFileChanged?.Invoke(sender, e);
                 });
+        }
 
         #region IDisposable Support
 
