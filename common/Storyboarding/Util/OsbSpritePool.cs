@@ -14,21 +14,17 @@ namespace StorybrewCommon.Storyboarding.Util
 
         public int MaxPoolDuration = 60000;
 
-        public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, bool additive)
-        {
-            this.layer = layer;
-            this.path = path;
-            this.origin = origin;
-
-            finalizeSprite = (sprite, startTime, endTime) => sprite.Additive(startTime, endTime);
-        }
-
         public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite = null)
         {
             this.layer = layer;
             this.path = path;
             this.origin = origin;
             this.finalizeSprite = finalizeSprite;
+        }
+
+        public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, bool additive)
+            : this(layer, path, origin, additive ? (sprite, startTime, endTime) => sprite.Additive(startTime, endTime) : (Action<OsbSprite, double, double>)null)
+        {
         }
 
         public void Clear()
@@ -45,12 +41,12 @@ namespace StorybrewCommon.Storyboarding.Util
 
         public OsbSprite Get(double startTime, double endTime)
         {
-            var sprite = Get(startTime);
-            Release(sprite, endTime);
+            var sprite = get(startTime);
+            release(sprite, endTime);
             return sprite;
         }
 
-        public OsbSprite Get(double startTime)
+        private OsbSprite get(double startTime)
         {
             var result = (PooledSprite)null;
             foreach (var pooledSprite in pooledSprites)
@@ -70,7 +66,7 @@ namespace StorybrewCommon.Storyboarding.Util
             return layer.CreateSprite(path, origin);
         }
 
-        public void Release(OsbSprite sprite, double endTime)
+        private void release(OsbSprite sprite, double endTime)
             => pooledSprites.Add(new PooledSprite(sprite, endTime));
 
         private class PooledSprite

@@ -50,38 +50,38 @@ namespace StorybrewScripts
         {
             bgLayer = GetLayer("Background");
             mainLayer = GetLayer("Main");
-            spritePools = new OsbSpritePools(mainLayer);
 
-            Intro(TimeIntro, TimePart1);
+            using (spritePools = new OsbSpritePools(mainLayer))
+            {
+                Intro(TimeIntro, TimePart1);
 
-            // Background
-            var bg = bgLayer.CreateSprite("bg.jpg", OsbOrigin.Centre);
-            bg.Scale(TimeSbStart, BgScaling);
-            bg.Fade(TimePart1 - BeatDuration * 2, TimePart1, 0, 1);
-            bg.ColorHsb(TimeSbStart, 0, 0, 0.3);
-            bg.ColorHsb(TimePart2 - BeatDuration * 3 / 2, TimePart2 - BeatDuration / 2, 0, 0, 0.3, 0, 0, 0.6);
-            bg.ColorHsb(OsbEasing.In, TimePart6 - BeatDuration * 4, TimePart6, 0, 0, 0.3, 0, 0, 0.3);
-            bg.Fade(OsbEasing.In, TimePart3 - BeatDuration * 4, TimePart3, 1, 0);
-            bg.ColorHsb(OsbEasing.In, TimePart4 - BeatDuration * 2, TimePart4, 0, 0, 0.6, 0, 0, 0.3);
-            bg.Fade(OsbEasing.Out, TimePart4 - BeatDuration * 2, TimePart4, 0, 1);
-            bg.Fade(OsbEasing.In, TimePart5 - BeatDuration * 4, TimePart5, 1, 0);
-            bg.Fade(OsbEasing.Out, TimePart6, TimePart7, 0, 1);
-            bg.Fade(OsbEasing.In, TimePart10 - BeatDuration * 4, TimePart10, 1, 0);
+                // Background
+                var bg = bgLayer.CreateSprite("bg.jpg", OsbOrigin.Centre);
+                bg.Scale(TimeSbStart, BgScaling);
+                bg.Fade(TimePart1 - BeatDuration * 2, TimePart1, 0, 1);
+                bg.ColorHsb(TimeSbStart, 0, 0, 0.3);
+                bg.ColorHsb(TimePart2 - BeatDuration * 3 / 2, TimePart2 - BeatDuration / 2, 0, 0, 0.3, 0, 0, 0.6);
+                bg.ColorHsb(OsbEasing.In, TimePart6 - BeatDuration * 4, TimePart6, 0, 0, 0.3, 0, 0, 0.3);
+                bg.Fade(OsbEasing.In, TimePart3 - BeatDuration * 4, TimePart3, 1, 0);
+                bg.ColorHsb(OsbEasing.In, TimePart4 - BeatDuration * 2, TimePart4, 0, 0, 0.6, 0, 0, 0.3);
+                bg.Fade(OsbEasing.Out, TimePart4 - BeatDuration * 2, TimePart4, 0, 1);
+                bg.Fade(OsbEasing.In, TimePart5 - BeatDuration * 4, TimePart5, 1, 0);
+                bg.Fade(OsbEasing.Out, TimePart6, TimePart7, 0, 1);
+                bg.Fade(OsbEasing.In, TimePart10 - BeatDuration * 4, TimePart10, 1, 0);
 
-            Part1(TimePart1, TimePart2);
-            Part2(TimePart2, TimePart3);
-            Part3(TimePart3, TimePart4);
-            Part4(TimePart4, TimePart5);
-            Part5(TimePart5, TimePart6);
-            Part6(TimePart6, TimePart7);
-            Part7(TimePart7, TimePart8);
-            Part8(TimePart8, TimePart9);
-            Part9(TimePart9, TimePart10);
-            Part10(TimePart10, TimePart11);
-            Part11(TimePart11, TimeEnd);
-            Outro(TimeEnd, TimeSbEnd);
-
-            spritePools.Clear();
+                Part1(TimePart1, TimePart2);
+                Part2(TimePart2, TimePart3);
+                Part3(TimePart3, TimePart4);
+                Part4(TimePart4, TimePart5);
+                Part5(TimePart5, TimePart6);
+                Part6(TimePart6, TimePart7);
+                Part7(TimePart7, TimePart8);
+                Part8(TimePart8, TimePart9);
+                Part9(TimePart9, TimePart10);
+                Part10(TimePart10, TimePart11);
+                Part11(TimePart11, TimeEnd);
+                Outro(TimeEnd, TimeSbEnd);
+            }
         }
 
         private void Intro(int tStart, int tEnd)
