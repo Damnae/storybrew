@@ -1,6 +1,7 @@
 ﻿using BrewLib.Audio;
 using BrewLib.Graphics;
 using BrewLib.Util;
+using Microsoft.Win32;
 using OpenTK;
 using OpenTK.Graphics;
 using StorybrewEditor.Processes;
@@ -93,7 +94,7 @@ namespace StorybrewEditor
             using (audioManager = createAudioManager(window))
             using (var editor = new Editor(window))
             {
-                Trace.WriteLine($"{Environment.OSVersion} / {window.WindowInfo}");
+                Trace.WriteLine($"{getOSVersion()} / {window.WindowInfo}");
                 Trace.WriteLine($"graphics mode: {window.Context.GraphicsMode}");
 
                 window.Icon = new Icon(typeof(Program), "icon.ico");
@@ -108,6 +109,17 @@ namespace StorybrewEditor
 
                 settings.Save();
             }
+        }
+
+        private static string getOSVersion()
+        {
+            try
+            {
+                using (var registryKey = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion"))
+                    return (string)registryKey.GetValue("ProductName");
+            }
+            catch { }
+            return Environment.OSVersion.ToString();
         }
 
         private static DisplayDevice findDisplayDevice()
