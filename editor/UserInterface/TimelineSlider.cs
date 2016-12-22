@@ -30,6 +30,7 @@ namespace StorybrewEditor.UserInterface
         private float timeSpan;
 
         public int SnapDivisor = 4;
+        public bool ShowHitObjects;
 
         public TimelineSlider(WidgetManager manager, Project project) : base(manager)
         {
@@ -62,7 +63,8 @@ namespace StorybrewEditor.UserInterface
 
             var bounds = Bounds;
             var offset = new Vector2(bounds.Left, bounds.Top);
-            var lineBottomY = bounds.Height * 0.6f;
+            var lineBottomY = ShowHitObjects ? bounds.Height * 0.7f : bounds.Height * 0.6f;
+            var hitObjectsY = bounds.Height * 0.6f;
             var pixelSize = Manager.PixelSize;
 
             var currentTimingPoint = project.MainBeatmap.GetTimingPointAt((int)(Value * 1000));
@@ -161,6 +163,21 @@ namespace StorybrewEditor.UserInterface
                     timingPoint = nextTimingPoint;
                 }
             }
+
+            // HitObjects
+            if (ShowHitObjects)
+                foreach (var hitObject in project.MainBeatmap.HitObjects)
+                    if (leftTime < hitObject.EndTime && hitObject.StartTime < rightTime)
+                    {
+                        var left = Math.Max(0, (hitObject.StartTime - leftTime) * timeScale);
+                        var right = Math.Min((hitObject.EndTime - leftTime) * timeScale, bounds.Width);
+                        var height = Math.Max(bounds.Height * 0.1f - pixelSize, pixelSize);
+
+                        drawLine(drawContext,
+                            offset + new Vector2((float)Manager.SnapToPixel(left - height / 2), hitObjectsY),
+                            new Vector2((float)Manager.SnapToPixel(right - left + height), height),
+                            hitObject.Color, actualOpacity);
+                    }
 
             // Bookmarks
             foreach (var bookmark in project.MainBeatmap.Bookmarks)
