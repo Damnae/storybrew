@@ -70,7 +70,7 @@ namespace StorybrewEditor.Scripting
             }
             catch (Exception e)
             {
-                throw new ScriptLoadingException($"{ScriptTypeName} failed to load", e);
+                throw CreateScriptLoadingException(e);
             }
         }
 

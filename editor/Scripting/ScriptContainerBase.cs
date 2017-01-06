@@ -103,6 +103,15 @@ namespace StorybrewEditor.Scripting
 
         protected abstract ScriptProvider<TScript> LoadScript();
 
+        protected ScriptLoadingException CreateScriptLoadingException(Exception e)
+        {
+            var details = "";
+            if (e is TypeLoadException)
+                details = "Make sure the script's class name is the same as the file name.\n";
+
+            return new ScriptLoadingException($"{ScriptTypeName} failed to load.\n{details}\n{e}");
+        }
+
         #region IDisposable Support
 
         private bool disposedValue = false;
