@@ -121,6 +121,18 @@ namespace StorybrewEditor.Storyboarding
         }
 #endif
 
+        public override OsbSample CreateSample(string path, double time, double volume)
+        {
+            var storyboardObject = new EditorOsbSample()
+            {
+                AudioPath = path,
+                Time = time,
+                Volume = volume,
+            };
+            storyboardObjects.Add(storyboardObject);
+            return storyboardObject;
+        }
+
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             if (!Visible) return;

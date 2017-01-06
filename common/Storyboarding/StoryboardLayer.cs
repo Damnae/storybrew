@@ -23,5 +23,7 @@ namespace StorybrewCommon.Storyboarding
 #if DEBUG
         public abstract OsbScene3d CreateScene3d();
 #endif
+
+        public abstract OsbSample CreateSample(string path, double time, double volume = 100);
     }
 }
