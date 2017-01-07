@@ -27,10 +27,10 @@ namespace StorybrewScripts
         public double ParticleAmount = 16;
 
         [Configurable]
-        public Vector2 StartPosition = new Vector2((640 - 854) / 2, 0);
+        public Vector2 StartPosition = new Vector2(-107, 0);
 
         [Configurable]
-        public Vector2 EndPosition = new Vector2(854, 480);
+        public Vector2 EndPosition = new Vector2(747, 480);
 
         [Configurable]
         public bool RandomX = true;
