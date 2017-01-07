@@ -60,7 +60,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioChannel.cs" />
     <Compile Include="Audio\AudioManager.cs" />
+    <Compile Include="Audio\AudioSample.cs" />
+    <Compile Include="Audio\AudioSampleContainer.cs" />
     <Compile Include="Audio\AudioStream.cs" />
     <Compile Include="Audio\FftStream.cs" />
     <Compile Include="Graphics\Cameras\Camera.cs" />

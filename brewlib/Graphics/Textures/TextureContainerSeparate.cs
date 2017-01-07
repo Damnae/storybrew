@@ -16,13 +16,6 @@ namespace BrewLib.Graphics.Textures
             this.textureOptions = textureOptions;
         }
 
-        public void Dispose()
-        {
-            foreach (var textureEntry in textures)
-                textureEntry.Value?.Dispose();
-            textures.Clear();
-        }
-
         public Texture2d Get(string filename)
         {
             Texture2d texture;
@@ -33,5 +26,30 @@ namespace BrewLib.Graphics.Textures
             }
             return texture;
         }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach (var entry in textures)
+                        entry.Value?.Dispose();
+                    textures.Clear();
+                }
+                textures = null;
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

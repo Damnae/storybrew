@@ -1,12 +1,13 @@
 ﻿using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.Resources;
 
 namespace BrewLib.Audio
 {
     public class AudioManager : IDisposable
     {
-        private List<AudioStream> audioStreams = new List<AudioStream>();
+        private List<AudioChannel> audioChannels = new List<AudioChannel>();
 
         private float volume = 1;
         public float Volume
@@ -17,7 +18,7 @@ namespace BrewLib.Audio
                 if (volume == value) return;
 
                 volume = value;
-                foreach (var audio in audioStreams)
+                foreach (var audio in audioChannels)
                     audio.UpdateVolume();
             }
         }
@@ -30,17 +31,34 @@ namespace BrewLib.Audio
             Bass.UpdatePeriod = 10;
         }
 
-        public AudioStream LoadStream(string path)
+        public void Update()
         {
-            var audio = new AudioStream(this, path);
-            audioStreams.Add(audio);
+            for (var i = 0; i < audioChannels.Count; i++)
+            {
+                var channel = audioChannels[i];
+                if (channel.Temporary && channel.Completed)
+                {
+                    channel.Dispose();
+                    i--;
+                }
+            }
+        }
+
+        public AudioStream LoadStream(string path, ResourceManager resourceManager = null)
+        {
+            var audio = new AudioStream(this, path, resourceManager);
+            RegisterChannel(audio);
             return audio;
         }
 
-        public void NotifyDisposed(AudioStream audio)
-        {
-            audioStreams.Remove(audio);
-        }
+        public AudioSample LoadSample(string path, ResourceManager resourceManager = null)
+            => new AudioSample(this, path, resourceManager);
+
+        internal void RegisterChannel(AudioChannel channel)
+           => audioChannels.Add(channel);
+
+        internal void UnregisterChannel(AudioChannel channel)
+            => audioChannels.Remove(channel);
 
         #region IDisposable Support
 
