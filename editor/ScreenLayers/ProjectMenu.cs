@@ -404,6 +404,9 @@ namespace StorybrewEditor.ScreenLayers
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
                 timeButton.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
+            if (audio.Playing && mainStoryboardDrawable.Time < time)
+                project.TriggerEvents(mainStoryboardDrawable.Time, time);
+
             mainStoryboardDrawable.Time = time;
             if (previewContainer.Visible)
                 previewDrawable.Time = timeline.GetValueForPosition(Manager.GetContext<Editor>().InputManager.MousePosition);

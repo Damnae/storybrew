@@ -75,6 +75,7 @@ namespace StorybrewEditor.Storyboarding
 
         private List<StoryboardObject> storyboardObjects = new List<StoryboardObject>();
         private List<DisplayableObject> displayableObjects = new List<DisplayableObject>();
+        private List<EventObject> eventObjects = new List<EventObject>();
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
         {
@@ -130,7 +131,16 @@ namespace StorybrewEditor.Storyboarding
                 Volume = volume,
             };
             storyboardObjects.Add(storyboardObject);
+            eventObjects.Add(storyboardObject);
             return storyboardObject;
+        }
+
+        public void TriggerEvents(double startTime, double endTime)
+        {
+            if (!Visible) return;
+            foreach (var eventObject in eventObjects)
+                if (startTime < eventObject.EventTime && eventObject.EventTime <= endTime)
+                    eventObject.TriggerEvent(effect.Project, endTime);
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)

@@ -28,8 +28,8 @@ namespace StorybrewEditor
         public static string FullName => $"{Name} {Version} ({Repository})";
         public static string DiscordUrl = $"https://discord.gg/0qfFOucX93QDNVN7";
 
-        public static AudioManager audioManager;
-        public static Settings settings;
+        private static AudioManager audioManager;
+        private static Settings settings;
 
         public static AudioManager AudioManager => audioManager;
         public static Settings Settings => settings;
@@ -209,6 +209,7 @@ namespace StorybrewEditor
                 var currentTime = watch.Elapsed.TotalSeconds;
                 var fixedUpdates = 0;
 
+                audioManager.Update();
                 window.ProcessEvents();
 
                 while (time - fixedRateTime >= fixedRateUpdateDuration && fixedUpdates < 2)

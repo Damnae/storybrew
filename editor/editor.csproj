@@ -94,6 +94,7 @@
     <Compile Include="Scripting\ScriptProvider.cs" />
     <Compile Include="Processes\ProcessWorker.cs" />
     <Compile Include="Storyboarding\EditorOsbSample.cs" />
+    <Compile Include="Storyboarding\EventObject.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />
     <Compile Include="UserInterface\Skinning\Styles\ColorPickerStyle.cs" />

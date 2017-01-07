@@ -1,9 +1,9 @@
-﻿using OpenTK;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
+using BrewLib.Util;
+using OpenTK;
 using System;
 using System.Collections.Generic;
-using BrewLib.Util;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -165,6 +165,12 @@ namespace StorybrewEditor.Storyboarding
             else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
             OnLayersChanged?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        public void TriggerEvents(double startTime, double endTime)
+        {
+            foreach (var layer in Layers)
+                layer.TriggerEvents(startTime, endTime);
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)

@@ -1,4 +1,5 @@
-﻿using BrewLib.Graphics;
+﻿using BrewLib.Audio;
+using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
@@ -41,9 +42,6 @@ namespace StorybrewEditor.Storyboarding
 
         private string scriptsLibraryPath;
         public string ScriptsLibraryPath => scriptsLibraryPath;
-
-        private TextureContainer textureContainer;
-        public TextureContainer TextureContainer => textureContainer;
 
         public string AudioPath
         {
@@ -101,6 +99,7 @@ namespace StorybrewEditor.Storyboarding
             this.projectPath = projectPath;
 
             reloadTextures();
+            reloadAudio();
 
             scriptsSourcePath = Path.GetDirectoryName(projectPath);
             if (withCommonScripts)
@@ -145,11 +144,22 @@ namespace StorybrewEditor.Storyboarding
             };
         }
 
-        #region Display
+        #region Audio and Display
 
         public static readonly OsbLayer[] OsbLayers = new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, };
 
         public double DisplayTime;
+
+        private TextureContainer textureContainer;
+        public TextureContainer TextureContainer => textureContainer;
+
+        private AudioContainer audioContainer;
+        public AudioContainer AudioContainer => audioContainer;
+
+        public void TriggerEvents(double startTime, double endTime)
+        {
+            layerManager.TriggerEvents(startTime, endTime);
+        }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
@@ -161,6 +171,12 @@ namespace StorybrewEditor.Storyboarding
         {
             textureContainer?.Dispose();
             textureContainer = new TextureContainerSeparate(null, TextureOptions.Default);
+        }
+
+        private void reloadAudio()
+        {
+            audioContainer?.Dispose();
+            audioContainer = new AudioContainer(Program.AudioManager, null);
         }
 
         #endregion
@@ -353,6 +369,8 @@ namespace StorybrewEditor.Storyboarding
             var extension = Path.GetExtension(e.Name);
             if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
                 reloadTextures();
+            else if (extension == ".wav" || extension == ".mp3" || extension == ".ogg")
+                reloadAudio();
             else if (extension == ".osu")
                 refreshMapset();
         }
@@ -679,11 +697,13 @@ namespace StorybrewEditor.Storyboarding
                     effectUpdateQueue.Dispose();
                     scriptManager.Dispose();
                     textureContainer.Dispose();
+                    audioContainer.Dispose();
                 }
                 mapsetManager = null;
                 effectUpdateQueue = null;
                 scriptManager = null;
                 textureContainer = null;
+                audioContainer = null;
                 disposedValue = true;
             }
         }
