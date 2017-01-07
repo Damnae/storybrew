@@ -172,17 +172,20 @@ namespace BrewLib.UserInterface
                     case Key.C:
                         if (inputManager.ControlOnly)
                             if (selectionStart != cursorPosition)
-                                System.Windows.Forms.Clipboard.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
+                                ClipboardHelper.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
                             else
-                                System.Windows.Forms.Clipboard.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
+                                ClipboardHelper.SetText(Value, System.Windows.Forms.TextDataFormat.UnicodeText);
                         break;
                     case Key.V:
                         if (inputManager.ControlOnly)
                         {
-                            var clipboardText = System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
-                            if (!AcceptMultiline)
-                                clipboardText = clipboardText.Replace("\n", "");
-                            ReplaceSelection(clipboardText);
+                            var clipboardText = ClipboardHelper.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
+                            if (clipboardText != null)
+                            {
+                                if (!AcceptMultiline)
+                                    clipboardText = clipboardText.Replace("\n", "");
+                                ReplaceSelection(clipboardText);
+                            }
                         }
                         break;
                     case Key.X:
@@ -191,7 +194,7 @@ namespace BrewLib.UserInterface
                             if (selectionStart == cursorPosition)
                                 SelectAll();
 
-                            System.Windows.Forms.Clipboard.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
+                            ClipboardHelper.SetText(Value.Substring(SelectionLeft, SelectionLength), System.Windows.Forms.TextDataFormat.UnicodeText);
                             ReplaceSelection("");
                         }
                         break;

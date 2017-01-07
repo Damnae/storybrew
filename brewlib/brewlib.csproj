@@ -159,6 +159,7 @@
     <Compile Include="UserInterface\WidgetManager.cs" />
     <Compile Include="Util\ActionDisposable.cs" />
     <Compile Include="Util\ChangedHandler.cs" />
+    <Compile Include="Util\ClipboardHelper.cs" />
     <Compile Include="Util\ColorExtensions.cs" />
     <Compile Include="Util\DateTimeExtensions.cs" />
     <Compile Include="Util\EventHelper.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="Util\JObjectExtensions.cs" />
     <Compile Include="Util\LineBreaker.cs" />
     <Compile Include="Util\ListExtensions.cs" />
+    <Compile Include="Util\Misc.cs" />
     <Compile Include="Util\Native.cs" />
     <Compile Include="Util\PathHelper.cs" />
     <Compile Include="Util\SafeWriteStream.cs" />
