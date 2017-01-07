@@ -22,12 +22,12 @@ namespace StorybrewCommon.Util
         /// <summary>
         /// Calls the action with the content of a line, until it finds a blank line or the end of the file.
         /// </summary>
-        public static void ParseSectionLines(this StreamReader reader, Action<string> action)
+        public static void ParseSectionLines(this StreamReader reader, Action<string> action, bool trimLines = true)
         {
             string line;
             while ((line = reader.ReadLine()) != null)
             {
-                line = line.Trim();
+                if (trimLines) line = line.Trim();
                 if (line.Length == 0) return;
 
                 action(line);

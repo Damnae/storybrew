@@ -7,7 +7,7 @@ namespace StorybrewScripts
     public class Background : StoryboardObjectGenerator
     {
         [Configurable]
-        public string BackgroundPath = "bg.jpg";
+        public string BackgroundPath = "";
 
         [Configurable]
         public int StartTime = 0;
@@ -20,11 +20,10 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
+            if (BackgroundPath == "") BackgroundPath = Beatmap.BackgroundPath;
+            if (StartTime == EndTime) EndTime = (int)Beatmap.HitObjects.Last().EndTime;
+
             var bitmap = GetMapsetBitmap(BackgroundPath);
-
-            if (StartTime == EndTime)
-                EndTime = (int)Beatmap.HitObjects.Last().EndTime;
-
             var bg = GetLayer("").CreateSprite(BackgroundPath, OsbOrigin.Centre);
             bg.Scale(StartTime, 480.0f / bitmap.Height);
             bg.Fade(StartTime - 500, StartTime, 0, Opacity);

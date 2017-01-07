@@ -54,6 +54,12 @@ namespace StorybrewEditor.Mapset
         };
         public override IEnumerable<Color4> ComboColors => comboColors;
 
+        public string backgroundPath;
+        public override string BackgroundPath => backgroundPath;
+
+        private List<OsuBreak> breaks = new List<OsuBreak>();
+        public override IEnumerable<OsuBreak> Breaks => breaks;
+
         public EditorBeatmap(string path)
         {
             Path = path;
@@ -188,7 +194,25 @@ namespace StorybrewEditor.Mapset
                 beatmap.comboColors.Add(new Color4(byte.Parse(rgb[0]), byte.Parse(rgb[1]), byte.Parse(rgb[2]), 255));
             });
         }
-        private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader) { }
+        private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader)
+        {
+            reader.ParseSectionLines(line =>
+            {
+                if (line.StartsWith("//")) return;
+                if (line.StartsWith(" ")) return;
+
+                var values = line.Split(',');
+                switch (values[0])
+                {
+                    case "0":
+                        beatmap.backgroundPath = removePathQuotes(values[2]);
+                        break;
+                    case "2":
+                        beatmap.breaks.Add(OsuBreak.Parse(beatmap, line));
+                        break;
+                }
+            }, false);
+        }
         private static void parseHitObjectsSection(EditorBeatmap beatmap, StreamReader reader)
         {
             OsuHitObject previousHitObject = null;
@@ -219,6 +243,9 @@ namespace StorybrewEditor.Mapset
                 previousHitObject = hitobject;
             });
         }
+
+        private static string removePathQuotes(string path)
+            => path.StartsWith("\"") && path.EndsWith("\"") ? path.Substring(1, path.Length - 2) : path;
 
         #endregion
     }

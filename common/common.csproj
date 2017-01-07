@@ -73,6 +73,7 @@
     <Compile Include="Curves\BaseCurve.cs" />
     <Compile Include="Curves\Curve.cs" />
     <Compile Include="Curves\TransformedCurve.cs" />
+    <Compile Include="Mapset\OsuBreak.cs" />
     <Compile Include="Storyboarding\OsbSample.cs" />
     <Compile Include="Subtitles\FontEffect.cs" />
     <Compile Include="Subtitles\FontGenerator.cs" />

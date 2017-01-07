@@ -43,6 +43,10 @@ namespace StorybrewCommon.Mapset
 
         public abstract IEnumerable<Color4> ComboColors { get; }
 
+        public abstract string BackgroundPath { get; }
+
+        public abstract IEnumerable<OsuBreak> Breaks { get; }
+
         /// <summary>
         /// Finds the control point (red or green line) active at a specific time.
         /// </summary>
