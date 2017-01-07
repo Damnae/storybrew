@@ -54,7 +54,7 @@ namespace StorybrewEditor.Storyboarding
                     }
                     oldLayers.Remove(oldLayer);
                 }
-                else layers.Add(newLayer);
+                else layers.Insert(findLayerIndex(newLayer), newLayer);
                 newLayer.OnChanged += layer_OnChanged;
             }
             foreach (var oldLayer in oldLayers)
