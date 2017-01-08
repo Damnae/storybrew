@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Management;
 using System.Resources;
 using System.Runtime.InteropServices;
 
@@ -434,24 +435,29 @@ namespace BrewLib.Graphics
 
         private static void retrieveRendererInfo()
         {
+            logVideoControllers();
+            CheckError("initializing");
+
             var openGlVersionString = GL.GetString(StringName.Version);
             openGlVersion = new Version(openGlVersionString.Split(' ')[0]);
+            CheckError("retrieving openGL version");
+            Trace.WriteLine($"gl version: {openGlVersionString}");
 
             rendererName = GL.GetString(StringName.Renderer);
             rendererVendor = GL.GetString(StringName.Vendor);
+            CheckError("retrieving renderer information");
+            Trace.WriteLine($"renderer: {rendererName}, vendor: {rendererVendor}");
 
             if (!HasCapabilities(2, 0)) throw new NotSupportedException($"This application requires at least OpenGL 2.0 (version {openGlVersion} found)\n{rendererName} ({rendererVendor})");
 
             var glslVersionString = GL.GetString(StringName.ShadingLanguageVersion);
             glslVersion = string.IsNullOrEmpty(glslVersionString) ? new Version() : new Version(glslVersionString.Split(' ')[0]);
+            CheckError("retrieving glsl version");
+            Trace.WriteLine($"glsl version: {glslVersionString}");
 
             var extensionsString = GL.GetString(StringName.Extensions);
             supportedExtensions = extensionsString.Split(' ');
-
-            CheckError("retrieving openGL version");
-
-            Trace.WriteLine($"gl version: {openGlVersionString}, glsl: {glslVersionString}");
-            Trace.WriteLine($"renderer: {rendererName}, vendor: {rendererVendor}");
+            CheckError("retrieving extensions");
             Trace.WriteLine($"extensions: {extensionsString}");
         }
 
@@ -521,6 +527,31 @@ namespace BrewLib.Graphics
                 throw new Exception(
                     (context != null ? "openGL error while " + context : "openGL error") +
                     (error != ErrorCode.NoError ? ": " + error.ToString() : string.Empty));
+        }
+
+        private static void logVideoControllers()
+        {
+            try
+            {
+                // https://msdn.microsoft.com/en-us/library/aa394512(v=vs.85).aspx
+                var searcher = new ManagementObjectSearcher("select * from Win32_VideoController");
+
+                Trace.WriteLine("");
+                Trace.WriteLine("Video controllers:\n");
+                foreach (var o in searcher.Get())
+                {
+                    Trace.WriteLine(o["Name"]);
+                    Trace.WriteLine($"Status: {o["Status"]}, Availability: {o["Availability"]}, ConfigManagerErrorCode: {o["ConfigManagerErrorCode"]}");
+                    Trace.WriteLine($"DriverVersion: {o["DriverVersion"]}, DriverDate: {o["DriverDate"]}, InstalledDisplayDrivers: {o["InstalledDisplayDrivers"]}");
+                    Trace.WriteLine($"VideoProcessor: {o["VideoProcessor"]}, VideoArchitecture: {o["VideoArchitecture"]}, VideoMemoryType: {o["VideoMemoryType"]}, CurrentBitsPerPixel: {o["CurrentBitsPerPixel"]}");
+                    Trace.WriteLine($"AdapterDACType: {o["AdapterDACType"]}, AdapterRAM: {o["AdapterRAM"]}");
+                    Trace.WriteLine("");
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Failed to retrieve video controller information: {e}");
+            }
         }
 
         #endregion
