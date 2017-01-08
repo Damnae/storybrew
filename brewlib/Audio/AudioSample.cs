@@ -31,6 +31,7 @@ namespace BrewLib.Audio
 
         public void Play(float volume = 1)
         {
+            if (sample == 0) return;
             var channel = new AudioChannel(Manager, Bass.SampleGetChannel(sample), true)
             {
                 Volume = volume,
