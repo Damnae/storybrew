@@ -117,7 +117,7 @@ namespace BrewLib.ScreenLayers
             }
         }
 
-        public virtual void Draw(DrawContext drawContext)
+        public virtual void Draw(DrawContext drawContext, double tween)
         {
         }
 

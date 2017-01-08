@@ -100,7 +100,7 @@ namespace StorybrewEditor
                 window.Icon = new Icon(typeof(Program), "icon.ico");
                 window.Resize += (sender, e) =>
                 {
-                    editor.Draw();
+                    editor.Draw(1);
                     window.SwapBuffers();
                 };
 
@@ -194,7 +194,7 @@ namespace StorybrewEditor
 
         private static void runMainLoop(GameWindow window, Editor editor, double fixedRateUpdateDuration, double targetFrameDuration)
         {
-            var time = 0.0;
+            var previousTime = 0.0;
             var fixedRateTime = 0.0;
             var averageFrameTime = 0.0;
             var longestFrameTime = 0.0;
@@ -212,7 +212,7 @@ namespace StorybrewEditor
                 audioManager.Update();
                 window.ProcessEvents();
 
-                while (time - fixedRateTime >= fixedRateUpdateDuration && fixedUpdates < 2)
+                while (currentTime - fixedRateTime >= fixedRateUpdateDuration && fixedUpdates < 2)
                 {
                     fixedRateTime += fixedRateUpdateDuration;
                     fixedUpdates++;
@@ -227,7 +227,8 @@ namespace StorybrewEditor
                 window.VSync = focused ? VSyncMode.Off : VSyncMode.On;
                 if (window.WindowState != WindowState.Minimized)
                 {
-                    editor.Draw();
+                    var tween = Math.Min((currentTime - fixedRateTime) / fixedRateUpdateDuration, 1);
+                    editor.Draw(tween);
                     window.SwapBuffers();
                 }
 
@@ -243,21 +244,21 @@ namespace StorybrewEditor
                 var sleepMs = Math.Max(0, (int)(((focused ? targetFrameDuration : fixedRateUpdateDuration) - activeDuration) * 1000));
                 Thread.Sleep(sleepMs);
 
-                var frameTime = currentTime - time;
-                time = currentTime;
+                var frameTime = currentTime - previousTime;
+                previousTime = currentTime;
 
                 // Stats
 
                 averageFrameTime = (frameTime + averageFrameTime) / 2;
                 longestFrameTime = Math.Max(frameTime, longestFrameTime);
 
-                if (lastStatTime + 1 < time)
+                if (lastStatTime + 1 < currentTime)
                 {
                     stats = $"fps:{1 / averageFrameTime:0} (avg:{averageFrameTime * 1000:0}ms hi:{longestFrameTime * 1000:0}ms)";
                     if (false) Debug.Print($"TexBinds - {DrawState.TextureBinds}, {editor.GetStats()}");
 
                     longestFrameTime = 0;
-                    lastStatTime = time;
+                    lastStatTime = currentTime;
                 }
             }
         }
@@ -353,7 +354,7 @@ namespace StorybrewEditor
                 try
                 {
 #endif
-                    action.Invoke();
+                action.Invoke();
 #if !DEBUG
                 }
                 catch (Exception e)

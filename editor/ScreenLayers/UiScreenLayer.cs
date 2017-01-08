@@ -48,9 +48,9 @@ namespace StorybrewEditor.ScreenLayers
             widgetManager.Opacity = opacity * (float)TransitionProgress;
         }
 
-        public override void Draw(DrawContext drawContext)
+        public override void Draw(DrawContext drawContext, double tween)
         {
-            base.Draw(drawContext);
+            base.Draw(drawContext, tween);
             widgetManager.Draw(drawContext);
         }
 

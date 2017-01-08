@@ -225,12 +225,12 @@ namespace StorybrewEditor
             ScreenLayerManager.Update();
         }
 
-        public void Draw()
+        public void Draw(double tween)
         {
             GL.ClearColor(ScreenLayerManager.BackgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            ScreenLayerManager.Draw(drawContext);
+            ScreenLayerManager.Draw(drawContext, tween);
             overlay.Draw(drawContext);
             DrawState.CompleteFrame();
         }

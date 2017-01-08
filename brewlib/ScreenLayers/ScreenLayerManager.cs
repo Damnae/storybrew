@@ -138,14 +138,14 @@ namespace BrewLib.ScreenLayers
                 window.Exit();
         }
 
-        public void Draw(DrawContext drawContext)
+        public void Draw(DrawContext drawContext, double tween)
         {
             foreach (var layer in layers)
             {
                 if (layer.CurrentState == ScreenLayer.State.Hidden)
                     continue;
 
-                layer.Draw(drawContext);
+                layer.Draw(drawContext, tween);
             }
         }
 

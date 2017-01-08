@@ -18,5 +18,7 @@
             }
         }
         public override double Previous => previousTime;
+
+        public void Reset() => Current = 0;
     }
 }
