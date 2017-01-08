@@ -137,6 +137,9 @@ namespace StorybrewEditor.Storyboarding
             scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
+            layerManager.OnLayersChanged +=
+                (sender, e) => changed = true;
+
             OnMainBeatmapChanged += (sender, e) =>
             {
                 foreach (var effect in effects)
@@ -208,6 +211,8 @@ namespace StorybrewEditor.Storyboarding
             var effect = new ScriptedEffect(this, scriptManager.Get(effectName));
 
             effects.Add(effect);
+            changed = true;
+
             effect.OnChanged += effect_OnChanged;
             refreshEffectsStatus();
 
@@ -222,6 +227,7 @@ namespace StorybrewEditor.Storyboarding
 
             effects.Remove(effect);
             effect.Dispose();
+            changed = true;
 
             refreshEffectsStatus();
 
@@ -239,7 +245,10 @@ namespace StorybrewEditor.Storyboarding
         }
 
         private void effect_OnChanged(object sender, EventArgs e)
-            => refreshEffectsStatus();
+        {
+            refreshEffectsStatus();
+            changed = true;
+        }
 
         private void refreshEffectsStatus()
         {
@@ -287,6 +296,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mapsetPath == value) return;
                 mapsetPath = value;
+                changed = true;
 
                 OnMapsetPathChanged?.Invoke(this, EventArgs.Empty);
                 refreshMapset();
@@ -312,6 +322,8 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mainBeatmap == value) return;
                 mainBeatmap = value;
+                changed = true;
+
                 OnMainBeatmapChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -381,7 +393,20 @@ namespace StorybrewEditor.Storyboarding
 
         public const int Version = 4;
 
-        public bool OwnsOsb;
+        private bool changed;
+        public bool Changed => changed;
+
+        private bool ownsOsb;
+        public bool OwnsOsb
+        {
+            get { return ownsOsb; }
+            set
+            {
+                if (ownsOsb == value) return;
+                ownsOsb = value;
+                changed = true;
+            }
+        }
 
         public void Save()
         {
@@ -432,7 +457,9 @@ namespace StorybrewEditor.Storyboarding
                     w.Write((int)layer.OsbLayer);
                     w.Write(layer.Visible);
                 }
+
                 stream.Commit();
+                changed = false;
             }
         }
 

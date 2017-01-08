@@ -397,6 +397,7 @@ namespace StorybrewEditor.ScreenLayers
             base.Update(isTop, isCovered);
 
             playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
+            saveButton.Disabled = !project.Changed;
             audio.Volume = WidgetManager.Root.Opacity;
 
             var time = (float)audio.Time;
@@ -441,12 +442,16 @@ namespace StorybrewEditor.ScreenLayers
 
         public override void Close()
         {
-            Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving...", () =>
+            if (project.Changed)
             {
-                project.Save();
-                Program.Schedule(() => Manager.GetContext<Editor>().Restart());
-            }),
-            () => Manager.GetContext<Editor>().Restart(), true);
+                Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving...", () =>
+                {
+                    project.Save();
+                    Program.Schedule(() => Manager.GetContext<Editor>().Restart());
+                }),
+                () => Manager.GetContext<Editor>().Restart(), true);
+            }
+            else Manager.GetContext<Editor>().Restart();
         }
 
         private void project_OnMapsetPathChanged(object sender, EventArgs e)
