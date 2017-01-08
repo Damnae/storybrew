@@ -46,6 +46,8 @@ namespace StorybrewCommon.Animations
 
         public static Func<double, double> ElasticIn = x => Reverse(ElasticOut, x);
         public static Func<double, double> ElasticOut = x => Math.Pow(2, -10 * x) * Math.Sin((x - 0.075) * (2 * Math.PI) / .3) + 1;
+        public static Func<double, double> ElasticOutHalf = x => Math.Pow(2, -10 * x) * Math.Sin((0.5 * x - 0.075) * (2 * Math.PI) / .3) + 1;
+        public static Func<double, double> ElasticOutQuarter = x => Math.Pow(2, -10 * x) * Math.Sin((0.25 * x - 0.075) * (2 * Math.PI) / .3) + 1;
         public static Func<double, double> ElasticInOut = x => ToInOut(ElasticIn, x);
 
         public static double Ease(this OsbEasing easing, double value)
@@ -84,9 +86,9 @@ namespace StorybrewCommon.Animations
                 case OsbEasing.OutCirc: return CircOut;
                 case OsbEasing.InOutCirc: return CircInOut;
                 case OsbEasing.InElastic: return ElasticIn;
-                case OsbEasing.OutElastic:
-                case OsbEasing.OutElasticHalf:
-                case OsbEasing.OutElasticQuarter: return ElasticOut;
+                case OsbEasing.OutElastic: return ElasticOut;
+                case OsbEasing.OutElasticHalf: return ElasticOutHalf;
+                case OsbEasing.OutElasticQuarter: return ElasticOutQuarter;
                 case OsbEasing.InOutElastic: return ElasticInOut;
                 case OsbEasing.InBack: return BackIn;
                 case OsbEasing.OutBack: return BackOut;
