@@ -89,7 +89,7 @@ namespace StorybrewEditor.UserInterface
                 if (inKiai)
                 {
                     var startProgress = kiaiStartTime / valueLength;
-                    var endProgress = (controlPoint.Offset * 0.001f) / valueLength;
+                    var endProgress = (controlPoint.Offset * 0.001) / valueLength;
 
                     var kiaiLeft = (float)Manager.SnapToPixel(offset.X + startProgress * bounds.Width);
                     var kiaiRight = (float)Manager.SnapToPixel(offset.X + endProgress * bounds.Width);
@@ -100,6 +100,21 @@ namespace StorybrewEditor.UserInterface
                 }
                 else kiaiStartTime = controlPoint.Offset * 0.001;
                 inKiai = controlPoint.IsKiai;
+            }
+
+            // Breaks
+            line.Color = breakColor;
+            foreach (var osuBreak in project.MainBeatmap.Breaks)
+            {
+                var startProgress = (osuBreak.StartTime * 0.001) / valueLength;
+                var endProgress = (osuBreak.EndTime * 0.001) / valueLength;
+
+                var breakLeft = (float)Manager.SnapToPixel(offset.X + startProgress * bounds.Width);
+                var breakRight = (float)Manager.SnapToPixel(offset.X + endProgress * bounds.Width);
+
+                if (breakRight < breakLeft + pixelSize)
+                    breakRight = breakLeft + pixelSize;
+                line.Draw(drawContext, Manager.Camera, new Box2(breakLeft, offset.Y + bounds.Height * 0.3f, breakRight, offset.Y + bounds.Height * 0.4f), actualOpacity);
             }
 
             // Ticks
