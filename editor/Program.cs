@@ -46,6 +46,7 @@ namespace StorybrewEditor
         public static void Main(string[] args)
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            //Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             if (args.Length != 0 && handleArguments(args))
                 return;
@@ -165,7 +166,7 @@ namespace StorybrewEditor
                 windowHeight = 600;
                 if (windowWidth >= primaryScreenArea.Width) windowWidth = 800;
             }
-            var window = new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, displayDevice, 1, 0, contextFlags);
+            var window = new GameWindow(windowWidth, windowHeight, graphicsMode, Name, GameWindowFlags.Default, displayDevice, 2, 0, contextFlags);
             Trace.WriteLine($"Window dpi scale: {window.Height / (float)windowHeight}");
 
             window.Location = new Point(

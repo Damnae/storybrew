@@ -36,30 +36,15 @@ namespace BrewLib.Graphics
         /// </summary>
         public bool WaitForRange(int index, int length)
         {
-            for (int i = syncRanges.Count - 1; i >= 0; i--)
+            trimExpiredRanges();
+            for (var i = syncRanges.Count - 1; i >= 0; i--)
             {
                 var syncRange = syncRanges[i];
                 if (index < syncRange.Index + syncRange.Length && syncRange.Index < index + length)
                 {
                     var blocked = syncRange.Wait();
-
-                    for (int j = i; j >= 0; j--)
-                        syncRanges[j].Dispose();
-                    syncRanges.RemoveRange(0, i + 1);
-
+                    clearToIndex(i);
                     return blocked;
-                }
-                else if (i % 8 == 0)
-                {
-                    var wouldBlock = syncRange.Wait(false);
-                    if (!wouldBlock)
-                    {
-                        for (int j = i; j >= 0; j--)
-                            syncRanges[j].Dispose();
-                        syncRanges.RemoveRange(0, i + 1);
-
-                        return false;
-                    }
                 }
             }
             return false;
@@ -71,6 +56,36 @@ namespace BrewLib.Graphics
         public void LockRange(int index, int length)
         {
             syncRanges.Add(new SyncRange(index, length));
+        }
+
+        private void trimExpiredRanges()
+        {
+            var left = 0;
+            var right = syncRanges.Count - 1;
+
+            var unblockedIndex = -1;
+            while (left <= right)
+            {
+                var index = (left + right) / 2;
+                var wouldBlock = syncRanges[index].Wait(false);
+                if (wouldBlock)
+                    right = index - 1;
+                else
+                {
+                    left = index + 1;
+                    unblockedIndex = Math.Max(unblockedIndex, index);
+                }
+            }
+
+            if (unblockedIndex >= 0)
+                clearToIndex(unblockedIndex);
+        }
+
+        private void clearToIndex(int index)
+        {
+            for (var i = 0; i <= index; i++)
+                syncRanges[i].Dispose();
+            syncRanges.RemoveRange(0, index + 1);
         }
 
         #region IDisposable Support
@@ -108,6 +123,7 @@ namespace BrewLib.Graphics
             public int Index;
             public int Length;
             public IntPtr Fence = IntPtr.Zero;
+            private bool expired;
 
             public SyncRange(int index, int length)
             {
@@ -118,7 +134,7 @@ namespace BrewLib.Graphics
 
             public bool Wait(bool canBlock = true)
             {
-                if (Fence == IntPtr.Zero)
+                if (expired || Fence == IntPtr.Zero)
                     return false;
 
                 var blocked = false;
@@ -130,10 +146,12 @@ namespace BrewLib.Graphics
                     switch (GL.ClientWaitSync(Fence, waitSyncFlags, timeout))
                     {
                         case WaitSyncStatus.AlreadySignaled:
+                            expired = true;
                             return blocked;
 
                         case WaitSyncStatus.ConditionSatisfied:
                             Debug.Assert(blocked); // Should never happen
+                            expired = true;
                             return true;
 
                         case WaitSyncStatus.WaitFailed:
@@ -151,7 +169,7 @@ namespace BrewLib.Graphics
                 }
             }
 
-            public override string ToString() => $"{Index} - {Index + Length - 1} ({Length})";
+            public override string ToString() => $"{Index} - {Index + Length - 1} ({Length}){(expired ? " Expired" : "")}";
 
             #region IDisposable Support
 
