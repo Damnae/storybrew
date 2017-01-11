@@ -26,11 +26,11 @@ namespace StorybrewCommon.Scripting
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
         /// Layers will be sorted by the order in which they are first retrieved.
         /// </summary>
-        protected StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
+        public StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
 
-        protected Beatmap Beatmap => context.Beatmap;
-        protected string ProjectPath => context.ProjectPath;
-        protected string MapsetPath => context.MapsetPath;
+        public Beatmap Beatmap => context.Beatmap;
+        public string ProjectPath => context.ProjectPath;
+        public string MapsetPath => context.MapsetPath;
 
         public StoryboardObjectGenerator()
         {
