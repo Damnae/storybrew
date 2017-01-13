@@ -387,10 +387,10 @@ namespace StorybrewEditor.ScreenLayers
         }
 
         private void saveProject()
-            => Manager.AsyncLoading("Saving...", () => project.Save());
+            => Manager.AsyncLoading("Saving", () => project.Save());
 
         private void exportProject()
-            => Manager.AsyncLoading("Exporting...", () => project.ExportToOsb());
+            => Manager.AsyncLoading("Exporting", () => project.ExportToOsb());
 
         public override void Update(bool isTop, bool isCovered)
         {
@@ -444,7 +444,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             if (project.Changed)
             {
-                Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving...", () =>
+                Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving", () =>
                 {
                     project.Save();
                     Program.Schedule(() => Manager.GetContext<Editor>().Restart());

@@ -10,7 +10,7 @@ namespace StorybrewEditor.ScreenLayers
     {
         public static void OpenFolderPicker(this ScreenLayerManager screenLayerManager, string description, string initialValue, Action<string> callback)
         {
-            screenLayerManager.AsyncLoading("Select a folder...", () =>
+            screenLayerManager.AsyncLoading("Select a folder", () =>
             {
                 using (var dialog = new System.Windows.Forms.FolderBrowserDialog()
                 {
@@ -28,7 +28,7 @@ namespace StorybrewEditor.ScreenLayers
 
         public static void OpenFilePicker(this ScreenLayerManager screenLayerManager, string description, string initialValue, string initialDirectory, string filter, Action<string> callback)
         {
-            screenLayerManager.AsyncLoading("Select a file...", () =>
+            screenLayerManager.AsyncLoading("Select a file", () =>
             {
                 using (var dialog = new System.Windows.Forms.OpenFileDialog()
                 {
@@ -49,7 +49,7 @@ namespace StorybrewEditor.ScreenLayers
 
         public static void OpenSaveLocationPicker(this ScreenLayerManager screenLayerManager, string description, string initialValue, string extension, string filter, Action<string> callback)
         {
-            screenLayerManager.AsyncLoading("Select a location...", () =>
+            screenLayerManager.AsyncLoading("Select a location", () =>
             {
                 using (var dialog = new System.Windows.Forms.SaveFileDialog()
                 {

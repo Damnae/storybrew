@@ -141,7 +141,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private void openProject(string projectPath)
         {
-            Manager.AsyncLoading("Loading project...", () =>
+            Manager.AsyncLoading("Loading project", () =>
             {
                 var project = Project.Load(projectPath, true, true);
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));

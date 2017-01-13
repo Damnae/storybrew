@@ -1,7 +1,6 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
-using StorybrewEditor.UserInterface;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -40,8 +39,8 @@ namespace StorybrewEditor.ScreenLayers.Util
                 {
                     if (exception != null)
                     {
-                        Trace.WriteLine($"Loading failed ({title}, {action.Method.Name}): {exception}");
-                        Manager.ShowMessage($"Loading failed:\n{exception.Message}");
+                        Trace.WriteLine($"{title} failed ({action.Method.Name}): {exception}");
+                        Manager.ShowMessage($"{title} failed:\n{exception.Message} ({exception.GetType().Name})");
                     }
                     Exit();
                 });
@@ -64,7 +63,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                 {
                     new Label(WidgetManager)
                     {
-                        Text = title ?? "Loading...",
+                        Text = $"{title}..." ?? "Loading...",
                     }
                 },
             });
