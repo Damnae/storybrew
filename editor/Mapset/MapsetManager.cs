@@ -9,17 +9,20 @@ namespace StorybrewEditor.Mapset
     public class MapsetManager : IDisposable
     {
         private string path;
+        private bool logLoadingExceptions;
 
         private List<EditorBeatmap> beatmaps = new List<EditorBeatmap>();
         public IEnumerable<EditorBeatmap> Beatmaps => beatmaps;
         public int BeatmapCount => beatmaps.Count;
 
-        public MapsetManager(string path)
+        public MapsetManager(string path, bool logLoadingExceptions)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentException("Mapset path cannot be empty", nameof(path));
 
             this.path = path;
+            this.logLoadingExceptions = logLoadingExceptions;
+
             loadBeatmaps();
             initializeMapsetWatcher();
         }
@@ -32,7 +35,16 @@ namespace StorybrewEditor.Mapset
                 return;
 
             foreach (var beatmapPath in Directory.GetFiles(path, "*.osu", SearchOption.TopDirectoryOnly))
-                beatmaps.Add(EditorBeatmap.Load(beatmapPath));
+                try
+                {
+                    beatmaps.Add(EditorBeatmap.Load(beatmapPath));
+                }
+                catch (Exception e)
+                {
+                    if (logLoadingExceptions)
+                        Trace.WriteLine($"Failed to load beatmap: {e}");
+                    else throw e;
+                }
         }
 
         #endregion
@@ -78,6 +90,7 @@ namespace StorybrewEditor.Mapset
         #region IDisposable Support
 
         private bool disposedValue = false;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

@@ -369,7 +369,7 @@ namespace StorybrewEditor.Storyboarding
             mainBeatmap = null;
             mapsetManager?.Dispose();
 
-            mapsetManager = new MapsetManager(mapsetPath);
+            mapsetManager = new MapsetManager(mapsetPath, mapsetManager != null);
             mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
 
             if (previousBeatmapName != null)
