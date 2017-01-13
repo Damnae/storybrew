@@ -50,6 +50,7 @@ namespace StorybrewEditor
             drawContext = new DrawContext();
             drawContext.Register<TextureContainer>(new TextureContainerSeparate(Resources.ResourceManager), true);
             drawContext.Register<SpriteRenderer>(new SpriteRendererBuffered(), true);
+            drawContext.Register<LineRenderer>(new LineRendererBuffered(), true);
 
             try
             {

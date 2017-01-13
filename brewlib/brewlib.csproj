@@ -81,6 +81,8 @@
     <Compile Include="Graphics\DrawContext.cs" />
     <Compile Include="Graphics\DrawState.cs" />
     <Compile Include="Graphics\GpuCommandSync.cs" />
+    <Compile Include="Graphics\Renderers\LineRenderer.cs" />
+    <Compile Include="Graphics\Renderers\LineRendererBuffered.cs" />
     <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamer.cs" />
     <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerBufferData.cs" />
     <Compile Include="Graphics\Renderers\PrimitiveStreamers\PrimitiveStreamerPersistentMap.cs" />

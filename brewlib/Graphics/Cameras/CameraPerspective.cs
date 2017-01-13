@@ -28,7 +28,7 @@ namespace BrewLib.Graphics.Cameras
         protected override void Recalculate(out Matrix4 view, out Matrix4 projection, out Rectangle internalViewport, out Rectangle extendedViewport)
         {
             var screenViewport = Viewport;
-            var fovRadians = (float)Math.Min(fieldOfView * Math.PI / 180, Math.PI - 0.0001f);
+            var fovRadians = (float)Math.Max(0.0001f, Math.Min(fieldOfView * Math.PI / 180, Math.PI - 0.0001f));
             var aspect = (float)screenViewport.Width / screenViewport.Height;
 
             internalViewport = extendedViewport = screenViewport;
