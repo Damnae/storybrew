@@ -40,7 +40,15 @@ namespace StorybrewEditor.ScreenLayers.Util
                     if (exception != null)
                     {
                         Trace.WriteLine($"{title} failed ({action.Method.Name}): {exception}");
-                        Manager.ShowMessage($"{title} failed:\n{exception.Message} ({exception.GetType().Name})");
+
+                        var exceptionMessage = $"{exception.Message} ({exception.GetType().Name})";
+                        var innerException = exception.InnerException;
+                        while (innerException != null)
+                        {
+                            exceptionMessage += $"\nCaused by: {innerException.Message} ({innerException.GetType().Name})";
+                            innerException = innerException.InnerException;
+                        }
+                        Manager.ShowMessage($"{title} failed:\n\n{exceptionMessage}\n\nDetails:\n{exception.GetBaseException()}");
                     }
                     Exit();
                 });
