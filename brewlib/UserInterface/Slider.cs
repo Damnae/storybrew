@@ -40,6 +40,7 @@ namespace BrewLib.UserInterface
                 if (e.Button != MouseButton.Left) return false;
                 dragged = true;
                 Value = GetValueForPosition(new Vector2(e.X, e.Y));
+                DragStart();
                 return true;
             };
             OnClickUp += (sender, e) =>
@@ -48,12 +49,14 @@ namespace BrewLib.UserInterface
                 if (e.Button != MouseButton.Left) return;
                 dragged = false;
                 RefreshStyle();
+                DragEnd();
                 OnValueCommited?.Invoke(this, e);
             };
             OnDrag += (sender, e) =>
             {
                 if (disabled || !dragged) return;
                 Value = GetValueForPosition(new Vector2(e.X, e.Y));
+                DragUpdate();
             };
         }
 
@@ -64,6 +67,18 @@ namespace BrewLib.UserInterface
             var value = (MaxValue - MinValue) * (mouseX - bounds.Left) / bounds.Width;
             if (Step != 0) value = Math.Min((int)(value / Step) * Step, MaxValue);
             return value;
+        }
+
+        protected virtual void DragStart()
+        {
+        }
+
+        protected virtual void DragUpdate()
+        {
+        }
+
+        protected virtual void DragEnd()
+        {
         }
 
         protected override WidgetStyle Style => Manager.Skin.GetStyle<ProgressBarStyle>(BuildStyleName(disabled ? "disabled" : (dragged || hovered) ? "hover" : null));

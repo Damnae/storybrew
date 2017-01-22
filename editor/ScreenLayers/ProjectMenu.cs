@@ -400,6 +400,9 @@ namespace StorybrewEditor.ScreenLayers
             saveButton.Disabled = !project.Changed;
             audio.Volume = WidgetManager.Root.Opacity;
 
+            if (audio.Playing && timeline.RepeatStart != timeline.RepeatEnd && timeline.RepeatEnd < audio.Time)
+                audio.Time = timeline.RepeatStart;
+
             var time = (float)audio.Time;
             timeline.SetValueSilent(time);
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
