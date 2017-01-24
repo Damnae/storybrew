@@ -240,9 +240,7 @@ namespace BrewLib.Graphics.Renderers
                 currentTexture = texture.BindableTexture;
             }
             else if (spritesInBatch == maxSpritesPerBatch)
-            {
                 DrawState.FlushRenderer(true);
-            }
 
             var width = textureX1 - textureX0;
             var height = textureY1 - textureY0;

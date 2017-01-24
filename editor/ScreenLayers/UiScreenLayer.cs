@@ -3,7 +3,6 @@ using BrewLib.Graphics.Cameras;
 using BrewLib.ScreenLayers;
 using BrewLib.UserInterface;
 using OpenTK;
-using StorybrewEditor.UserInterface;
 using System;
 
 namespace StorybrewEditor.ScreenLayers

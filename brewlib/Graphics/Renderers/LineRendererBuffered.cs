@@ -208,9 +208,7 @@ namespace BrewLib.Graphics.Renderers
             if (!rendering) throw new InvalidOperationException("Not rendering");
 
             if (linesInBatch == maxLinesPerBatch)
-            {
                 DrawState.FlushRenderer(true);
-            }
 
             var linePrimitive = default(LinePrimitive);
 
