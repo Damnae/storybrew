@@ -195,6 +195,9 @@ namespace StorybrewEditor.Mapset
             beatmap.comboColors.Clear();
             reader.ParseKeyValueSection((key, value) =>
             {
+                if (!key.StartsWith("Combo"))
+                    return;
+
                 var rgb = value.Split(',');
                 beatmap.comboColors.Add(new Color4(byte.Parse(rgb[0]), byte.Parse(rgb[1]), byte.Parse(rgb[2]), 255));
             });
