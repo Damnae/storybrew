@@ -4,6 +4,7 @@ using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.Remoting;
 
 namespace StorybrewEditor.Storyboarding
@@ -133,7 +134,7 @@ namespace StorybrewEditor.Storyboarding
             }
             catch (Exception e)
             {
-                changeStatus(EffectStatus.ExecutionFailed, $"Unexpected error during {status}:\n{e.ToString()}", context.Log);
+                changeStatus(EffectStatus.ExecutionFailed, getExecutionFailedMessage(e), context.Log);
                 return;
             }
             finally
@@ -222,6 +223,14 @@ namespace StorybrewEditor.Storyboarding
 
                 statusStopwatch.Restart();
             });
+        }
+
+        private string getExecutionFailedMessage(Exception e)
+        {
+            if (e is FileNotFoundException)
+                return $"File not found while {status}. Make sure this path is correct:\n{(e as FileNotFoundException).FileName}\n\nDetails:\n{e.ToString()}";
+
+            return $"Unexpected error during {status}:\n{e.ToString()}";
         }
 
         #region IDisposable Support
