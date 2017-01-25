@@ -20,10 +20,6 @@ namespace BrewLib.UserInterface
         private ScreenLayerManager screenLayerManager;
         public ScreenLayerManager ScreenLayerManager => screenLayerManager;
 
-        private bool needsAnchorUpdate;
-        private bool refreshingAnchors;
-        private int anchoringIteration;
-
         private Widget root;
         public Vector2 Size
         {
@@ -220,6 +216,10 @@ namespace BrewLib.UserInterface
         #endregion
 
         #region Placement
+
+        private bool needsAnchorUpdate;
+        private bool refreshingAnchors;
+        private int anchoringIteration;
 
         public void InvalidateAnchors()
         {

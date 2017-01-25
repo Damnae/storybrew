@@ -22,7 +22,7 @@ namespace BrewLib.UserInterface
         {
             get
             {
-                var position = ScreenPosition;
+                var position = AbsolutePosition;
                 var size = Size;
                 var textSize = new Vector2(Math.Min(textDrawable.Size.X, size.X), Math.Min(textDrawable.Size.Y, size.Y));
 
@@ -116,20 +116,20 @@ namespace BrewLib.UserInterface
 
         public Box2 GetCharacterBounds(int index)
         {
-            var position = ScreenPosition;
+            var position = AbsolutePosition;
             var bounds = textDrawable.GetCharacterBounds(index);
             return new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom);
         }
 
         public void ForTextBounds(int startIndex, int endIndex, Action<Box2> action)
         {
-            var position = ScreenPosition;
+            var position = AbsolutePosition;
             textDrawable.ForTextBounds(startIndex, endIndex, bounds =>
                 action(new Box2(position.X + bounds.Left, position.Y + bounds.Top, position.X + bounds.Right, position.Y + bounds.Bottom)));
         }
 
         public int GetCharacterIndexAt(Vector2 position)
-            => textDrawable.GetCharacterIndexAt(position - ScreenPosition);
+            => textDrawable.GetCharacterIndexAt(position - AbsolutePosition);
 
         public int GetCharacterIndexAbove(int index)
             => textDrawable.GetCharacterIndexAbove(index);

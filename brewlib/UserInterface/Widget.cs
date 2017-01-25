@@ -19,119 +19,6 @@ namespace BrewLib.UserInterface
         private WidgetManager manager;
         public WidgetManager Manager => manager;
 
-        private Widget parent;
-        public Widget Parent => parent;
-        private List<Widget> children = new List<Widget>();
-        public IEnumerable<Widget> Children
-        {
-            get { return children; }
-            set
-            {
-                ClearWidgets();
-                foreach (var widget in value)
-                    Add(widget);
-            }
-        }
-        private int anchoringIteration;
-
-        private Widget anchorTarget;
-        public Widget AnchorTarget
-        {
-            get { return anchorTarget; }
-            set
-            {
-                if (anchorTarget == value) return;
-                anchorTarget = value;
-                manager.InvalidateAnchors();
-            }
-        }
-
-        private BoxAlignment anchorFrom = BoxAlignment.TopLeft;
-        public BoxAlignment AnchorFrom
-        {
-            get { return anchorFrom; }
-            set
-            {
-                if (anchorFrom == value) return;
-                anchorFrom = value;
-                manager.InvalidateAnchors();
-            }
-        }
-
-        private BoxAlignment anchorTo = BoxAlignment.TopLeft;
-        public BoxAlignment AnchorTo
-        {
-            get { return anchorTo; }
-            set
-            {
-                if (anchorTo == value) return;
-                anchorTo = value;
-                manager.InvalidateAnchors();
-            }
-        }
-
-        public virtual Vector2 MinSize => PreferredSize;
-        public virtual Vector2 MaxSize => Vector2.Zero;
-        public virtual Vector2 PreferredSize => Vector2.Zero;
-
-        private bool canGrow = true;
-        public bool CanGrow
-        {
-            get { return canGrow; }
-            set
-            {
-                if (canGrow == value) return;
-                canGrow = value;
-                InvalidateAncestorLayout();
-            }
-        }
-
-        private Vector2 size;
-        public Vector2 Size
-        {
-            get { return size; }
-            set
-            {
-                if (size == value) return;
-                size = value;
-                InvalidateLayout();
-            }
-        }
-        public float Width
-        {
-            get { return Size.X; }
-            set { Size = new Vector2(value, Size.Y); }
-        }
-        public float Height
-        {
-            get { return Size.Y; }
-            set { Size = new Vector2(Size.X, value); }
-        }
-
-        private Vector2 offset;
-        public Vector2 Offset
-        {
-            get { return offset; }
-            set
-            {
-                if (offset == value) return;
-                offset = value;
-                manager.InvalidateAnchors();
-            }
-        }
-
-        private Vector2 screenPosition;
-        public Vector2 ScreenPosition
-        {
-            get
-            {
-                manager.RefreshAnchors();
-                return screenPosition;
-            }
-        }
-
-        public Box2 Bounds => new Box2(ScreenPosition, ScreenPosition + Size);
-
         private bool displayed = true;
         public bool Displayed
         {
@@ -237,7 +124,7 @@ namespace BrewLib.UserInterface
             if (!displayed || !hoverable)
                 return null;
 
-            var position = ScreenPosition;
+            var position = AbsolutePosition;
             var overThis = x >= position.X && x < position.X + size.X
                         && y >= position.Y && y < position.Y + size.Y;
 
@@ -346,6 +233,20 @@ namespace BrewLib.UserInterface
 
         #region Parenting
 
+        private Widget parent;
+        public Widget Parent => parent;
+        private List<Widget> children = new List<Widget>();
+        public IEnumerable<Widget> Children
+        {
+            get { return children; }
+            set
+            {
+                ClearWidgets();
+                foreach (var widget in value)
+                    Add(widget);
+            }
+        }
+
         public void Add(Widget widget)
         {
             if (children.Contains(widget)) return;
@@ -409,7 +310,154 @@ namespace BrewLib.UserInterface
 
         #endregion
 
-        #region Layout / Anchoring
+        #region Placement
+
+        private Vector2 offset;
+        public Vector2 Offset
+        {
+            get { return offset; }
+            set
+            {
+                if (offset == value) return;
+                offset = value;
+                manager.InvalidateAnchors();
+            }
+        }
+
+        private Vector2 size;
+        public Vector2 Size
+        {
+            get { return size; }
+            set
+            {
+                if (size == value) return;
+                size = value;
+                InvalidateLayout();
+            }
+        }
+        public float Width
+        {
+            get { return Size.X; }
+            set { Size = new Vector2(value, Size.Y); }
+        }
+        public float Height
+        {
+            get { return Size.Y; }
+            set { Size = new Vector2(Size.X, value); }
+        }
+
+        private Vector2 absolutePosition;
+        public Vector2 AbsolutePosition
+        {
+            get
+            {
+                manager.RefreshAnchors();
+                return absolutePosition;
+            }
+        }
+
+        public Box2 Bounds =>
+            new Box2(AbsolutePosition, AbsolutePosition + Size);
+
+        private Widget anchorTarget;
+        public Widget AnchorTarget
+        {
+            get { return anchorTarget; }
+            set
+            {
+                if (anchorTarget == value) return;
+                anchorTarget = value;
+                manager.InvalidateAnchors();
+            }
+        }
+
+        private BoxAlignment anchorFrom = BoxAlignment.TopLeft;
+        public BoxAlignment AnchorFrom
+        {
+            get { return anchorFrom; }
+            set
+            {
+                if (anchorFrom == value) return;
+                anchorFrom = value;
+                manager.InvalidateAnchors();
+            }
+        }
+
+        private BoxAlignment anchorTo = BoxAlignment.TopLeft;
+        public BoxAlignment AnchorTo
+        {
+            get { return anchorTo; }
+            set
+            {
+                if (anchorTo == value) return;
+                anchorTo = value;
+                manager.InvalidateAnchors();
+            }
+        }
+
+        private int anchoringIteration;
+
+        public void UpdateAnchoring(int iteration, bool includeChildren = true)
+        {
+            ValidateLayout();
+            if (anchoringIteration < iteration)
+            {
+                anchoringIteration = iteration;
+
+                var actualAnchorTarget = anchorTarget != null && (anchorTarget.parent != null || anchorTarget == manager.Root) ? anchorTarget : parent;
+                if (actualAnchorTarget != null)
+                {
+                    actualAnchorTarget.UpdateAnchoring(iteration, false);
+                    absolutePosition = actualAnchorTarget.absolutePosition + offset;
+
+                    if (anchorFrom.HasFlag(BoxAlignment.Right))
+                        absolutePosition.X -= size.X;
+                    else if (!anchorFrom.HasFlag(BoxAlignment.Left))
+                        absolutePosition.X -= size.X * 0.5f;
+
+                    if (anchorFrom.HasFlag(BoxAlignment.Bottom))
+                        absolutePosition.Y -= size.Y;
+                    else if (!anchorFrom.HasFlag(BoxAlignment.Top))
+                        absolutePosition.Y -= size.Y * 0.5f;
+
+                    if (anchorTo.HasFlag(BoxAlignment.Right))
+                        absolutePosition.X += actualAnchorTarget.Size.X;
+                    else if (!anchorTo.HasFlag(BoxAlignment.Left))
+                        absolutePosition.X += actualAnchorTarget.Size.X * 0.5f;
+
+                    if (anchorTo.HasFlag(BoxAlignment.Bottom))
+                        absolutePosition.Y += actualAnchorTarget.Size.Y;
+                    else if (!anchorTo.HasFlag(BoxAlignment.Top))
+                        absolutePosition.Y += actualAnchorTarget.Size.Y * 0.5f;
+                }
+                else absolutePosition = offset;
+                absolutePosition = manager.SnapToPixel(absolutePosition);
+            }
+
+            if (includeChildren)
+                foreach (var child in children)
+                    child.UpdateAnchoring(iteration);
+        }
+
+        #endregion
+
+        #region Layout
+
+        public virtual Vector2 MinSize => PreferredSize;
+        public virtual Vector2 MaxSize => Vector2.Zero;
+        public virtual Vector2 PreferredSize => Vector2.Zero;
+
+        private bool canGrow = true;
+        public bool CanGrow
+        {
+            get { return canGrow; }
+            set
+            {
+                if (canGrow == value) return;
+                canGrow = value;
+                InvalidateAncestorLayout();
+            }
+        }
 
         private bool needsLayout = true;
         public bool NeedsLayout => needsLayout;
@@ -461,48 +509,6 @@ namespace BrewLib.UserInterface
         {
             lastLayoutTime = manager.ScreenLayerManager.TimeSource.Current;
             needsLayout = false;
-        }
-
-        public void UpdateAnchoring(int iteration, bool includeChildren = true)
-        {
-            ValidateLayout();
-            if (anchoringIteration < iteration)
-            {
-                anchoringIteration = iteration;
-
-                var actualAnchorTarget = anchorTarget != null && (anchorTarget.parent != null || anchorTarget == manager.Root) ? anchorTarget : parent;
-                if (actualAnchorTarget != null)
-                {
-                    actualAnchorTarget.UpdateAnchoring(iteration, false);
-                    screenPosition = actualAnchorTarget.screenPosition + offset;
-
-                    if (anchorFrom.HasFlag(BoxAlignment.Right))
-                        screenPosition.X -= size.X;
-                    else if (!anchorFrom.HasFlag(BoxAlignment.Left))
-                        screenPosition.X -= size.X * 0.5f;
-
-                    if (anchorFrom.HasFlag(BoxAlignment.Bottom))
-                        screenPosition.Y -= size.Y;
-                    else if (!anchorFrom.HasFlag(BoxAlignment.Top))
-                        screenPosition.Y -= size.Y * 0.5f;
-
-                    if (anchorTo.HasFlag(BoxAlignment.Right))
-                        screenPosition.X += actualAnchorTarget.Size.X;
-                    else if (!anchorTo.HasFlag(BoxAlignment.Left))
-                        screenPosition.X += actualAnchorTarget.Size.X * 0.5f;
-
-                    if (anchorTo.HasFlag(BoxAlignment.Bottom))
-                        screenPosition.Y += actualAnchorTarget.Size.Y;
-                    else if (!anchorTo.HasFlag(BoxAlignment.Top))
-                        screenPosition.Y += actualAnchorTarget.Size.Y * 0.5f;
-                }
-                else screenPosition = offset;
-                screenPosition = manager.SnapToPixel(screenPosition);
-            }
-
-            if (includeChildren)
-                foreach (var child in children)
-                    child.UpdateAnchoring(iteration);
         }
 
         #endregion

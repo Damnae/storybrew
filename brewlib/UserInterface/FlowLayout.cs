@@ -166,7 +166,7 @@ namespace BrewLib.UserInterface
             var y = padding.Top;
             foreach (var line in lines)
             {
-                var topLeft = ScreenPosition + new Vector2(padding.Left, y);
+                var topLeft = AbsolutePosition + new Vector2(padding.Left, y);
                 var bottomRight = topLeft + new Vector2(line.GetTotalWidth(spacing), line.Height);
                 Manager.Skin.GetDrawable("debug")?.Draw(drawContext, Manager.Camera, new Box2(topLeft, bottomRight), actualOpacity * 0.5f);
 
