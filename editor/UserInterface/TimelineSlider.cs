@@ -38,6 +38,7 @@ namespace StorybrewEditor.UserInterface
         private float repeatEnd;
         public float RepeatStart => repeatStart;
         public float RepeatEnd => repeatEnd;
+        public bool UpdateRepeat = false;
 
         public TimelineSlider(WidgetManager manager, Project project) : base(manager)
         {
@@ -288,6 +289,9 @@ namespace StorybrewEditor.UserInterface
 
         protected override void DragStart()
         {
+            if (!UpdateRepeat)
+                return;
+
             dragStart = Value;
             repeatStart = dragStart;
             repeatEnd = dragStart;
@@ -295,6 +299,9 @@ namespace StorybrewEditor.UserInterface
 
         protected override void DragUpdate()
         {
+            if (!UpdateRepeat)
+                return;
+
             var value = Value;
             if (value < dragStart)
             {

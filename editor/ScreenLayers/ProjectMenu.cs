@@ -37,6 +37,7 @@ namespace StorybrewEditor.ScreenLayers
         private TimelineSlider timeline;
         private Button playPauseButton;
         private Button fitButton;
+        private Button repeatButton;
         private Button projectFolderButton;
         private Button mapsetFolderButton;
         private Button saveButton;
@@ -129,6 +130,15 @@ namespace StorybrewEditor.ScreenLayers
                         CanGrow = false,
                         Checkable = true,
                     },
+                    repeatButton = new Button(WidgetManager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Repeat,
+                        Tooltip = "Set Repeat Points\nShortcut: Ctrl+R",
+                        AnchorFrom = BoxAlignment.Centre,
+                        CanGrow = false,
+                        Checkable = true,
+                    }
                 },
             });
 
@@ -272,6 +282,7 @@ namespace StorybrewEditor.ScreenLayers
             };
             playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
             Program.Settings.FitStoryboard.Bind(fitButton, () => resizeStoryboard());
+            repeatButton.OnClick += (sender, e) => timeline.UpdateRepeat = !timeline.UpdateRepeat;
 
             divisorButton.OnClick += (sender, e) =>
             {
@@ -336,7 +347,7 @@ namespace StorybrewEditor.ScreenLayers
                         if (prevBookmark != 0) timeline.Value = prevBookmark * 0.001f;
                     }
                     else timeline.Scroll(e.Shift ? -4 : -1);
-                    return true;
+                    return true;                    
             }
 
             if (!e.IsRepeat)
@@ -357,6 +368,13 @@ namespace StorybrewEditor.ScreenLayers
                         if (e.Control)
                         {
                             ClipboardHelper.SetText(((int)(audio.Time * 1000)).ToString());
+                            return true;
+                        }
+                        break;
+                    case Key.R:
+                        if (e.Control)
+                        {
+                            repeatButton.Click();
                             return true;
                         }
                         break;
