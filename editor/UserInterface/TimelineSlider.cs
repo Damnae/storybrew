@@ -89,11 +89,8 @@ namespace StorybrewEditor.UserInterface
             {
                 line.Color = repeatColor;
 
-                var startProgress = repeatStart / valueLength;
-                var endProgress = repeatEnd / valueLength;
-
-                var left = (float)Manager.SnapToPixel(offset.X + startProgress * bounds.Width);
-                var right = (float)Manager.SnapToPixel(offset.X + endProgress * bounds.Width);
+                var left = timeToXTop(repeatStart);
+                var right = timeToXTop(repeatEnd);
                 if (right < left + pixelSize)
                     right = left + pixelSize;
 
@@ -112,11 +109,8 @@ namespace StorybrewEditor.UserInterface
 
                 if (inKiai)
                 {
-                    var startProgress = kiaiStartTime / valueLength;
-                    var endProgress = (controlPoint.Offset * 0.001) / valueLength;
-
-                    var kiaiLeft = (float)Manager.SnapToPixel(offset.X + startProgress * bounds.Width);
-                    var kiaiRight = (float)Manager.SnapToPixel(offset.X + endProgress * bounds.Width);
+                    var kiaiLeft = timeToXTop(kiaiStartTime);
+                    var kiaiRight = timeToXTop(controlPoint.Offset * 0.001);
                     if (kiaiRight < kiaiLeft + pixelSize)
                         kiaiRight = kiaiLeft + pixelSize;
 
@@ -130,11 +124,8 @@ namespace StorybrewEditor.UserInterface
             line.Color = breakColor;
             foreach (var osuBreak in project.MainBeatmap.Breaks)
             {
-                var startProgress = (osuBreak.StartTime * 0.001) / valueLength;
-                var endProgress = (osuBreak.EndTime * 0.001) / valueLength;
-
-                var breakLeft = (float)Manager.SnapToPixel(offset.X + startProgress * bounds.Width);
-                var breakRight = (float)Manager.SnapToPixel(offset.X + endProgress * bounds.Width);
+                var breakLeft = timeToXTop(osuBreak.StartTime * 0.001);
+                var breakRight = timeToXTop(osuBreak.EndTime * 0.001);
                 if (breakRight < breakLeft + pixelSize)
                     breakRight = breakLeft + pixelSize;
 
@@ -221,9 +212,8 @@ namespace StorybrewEditor.UserInterface
             // Bookmarks
             foreach (var bookmark in project.MainBeatmap.Bookmarks)
             {
-                var progress = (bookmark * 0.001f) / (MaxValue - MinValue);
                 var topLineSize = new Vector2(pixelSize, bounds.Height * 0.3f);
-                drawLine(drawContext, offset + new Vector2((float)Manager.SnapToPixel(progress * bounds.Width), bounds.Height * 0.1f), topLineSize, bookmarkColor, actualOpacity);
+                drawLine(drawContext, new Vector2(timeToXTop(bookmark * 0.001f), offset.Y + bounds.Height * 0.1f), topLineSize, bookmarkColor, actualOpacity);
 
                 if (leftTime < bookmark && bookmark < rightTime)
                 {
@@ -234,25 +224,19 @@ namespace StorybrewEditor.UserInterface
 
             // Current time (top)
             {
-                var x = (float)Manager.SnapToPixel(Value / (MaxValue - MinValue) * bounds.Width);
+                var x = timeToXTop(Value);
                 var lineSize = new Vector2(pixelSize, bounds.Height * 0.4f);
 
                 if (repeatStart != repeatEnd)
                 {
-                    var startProgress = repeatStart / valueLength;
-                    var endProgress = repeatEnd / valueLength;
-
-                    var left = (float)Manager.SnapToPixel(startProgress * bounds.Width);
-                    var right = (float)Manager.SnapToPixel(endProgress * bounds.Width);
-
-                    drawLine(drawContext, offset + new Vector2(left - pixelSize, 0), lineSize, Color4.White, actualOpacity);
-                    drawLine(drawContext, offset + new Vector2(x, 0), lineSize * 0.6f, Color4.White, actualOpacity);
-                    drawLine(drawContext, offset + new Vector2(right + pixelSize, 0), lineSize, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(timeToXTop(repeatStart) - pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(x, offset.Y), lineSize * 0.6f, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(timeToXTop(repeatEnd) + pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
                 }
                 else
                 {
-                    drawLine(drawContext, offset + new Vector2(x - pixelSize, 0), lineSize, Color4.White, actualOpacity);
-                    drawLine(drawContext, offset + new Vector2(x + pixelSize, 0), lineSize, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(x - pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(x + pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
                 }
             }
 
@@ -263,6 +247,12 @@ namespace StorybrewEditor.UserInterface
                 drawLine(drawContext, offset + new Vector2(centerX - pixelSize, lineBottomY), lineSize, Color4.White, actualOpacity);
                 drawLine(drawContext, offset + new Vector2(centerX + pixelSize, lineBottomY), lineSize, Color4.White, actualOpacity);
             }
+        }
+
+        private float timeToXTop(double time)
+        {
+            var progress = time / (MaxValue - MinValue);
+            return (float)Manager.SnapToPixel(AbsolutePosition.X + progress * Width);
         }
 
         private void drawLine(DrawContext drawContext, Vector2 position, Vector2 size, Color4 color, float opacity)
