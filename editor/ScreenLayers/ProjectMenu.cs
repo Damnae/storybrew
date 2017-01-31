@@ -35,8 +35,9 @@ namespace StorybrewEditor.ScreenLayers
         private Button divisorButton;
         private Button audioTimeFactorButton;
         private TimelineSlider timeline;
-        private Button playPauseButton;
+        private Button changeMapButton;
         private Button fitButton;
+        private Button playPauseButton;
         private Button projectFolderButton;
         private Button mapsetFolderButton;
         private Button saveButton;
@@ -112,11 +113,11 @@ namespace StorybrewEditor.ScreenLayers
                         AnchorFrom = BoxAlignment.Centre,
                         SnapDivisor = snapDivisor,
                     },
-                    playPauseButton = new Button(WidgetManager)
+                    changeMapButton = new Button(WidgetManager)
                     {
                         StyleName = "icon",
-                        Icon = IconFont.Play,
-                        Tooltip = "Play/Pause\nShortcut: Space",
+                        Icon = IconFont.FilesO,
+                        Tooltip = "Change beatmap",
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
@@ -128,6 +129,14 @@ namespace StorybrewEditor.ScreenLayers
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                         Checkable = true,
+                    },
+                    playPauseButton = new Button(WidgetManager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Play,
+                        Tooltip = "Play/Pause\nShortcut: Space",
+                        AnchorFrom = BoxAlignment.Centre,
+                        CanGrow = false,
                     },
                 },
             });
@@ -264,14 +273,9 @@ namespace StorybrewEditor.ScreenLayers
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
-            timeline.OnClickDown += (sender, e) =>
-            {
-                if (e.Button != MouseButton.Right) return false;
-                project.SwitchMainBeatmap();
-                return true;
-            };
-            playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
+            changeMapButton.OnClick += (sender, e) => project.SwitchMainBeatmap();
             Program.Settings.FitStoryboard.Bind(fitButton, () => resizeStoryboard());
+            playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
 
             divisorButton.OnClick += (sender, e) =>
             {
@@ -396,14 +400,20 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Update(isTop, isCovered);
 
+            changeMapButton.Disabled = project.MapsetManager.BeatmapCount < 2;
             playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
             saveButton.Disabled = !project.Changed;
             audio.Volume = WidgetManager.Root.Opacity;
 
-            if (audio.Playing && timeline.RepeatStart != timeline.RepeatEnd && timeline.RepeatEnd < audio.Time)
-                audio.Time = timeline.RepeatStart;
-
             var time = (float)audio.Time;
+
+            if (audio.Playing &&
+                timeline.RepeatStart != timeline.RepeatEnd &&
+                (time < timeline.RepeatStart - 0.005 || timeline.RepeatEnd < time))
+            {
+                audio.Time = time = timeline.RepeatStart;
+            }
+
             timeline.SetValueSilent(time);
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
                 timeButton.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";

@@ -9,6 +9,7 @@ namespace BrewLib.UserInterface
     {
         private bool hovered;
         private bool dragged;
+        private MouseButton dragButton;
 
         public float Step;
 
@@ -36,27 +37,27 @@ namespace BrewLib.UserInterface
             };
             OnClickDown += (sender, e) =>
             {
-                if (disabled) return false;
-                if (e.Button != MouseButton.Left) return false;
+                if (disabled || dragged) return false;
+                dragButton = e.Button;
                 dragged = true;
                 Value = GetValueForPosition(new Vector2(e.X, e.Y));
-                DragStart();
+                DragStart(dragButton);
                 return true;
             };
             OnClickUp += (sender, e) =>
             {
                 if (disabled || !dragged) return;
-                if (e.Button != MouseButton.Left) return;
+                if (e.Button != dragButton) return;
                 dragged = false;
                 RefreshStyle();
-                DragEnd();
+                DragEnd(dragButton);
                 OnValueCommited?.Invoke(this, e);
             };
             OnDrag += (sender, e) =>
             {
                 if (disabled || !dragged) return;
                 Value = GetValueForPosition(new Vector2(e.X, e.Y));
-                DragUpdate();
+                DragUpdate(dragButton);
             };
         }
 
@@ -69,15 +70,15 @@ namespace BrewLib.UserInterface
             return value;
         }
 
-        protected virtual void DragStart()
+        protected virtual void DragStart(MouseButton button)
         {
         }
 
-        protected virtual void DragUpdate()
+        protected virtual void DragUpdate(MouseButton button)
         {
         }
 
-        protected virtual void DragEnd()
+        protected virtual void DragEnd(MouseButton button)
         {
         }
 

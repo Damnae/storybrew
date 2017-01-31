@@ -6,6 +6,7 @@ using StorybrewEditor.Storyboarding;
 using System;
 using BrewLib.Util;
 using BrewLib.UserInterface;
+using OpenTK.Input;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -286,15 +287,19 @@ namespace StorybrewEditor.UserInterface
 
         public void Snap() => Scroll(0);
 
-        protected override void DragStart()
+        protected override void DragStart(MouseButton button)
         {
+            if (button != MouseButton.Right) return;
+
             dragStart = Value;
             repeatStart = dragStart;
             repeatEnd = dragStart;
         }
 
-        protected override void DragUpdate()
+        protected override void DragUpdate(MouseButton button)
         {
+            if (button != MouseButton.Right) return;
+
             var value = Value;
             if (value < dragStart)
             {
