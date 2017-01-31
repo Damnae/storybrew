@@ -430,8 +430,8 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Resize(width, height);
 
-            bottomLeftLayout.Pack(650);
-            bottomRightLayout.Pack(1024 - bottomLeftLayout.Width);
+            bottomRightLayout.Pack(374);
+            bottomLeftLayout.Pack(WidgetManager.Size.X - bottomRightLayout.Width);
 
             effectsList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
             layersList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
@@ -490,13 +490,13 @@ namespace StorybrewEditor.ScreenLayers
                 case EffectStatus.ExecutionFailed:
                     statusIcon.Icon = IconFont.Bug;
                     statusMessage.Text = "An effect failed to execute.\nClick the Effects tabs, then the bug icon to see its error message.";
-                    statusLayout.Pack(bottomLeftLayout.Width - 24);
+                    statusLayout.Pack(1024 - bottomRightLayout.Width - 24);
                     statusLayout.Displayed = true;
                     break;
                 case EffectStatus.Updating:
                     statusIcon.Icon = IconFont.Spinner;
                     statusMessage.Text = "Updating effects...";
-                    statusLayout.Pack(bottomLeftLayout.Width - 24);
+                    statusLayout.Pack(1024 - bottomRightLayout.Width - 24);
                     statusLayout.Displayed = true;
                     break;
                 default:
