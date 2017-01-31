@@ -210,7 +210,7 @@ namespace StorybrewEditor.ScreenLayers
                                 }
                             }
 
-                            if (Program.Version < version)
+                            if (Program.Version < version || Program.Version >= latestVersion)
                             {
                                 var publishedAt = release.Value<string>("published_at");
                                 var publishDate = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
@@ -241,8 +241,9 @@ namespace StorybrewEditor.ScreenLayers
                                 else Updater.OpenLastestReleasePage();
                             };
                             updateButton.Displayed = true;
-                            bottomLayout.Pack(600);
                         }
+                        else versionLabel.Tooltip = $"Recent changes:\n\n{description.TrimEnd('\n')}";
+                        bottomLayout.Pack(600);
                     }
                     catch (Exception e)
                     {
