@@ -273,7 +273,12 @@ namespace StorybrewEditor.ScreenLayers
             timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
-            changeMapButton.OnClick += (sender, e) => project.SwitchMainBeatmap();
+            changeMapButton.OnClick += (sender, e) =>
+            {
+                if (project.MapsetManager.BeatmapCount > 2)
+                    Manager.ShowContextMenu("Select a beatmap", beatmap => project.SelectBeatmap(beatmap.Id, beatmap.Name), project.MapsetManager.Beatmaps);
+                else project.SwitchMainBeatmap();
+            };
             Program.Settings.FitStoryboard.Bind(fitButton, () => resizeStoryboard());
             playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
 

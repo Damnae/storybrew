@@ -58,7 +58,7 @@ namespace StorybrewEditor.UserInterface
                 if (options == null)
                     return;
                 else if (options.Length > 2)
-                    Manager.ScreenLayerManager.ShowContextMenu("Select a value", (NamedValue optionValue) => Value = optionValue.Value, options);
+                    Manager.ScreenLayerManager.ShowContextMenu("Select a value", optionValue => Value = optionValue.Value, options);
                 else
                 {
                     var optionFound = false;

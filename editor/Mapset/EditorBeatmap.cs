@@ -65,6 +65,8 @@ namespace StorybrewEditor.Mapset
             Path = path;
         }
 
+        public override string ToString() => Name;
+
         #region Timing
 
         private List<ControlPoint> controlPoints = new List<ControlPoint>();
