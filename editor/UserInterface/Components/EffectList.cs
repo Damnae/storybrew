@@ -302,7 +302,9 @@ namespace StorybrewEditor.UserInterface.Components
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code", "bin", "code"),
             };
             foreach (var path in Environment.GetEnvironmentVariable("path").Split(';'))
-                paths.Add(Path.Combine(path, "code"));
+                if (PathHelper.IsValidPath(path))
+                    paths.Add(Path.Combine(path, "code"));
+                else Trace.WriteLine($"Invalid path in environment variables: {path}");
 
             var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
             if (Program.Settings.VerboseVsCode)

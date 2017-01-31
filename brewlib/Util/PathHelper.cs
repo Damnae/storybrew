@@ -47,5 +47,23 @@ namespace BrewLib.Util
 
             return path.Substring(folder.Length + 1);
         }
+
+        public static bool IsValidPath(string path)
+        {
+            foreach (var invalidCharacter in Path.GetInvalidPathChars())
+                foreach (var character in path)
+                    if (character == invalidCharacter)
+                        return false;
+            return true;
+        }
+
+        public static bool IsValidFilename(string filename)
+        {
+            foreach (var invalidCharacter in Path.GetInvalidFileNameChars())
+                foreach (var character in filename)
+                    if (character == invalidCharacter)
+                        return false;
+            return true;
+        }
     }
 }
