@@ -53,7 +53,7 @@ namespace StorybrewScripts
         public float SubtitleY = 400;
 
         [Configurable]
-        public bool PerCharacter = false;
+        public bool PerCharacter = true;
 
         [Configurable]
         public bool Debug = false;
