@@ -48,13 +48,12 @@ namespace StorybrewCommon.Subtitles
 
             using (var blurSource = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb))
             {
-                using (var brush = new SolidBrush(System.Drawing.Color.FromArgb(Color.ToArgb())))
+                using (var brush = new SolidBrush(System.Drawing.Color.White))
                 using (var graphics = Graphics.FromImage(blurSource))
                 {
                     graphics.TextRenderingHint = textGraphics.TextRenderingHint;
                     graphics.SmoothingMode = SmoothingMode.HighQuality;
                     graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    graphics.Clear(System.Drawing.Color.FromArgb(1, (byte)(Color.R * 255), (byte)(Color.G * 255), (byte)(Color.B * 255)));
                     graphics.DrawString(text, font, brush, x, y, stringFormat);
                 }
 
@@ -65,7 +64,7 @@ namespace StorybrewCommon.Subtitles
                     kernel = BitmapHelper.CalculateGaussianKernel(radius, power);
                 }
 
-                using (var blurredBitmap = BitmapHelper.Convolute(blurSource, kernel))
+                using (var blurredBitmap = BitmapHelper.ConvoluteAlpha(blurSource, kernel, System.Drawing.Color.FromArgb(Color.ToArgb())))
                     textGraphics.DrawImage(blurredBitmap.Bitmap, 0, 0);
             }
         }

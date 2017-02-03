@@ -103,6 +103,63 @@ namespace StorybrewCommon.Util
             }
         }
 
+        public static PinnedBitmap ConvoluteAlpha(Bitmap source, double[,] kernel, Color color)
+        {
+            var kernelHeight = kernel.GetUpperBound(0) + 1;
+            var kernelWidth = kernel.GetUpperBound(1) + 1;
+
+            if ((kernelWidth % 2) == 0 || (kernelHeight % 2) == 0)
+                throw new InvalidOperationException("Invalid kernel size");
+
+            using (var pinnedSource = PinnedBitmap.FromBitmap(source))
+            {
+                var width = source.Width;
+                var height = source.Height;
+                var result = new PinnedBitmap(width, height);
+
+                var index = 0;
+                var halfKernelWidth = kernelWidth >> 1;
+                var halfKernelHeight = kernelHeight >> 1;
+
+                var colorRgb = (color.R << 16) | (color.G << 8) | color.B;
+
+                for (var y = 0; y < height; y++)
+                    for (var x = 0; x < width; x++)
+                    {
+                        var a = 0.0;
+
+                        for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
+                        {
+                            var pixelX = kernelX + x;
+                            if (pixelX < 0)
+                                pixelX = 0;
+                            else if (pixelX >= width)
+                                pixelX = width - 1;
+
+                            for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
+                            {
+                                var pixelY = kernelY + y;
+                                if (pixelY < 0)
+                                    pixelY = 0;
+                                else if (pixelY >= height)
+                                    pixelY = height - 1;
+
+                                var col = pinnedSource.Data[pixelY * width + pixelX];
+                                var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
+                                a += ((col >> 24) & 0x000000FF) * k;
+                            }
+                        }
+
+                        var alphaInt = (int)a;
+                        var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
+
+                        result.Data[index++] = (alpha << 24) | colorRgb;
+                    }
+
+                return result;
+            }
+        }
+
         public static Rectangle? FindTransparencyBounds(Bitmap source)
         {
             var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
