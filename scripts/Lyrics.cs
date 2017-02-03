@@ -5,6 +5,7 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Subtitles;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace StorybrewScripts
 {
@@ -36,6 +37,9 @@ namespace StorybrewScripts
 
         [Configurable]
         public Color4 GlowColor = new Color4(255, 255, 255, 100);
+
+        [Configurable]
+        public bool AdditiveGlow = true;
 
         [Configurable]
         public int OutlineThickness = 3;
@@ -82,7 +86,7 @@ namespace StorybrewScripts
             },
             new FontGlow()
             {
-                Radius = GlowRadius,
+                Radius = AdditiveGlow ? 0 : GlowRadius,
                 Color = GlowColor,
             },
             new FontOutline()
@@ -97,30 +101,56 @@ namespace StorybrewScripts
             });
 
             var subtitles = LoadSubtitles(SubtitlesPath);
-            if (PerCharacter) generatePerCharacter(font, subtitles);
-            else generatePerLine(font, subtitles);
+
+            if (GlowRadius > 0 && AdditiveGlow)
+            {
+                var glowFont = LoadFont(Path.Combine(SpritesPath, "glow"), new FontDescription()
+                {
+                    FontPath = FontName,
+                    FontSize = FontSize,
+                    Color = FontColor,
+                    Padding = Padding,
+                    FontStyle = FontStyle,
+                    TrimTransparency = TrimTransparency,
+                    EffectsOnly = true,
+                    Debug = Debug,
+                },
+                new FontGlow()
+                {
+                    Radius = GlowRadius,
+                    Color = GlowColor,
+                });
+                generateLyrics(glowFont, subtitles, "glow", true);
+            }
+            generateLyrics(font, subtitles, "", false);
         }
 
-        public void generatePerLine(FontGenerator font, SubtitleSet subtitles)
+        public void generateLyrics(FontGenerator font, SubtitleSet subtitles, string layerName, bool additive)
         {
-            var layer = GetLayer("");
+            var layer = GetLayer(layerName);
+            if (PerCharacter) generatePerCharacter(font, subtitles, layer, additive);
+            else generatePerLine(font, subtitles, layer, additive);
+        }
+
+        public void generatePerLine(FontGenerator font, SubtitleSet subtitles, StoryboardLayer layer, bool additive)
+        {
             foreach (var line in subtitles.Lines)
             {
                 var texture = font.GetTexture(line.Text);
 
-                var x = texture.OffsetX * FontScale + 320;
+                var x = texture.OffsetX * FontScale + 320 - texture.BaseWidth * FontScale * 0.5f;
                 var y = texture.OffsetY * FontScale + SubtitleY;
 
-                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(x, y));
+                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopLeft, new Vector2(x, y));
                 sprite.Scale(line.StartTime, FontScale);
                 sprite.Fade(line.StartTime - 200, line.StartTime, 0, 1);
                 sprite.Fade(line.EndTime - 200, line.EndTime, 1, 0);
+                if (additive) sprite.Additive(line.EndTime - 200, line.EndTime);
             }
         }
 
-        public void generatePerCharacter(FontGenerator font, SubtitleSet subtitles)
+        public void generatePerCharacter(FontGenerator font, SubtitleSet subtitles, StoryboardLayer layer, bool additive)
         {
-            var layer = GetLayer("");
             foreach (var subtitleLine in subtitles.Lines)
             {
                 var letterY = SubtitleY;
@@ -141,13 +171,14 @@ namespace StorybrewScripts
                         var texture = font.GetTexture(letter.ToString());
                         if (!texture.IsEmpty)
                         {
-                            var x = texture.OffsetX * FontScale + letterX + texture.BaseWidth * 0.5f * FontScale;
+                            var x = texture.OffsetX * FontScale + letterX;
                             var y = texture.OffsetY * FontScale + letterY;
 
-                            var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(x, y));
+                            var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopLeft, new Vector2(x, y));
                             sprite.Scale(subtitleLine.StartTime, FontScale);
                             sprite.Fade(subtitleLine.StartTime - 200, subtitleLine.StartTime, 0, 1);
                             sprite.Fade(subtitleLine.EndTime - 200, subtitleLine.EndTime, 1, 0);
+                            if (additive) sprite.Additive(subtitleLine.EndTime - 200, subtitleLine.EndTime);
                         }
                         letterX += texture.BaseWidth * FontScale;
                     }
