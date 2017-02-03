@@ -17,11 +17,11 @@ namespace StorybrewCommon.Subtitles
         public string Path => path;
         public bool IsEmpty => path == null;
 
-        private int offsetX;
-        public int OffsetX => offsetX;
+        private float offsetX;
+        public float OffsetX => offsetX;
 
-        private int offsetY;
-        public int OffsetY => offsetY;
+        private float offsetY;
+        public float OffsetY => offsetY;
 
         private int baseWidth;
         public int BaseWidth => baseWidth;
@@ -35,7 +35,7 @@ namespace StorybrewCommon.Subtitles
         private int height;
         public int Height => height;
 
-        public FontTexture(string path, int offsetX, int offsetY, int baseWidth, int baseHeight, int width, int height)
+        public FontTexture(string path, float offsetX, float offsetY, int baseWidth, int baseHeight, int width, int height)
         {
             this.path = path;
             this.offsetX = offsetX;
@@ -96,7 +96,7 @@ namespace StorybrewCommon.Subtitles
             var fontPath = Path.Combine(projectDirectory, description.FontPath);
             if (!File.Exists(fontPath)) fontPath = description.FontPath;
 
-            int offsetX = 0, offsetY = 0;
+            float offsetX = 0, offsetY = 0;
             int baseWidth, baseHeight, width, height;
             using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
             using (var stringFormat = new StringFormat(StringFormat.GenericTypographic))
@@ -119,20 +119,30 @@ namespace StorybrewCommon.Subtitles
                 using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize * dpiScale, fontStyle) : new Font(fontPath, description.FontSize * dpiScale, fontStyle))
                 {
                     var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
-                    width = baseWidth = (int)(measuredSize.Width + 1 + description.Padding.X * 2);
-                    height = baseHeight = (int)(measuredSize.Height + 1 + description.Padding.Y * 2);
+                    baseWidth = (int)Math.Ceiling(measuredSize.Width);
+                    baseHeight = (int)Math.Ceiling(measuredSize.Height);
+
+                    var effectsWidth = 0f;
+                    var effectsHeight = 0f;
                     foreach (var effect in effects)
                     {
                         var effectSize = effect.Measure();
-                        width = Math.Max(width, (int)(baseWidth + effectSize.X));
-                        height = Math.Max(height, (int)(baseHeight + effectSize.Y));
+                        effectsWidth = Math.Max(effectsWidth, effectSize.X);
+                        effectsHeight = Math.Max(effectsHeight, effectSize.Y);
                     }
+                    width = (int)Math.Ceiling(baseWidth + effectsWidth + description.Padding.X * 2);
+                    height = (int)Math.Ceiling(baseHeight + effectsHeight + description.Padding.Y * 2);
+
+                    var paddingX = description.Padding.X + effectsWidth * 0.5f;
+                    var paddingY = description.Padding.Y + effectsHeight * 0.5f;
+                    var textX = paddingX + measuredSize.Width * 0.5f;
+                    var textY = paddingY;
+
+                    offsetX = -paddingX;
+                    offsetY = -paddingY;
 
                     if (text.Length == 1 && char.IsWhiteSpace(text[0]))
-                        return new FontTexture(null, 0, 0, baseWidth, baseHeight, width, height);
-
-                    var textX = width / 2;
-                    var textY = description.Padding.Y + (height - baseHeight) / 2;
+                        return new FontTexture(null, offsetX, offsetY, baseWidth, baseHeight, width, height);
 
                     using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
                     {
@@ -159,7 +169,10 @@ namespace StorybrewCommon.Subtitles
 
                             if (description.Debug)
                                 using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
+                                {
                                     textGraphics.DrawLine(pen, textX, textY, textX, textY + baseHeight);
+                                    textGraphics.DrawLine(pen, textX - baseWidth * 0.5f, textY, textX + baseWidth * 0.5f, textY);
+                                }
                         }
 
                         var bounds = description.TrimTransparency ? BitmapHelper.FindTransparencyBounds(bitmap) : null;
@@ -168,8 +181,8 @@ namespace StorybrewCommon.Subtitles
                             var trimBounds = bounds.Value;
                             using (var trimmedBitmap = new Bitmap(trimBounds.Width, trimBounds.Height))
                             {
-                                offsetX = trimBounds.Left;
-                                offsetY = trimBounds.Top;
+                                offsetX += trimBounds.Left;
+                                offsetY += trimBounds.Top;
                                 using (var trimGraphics = Graphics.FromImage(trimmedBitmap))
                                     trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
                                 Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
