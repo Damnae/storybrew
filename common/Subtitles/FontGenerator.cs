@@ -46,6 +46,7 @@ namespace StorybrewCommon.Subtitles
         public Color4 Color = new Color4(0, 0, 0, 100);
         public Vector2 Padding = Vector2.Zero;
         public FontStyle FontStyle = FontStyle.Regular;
+        public bool EffectsOnly;
         public bool Debug;
     }
 
@@ -87,8 +88,8 @@ namespace StorybrewCommon.Subtitles
             if (!File.Exists(fontPath)) fontPath = description.FontPath;
 
             int baseWidth, baseHeight, width, height;
-            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
-            using (StringFormat stringFormat = new StringFormat(StringFormat.GenericTypographic))
+            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
+            using (var stringFormat = new StringFormat(StringFormat.GenericTypographic))
             using (var textBrush = new SolidBrush(Color.FromArgb(description.Color.ToArgb())))
             using (var fontCollection = new PrivateFontCollection())
             {
@@ -123,9 +124,9 @@ namespace StorybrewCommon.Subtitles
                     var offsetX = width / 2;
                     var offsetY = description.Padding.Y + (height - baseHeight) / 2;
 
-                    using (Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+                    using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
                     {
-                        using (Graphics textGraphics = Graphics.FromImage(bitmap))
+                        using (var textGraphics = Graphics.FromImage(bitmap))
                         {
                             textGraphics.TextRenderingHint = graphics.TextRenderingHint;
                             textGraphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -137,12 +138,13 @@ namespace StorybrewCommon.Subtitles
 
                             foreach (var effect in effects)
                                 if (!effect.Overlay)
-                                    effect.Draw(textGraphics, font, stringFormat, text, offsetX, offsetY);
-                            textGraphics.DrawString(text, font, textBrush, offsetX, offsetY, stringFormat);
+                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, offsetX, offsetY);
+                            if (!description.EffectsOnly)
+                                textGraphics.DrawString(text, font, textBrush, offsetX, offsetY, stringFormat);
                             foreach (var effect in effects)
                                 if (effect.Overlay)
-                                    effect.Draw(textGraphics, font, stringFormat, text, offsetX, offsetY);
-                            
+                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, offsetX, offsetY);
+
                             if (description.Debug)
                                 using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
                                     textGraphics.DrawLine(pen, offsetX, offsetY, offsetX, offsetY + baseHeight);

@@ -7,6 +7,6 @@ namespace StorybrewCommon.Subtitles
     {
         bool Overlay { get; }
         Vector2 Measure();
-        void Draw(Graphics textGraphics, Font font, StringFormat stringFormat, string text, float x, float y);
+        void Draw(Bitmap bitmap, Graphics textGraphics, Font font, StringFormat stringFormat, string text, float x, float y);
     }
 }

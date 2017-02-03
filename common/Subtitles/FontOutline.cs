@@ -14,8 +14,11 @@ namespace StorybrewCommon.Subtitles
         public bool Overlay => false;
         public Vector2 Measure() => new Vector2(Thickness * diagonal * 2);
 
-        public void Draw(Graphics textGraphics, Font font, StringFormat stringFormat, string text, float x, float y)
+        public void Draw(Bitmap bitmap, Graphics textGraphics, Font font, StringFormat stringFormat, string text, float x, float y)
         {
+            if (Thickness < 1)
+                return;
+
             using (var brush = new SolidBrush(System.Drawing.Color.FromArgb(Color.ToArgb())))
                 for (var i = 1; i <= Thickness; i++)
                     if (i % 2 == 0)

@@ -32,6 +32,12 @@ namespace StorybrewScripts
         public FontStyle FontStyle = FontStyle.Regular;
 
         [Configurable]
+        public int GlowRadius = 0;
+
+        [Configurable]
+        public Color4 GlowColor = new Color4(255, 255, 255, 100);
+
+        [Configurable]
         public int OutlineThickness = 3;
 
         [Configurable]
@@ -56,6 +62,9 @@ namespace StorybrewScripts
         public bool PerCharacter = true;
 
         [Configurable]
+        public bool EffectsOnly = false;
+
+        [Configurable]
         public bool Debug = false;
 
         public override void Generate()
@@ -67,7 +76,13 @@ namespace StorybrewScripts
                 Color = FontColor,
                 Padding = new Vector2(PaddingX, PaddingY),
                 FontStyle = FontStyle,
+                EffectsOnly = EffectsOnly,
                 Debug = Debug,
+            },
+            new FontGlow()
+            {
+                Radius = GlowRadius,
+                Color = GlowColor,
             },
             new FontOutline()
             {
