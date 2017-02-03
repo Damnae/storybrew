@@ -45,7 +45,7 @@ namespace StorybrewEditor.Storyboarding
             statusStopwatch.Start();
 
             this.scriptContainer = scriptContainer;
-            name = project.GetUniqueEffectName();
+            name = project.GetUniqueEffectName(BaseName);
 
             layers = new List<EditorStoryboardLayer>();
             layers.Add(placeHolderLayer = new EditorStoryboardLayer(string.Empty, this));

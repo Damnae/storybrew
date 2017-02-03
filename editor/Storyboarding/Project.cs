@@ -234,12 +234,12 @@ namespace StorybrewEditor.Storyboarding
             OnEffectsChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public string GetUniqueEffectName()
+        public string GetUniqueEffectName(string baseName)
         {
             var count = 1;
             string name;
             do
-                name = $"Effect {count++}";
+                name = $"{baseName} {count++}";
             while (GetEffectByName(name) != null);
             return name;
         }
