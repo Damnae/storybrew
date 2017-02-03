@@ -81,6 +81,87 @@ namespace StorybrewCommon.Util
             }
         }
 
+        public static Rectangle? FindTransparencyBounds(Bitmap source)
+        {
+            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var buffer = new byte[data.Height * data.Stride];
+            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
+            source.UnlockBits(data);
+
+            int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
+            var foundPixel = false;
+
+            for (var x = 0; x < data.Width; x++)
+            {
+                var stop = false;
+                for (var y = 0; y < data.Height; y++)
+                {
+                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    if (alpha != 0)
+                    {
+                        xMin = x;
+                        stop = true;
+                        foundPixel = true;
+                        break;
+                    }
+                }
+                if (stop) break;
+            }
+
+            if (!foundPixel)
+                return null;
+
+            for (var y = 0; y < data.Height; y++)
+            {
+                var stop = false;
+                for (var x = xMin; x < data.Width; x++)
+                {
+                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    if (alpha != 0)
+                    {
+                        yMin = y;
+                        stop = true;
+                        break;
+                    }
+                }
+                if (stop) break;
+            }
+
+            for (var x = data.Width - 1; x >= xMin; x--)
+            {
+                var stop = false;
+                for (var y = yMin; y < data.Height; y++)
+                {
+                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    if (alpha != 0)
+                    {
+                        xMax = x;
+                        stop = true;
+                        break;
+                    }
+                }
+                if (stop) break;
+            }
+
+            for (var y = data.Height - 1; y >= yMin; y--)
+            {
+                var stop = false;
+                for (var x = xMin; x <= xMax; x++)
+                {
+                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    if (alpha != 0)
+                    {
+                        yMax = y;
+                        stop = true;
+                        break;
+                    }
+                }
+                if (stop) break;
+            }
+            
+            return Rectangle.Intersect(Rectangle.FromLTRB(xMin - 1, yMin - 1, xMax + 2, yMax + 2), new Rectangle(0, 0, source.Width, source.Height));
+        }
+
         private static double[,] calculateGaussianKernel(int radius, double weight)
         {
             var length = radius * 2 + 1;

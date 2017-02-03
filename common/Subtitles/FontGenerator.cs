@@ -17,6 +17,12 @@ namespace StorybrewCommon.Subtitles
         public string Path => path;
         public bool IsEmpty => path == null;
 
+        private int offsetX;
+        public int OffsetX => offsetX;
+
+        private int offsetY;
+        public int OffsetY => offsetY;
+
         private int baseWidth;
         public int BaseWidth => baseWidth;
 
@@ -29,9 +35,11 @@ namespace StorybrewCommon.Subtitles
         private int height;
         public int Height => height;
 
-        public FontTexture(string path, int baseWidth, int baseHeight, int width, int height)
+        public FontTexture(string path, int offsetX, int offsetY, int baseWidth, int baseHeight, int width, int height)
         {
             this.path = path;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
             this.baseWidth = baseWidth;
             this.baseHeight = baseHeight;
             this.width = width;
@@ -46,6 +54,7 @@ namespace StorybrewCommon.Subtitles
         public Color4 Color = new Color4(0, 0, 0, 100);
         public Vector2 Padding = Vector2.Zero;
         public FontStyle FontStyle = FontStyle.Regular;
+        public bool TrimTransparency;
         public bool EffectsOnly;
         public bool Debug;
     }
@@ -87,6 +96,7 @@ namespace StorybrewCommon.Subtitles
             var fontPath = Path.Combine(projectDirectory, description.FontPath);
             if (!File.Exists(fontPath)) fontPath = description.FontPath;
 
+            int offsetX = 0, offsetY = 0;
             int baseWidth, baseHeight, width, height;
             using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
             using (var stringFormat = new StringFormat(StringFormat.GenericTypographic))
@@ -119,10 +129,10 @@ namespace StorybrewCommon.Subtitles
                     }
 
                     if (text.Length == 1 && char.IsWhiteSpace(text[0]))
-                        return new FontTexture(null, baseWidth, baseHeight, width, height);
+                        return new FontTexture(null, 0, 0, baseWidth, baseHeight, width, height);
 
-                    var offsetX = width / 2;
-                    var offsetY = description.Padding.Y + (height - baseHeight) / 2;
+                    var textX = width / 2;
+                    var textY = description.Padding.Y + (height - baseHeight) / 2;
 
                     using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
                     {
@@ -132,28 +142,44 @@ namespace StorybrewCommon.Subtitles
                             textGraphics.SmoothingMode = SmoothingMode.HighQuality;
                             textGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-                            var r = new Random(letters.Count);
                             if (description.Debug)
+                            {
+                                var r = new Random(letters.Count);
                                 textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
+                            }
 
                             foreach (var effect in effects)
                                 if (!effect.Overlay)
-                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, offsetX, offsetY);
+                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, textX, textY);
                             if (!description.EffectsOnly)
-                                textGraphics.DrawString(text, font, textBrush, offsetX, offsetY, stringFormat);
+                                textGraphics.DrawString(text, font, textBrush, textX, textY, stringFormat);
                             foreach (var effect in effects)
                                 if (effect.Overlay)
-                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, offsetX, offsetY);
+                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, textX, textY);
 
                             if (description.Debug)
                                 using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
-                                    textGraphics.DrawLine(pen, offsetX, offsetY, offsetX, offsetY + baseHeight);
+                                    textGraphics.DrawLine(pen, textX, textY, textX, textY + baseHeight);
                         }
-                        Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
+
+                        var bounds = description.TrimTransparency ? BitmapHelper.FindTransparencyBounds(bitmap) : null;
+                        if (bounds != null && bounds != new Rectangle(0, 0, bitmap.Width, bitmap.Height))
+                        {
+                            var trimBounds = bounds.Value;
+                            using (var trimmedBitmap = new Bitmap(trimBounds.Width, trimBounds.Height))
+                            {
+                                offsetX = trimBounds.Left;
+                                offsetY = trimBounds.Top;
+                                using (var trimGraphics = Graphics.FromImage(trimmedBitmap))
+                                    trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
+                                Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
+                            }
+                        }
+                        else Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
                     }
                 }
             }
-            return new FontTexture(Path.Combine(directory, filename), baseWidth, baseHeight, width, height);
+            return new FontTexture(Path.Combine(directory, filename), offsetX, offsetY, baseWidth, baseHeight, width, height);
         }
     }
 }

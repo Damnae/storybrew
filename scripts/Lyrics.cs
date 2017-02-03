@@ -50,16 +50,16 @@ namespace StorybrewScripts
         public Color4 ShadowColor = new Color4(0, 0, 0, 100);
 
         [Configurable]
-        public float PaddingX = 0;
-
-        [Configurable]
-        public float PaddingY = 0;
+        public Vector2 Padding = Vector2.Zero;
 
         [Configurable]
         public float SubtitleY = 400;
 
         [Configurable]
         public bool PerCharacter = true;
+
+        [Configurable]
+        public bool TrimTransparency = true;
 
         [Configurable]
         public bool EffectsOnly = false;
@@ -74,8 +74,9 @@ namespace StorybrewScripts
                 FontPath = FontName,
                 FontSize = FontSize,
                 Color = FontColor,
-                Padding = new Vector2(PaddingX, PaddingY),
+                Padding = Padding,
                 FontStyle = FontStyle,
+                TrimTransparency = TrimTransparency,
                 EffectsOnly = EffectsOnly,
                 Debug = Debug,
             },
@@ -106,7 +107,11 @@ namespace StorybrewScripts
             foreach (var line in subtitles.Lines)
             {
                 var texture = font.GetTexture(line.Text);
-                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(320, SubtitleY));
+
+                var x = texture.OffsetX * FontScale + 320;
+                var y = texture.OffsetY * FontScale + SubtitleY;
+
+                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(x, y));
                 sprite.Scale(line.StartTime, FontScale);
                 sprite.Fade(line.StartTime - 200, line.StartTime, 0, 1);
                 sprite.Fade(line.EndTime - 200, line.EndTime, 1, 0);
@@ -136,8 +141,8 @@ namespace StorybrewScripts
                         var texture = font.GetTexture(letter.ToString());
                         if (!texture.IsEmpty)
                         {
-                            var x = letterX + texture.BaseWidth * FontScale * 0.5f;
-                            var y = letterY;
+                            var x = texture.OffsetX * FontScale + letterX + texture.BaseWidth * 0.5f * FontScale;
+                            var y = texture.OffsetY * FontScale + letterY;
 
                             var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopCentre, new Vector2(x, y));
                             sprite.Scale(subtitleLine.StartTime, FontScale);
