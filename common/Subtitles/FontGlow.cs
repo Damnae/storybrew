@@ -10,8 +10,32 @@ namespace StorybrewCommon.Subtitles
 {
     public class FontGlow : FontEffect
     {
-        public int Radius = 6;
-        public double Power = 0;
+        private double[,] kernel;
+
+        private int radius = 6;
+        public int Radius
+        {
+            get { return radius; }
+            set
+            {
+                if (radius == value) return;
+                radius = value;
+                kernel = null;
+            }
+        }
+
+        private double power = 0;
+        public double Power
+        {
+            get { return power; }
+            set
+            {
+                if (power == value) return;
+                power = value;
+                kernel = null;
+            }
+        }
+
         public Color4 Color = new Color4(255, 255, 255, 100);
 
         public bool Overlay => false;
@@ -34,9 +58,14 @@ namespace StorybrewCommon.Subtitles
                     graphics.DrawString(text, font, brush, x, y, stringFormat);
                 }
 
-                var radius = Math.Min(Radius, 24);
-                var power = Power >= 1 ? Power : Radius * 0.5;
-                using (var blurredBitmap = BitmapHelper.Blur(blurSource, radius, power))
+                if (kernel == null)
+                {
+                    var radius = Math.Min(Radius, 24);
+                    var power = Power >= 1 ? Power : Radius * 0.5;
+                    kernel = BitmapHelper.CalculateGaussianKernel(radius, power);
+                }
+
+                using (var blurredBitmap = BitmapHelper.Convolute(blurSource, kernel))
                     textGraphics.DrawImage(blurredBitmap.Bitmap, 0, 0);
             }
         }

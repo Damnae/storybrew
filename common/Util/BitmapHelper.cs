@@ -8,7 +8,29 @@ namespace StorybrewCommon.Util
     public static class BitmapHelper
     {
         public static PinnedBitmap Blur(Bitmap source, int radius, double power)
-            => Convolute(source, calculateGaussianKernel(radius, power));
+            => Convolute(source, CalculateGaussianKernel(radius, power));
+
+        public static double[,] CalculateGaussianKernel(int radius, double weight)
+        {
+            var length = radius * 2 + 1;
+            var kernel = new double[length, length];
+            var total = 0.0;
+
+            var scale = 1.0 / (2.0 * Math.PI * Math.Pow(weight, 2));
+            for (var y = -radius; y <= radius; y++)
+                for (var x = -radius; x <= radius; x++)
+                {
+                    var distance = (x * x + y * y) / (2 * weight * weight);
+                    var value = kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
+                    total += value;
+                }
+
+            for (var y = 0; y < length; y++)
+                for (var x = 0; x < length; x++)
+                    kernel[y, x] = kernel[y, x] / total;
+
+            return kernel;
+        }
 
         public static PinnedBitmap Convolute(Bitmap source, double[,] kernel)
         {
@@ -158,30 +180,8 @@ namespace StorybrewCommon.Util
                 }
                 if (stop) break;
             }
-            
+
             return Rectangle.Intersect(Rectangle.FromLTRB(xMin - 1, yMin - 1, xMax + 2, yMax + 2), new Rectangle(0, 0, source.Width, source.Height));
-        }
-
-        private static double[,] calculateGaussianKernel(int radius, double weight)
-        {
-            var length = radius * 2 + 1;
-            var kernel = new double[length, length];
-            var total = 0.0;
-
-            var scale = 1.0 / (2.0 * Math.PI * Math.Pow(weight, 2));
-            for (var y = -radius; y <= radius; y++)
-                for (var x = -radius; x <= radius; x++)
-                {
-                    var distance = (x * x + y * y) / (2 * weight * weight);
-                    kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
-                    total += kernel[y + radius, x + radius];
-                }
-
-            for (var y = 0; y < length; y++)
-                for (var x = 0; x < length; x++)
-                    kernel[y, x] = kernel[y, x] / total;
-
-            return kernel;
         }
 
         public class PinnedBitmap : IDisposable
