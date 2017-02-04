@@ -166,6 +166,8 @@ namespace StorybrewCommon.Scripting
         private SrtParser srtParser = new SrtParser();
         private AssParser assParser = new AssParser();
 
+        private HashSet<string> fontDirectories = new HashSet<string>();
+
         public SubtitleSet LoadSubtitles(string path)
         {
             path = Path.Combine(context.ProjectPath, path);
@@ -181,7 +183,14 @@ namespace StorybrewCommon.Scripting
         }
 
         public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
-            => new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+        {
+            var fontDirectory = Path.GetFullPath(Path.Combine(context.MapsetPath, directory));
+            if (fontDirectories.Contains(fontDirectory))
+                throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
+
+            fontDirectories.Add(fontDirectory);
+            return new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+        }
 
         #endregion
 
