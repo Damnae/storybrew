@@ -30,6 +30,8 @@ namespace StorybrewCommon.Subtitles
                             text = ""; //Reset Text
                         }
                         
+                        sTime = parseTimestamp(times[0]); //Parse timestamp for StartTime
+                        eTime = parseTimestamp(times[1]); //Parse timestamp for EndTime
                         continue;
                     }
                 }
