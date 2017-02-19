@@ -165,6 +165,7 @@ namespace StorybrewCommon.Scripting
 
         private SrtParser srtParser = new SrtParser();
         private AssParser assParser = new AssParser();
+        private SbvParser sbvParser = new SbvParser();
 
         private HashSet<string> fontDirectories = new HashSet<string>();
 
@@ -178,6 +179,7 @@ namespace StorybrewCommon.Scripting
                 case ".srt": return srtParser.Parse(path);
                 case ".ssa":
                 case ".ass": return assParser.Parse(path);
+                case ".sbv": return sbvParser.Parse(path); //YouTube's subtitle format
             }
             throw new NotSupportedException($"{Path.GetExtension(path)} isn't a supported subtitle format");
         }
