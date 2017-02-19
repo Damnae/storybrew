@@ -179,7 +179,7 @@ namespace StorybrewCommon.Scripting
                 case ".srt": return srtParser.Parse(path);
                 case ".ssa":
                 case ".ass": return assParser.Parse(path);
-                case ".sbv": return sbvParser.Parse(path); //YouTube's subtitle format
+                case ".sbv": return sbvParser.Parse(path);
             }
             throw new NotSupportedException($"{Path.GetExtension(path)} isn't a supported subtitle format");
         }
