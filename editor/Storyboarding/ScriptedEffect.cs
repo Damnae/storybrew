@@ -235,17 +235,22 @@ namespace StorybrewEditor.Storyboarding
 
         #region IDisposable Support
 
+        private bool disposedValue = false;
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposedValue)
             {
-                dependencyWatcher?.Dispose();
-                scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
-                foreach (var layer in layers)
-                    Project.LayerManager.Remove(layer);
+                if (disposing)
+                {
+                    dependencyWatcher?.Dispose();
+                    scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
+                    foreach (var layer in layers)
+                        Project.LayerManager.Remove(layer);
+                }
+                dependencyWatcher = null;
+                layers = null;
+                disposedValue = true;
             }
-            dependencyWatcher = null;
-            layers = null;
 
             base.Dispose(disposing);
         }
