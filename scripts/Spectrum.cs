@@ -1,8 +1,7 @@
 ﻿using OpenTK;
-using OpenTK.Graphics;
+using StorybrewCommon.Animations;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Storyboarding.Util;
 using System;
 
 namespace StorybrewScripts
@@ -19,58 +18,86 @@ namespace StorybrewScripts
         public int EndTime = 10000;
 
         [Configurable]
-        public int BeatDivisor = 4;
+        public Vector2 Position = new Vector2(-107, 240);
 
         [Configurable]
-        public int BarCount = 256;
+        public float Width = 844;
+
+        [Configurable]
+        public int BeatDivisor = 16;
+
+        [Configurable]
+        public int BarCount = 96;
 
         [Configurable]
         public string SpritePath = "sb/pl.png";
 
         [Configurable]
-        public int SpriteWidth = 76;
+        public OsbOrigin SpriteOrigin = OsbOrigin.CentreLeft;
+
+        [Configurable]
+        public Vector2 Scale = new Vector2(1, 200);
+
+        [Configurable]
+        public int LogScale = 600;
+
+        [Configurable]
+        public double Tolerance = 0.2;
+
+        [Configurable]
+        public float MinimalHeight = 0.05f;
+
+        [Configurable]
+        public OsbEasing FftEasing = OsbEasing.InExpo;
 
         public override void Generate()
         {
             var endTime = Math.Min(EndTime, (int)AudioDuration);
             var startTime = Math.Min(StartTime, endTime);
+            var bitmap = GetMapsetBitmap(SpritePath);
 
-            var layer = GetLayer("Spectrum");
+            var heightKeyframes = new KeyframedValue<float>[BarCount];
+            for (var i = 0; i < BarCount; i++)
+                heightKeyframes[i] = new KeyframedValue<float>(null);
+
             var fftTimeStep = Beatmap.GetTimingPointAt(startTime).BeatDuration / BeatDivisor;
-
-            var bars = new OsbSprite[BarCount];
-            var barWidth = 640.0 / bars.Length;
-            var imageWidth = SpriteWidth;
-
-            for (var i = 0; i < bars.Length; i++)
-            {
-                bars[i] = layer.CreateSprite(SpritePath, OsbOrigin.CentreLeft);
-                bars[i].Move(startTime, i * barWidth, 240);
-                bars[i].ScaleVec(startTime, barWidth / imageWidth, 0);
-                bars[i].Additive(startTime, endTime);
-            }
-
             var fftOffset = fftTimeStep * 0.2;
             for (var time = (double)startTime; time < endTime; time += fftTimeStep)
             {
-                var fft = GetFft(time + fftOffset, bars.Length);
-                for (var i = 0; i < bars.Length; i++)
+                var fft = GetFft(time + fftOffset, BarCount, null, FftEasing);
+                for (var i = 0; i < BarCount; i++)
                 {
-                    var height = fft[i] * 2000 / imageWidth;
-                    if (height < 0.01) height = 0;
+                    var height = (float)Math.Log10(1 + fft[i] * LogScale) * Scale.Y / bitmap.Height;
+                    height = (float)Math.Floor(height * 10) / 10.0f;
+                    if (height < MinimalHeight) height = MinimalHeight;
 
-                    var previousHeight = bars[i].ScaleAt(time).Y;
-                    if (height == previousHeight)
-                        continue;
-
-                    if (height < previousHeight)
-                        bars[i].ScaleVec(time, time + fftTimeStep,
-                            barWidth / imageWidth, previousHeight,
-                            barWidth / imageWidth, height);
-                    else if (height != previousHeight)
-                        bars[i].ScaleVec(time,
-                            barWidth / imageWidth, height);
+                    heightKeyframes[i].Add(time, height);
                 }
+            }
+
+            var layer = GetLayer("Spectrum");
+            var barWidth = Width / BarCount;
+            for (var i = 0; i < BarCount; i++)
+            {
+                var keyframes = heightKeyframes[i];
+                keyframes.Simplify1dKeyframes(Tolerance, h => h);
+
+                var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(Position.X + (float)(i * barWidth), Position.Y));
+                bar.ColorHsb(startTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
+                bar.Additive(startTime, endTime);
+
+                var scaleX = Scale.X * barWidth / bitmap.Width;
+                scaleX = (float)Math.Floor(scaleX * 10) / 10.0f;
+
+                var hasScale = false;
+                keyframes.ForEachPair((startKeyframe, endKeyframe) =>
+                {
+                    hasScale = true;
+                    bar.ScaleVec(startKeyframe.Time, endKeyframe.Time,
+                        scaleX, startKeyframe.Value,
+                        scaleX, endKeyframe.Value);
+                });
+                if (!hasScale) bar.ScaleVec(startTime, scaleX, MinimalHeight);
             }
         }
     }
