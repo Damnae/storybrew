@@ -48,7 +48,7 @@ namespace StorybrewEditor.Scripting
             foreach (var referencedAssembly in referencedAssemblies)
                 parameters.ReferencedAssemblies.Add(referencedAssembly);
 
-            using (var codeProvider = CodeDomProvider.CreateProvider("csharp"))
+            using (var codeProvider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider())
             {
                 var results = codeProvider.CompileAssemblyFromFile(parameters, sourcePaths);
 
