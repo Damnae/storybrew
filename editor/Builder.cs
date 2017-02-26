@@ -12,6 +12,7 @@ namespace StorybrewEditor
 {
     public class Builder
     {
+        private static string mainExecutablePath = "StorybrewEditor.exe";
         private static string[] ignoredPaths = { @"scripts\Scene3dTest.cs", };
 
         public static void Build()
@@ -52,7 +53,7 @@ namespace StorybrewEditor
             using (var stream = new FileStream(archiveName, FileMode.Create, FileAccess.ReadWrite))
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Create))
             {
-                addFile(archive, "StorybrewEditor.exe", appDirectory);
+                addFile(archive, mainExecutablePath, appDirectory);
                 addFile(archive, "StorybrewEditor.exe.config", appDirectory);
                 foreach (var path in Directory.EnumerateFiles(appDirectory, "*.dll", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, appDirectory);
@@ -86,7 +87,7 @@ namespace StorybrewEditor
 
             var updateTestPath = Path.GetFullPath("updatetest");
             var updateFolderPath = Path.GetFullPath(Path.Combine(updateTestPath, Updater.UpdateFolderPath));
-            var executablePath = Path.GetFullPath(Path.Combine(updateFolderPath, "StorybrewEditor.exe"));
+            var executablePath = Path.GetFullPath(Path.Combine(updateFolderPath, mainExecutablePath));
 
             if (Directory.Exists(updateTestPath))
             {
@@ -121,6 +122,8 @@ namespace StorybrewEditor
                 Trace.WriteLine($"  Skipping {path}");
                 return;
             }
+            if (entryName != mainExecutablePath && Path.GetExtension(entryName) == ".exe")
+                entryName += "_";
 
             Trace.WriteLine($"  Adding {path} -> {entryName}");
             var entry = archive.CreateEntryFromFile(path, entryName, CompressionLevel.Optimal);
