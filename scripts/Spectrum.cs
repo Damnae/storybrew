@@ -82,7 +82,7 @@ namespace StorybrewScripts
                 var keyframes = heightKeyframes[i];
                 keyframes.Simplify1dKeyframes(Tolerance, h => h);
 
-                var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(Position.X + (float)(i * barWidth), Position.Y));
+                var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(Position.X + i * barWidth, Position.Y));
                 bar.ColorHsb(startTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
                 bar.Additive(startTime, endTime);
 
