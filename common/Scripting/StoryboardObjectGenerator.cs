@@ -138,25 +138,23 @@ namespace StorybrewCommon.Scripting
         public float[] GetFft(double time, int magnitudes, string path = null, OsbEasing easing = OsbEasing.None)
         {
             var fft = GetFft(time, path);
+            if (magnitudes == fft.Length && easing == OsbEasing.None)
+                return fft;
+
             var resultFft = new float[magnitudes];
-
-            if (magnitudes != fft.Length || easing != OsbEasing.None)
+            var baseIndex = 0;
+            for (var i = 0; i < magnitudes; i++)
             {
-                var baseIndex = 0;
-                for (var i = 0; i < magnitudes; i++)
-                {
-                    var progress = EasingFunctions.Ease(easing, (double)i / magnitudes);
-                    var index = Math.Min(Math.Max(baseIndex + 1, (int)(progress * fft.Length)), fft.Length - 1);
+                var progress = EasingFunctions.Ease(easing, (double)i / magnitudes);
+                var index = Math.Min(Math.Max(baseIndex + 1, (int)(progress * fft.Length)), fft.Length - 1);
 
-                    var value = 0f;
-                    for (var v = baseIndex; v < index; v++)
-                        value = Math.Max(value, fft[index]);
+                var value = 0f;
+                for (var v = baseIndex; v < index; v++)
+                    value = Math.Max(value, fft[index]);
 
-                    resultFft[i] = value;
-                    baseIndex = index;
-                }
+                resultFft[i] = value;
+                baseIndex = index;
             }
-            else Array.Copy(fft, resultFft, magnitudes);
             return resultFft;
         }
 
