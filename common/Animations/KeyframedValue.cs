@@ -10,6 +10,8 @@ namespace StorybrewCommon.Animations
         private Func<TValue, TValue, double, TValue> interpolate;
         private TValue defaultValue;
 
+        public TValue StartValue => keyframes.Count == 0 ? defaultValue : keyframes[0].Value;
+        public TValue EndValue => keyframes.Count == 0 ? defaultValue : keyframes[keyframes.Count - 1].Value;
         public int Count => keyframes.Count;
 
         public KeyframedValue(Func<TValue, TValue, double, TValue> interpolate, TValue defaultValue = default(TValue))
@@ -55,14 +57,20 @@ namespace StorybrewCommon.Animations
 
         public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair)
         {
+            var hasPair = false;
             var previousKeyframe = (Keyframe<TValue>?)null;
             foreach (var keyframe in keyframes)
             {
                 if (previousKeyframe.HasValue && !previousKeyframe.Value.Value.Equals(keyframe.Value))
+                {
                     pair(previousKeyframe.Value, keyframe);
-
+                    hasPair = true;
+                }
                 previousKeyframe = keyframe;
             }
+
+            if (!hasPair && previousKeyframe.HasValue)
+                pair(previousKeyframe.Value, previousKeyframe.Value);
         }
 
         private int indexFor(Keyframe<TValue> keyframe)
