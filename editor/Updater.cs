@@ -73,7 +73,7 @@ namespace StorybrewEditor
             {
                 var newFilename = Path.ChangeExtension(exeFilename, ".exe");
                 Trace.WriteLine($"Renaming {exeFilename} to {newFilename}");
-                Misc.WithRetries(() => File.Move(exeFilename, newFilename));
+                Misc.WithRetries(() => File.Move(exeFilename, newFilename), canThrow: false);
             }
 
             foreach (var scriptFilename in Directory.GetFiles("scripts", "*.cs", SearchOption.TopDirectoryOnly))
