@@ -78,6 +78,8 @@ namespace StorybrewEditor
 
             foreach (var scriptFilename in Directory.GetFiles("scripts", "*.cs", SearchOption.TopDirectoryOnly))
                 File.SetAttributes(scriptFilename, FileAttributes.ReadOnly);
+
+            Program.Settings.UseRoslyn.Set(false);
         }
 
         private static void replaceFiles(string sourceFolder, string destinationFolder, Version fromVersion)
