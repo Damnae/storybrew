@@ -59,9 +59,9 @@ namespace StorybrewEditor
             }
 
             if (File.Exists(UpdateArchivePath))
-                Misc.WithRetries(() => File.Delete(UpdateArchivePath));
+                Misc.WithRetries(() => File.Delete(UpdateArchivePath), canThrow: false);
             if (Directory.Exists(UpdateFolderPath))
-                Misc.WithRetries(() => Directory.Delete(UpdateFolderPath, true));
+                Misc.WithRetries(() => Directory.Delete(UpdateFolderPath, true), canThrow: false);
         }
 
         private static void firstRun()
