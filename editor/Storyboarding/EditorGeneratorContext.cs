@@ -69,7 +69,7 @@ namespace StorybrewEditor.Storyboarding
 
             FftStream audioStream;
             if (!fftAudioStreams.TryGetValue(path, out audioStream))
-                fftAudioStreams[path] = audioStream = new FftStream(effect.Project.AudioPath);
+                fftAudioStreams[path] = audioStream = new FftStream(path);
 
             return audioStream;
         }
