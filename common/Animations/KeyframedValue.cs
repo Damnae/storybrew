@@ -1,10 +1,11 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace StorybrewCommon.Animations
 {
-    public class KeyframedValue<TValue> : MarshalByRefObject
+    public class KeyframedValue<TValue> : MarshalByRefObject, IEnumerable<Keyframe<TValue>>
     {
         private List<Keyframe<TValue>> keyframes = new List<Keyframe<TValue>>();
         private Func<TValue, TValue, double, TValue> interpolate;
@@ -72,6 +73,9 @@ namespace StorybrewCommon.Animations
             if (!hasPair && previousKeyframe.HasValue)
                 pair(previousKeyframe.Value, previousKeyframe.Value);
         }
+
+        public IEnumerator<Keyframe<TValue>> GetEnumerator() => keyframes.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         private int indexFor(Keyframe<TValue> keyframe)
         {
