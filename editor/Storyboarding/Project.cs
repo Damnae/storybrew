@@ -18,6 +18,7 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -580,6 +581,29 @@ namespace StorybrewEditor.Storyboarding
             using (var stream = new MemoryStream(Resources.projecttemplate))
             using (var zip = new ZipArchive(stream))
                 zip.ExtractToDirectoryOverwrite(projectFolderPath);
+
+            var csProjPath = Path.Combine(projectFolderPath, "scripts.csproj");
+            var document = new XmlDocument() { PreserveWhitespace = false, };
+            try
+            {
+                document.Load(csProjPath);
+                var xmlns = document.DocumentElement.GetAttribute("xmlns");
+                var compileGroup = document.CreateElement("ItemGroup", xmlns);
+                document.DocumentElement.AppendChild(compileGroup);
+                foreach (var path in Directory.EnumerateFiles(projectFolderPath, "*.cs", SearchOption.AllDirectories))
+                {
+                    var relativePath = PathHelper.GetRelativePath(projectFolderPath, path);
+
+                    var compileNode = document.CreateElement("Compile", xmlns);
+                    compileNode.SetAttribute("Include", relativePath);
+                    compileGroup.AppendChild(compileNode);
+                }
+                document.Save(csProjPath);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Failed to update scripts.csproj: {e}");
+            }
         }
 
         public static string Migrate(string projectPath, string projectFolderName)
