@@ -522,8 +522,6 @@ namespace StorybrewEditor.ScreenLayers
                     statusLayout.Displayed = false;
                     break;
             }
-
-
         }
 
         #region IDisposable Support
