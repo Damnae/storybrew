@@ -141,7 +141,7 @@ namespace StorybrewCommon.Subtitles
                     offsetX = -paddingX;
                     offsetY = -paddingY;
 
-                    if (text.Length == 1 && char.IsWhiteSpace(text[0]))
+                    if (text.Length == 1 && char.IsWhiteSpace(text[0]) || width == 0 || height == 0)
                         return new FontTexture(null, offsetX, offsetY, baseWidth, baseHeight, width, height);
 
                     using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))

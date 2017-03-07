@@ -1,4 +1,5 @@
-﻿using StorybrewCommon.Mapset;
+﻿using StorybrewCommon.Animations;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Subtitles;
 using StorybrewCommon.Util;
@@ -134,28 +135,26 @@ namespace StorybrewCommon.Scripting
         /// Returns the Fast Fourier Transform of the song at a certain time, with the specified amount of magnitudes.
         /// Useful to make spectrum effets.
         /// </summary>
-        public float[] GetFft(double time, int magnitudes, string path = null)
+        public float[] GetFft(double time, int magnitudes, string path = null, OsbEasing easing = OsbEasing.None)
         {
             var fft = GetFft(time, path);
+            if (magnitudes == fft.Length && easing == OsbEasing.None)
+                return fft;
+
             var resultFft = new float[magnitudes];
+            var baseIndex = 0;
+            for (var i = 0; i < magnitudes; i++)
+            {
+                var progress = EasingFunctions.Ease(easing, (double)i / magnitudes);
+                var index = Math.Min(Math.Max(baseIndex + 1, (int)(progress * fft.Length)), fft.Length - 1);
 
-            if (magnitudes == fft.Length)
-                Array.Copy(fft, resultFft, magnitudes);
-            else
-                for (var i = 0; i < magnitudes; i++)
-                {
-                    var left = (int)(((double)i / magnitudes) * fft.Length);
-                    var right = (int)(((i + 1.0) / magnitudes) * fft.Length);
+                var value = 0f;
+                for (var v = baseIndex; v < index; v++)
+                    value = Math.Max(value, fft[index]);
 
-                    if (left == right)
-                        right++;
-
-                    var value = 0f;
-                    for (var j = left; j < right; j++)
-                        value = Math.Max(value, fft[j]);
-
-                    resultFft[i] = value;
-                }
+                resultFft[i] = value;
+                baseIndex = index;
+            }
             return resultFft;
         }
 
@@ -179,7 +178,7 @@ namespace StorybrewCommon.Scripting
                 case ".srt": return srtParser.Parse(path);
                 case ".ssa":
                 case ".ass": return assParser.Parse(path);
-                case ".sbv": return sbvParser.Parse(path); //YouTube's subtitle format
+                case ".sbv": return sbvParser.Parse(path);
             }
             throw new NotSupportedException($"{Path.GetExtension(path)} isn't a supported subtitle format");
         }

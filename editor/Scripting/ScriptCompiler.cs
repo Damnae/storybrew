@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
+using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +28,7 @@ namespace StorybrewEditor.Scripting
                     typeof(ScriptCompiler).Assembly.ManifestModule.FullyQualifiedName,
                     typeof(ScriptCompiler).FullName);
 
-                compiler.compile(sourcePaths, outputPath, referencedAssemblies);
+                compiler.compile(sourcePaths, outputPath, Program.Settings.UseRoslyn, referencedAssemblies);
             }
             finally
             {
@@ -35,7 +36,7 @@ namespace StorybrewEditor.Scripting
             }
         }
 
-        private void compile(string[] sourcePaths, string outputPath, params string[] referencedAssemblies)
+        private void compile(string[] sourcePaths, string outputPath, bool useRoslyn, params string[] referencedAssemblies)
         {
             var parameters = new CompilerParameters()
             {
@@ -48,7 +49,7 @@ namespace StorybrewEditor.Scripting
             foreach (var referencedAssembly in referencedAssemblies)
                 parameters.ReferencedAssemblies.Add(referencedAssembly);
 
-            using (var codeProvider = CodeDomProvider.CreateProvider("csharp"))
+            using (var codeProvider = useRoslyn ? new CSharpCodeProvider() : CodeDomProvider.CreateProvider("csharp"))
             {
                 var results = codeProvider.CompileAssemblyFromFile(parameters, sourcePaths);
 

@@ -59,16 +59,27 @@ namespace StorybrewEditor
             }
 
             if (File.Exists(UpdateArchivePath))
-                Misc.WithRetries(() => File.Delete(UpdateArchivePath));
+                Misc.WithRetries(() => File.Delete(UpdateArchivePath), canThrow: false);
             if (Directory.Exists(UpdateFolderPath))
-                Misc.WithRetries(() => Directory.Delete(UpdateFolderPath, true));
+                Misc.WithRetries(() => Directory.Delete(UpdateFolderPath, true), canThrow: false);
         }
 
         private static void firstRun()
         {
             Trace.WriteLine("First run\n");
+
+            var localPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            foreach (var exeFilename in Directory.GetFiles(localPath, "*.exe_", SearchOption.AllDirectories))
+            {
+                var newFilename = Path.ChangeExtension(exeFilename, ".exe");
+                Trace.WriteLine($"Renaming {exeFilename} to {newFilename}");
+                Misc.WithRetries(() => File.Move(exeFilename, newFilename), canThrow: false);
+            }
+
             foreach (var scriptFilename in Directory.GetFiles("scripts", "*.cs", SearchOption.TopDirectoryOnly))
                 File.SetAttributes(scriptFilename, FileAttributes.ReadOnly);
+
+            Program.Settings.UseRoslyn.Set(false);
         }
 
         private static void replaceFiles(string sourceFolder, string destinationFolder, Version fromVersion)
@@ -86,6 +97,9 @@ namespace StorybrewEditor
                 var readOnly = matchFilter(relativeFilename, readOnlyPaths);
 
                 var destinationFilename = Path.Combine(destinationFolder, relativeFilename);
+                if (Path.GetExtension(destinationFilename) == ".exe_")
+                    destinationFilename = Path.ChangeExtension(destinationFilename, ".exe");
+
                 Trace.WriteLine($"  Copying {relativeFilename} to {destinationFilename}");
                 replaceFile(sourceFilename, destinationFilename, readOnly, fromVersion);
             }

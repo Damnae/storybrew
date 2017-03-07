@@ -12,7 +12,8 @@ namespace StorybrewEditor
 {
     public class Builder
     {
-        private static string[] ignoredPaths = { @"scripts\Scene3dTest.cs" };
+        private static string mainExecutablePath = "StorybrewEditor.exe";
+        private static string[] ignoredPaths = { @"scripts\Scene3dTest.cs", };
 
         public static void Build()
         {
@@ -52,12 +53,23 @@ namespace StorybrewEditor
             using (var stream = new FileStream(archiveName, FileMode.Create, FileAccess.ReadWrite))
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Create))
             {
-                addFile(archive, "StorybrewEditor.exe", appDirectory);
+                addFile(archive, mainExecutablePath, appDirectory);
                 addFile(archive, "StorybrewEditor.exe.config", appDirectory);
                 foreach (var path in Directory.EnumerateFiles(appDirectory, "*.dll", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, appDirectory);
+
+                // Roslyn (white-listed, most files seem useless)
+                addFile(archive, "bin/roslyn/csc.exe", appDirectory);
+                addFile(archive, "bin/roslyn/csc.exe.config", appDirectory);
+                addFile(archive, "bin/roslyn/csc.rsp", appDirectory);
+                addFile(archive, "bin/roslyn/Microsoft.CodeAnalysis.CSharp.dll", appDirectory);
+                addFile(archive, "bin/roslyn/Microsoft.CodeAnalysis.dll", appDirectory);
+                addFile(archive, "bin/roslyn/System.Reflection.Metadata.dll", appDirectory);
+
+                // Scripts
                 foreach (var path in Directory.EnumerateFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, scriptsDirectory, "scripts");
+
                 archive.CreateEntry(Updater.FirstRunPath);
             }
         }
@@ -75,7 +87,7 @@ namespace StorybrewEditor
 
             var updateTestPath = Path.GetFullPath("updatetest");
             var updateFolderPath = Path.GetFullPath(Path.Combine(updateTestPath, Updater.UpdateFolderPath));
-            var executablePath = Path.GetFullPath(Path.Combine(updateFolderPath, "StorybrewEditor.exe"));
+            var executablePath = Path.GetFullPath(Path.Combine(updateFolderPath, mainExecutablePath));
 
             if (Directory.Exists(updateTestPath))
             {
@@ -110,6 +122,8 @@ namespace StorybrewEditor
                 Trace.WriteLine($"  Skipping {path}");
                 return;
             }
+            if (entryName != mainExecutablePath && Path.GetExtension(entryName) == ".exe")
+                entryName += "_";
 
             Trace.WriteLine($"  Adding {path} -> {entryName}");
             var entry = archive.CreateEntryFromFile(path, entryName, CompressionLevel.Optimal);

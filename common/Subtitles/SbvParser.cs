@@ -1,44 +1,56 @@
-﻿using System;
+﻿using StorybrewCommon.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace StorybrewCommon.Subtitles
 {
+    // YouTube's subtitle format
     public class SbvParser
     {
-        public SubtitleSet Parse(String path)
+        public SubtitleSet Parse(string path)
         {
-            var rawLines = File.ReadAllLines(path);
+            using (var stream = Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
+                return Parse(stream);
+        }
+
+        public SubtitleSet Parse(Stream stream)
+        {
             var lines = new List<SubtitleLine>();
-
-            var startTime = 0d;
-            var endTime = 0d;
-            var text = "";
-
-            foreach (var line in rawLines)
+            foreach (var block in parseBlocks(stream))
             {
-                var times = line.Split(',');
-                if (times.Length == 2 && !line.Contains(" "))
-                {
-                    //Make sure that this line is a blockstart!
-                    if (times[0].Split(':').Length == 3 && times[1].Split(':').Length == 3)
-                    {
-                        //Had the previous block content?
-                        if (text != "")
-                        {
-                            lines.Add(new SubtitleLine(startTime, endTime, text));
-                            text = "";
-                        }
-
-                        startTime = parseTimestamp(times[0]);
-                        endTime = parseTimestamp(times[1]);
-                        continue;
-                    }
-                }
-                text += line;
+                var blockLines = block.Split('\n');
+                var timestamps = blockLines[0].Split(',');
+                var startTime = parseTimestamp(timestamps[0]);
+                var endTime = parseTimestamp(timestamps[1]);
+                var text = string.Join("\n", blockLines, 1, blockLines.Length - 1);
+                lines.Add(new SubtitleLine(startTime, endTime, text));
             }
-            if (text != "") lines.Add(new SubtitleLine(startTime, endTime, text));
             return new SubtitleSet(lines);
+        }
+
+        private IEnumerable<string> parseBlocks(Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                var sb = new StringBuilder();
+
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrEmpty(line.Trim()))
+                    {
+                        var block = sb.ToString().Trim();
+                        if (block.Length > 0) yield return block;
+                        sb.Clear();
+                    }
+                    else sb.AppendLine(line);
+                }
+
+                var endBlock = sb.ToString().Trim();
+                if (endBlock.Length > 0) yield return endBlock;
+            }
         }
 
         private double parseTimestamp(string timestamp)

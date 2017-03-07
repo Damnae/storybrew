@@ -86,9 +86,10 @@ namespace StorybrewEditor
         private static void startEditor()
         {
             enableScheduling();
-            Updater.NotifyEditorRun();
 
             settings = new Settings();
+            Updater.NotifyEditorRun();
+
             var displayDevice = findDisplayDevice();
 
             using (var window = createWindow(displayDevice))
@@ -151,7 +152,7 @@ namespace StorybrewEditor
 
         private static GameWindow createWindow(DisplayDevice displayDevice)
         {
-            var graphicsMode = new GraphicsMode(new ColorFormat(32), 24, 8, 4, ColorFormat.Empty, 2, false);
+            var graphicsMode = new GraphicsMode(new ColorFormat(32), 24, 8, 0, ColorFormat.Empty, 2, false);
 #if DEBUG
             var contextFlags = GraphicsContextFlags.Debug | GraphicsContextFlags.ForwardCompatible;
 #else
