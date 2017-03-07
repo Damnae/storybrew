@@ -199,6 +199,7 @@ namespace StorybrewEditor.ScreenLayers
                     },
                 },
             });
+            if(Program.Settings.AutosaveProject) bottomRightLayout.Remove(saveButton);
 
             WidgetManager.Root.Add(effectConfigUi = new EffectConfigUi(WidgetManager)
             {
@@ -462,6 +463,15 @@ namespace StorybrewEditor.ScreenLayers
         {
             if (project.Changed)
             {
+                if (Program.Settings.AutosaveProject)
+                {
+                    Manager.AsyncLoading("Saving", () =>
+                    {
+                        project.Save();
+                        Program.Schedule(() => Manager.GetContext<Editor>().Restart());
+                    });
+                }
+
                 Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving", () =>
                 {
                     project.Save();
@@ -504,10 +514,16 @@ namespace StorybrewEditor.ScreenLayers
                     statusLayout.Pack(1024 - bottomRightLayout.Width - 24);
                     statusLayout.Displayed = true;
                     break;
+                case EffectStatus.Ready:
+                    if (Program.Settings.AutosaveProject) saveProject();
+                    statusLayout.Displayed = false;
+                    break;
                 default:
                     statusLayout.Displayed = false;
                     break;
             }
+
+
         }
 
         #region IDisposable Support
