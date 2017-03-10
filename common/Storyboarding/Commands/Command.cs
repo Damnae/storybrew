@@ -44,7 +44,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public abstract TValue ValueAtProgress(double progress);
         public abstract TValue Midpoint(Command<TValue> endCommand, double progress);
 
-        public string ToOsbString(ExportSettings exportSettings)
+        public virtual string ToOsbString(ExportSettings exportSettings)
         {
             var startTimeString = ((int)StartTime).ToString(exportSettings.NumberFormat);
             var endTimeString = ((int)EndTime).ToString(exportSettings.NumberFormat);
