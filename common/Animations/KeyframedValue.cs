@@ -23,18 +23,30 @@ namespace StorybrewCommon.Animations
             this.defaultValue = defaultValue;
         }
 
-        public void Add(double time, TValue value)
+        public void Add(Keyframe<TValue> keyframe)
         {
-            Add(time, value, EasingFunctions.Linear);
+            if (keyframes.Count == 0 || keyframes[keyframes.Count - 1].Time < keyframe.Time)
+                keyframes.Add(keyframe);
+            else keyframes.Insert(indexFor(keyframe), keyframe);
         }
 
+        public void Add(double time, TValue value)
+            => Add(time, value, EasingFunctions.Linear);
+
         public void Add(double time, TValue value, Func<double, double> easing)
+            => Add(new Keyframe<TValue>(time, value, easing));
+
+        public void AddRange(IEnumerable<Keyframe<TValue>> collection)
         {
-            var keyframe = new Keyframe<TValue>(time, value, easing);
-            if (keyframes.Count == 0 || keyframes[keyframes.Count - 1].Time < time)
-                keyframes.Add(keyframe);
-            else
-                keyframes.Insert(indexFor(keyframe), keyframe);
+            foreach (var keyframe in collection)
+                Add(keyframe);
+        }
+
+        public void TransferKeyframes(KeyframedValue<TValue> to, bool pad = true, bool clear = true)
+        {
+            if (pad && to.Count > 0) to.Add(StartTime, to.EndValue);
+            to.AddRange(this);
+            if (clear) Clear();
         }
 
         public TValue ValueAt(double time)
@@ -58,13 +70,15 @@ namespace StorybrewCommon.Animations
             }
         }
 
-        public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair)
+        public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair, TValue defaultValue = default(TValue))
         {
             var hasPair = false;
             var previousKeyframe = (Keyframe<TValue>?)null;
             foreach (var keyframe in keyframes)
             {
-                if (previousKeyframe.HasValue && !previousKeyframe.Value.Value.Equals(keyframe.Value))
+                if (previousKeyframe.HasValue 
+                    && previousKeyframe.Value.Time != keyframe.Time 
+                    && !previousKeyframe.Value.Value.Equals(keyframe.Value))
                 {
                     pair(previousKeyframe.Value, keyframe);
                     hasPair = true;
@@ -72,7 +86,7 @@ namespace StorybrewCommon.Animations
                 previousKeyframe = keyframe;
             }
 
-            if (!hasPair && previousKeyframe.HasValue)
+            if (!hasPair && previousKeyframe.HasValue && !previousKeyframe.Value.Value.Equals(defaultValue))
                 pair(previousKeyframe.Value, previousKeyframe.Value);
         }
 

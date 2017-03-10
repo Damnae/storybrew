@@ -96,7 +96,7 @@ namespace StorybrewScripts
                     bar.ScaleVec(startKeyframe.Time, endKeyframe.Time,
                         scaleX, startKeyframe.Value,
                         scaleX, endKeyframe.Value);
-                });
+                }, MinimalHeight);
                 if (!hasScale) bar.ScaleVec(startTime, scaleX, MinimalHeight);
             }
         }
