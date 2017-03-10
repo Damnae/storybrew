@@ -73,20 +73,32 @@ namespace StorybrewCommon.Animations
         public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair, TValue defaultValue = default(TValue))
         {
             var hasPair = false;
+            var afterStep = true;
             var previousKeyframe = (Keyframe<TValue>?)null;
             foreach (var keyframe in keyframes)
             {
-                if (previousKeyframe.HasValue 
-                    && previousKeyframe.Value.Time != keyframe.Time 
-                    && !previousKeyframe.Value.Value.Equals(keyframe.Value))
+                if (previousKeyframe.HasValue)
                 {
-                    pair(previousKeyframe.Value, keyframe);
-                    hasPair = true;
+                    var isStep = previousKeyframe.Value.Time == keyframe.Time;
+                    var isFlat = previousKeyframe.Value.Value.Equals(keyframe.Value);
+
+                    if (!isStep && !isFlat)
+                    {
+                        pair(previousKeyframe.Value, keyframe);
+                        hasPair = true;
+                    }
+                    else if (afterStep)
+                    {
+                        pair(previousKeyframe.Value, previousKeyframe.Value);
+                        hasPair = true;
+                    }
+                    afterStep = isStep;
                 }
                 previousKeyframe = keyframe;
             }
 
-            if (!hasPair && previousKeyframe.HasValue && !previousKeyframe.Value.Value.Equals(defaultValue))
+            if ((hasPair && afterStep) ||
+                !hasPair && previousKeyframe.HasValue && !previousKeyframe.Value.Value.Equals(defaultValue))
                 pair(previousKeyframe.Value, previousKeyframe.Value);
         }
 
