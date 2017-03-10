@@ -79,15 +79,15 @@ namespace StorybrewCommon.Animations
             {
                 if (previousKeyframe.HasValue)
                 {
-                    var isStep = previousKeyframe.Value.Time == keyframe.Time;
                     var isFlat = previousKeyframe.Value.Value.Equals(keyframe.Value);
+                    var isStep = !isFlat && previousKeyframe.Value.Time == keyframe.Time;
 
                     if (!isStep && !isFlat)
                     {
                         pair(previousKeyframe.Value, keyframe);
                         hasPair = true;
                     }
-                    else if (afterStep)
+                    else if (afterStep && keyframes.Count > 2)
                     {
                         pair(previousKeyframe.Value, previousKeyframe.Value);
                         hasPair = true;
