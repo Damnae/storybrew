@@ -11,6 +11,8 @@ namespace StorybrewCommon.Animations
         private Func<TValue, TValue, double, TValue> interpolate;
         private TValue defaultValue;
 
+        public double StartTime => keyframes.Count == 0 ? 0 : keyframes[0].Time;
+        public double EndTime => keyframes.Count == 0 ? 0 : keyframes[keyframes.Count - 1].Time;
         public TValue StartValue => keyframes.Count == 0 ? defaultValue : keyframes[0].Value;
         public TValue EndValue => keyframes.Count == 0 ? defaultValue : keyframes[keyframes.Count - 1].Value;
         public int Count => keyframes.Count;
@@ -73,6 +75,8 @@ namespace StorybrewCommon.Animations
             if (!hasPair && previousKeyframe.HasValue)
                 pair(previousKeyframe.Value, previousKeyframe.Value);
         }
+
+        public void Clear() => keyframes.Clear();
 
         public IEnumerator<Keyframe<TValue>> GetEnumerator() => keyframes.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
