@@ -45,18 +45,20 @@ namespace StorybrewCommon.Storyboarding.Util
             }
         }
         
-        public void GenerateCommands(OsbSprite sprite, int width, int height)
+        public bool GenerateCommands(OsbSprite sprite, int width, int height)
             => GenerateCommands(sprite, width, height, OsuHitObject.WidescreenStoryboardBounds);
 
-        public void GenerateCommands(OsbSprite sprite, int width, int height, Box2 bounds)
+        public bool GenerateCommands(OsbSprite sprite, int width, int height, Box2 bounds)
         {
             var previousState = (State)null;
             var wasVisible = false;
+            var everVisible = false;
             var stateAdded = false;
 
             foreach (var state in states)
             {
                 var isVisible = state.IsVisible(width, height, sprite.Origin, bounds);
+                if (isVisible) everVisible = true;
 
                 if (!wasVisible && isVisible)
                 {
@@ -86,6 +88,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 commitKeyframes();
 
             convertToCommands(sprite);
+            return everVisible;
         }
 
         private void commitKeyframes()

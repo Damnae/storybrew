@@ -10,6 +10,8 @@ namespace StorybrewCommon.Storyboarding3d
     public class Line3d : Object3d
     {
         public string SpritePath;
+        public bool Additive;
+
         public float Thickness = 1;
         public readonly KeyframedValue<Vector3> StartPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
         public readonly KeyframedValue<Vector3> EndPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
@@ -51,8 +53,11 @@ namespace StorybrewCommon.Storyboarding3d
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
 
             var sprite = layer.CreateSprite(SpritePath, SpriteOrigin);
-            generator.GenerateCommands(sprite, bitmap.Width, bitmap.Height);
-            sprite.Additive(startTime, endTime);
+            if (generator.GenerateCommands(sprite, bitmap.Width, bitmap.Height))
+            {
+                if (Additive)
+                    sprite.Additive(sprite.CommandsStartTime, sprite.CommandsEndTime);
+            }
         }
     }
 }

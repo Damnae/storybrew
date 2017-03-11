@@ -49,8 +49,11 @@ namespace StorybrewCommon.Storyboarding3d
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
 
             var sprite = layer.CreateSprite(SpritePath, SpriteOrigin);
-            generator.GenerateCommands(sprite, bitmap.Width, bitmap.Height);
-            if (Additive) sprite.Additive(startTime, endTime);
+            if (generator.GenerateCommands(sprite, bitmap.Width, bitmap.Height))
+            {
+                if (Additive)
+                    sprite.Additive(sprite.CommandsStartTime, sprite.CommandsEndTime);
+            }
         }
     }
 }
