@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="Background.cs" />
     <Compile Include="Particles.cs" />
-    <Compile Include="Scene3dTest.cs" />
     <Compile Include="HitObjectHighlight.cs" />
     <Compile Include="Lyrics.cs" />
     <Compile Include="Spectrum.cs" />
