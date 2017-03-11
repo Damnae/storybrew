@@ -11,7 +11,9 @@ namespace StorybrewCommon.Mapset
         public static readonly Vector2 PlayfieldSize = new Vector2(512, 384);
         public static readonly Vector2 StoryboardSize = new Vector2(640, 480);
         public static readonly Vector2 PlayfieldToStoryboardOffset = new Vector2((StoryboardSize.X - PlayfieldSize.X) * 0.5f, (StoryboardSize.Y - PlayfieldSize.Y) * 0.75f - 16);
-        public static readonly Vector2 WidescreenStoryboardSize = StoryboardSize * (16f / 9);
+        public static readonly Vector2 WidescreenStoryboardSize = new Vector2(StoryboardSize.Y * 16f / 9, StoryboardSize.Y);
+
+        public static readonly Box2 StoryboardBounds = new Box2(Vector2.Zero, StoryboardSize);
         public static readonly Box2 WidescreenStoryboardBounds = new Box2((StoryboardSize.X - WidescreenStoryboardSize.X) / 2, 0, StoryboardSize.X + (WidescreenStoryboardSize.X - StoryboardSize.X) / 2, 480);
 
         public Vector2 PlayfieldPosition;
