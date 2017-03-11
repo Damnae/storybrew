@@ -11,8 +11,11 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<float> PositionZ = new KeyframedValue<float>(InterpolatingFunctions.Float);
         public readonly KeyframedValue<Vector3> TargetPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
         public readonly KeyframedValue<Vector3> Up = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3, new Vector3(0, 1, 0));
-        public readonly KeyframedValue<float> ZNear = new KeyframedValue<float>(InterpolatingFunctions.Float, 10);
-        public readonly KeyframedValue<float> ZFar = new KeyframedValue<float>(InterpolatingFunctions.Float, 1000);
+
+        public readonly KeyframedValue<float> NearClip = new KeyframedValue<float>(InterpolatingFunctions.Float);
+        public readonly KeyframedValue<float> NearFade = new KeyframedValue<float>(InterpolatingFunctions.Float);
+        public readonly KeyframedValue<float> FarFade = new KeyframedValue<float>(InterpolatingFunctions.Float);
+        public readonly KeyframedValue<float> FarClip = new KeyframedValue<float>(InterpolatingFunctions.Float);
 
         public readonly KeyframedValue<float> HorizontalFov = new KeyframedValue<float>(InterpolatingFunctions.Float);
         public readonly KeyframedValue<float> VerticalFov = new KeyframedValue<float>(InterpolatingFunctions.Float);
@@ -39,14 +42,17 @@ namespace StorybrewCommon.Storyboarding3d
             }
 
             var focusDistance = Resolution.Y * 0.5 / Math.Tan(fovY * 0.5);
-            var zNear = ZNear.ValueAt(time);
-            var zFar = ZFar.ValueAt(time);
+            var nearClip = NearClip.Count > 0 ? NearClip.ValueAt(time) : Math.Min((float)focusDistance * 0.5f, 1);
+            var farClip = FarClip.Count > 0 ? FarClip.ValueAt(time) : (float)focusDistance * 1.5f;
+
+            var nearFade = NearFade.Count > 0 ? NearFade.ValueAt(time) : nearClip;
+            var farFade = FarFade.Count > 0 ? FarFade.ValueAt(time) : farClip;
 
             var view = Matrix4.LookAt(cameraPosition, targetPosition, up);
             var projection = Matrix4.CreatePerspectiveFieldOfView(fovY,
-                (float)aspectRatio, zNear, zFar);
+                (float)aspectRatio, nearClip, farClip);
 
-            return new CameraState(view * projection, aspectRatio, focusDistance, ResolutionScale, zNear, zFar);
+            return new CameraState(view * projection, aspectRatio, focusDistance, ResolutionScale, nearClip, nearFade, farFade, farClip);
         }
     }
 }

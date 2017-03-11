@@ -8,7 +8,6 @@ namespace StorybrewCommon.Storyboarding3d
 {
     public class Object3d
     {
-        public OsbOrigin SpriteOrigin = OsbOrigin.Centre;
         public readonly KeyframedValue<CommandColor> Coloring = new KeyframedValue<CommandColor>(InterpolatingFunctions.CommandColor, CommandColor.White);
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
 
@@ -35,17 +34,17 @@ namespace StorybrewCommon.Storyboarding3d
             foreach (var child in children)
                 child.GenerateTreeKeyframes(time, cameraState, object3dState);
         }
-        public void GenerateTreeSprite(StoryboardLayer layer, double startTime, double endTime)
+        public void GenerateTreeSprite(StoryboardLayer layer)
         {
-            GenerateSprite(layer, startTime, endTime);
+            GenerateSprite(layer);
             foreach (var child in children)
-                child.GenerateTreeSprite(layer, startTime, endTime);
+                child.GenerateTreeSprite(layer);
         }
 
         public virtual void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
         {
         }
-        public virtual void GenerateSprite(StoryboardLayer layer, double startTime, double endTime)
+        public virtual void GenerateSprite(StoryboardLayer layer)
         {
         }
     }

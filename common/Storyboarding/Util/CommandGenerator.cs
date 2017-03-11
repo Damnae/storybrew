@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Mapset;
+using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Util;
 using System;
@@ -45,10 +46,10 @@ namespace StorybrewCommon.Storyboarding.Util
             }
         }
         
-        public bool GenerateCommands(OsbSprite sprite, int width, int height)
-            => GenerateCommands(sprite, width, height, OsuHitObject.WidescreenStoryboardBounds);
+        public bool GenerateCommands(OsbSprite sprite)
+            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds);
 
-        public bool GenerateCommands(OsbSprite sprite, int width, int height, Box2 bounds)
+        public bool GenerateCommands(OsbSprite sprite, Box2 bounds)
         {
             var previousState = (State)null;
             var wasVisible = false;
@@ -57,7 +58,9 @@ namespace StorybrewCommon.Storyboarding.Util
 
             foreach (var state in states)
             {
-                var isVisible = state.IsVisible(width, height, sprite.Origin, bounds);
+                var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(state.Time));
+
+                var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
                 if (isVisible) everVisible = true;
 
                 if (!wasVisible && isVisible)

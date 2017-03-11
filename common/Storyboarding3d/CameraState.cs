@@ -10,17 +10,21 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly double AspectRatio;
         public readonly double FocusDistance;
         public readonly double ResolutionScale;
-        public readonly double ZNear;
-        public readonly double ZFar;
+        public readonly double NearClip;
+        public readonly double NearFade;
+        public readonly double FarFade;
+        public readonly double FarClip;
 
-        public CameraState(Matrix4 viewProjection, double aspectRatio, double focusDistance, double resolutionScale, double zNear, double zFar)
+        public CameraState(Matrix4 viewProjection, double aspectRatio, double focusDistance, double resolutionScale, double nearClip, double nearFade, double farFade, double farClip)
         {
             ViewProjection = viewProjection;
             AspectRatio = aspectRatio;
             FocusDistance = focusDistance;
             ResolutionScale = resolutionScale;
-            ZNear = zNear;
-            ZFar = zFar;
+            NearClip = nearClip;
+            NearFade = nearFade;
+            FarFade = farFade;
+            FarClip = farClip;
         }
 
         public Vector4 ToScreen(Matrix4 transform, Vector3 point)
@@ -39,7 +43,16 @@ namespace StorybrewCommon.Storyboarding3d
 
         public double LinearizeZ(double z)
         {
-            return (2 * ZNear) / (ZFar + ZNear - z * (ZFar - ZNear));
+            return (2 * NearClip) / (FarClip + NearClip - z * (FarClip - NearClip));
+        }
+
+        public float OpacityAt(float distance)
+        {
+            if (distance < NearFade)
+                return (float)Math.Max(0, Math.Min((distance - NearClip) / (NearFade - NearClip), 1));
+            else if (distance > FarFade)
+                return (float)Math.Max(0, Math.Min((FarClip - distance) / (FarClip - FarFade), 1));
+            return 1;
         }
     }
 }
