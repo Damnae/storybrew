@@ -146,6 +146,7 @@
     <Compile Include="Util\BitmapHelper.cs" />
     <Compile Include="Util\Misc.cs" />
     <Compile Include="Util\NamedValue.cs" />
+    <Compile Include="Util\OrientedBoundingBox.cs" />
     <Compile Include="Util\ObjectSerializer.cs" />
     <Compile Include="Util\Pool.cs" />
     <Compile Include="Util\StreamReaderExtensions.cs" />

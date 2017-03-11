@@ -2,6 +2,7 @@
 using StorybrewCommon.Animations;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding.CommandValues;
+using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 
@@ -43,8 +44,11 @@ namespace StorybrewCommon.Storyboarding.Util
                 states.Insert(index, state);
             }
         }
-
+        
         public void GenerateCommands(OsbSprite sprite, int width, int height)
+            => GenerateCommands(sprite, width, height, OsuHitObject.WidescreenStoryboardBounds);
+
+        public void GenerateCommands(OsbSprite sprite, int width, int height, Box2 bounds)
         {
             var previousState = (State)null;
             var wasVisible = false;
@@ -52,7 +56,7 @@ namespace StorybrewCommon.Storyboarding.Util
 
             foreach (var state in states)
             {
-                var isVisible = state.IsVisible(width, height);
+                var isVisible = state.IsVisible(width, height, sprite.Origin, bounds);
 
                 if (!wasVisible && isVisible)
                 {
@@ -137,19 +141,34 @@ namespace StorybrewCommon.Storyboarding.Util
             public CommandColor Color = CommandColor.White;
             public double Opacity = 1;
 
-            public bool IsVisible(int width, int height)
+            public bool IsVisible(int width, int height, OsbOrigin origin, Box2 bounds)
             {
                 if (Opacity <= 0)
                     return false;
 
                 if (Scale.X == 0 || Scale.Y == 0)
                     return false;
-
-                var radius = Math.Max(width * Scale.X, height * Scale.Y) * 0.5 * Math.Sqrt(2);
-                var bounds = OsuHitObject.WidescreenStoryboardBounds;
-                if (Position.X + radius < bounds.Left || bounds.Right < Position.X - radius ||
-                    Position.Y + radius < bounds.Top || bounds.Bottom < Position.Y - radius)
-                    return false;
+                
+                if (!bounds.Contains(Position))
+                {
+                    Vector2 originVector;
+                    switch (origin)
+                    {
+                        default:
+                        case OsbOrigin.TopLeft: originVector = Vector2.Zero; break;
+                        case OsbOrigin.TopCentre: originVector = new Vector2(width * 0.5f, 0); break;
+                        case OsbOrigin.TopRight: originVector = new Vector2(width, 0); break;
+                        case OsbOrigin.CentreLeft: originVector = new Vector2(0, height * 0.5f); break;
+                        case OsbOrigin.Centre: originVector = new Vector2(width * 0.5f, height * 0.5f); break;
+                        case OsbOrigin.CentreRight: originVector = new Vector2(width, height * 0.5f); break;
+                        case OsbOrigin.BottomLeft: originVector = new Vector2(0, height); break;
+                        case OsbOrigin.BottomCentre: originVector = new Vector2(width * 0.5f, height); break;
+                        case OsbOrigin.BottomRight: originVector = new Vector2(width, height); break;
+                    }
+                    var obb = new OrientedBoundingBox(Position, originVector, width * Scale.X, height * Scale.Y, Rotation);
+                    if (!obb.Intersects(bounds))
+                        return false;
+                }
 
                 return true;
             }
