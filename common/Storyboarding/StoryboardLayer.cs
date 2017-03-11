@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using StorybrewCommon.Storyboarding3d;
 using System;
 
 namespace StorybrewCommon.Storyboarding
@@ -19,10 +18,6 @@ namespace StorybrewCommon.Storyboarding
 
         public abstract OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition);
         public abstract OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre);
-
-#if DEBUG
-        public abstract OsbScene3d CreateScene3d();
-#endif
 
         public abstract OsbSample CreateSample(string path, double time, double volume = 100);
     }

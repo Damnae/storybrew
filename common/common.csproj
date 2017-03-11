@@ -92,12 +92,7 @@
     <Compile Include="Mapset\OsuHold.cs" />
     <Compile Include="Mapset\OsuSlider.cs" />
     <Compile Include="Mapset\OsuSpinner.cs" />
-    <Compile Include="Storyboarding3d\StoryboardCamera.cs" />
     <Compile Include="Storyboarding\Commands\IOffsetable.cs" />
-    <Compile Include="Storyboarding3d\StoryboardObject3d.cs" />
-    <Compile Include="Storyboarding3d\OsbScene3d.cs" />
-    <Compile Include="Storyboarding3d\OsbContainer3d.cs" />
-    <Compile Include="Storyboarding3d\OsbSprite3d.cs" />
     <Compile Include="Storyboarding\ConfigurableAttribute.cs" />
     <Compile Include="Storyboarding\EffectConfig.cs" />
     <Compile Include="Storyboarding\GeneratorContext.cs" />
@@ -151,6 +146,9 @@
     <None Include="App.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Storyboarding3d\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
