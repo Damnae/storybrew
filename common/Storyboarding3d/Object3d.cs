@@ -8,10 +8,11 @@ namespace StorybrewCommon.Storyboarding3d
 {
     public class Object3d
     {
+        private List<Object3d> children = new List<Object3d>();
+
         public readonly KeyframedValue<CommandColor> Coloring = new KeyframedValue<CommandColor>(InterpolatingFunctions.CommandColor, CommandColor.White);
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
-
-        private List<Object3d> children = new List<Object3d>();
+        public StoryboardLayer Layer;
 
         public void Add(Object3d child)
         {
@@ -36,7 +37,7 @@ namespace StorybrewCommon.Storyboarding3d
         }
         public void GenerateTreeSprite(StoryboardLayer layer)
         {
-            GenerateSprite(layer);
+            GenerateSprite(Layer ?? layer);
             foreach (var child in children)
                 child.GenerateTreeSprite(layer);
         }
