@@ -104,6 +104,51 @@ namespace StorybrewEditor.Mapset
         public override ControlPoint GetTimingPointAt(int time)
             => GetControlPointAt(time, cp => !cp.IsInherited);
 
+        public override void ForEachTick(int startTime, int endTime, int snapDivisor, Action<ControlPoint, double, int, int> tickAction)
+        {
+            var leftTimingPoint = GetTimingPointAt(startTime);
+            var timingPoints = TimingPoints.GetEnumerator();
+
+            if (timingPoints.MoveNext())
+            {
+                var timingPoint = timingPoints.Current;
+                while (timingPoint != null)
+                {
+                    var nextTimingPoint = timingPoints.MoveNext() ? timingPoints.Current : null;
+                    if (timingPoint.Offset < leftTimingPoint.Offset)
+                    {
+                        timingPoint = nextTimingPoint;
+                        continue;
+                    }
+                    if (timingPoint != leftTimingPoint && endTime < timingPoint.Offset) break;
+
+                    int tickCount = 0, beatCount = 0;
+                    var step = timingPoint.BeatDuration / snapDivisor;
+                    var sectionStartTime = timingPoint.Offset;
+                    var sectionEndTime = Math.Min(nextTimingPoint?.Offset ?? endTime, endTime);
+                    if (timingPoint == leftTimingPoint)
+                        while (startTime < sectionStartTime)
+                        {
+                            sectionStartTime -= step;
+                            tickCount--;
+                            if (tickCount % snapDivisor == 0)
+                                beatCount--;
+                        }
+
+                    for (var time = sectionStartTime; time < sectionEndTime; time += step)
+                    {
+                        if (startTime < time)
+                            tickAction(timingPoint, time, beatCount, tickCount);
+
+                        if (tickCount % snapDivisor == 0)
+                            beatCount++;
+                        tickCount++;
+                    }
+                    timingPoint = nextTimingPoint;
+                }
+            }
+        }
+
         #endregion
 
         #region .osu parsing

@@ -1,12 +1,12 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Drawables;
+using BrewLib.UserInterface;
+using BrewLib.Util;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 using StorybrewEditor.Storyboarding;
 using System;
-using BrewLib.Util;
-using BrewLib.UserInterface;
-using OpenTK.Input;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -133,66 +133,28 @@ namespace StorybrewEditor.UserInterface
             }
 
             // Ticks
-            var leftTimingPoint = project.MainBeatmap.GetTimingPointAt(leftTime);
-            var timingPoints = project.MainBeatmap.TimingPoints.GetEnumerator();
-
-            if (timingPoints.MoveNext())
+            project.MainBeatmap.ForEachTick(leftTime, rightTime, SnapDivisor, (timingPoint, time, beatCount, tickCount) =>
             {
-                var timingPoint = timingPoints.Current;
-                while (timingPoint != null)
-                {
-                    var nextTimingPoint = timingPoints.MoveNext() ? timingPoints.Current : null;
-                    if (timingPoint.Offset < leftTimingPoint.Offset)
-                    {
-                        timingPoint = nextTimingPoint;
-                        continue;
-                    }
-                    if (timingPoint != leftTimingPoint && rightTime < timingPoint.Offset) break;
+                var tickColor = tickGrey;
+                var lineSize = new Vector2(pixelSize, bounds.Height * 0.3f);
 
-                    int tickCount = 0, beatCount = 0;
-                    var step = timingPoint.BeatDuration / SnapDivisor;
-                    var sectionStartTime = timingPoint.Offset;
-                    var sectionEndTime = Math.Min(nextTimingPoint?.Offset ?? rightTime, rightTime);
-                    if (timingPoint == leftTimingPoint)
-                        while (leftTime < sectionStartTime)
-                        {
-                            sectionStartTime -= step;
-                            tickCount--;
-                            if (tickCount % SnapDivisor == 0)
-                                beatCount--;
-                        }
+                var snap = tickCount % SnapDivisor;
+                if (snap == 0) tickColor = tickWhite;
+                else if ((snap * 2) % SnapDivisor == 0) { lineSize.Y *= 0.8f; tickColor = tickRed; }
+                else if ((snap * 3) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickViolet; }
+                else if ((snap * 4) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickBlue; }
+                else if ((snap * 6) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickMagenta; }
+                else if ((snap * 8) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickYellow; }
+                else lineSize.Y *= 0.4f;
 
-                    for (var time = sectionStartTime; time < sectionEndTime; time += step)
-                    {
-                        if (leftTime < time)
-                        {
-                            var tickColor = tickGrey;
-                            var lineSize = new Vector2(pixelSize, bounds.Height * 0.3f);
+                if (snap != 0 || (tickCount == 0 && timingPoint.OmitFirstBarLine) || beatCount % timingPoint.BeatPerMeasure != 0)
+                    lineSize.Y *= 0.5f;
 
-                            var snap = tickCount % SnapDivisor;
-                            if (snap == 0) tickColor = tickWhite;
-                            else if ((snap * 2) % SnapDivisor == 0) { lineSize.Y *= 0.8f; tickColor = tickRed; }
-                            else if ((snap * 3) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickViolet; }
-                            else if ((snap * 4) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickBlue; }
-                            else if ((snap * 6) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickMagenta; }
-                            else if ((snap * 8) % SnapDivisor == 0) { lineSize.Y *= 0.4f; tickColor = tickYellow; }
-                            else lineSize.Y *= 0.4f;
+                var tickX = offset.X + (float)Manager.SnapToPixel((time - leftTime) * timeScale);
+                var tickOpacity = tickX > beatmapLabel.TextBounds.Left - 8 ? actualOpacity * 0.2f : actualOpacity;
 
-                            if (snap != 0 || (tickCount == 0 && timingPoint.OmitFirstBarLine) || beatCount % timingPoint.BeatPerMeasure != 0)
-                                lineSize.Y *= 0.5f;
-
-                            var tickX = offset.X + (float)Manager.SnapToPixel((time - leftTime) * timeScale);
-                            var tickOpacity = tickX > beatmapLabel.TextBounds.Left - 8 ? actualOpacity * 0.2f : actualOpacity;
-
-                            drawLine(drawContext, new Vector2(tickX, offset.Y + lineBottomY), lineSize, tickColor, tickOpacity);
-                        }
-                        if (tickCount % SnapDivisor == 0)
-                            beatCount++;
-                        tickCount++;
-                    }
-                    timingPoint = nextTimingPoint;
-                }
-            }
+                drawLine(drawContext, new Vector2(tickX, offset.Y + lineBottomY), lineSize, tickColor, tickOpacity);
+            });
 
             // HitObjects
             if (ShowHitObjects)
