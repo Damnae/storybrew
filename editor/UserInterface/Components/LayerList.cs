@@ -234,6 +234,7 @@ namespace StorybrewEditor.UserInterface.Components
                 };
                 layerRoot.OnDisposed += (sender, e) =>
                 {
+                    la.Highlight = false;
                     la.OnChanged -= changedHandler;
                     effect.OnChanged -= effectChangedHandler;
                 };

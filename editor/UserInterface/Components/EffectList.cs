@@ -205,7 +205,11 @@ namespace StorybrewEditor.UserInterface.Components
                     OnEffectSelected?.Invoke(ef);
                     return true;
                 };
-                effectRoot.OnDisposed += (sender, e) => ef.OnChanged -= changedHandler;
+                effectRoot.OnDisposed += (sender, e) =>
+                {
+                    ef.Highlight = false;
+                    ef.OnChanged -= changedHandler;
+                };
 
                 statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
                 renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", (newName) =>
