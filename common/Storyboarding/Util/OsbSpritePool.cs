@@ -27,6 +27,28 @@ namespace StorybrewCommon.Storyboarding.Util
         {
         }
 
+        public OsbSprite Get(double startTime, double endTime)
+        {
+            var result = (PooledSprite)null;
+            foreach (var pooledSprite in pooledSprites)
+                if (pooledSprite.EndTime < startTime
+                    && startTime < pooledSprite.StartTime + MaxPoolDuration
+                    && (result == null || pooledSprite.StartTime < result.StartTime))
+                {
+                    result = pooledSprite;
+                }
+
+            if (result != null)
+            {
+                result.EndTime = endTime;
+                return result.Sprite;
+            }
+
+            var sprite = layer.CreateSprite(path, origin);
+            pooledSprites.Add(new PooledSprite(sprite, startTime, endTime));
+            return sprite;
+        }
+
         public void Clear()
         {
             if (finalizeSprite != null)
@@ -39,44 +61,16 @@ namespace StorybrewCommon.Storyboarding.Util
             pooledSprites.Clear();
         }
 
-        public OsbSprite Get(double startTime, double endTime)
-        {
-            var sprite = get(startTime);
-            release(sprite, endTime);
-            return sprite;
-        }
-
-        private OsbSprite get(double startTime)
-        {
-            var result = (PooledSprite)null;
-            foreach (var pooledSprite in pooledSprites)
-                if (pooledSprite.EndTime < startTime
-                    && startTime < pooledSprite.Sprite.CommandsStartTime + MaxPoolDuration
-                    && (result == null || pooledSprite.Sprite.CommandsStartTime < result.Sprite.CommandsStartTime))
-                {
-                    result = pooledSprite;
-                }
-
-            if (result != null)
-            {
-                pooledSprites.Remove(result);
-                return result.Sprite;
-            }
-
-            return layer.CreateSprite(path, origin);
-        }
-
-        private void release(OsbSprite sprite, double endTime)
-            => pooledSprites.Add(new PooledSprite(sprite, endTime));
-
         private class PooledSprite
         {
             public OsbSprite Sprite;
+            public double StartTime;
             public double EndTime;
 
-            public PooledSprite(OsbSprite sprite, double endTime)
+            public PooledSprite(OsbSprite sprite, double startTime, double endTime)
             {
                 Sprite = sprite;
+                StartTime = startTime;
                 EndTime = endTime;
             }
         }
