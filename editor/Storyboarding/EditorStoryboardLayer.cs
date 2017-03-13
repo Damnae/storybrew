@@ -8,6 +8,7 @@ using StorybrewEditor.Storyboarding3d;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -63,6 +64,9 @@ namespace StorybrewEditor.Storyboarding
                 RaiseChanged(nameof(DiffSpecific));
             }
         }
+
+        public double StartTime => storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty().Min();
+        public double EndTime => storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty().Max();
 
         public bool Highlight;
 

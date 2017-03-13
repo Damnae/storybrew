@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Remoting;
 
 namespace StorybrewEditor.Storyboarding
@@ -38,6 +39,9 @@ namespace StorybrewEditor.Storyboarding
         public override EffectStatus Status => status;
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
+
+        public override double StartTime => layers.Select(l => l.StartTime).DefaultIfEmpty().Min();
+        public override double EndTime => layers.Select(l => l.EndTime).DefaultIfEmpty().Max();
 
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {

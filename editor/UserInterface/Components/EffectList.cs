@@ -25,6 +25,8 @@ namespace StorybrewEditor.UserInterface.Components
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
+        public event Action<Effect> OnEffectSelected;
+
         public EffectList(WidgetManager manager, Project project, EffectConfigUi effectConfigUi) : base(manager)
         {
             this.project = project;
@@ -198,6 +200,11 @@ namespace StorybrewEditor.UserInterface.Components
                     updateStatusButton(statusButton, ef);
                 };
                 effectRoot.OnHovered += (sender, e) => ef.Highlight = e.Hovered;
+                effectRoot.OnClickDown += (sender, e) =>
+                {
+                    OnEffectSelected?.Invoke(ef);
+                    return true;
+                };
                 effectRoot.OnDisposed += (sender, e) => ef.OnChanged -= changedHandler;
 
                 statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");

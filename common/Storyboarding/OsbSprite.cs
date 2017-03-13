@@ -267,6 +267,9 @@ namespace StorybrewCommon.Storyboarding
         protected virtual void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
             => writer.WriteLine($"Sprite,{layer},{Origin.ToString()},\"{TexturePath}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
 
+        public override double StartTime => CommandsStartTime;
+        public override double EndTime => CommandsEndTime;
+
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             if (commands.Count == 0)

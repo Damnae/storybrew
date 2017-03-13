@@ -6,6 +6,7 @@ using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using StorybrewEditor.Storyboarding;
 using System.IO;
+using System;
 
 namespace StorybrewEditor.Storyboarding3d
 {
@@ -16,6 +17,9 @@ namespace StorybrewEditor.Storyboarding3d
 
         public EditorOsbContainer3d rootContainer = new EditorOsbContainer3d();
         public override OsbContainer3d RootContainer => rootContainer;
+
+        public override double StartTime => 0;
+        public override double EndTime => 0;
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project)
         {
