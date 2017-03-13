@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -30,6 +31,9 @@ namespace StorybrewCommon.Scripting
         public StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
 
         public Beatmap Beatmap => context.Beatmap;
+        public Beatmap GetBeatmap(string name)
+            => context.Beatmaps.FirstOrDefault(b => b.Name == name);
+
         public string ProjectPath => context.ProjectPath;
         public string MapsetPath => context.MapsetPath;
 
@@ -48,19 +52,6 @@ namespace StorybrewCommon.Scripting
         {
             if (!condition)
                 throw new Exception(message != null ? $"Assertion failed line {line}: {message}" : $"Assertion failed line {line}");
-        }
-
-        public Beatmap getBeatmap(String diffname)
-        {
-            //this.context.Beatmap
-            foreach (Beatmap diff in context.Beatmaps)
-            {
-                if (diff.Name == diffname)
-                {
-                    return diff;
-                }
-            }
-            return this.Beatmap;
         }
 
         #region File loading

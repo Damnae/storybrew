@@ -34,7 +34,6 @@ namespace StorybrewEditor.Storyboarding
         public override Beatmap Beatmap => beatmap;
 
         private IEnumerable<EditorBeatmap> beatmaps;
-
         public override IEnumerable<Beatmap> Beatmaps => beatmaps;
 
         private StringBuilder log = new StringBuilder();
