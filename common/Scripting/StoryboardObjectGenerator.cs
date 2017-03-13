@@ -50,6 +50,19 @@ namespace StorybrewCommon.Scripting
                 throw new Exception(message != null ? $"Assertion failed line {line}: {message}" : $"Assertion failed line {line}");
         }
 
+        public Beatmap getBeatmap(String diffname)
+        {
+            //this.context.Beatmap
+            foreach (Beatmap diff in context.Beatmaps)
+            {
+                if (diff.Name == diffname)
+                {
+                    return diff;
+                }
+            }
+            return this.Beatmap;
+        }
+
         #region File loading
 
         private Dictionary<string, Bitmap> bitmaps = new Dictionary<string, Bitmap>();
