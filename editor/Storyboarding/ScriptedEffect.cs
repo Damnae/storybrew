@@ -16,6 +16,7 @@ namespace StorybrewEditor.Storyboarding
         private EditorStoryboardLayer placeHolderLayer;
         private Stopwatch statusStopwatch = new Stopwatch();
         private string configScriptIdentifier;
+        private MultiFileWatcher dependencyWatcher;
 
         private string name;
         public override string Name
@@ -37,8 +38,6 @@ namespace StorybrewEditor.Storyboarding
         public override EffectStatus Status => status;
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
-
-        private MultiFileWatcher dependencyWatcher;
 
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {

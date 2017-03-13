@@ -224,6 +224,7 @@ namespace StorybrewEditor.UserInterface.Components
                     showHideButton.Checked = la.Visible;
                 };
                 effect.OnChanged += effectChangedHandler = (sender, e) => effectNameLabel.Text = $"using {effect.BaseName}";
+                layerRoot.OnHovered += (sender, e) => la.Highlight = e.Hovered;
                 layerRoot.OnDisposed += (sender, e) =>
                 {
                     la.OnChanged -= changedHandler;

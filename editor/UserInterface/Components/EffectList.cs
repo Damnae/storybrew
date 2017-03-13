@@ -197,6 +197,7 @@ namespace StorybrewEditor.UserInterface.Components
                     nameLabel.Text = ef.Name;
                     updateStatusButton(statusButton, ef);
                 };
+                effectRoot.OnHovered += (sender, e) => ef.Highlight = e.Hovered;
                 effectRoot.OnDisposed += (sender, e) => ef.OnChanged -= changedHandler;
 
                 statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");

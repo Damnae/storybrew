@@ -64,6 +64,8 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
+        public bool Highlight;
+
         public event ChangedHandler OnChanged;
         protected void RaiseChanged(string propertyName)
             => EventHelper.InvokeStrict(() => OnChanged, d => ((ChangedHandler)d)(this, new ChangedEventArgs(propertyName)));
@@ -146,6 +148,10 @@ namespace StorybrewEditor.Storyboarding
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             if (!Visible) return;
+
+            if (Highlight || effect.Highlight)
+                opacity *= 1 - (float)(drawContext.Get<Editor>().TimeSource.Current * 2) % 1f;
+
             foreach (var displayableObject in displayableObjects)
                 displayableObject.Draw(drawContext, camera, bounds, opacity, effect.Project);
         }
