@@ -33,17 +33,22 @@ namespace StorybrewEditor.Storyboarding
         private EditorBeatmap beatmap;
         public override Beatmap Beatmap => beatmap;
 
+        private IEnumerable<EditorBeatmap> beatmaps;
+
+        public override IEnumerable<Beatmap> Beatmaps => beatmaps;
+
         private StringBuilder log = new StringBuilder();
         public string Log => log.ToString();
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
-        public EditorGeneratorContext(Effect effect, string projectPath, string mapsetPath, EditorBeatmap beatmap, MultiFileWatcher watcher)
+        public EditorGeneratorContext(Effect effect, string projectPath, string mapsetPath, EditorBeatmap beatmap, IEnumerable<EditorBeatmap> beatmaps, MultiFileWatcher watcher)
         {
             this.projectPath = projectPath;
             this.mapsetPath = mapsetPath;
             this.effect = effect;
             this.beatmap = beatmap;
+            this.beatmaps = beatmaps;
             this.watcher = watcher;
         }
 

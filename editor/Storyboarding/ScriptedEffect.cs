@@ -88,7 +88,7 @@ namespace StorybrewEditor.Storyboarding
                 Refresh();
             };
 
-            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, newDependencyWatcher);
+            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, Project.MapsetManager.Beatmaps, newDependencyWatcher);
             var success = false;
             try
             {
