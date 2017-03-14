@@ -68,8 +68,6 @@ namespace StorybrewCommon.Storyboarding3d
 
         public override void GenerateSprite(StoryboardLayer layer)
         {
-            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
-
             var sprite = layer.CreateSprite(SpritePath, SpriteOrigin);
             if (Generator.GenerateCommands(sprite))
             {
