@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -30,6 +31,9 @@ namespace StorybrewCommon.Scripting
         public StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
 
         public Beatmap Beatmap => context.Beatmap;
+        public Beatmap GetBeatmap(string name)
+            => context.Beatmaps.FirstOrDefault(b => b.Name == name);
+
         public string ProjectPath => context.ProjectPath;
         public string MapsetPath => context.MapsetPath;
 

@@ -6,6 +6,7 @@ using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -61,6 +62,11 @@ namespace StorybrewEditor.Storyboarding
                 RaiseChanged(nameof(DiffSpecific));
             }
         }
+
+        public double StartTime => storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty().Min();
+        public double EndTime => storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty().Max();
+
+        public bool Highlight;
 
         public event ChangedHandler OnChanged;
         protected void RaiseChanged(string propertyName)
@@ -134,6 +140,10 @@ namespace StorybrewEditor.Storyboarding
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {
             if (!Visible) return;
+
+            if (Highlight || effect.Highlight)
+                opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
+
             foreach (var displayableObject in displayableObjects)
                 displayableObject.Draw(drawContext, camera, bounds, opacity, effect.Project);
         }

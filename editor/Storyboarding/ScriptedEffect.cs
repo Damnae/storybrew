@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Remoting;
 
 namespace StorybrewEditor.Storyboarding
@@ -16,6 +17,7 @@ namespace StorybrewEditor.Storyboarding
         private EditorStoryboardLayer placeHolderLayer;
         private Stopwatch statusStopwatch = new Stopwatch();
         private string configScriptIdentifier;
+        private MultiFileWatcher dependencyWatcher;
 
         private string name;
         public override string Name
@@ -38,7 +40,8 @@ namespace StorybrewEditor.Storyboarding
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
 
-        private MultiFileWatcher dependencyWatcher;
+        public override double StartTime => layers.Select(l => l.StartTime).DefaultIfEmpty().Min();
+        public override double EndTime => layers.Select(l => l.EndTime).DefaultIfEmpty().Max();
 
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {
@@ -85,7 +88,7 @@ namespace StorybrewEditor.Storyboarding
                 Refresh();
             };
 
-            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, newDependencyWatcher);
+            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.MapsetPath, Project.MainBeatmap, Project.MapsetManager.Beatmaps, newDependencyWatcher);
             var success = false;
             try
             {

@@ -15,6 +15,10 @@ namespace StorybrewEditor.Storyboarding
         public virtual EffectStatus Status { get; }
         public virtual string StatusMessage { get; }
 
+        public abstract double StartTime { get; }
+        public abstract double EndTime { get; }
+        public bool Highlight;
+
         public event EventHandler OnChanged;
         protected void RaiseChanged()
             => OnChanged?.Invoke(this, EventArgs.Empty);
