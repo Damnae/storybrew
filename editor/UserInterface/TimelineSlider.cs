@@ -5,6 +5,7 @@ using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using StorybrewCommon.Mapset;
 using StorybrewEditor.Storyboarding;
 using System;
 
@@ -133,7 +134,7 @@ namespace StorybrewEditor.UserInterface
             }
 
             // Ticks
-            project.MainBeatmap.ForEachTick(leftTime, rightTime, SnapDivisor, (timingPoint, time, beatCount, tickCount) =>
+            Beatmap.ForEachTick(project.MainBeatmap, leftTime, rightTime, SnapDivisor, (timingPoint, time, beatCount, tickCount) =>
             {
                 var tickColor = tickGrey;
                 var lineSize = new Vector2(pixelSize, bounds.Height * 0.3f);
