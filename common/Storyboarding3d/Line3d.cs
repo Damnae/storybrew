@@ -7,8 +7,9 @@ using System;
 
 namespace StorybrewCommon.Storyboarding3d
 {
-    public class Line3d : Object3d
+    public class Line3d : Object3d, HasOsbSprite
     {
+        public OsbSprite Sprite { get; private set; }
         public string SpritePath;
         public bool Additive;
         public bool UseDistanceFade = true;
@@ -18,7 +19,12 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<float> Thickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
 
         public readonly CommandGenerator Generator = new CommandGenerator();
-        
+
+        public override void GenerateSprite(StoryboardLayer layer)
+        {
+            Sprite = Sprite ?? layer.CreateSprite(SpritePath, OsbOrigin.CentreLeft);
+        }
+
         public override void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
         {
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
@@ -47,13 +53,12 @@ namespace StorybrewCommon.Storyboarding3d
             });
         }
 
-        public override void GenerateSprite(StoryboardLayer layer)
+        public override void GenerateCommands(Action<Action, OsbSprite> action)
         {
-            var sprite = layer.CreateSprite(SpritePath, OsbOrigin.CentreLeft);
-            if (Generator.GenerateCommands(sprite))
+            if (Generator.GenerateCommands(Sprite, action))
             {
                 if (Additive)
-                    sprite.Additive(sprite.CommandsStartTime, sprite.CommandsEndTime);
+                    Sprite.Additive(Sprite.CommandsStartTime, Sprite.CommandsEndTime);
             }
         }
     }

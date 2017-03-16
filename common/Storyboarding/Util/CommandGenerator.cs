@@ -47,11 +47,11 @@ namespace StorybrewCommon.Storyboarding.Util
                 states.Insert(index, state);
             }
         }
-        
-        public bool GenerateCommands(OsbSprite sprite)
-            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds);
 
-        public bool GenerateCommands(OsbSprite sprite, Box2 bounds)
+        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null)
+            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action);
+
+        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null)
         {
             var previousState = (State)null;
             var wasVisible = false;
@@ -92,7 +92,14 @@ namespace StorybrewCommon.Storyboarding.Util
             if (wasVisible)
                 commitKeyframes();
 
-            convertToCommands(sprite);
+            if (everVisible)
+            {
+                if (action != null)
+                    action(() => convertToCommands(sprite), sprite);
+                else convertToCommands(sprite);
+            }
+
+            clearFinalKeyframes();
             return everVisible;
         }
 
@@ -121,13 +128,7 @@ namespace StorybrewCommon.Storyboarding.Util
             finalScales.ForEachPair((startKeyframe, endKeyframe) => sprite.ScaleVec(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), Vector2.One);
             finalRotations.ForEachPair((startKeyframe, endKeyframe) => sprite.Rotate(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), 0);
             finalColors.ForEachPair((startKeyframe, endKeyframe) => sprite.Color(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), CommandColor.White);
-            finalOpacities.ForEachPair((startKeyframe, endKeyframe) => sprite.Fade(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), 1);
-
-            finalPositions.Clear();
-            finalScales.Clear();
-            finalRotations.Clear();
-            finalColors.Clear();
-            finalOpacities.Clear();
+            finalOpacities.ForEachPair((startKeyframe, endKeyframe) => sprite.Fade(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), 2);
         }
 
         private void addKeyframes(State state)
@@ -138,6 +139,15 @@ namespace StorybrewCommon.Storyboarding.Util
             rotations.Add(time, (float)state.Rotation);
             colors.Add(time, state.Color);
             opacities.Add(time, (float)state.Opacity);
+        }
+
+        private void clearFinalKeyframes()
+        {
+            finalPositions.Clear();
+            finalScales.Clear();
+            finalRotations.Clear();
+            finalColors.Clear();
+            finalOpacities.Clear();
         }
 
         public class State : IComparable<State>
@@ -156,7 +166,7 @@ namespace StorybrewCommon.Storyboarding.Util
 
                 if (Scale.X == 0 || Scale.Y == 0)
                     return false;
-                
+
                 if (!bounds.Contains(Position))
                 {
                     Vector2 originVector;

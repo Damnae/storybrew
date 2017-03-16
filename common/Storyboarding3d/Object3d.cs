@@ -2,6 +2,7 @@
 using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.CommandValues;
+using System;
 using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding3d
@@ -24,6 +25,12 @@ namespace StorybrewCommon.Storyboarding3d
             return Matrix4.Identity;
         }
 
+        public void GenerateTreeSprite(StoryboardLayer layer)
+        {
+            GenerateSprite(Layer ?? layer);
+            foreach (var child in children)
+                child.GenerateTreeSprite(layer);
+        }
         public void GenerateTreeKeyframes(double time, CameraState cameraState, Object3dState parent3dState)
         {
             var object3dState = new Object3dState(
@@ -35,17 +42,34 @@ namespace StorybrewCommon.Storyboarding3d
             foreach (var child in children)
                 child.GenerateTreeKeyframes(time, cameraState, object3dState);
         }
-        public void GenerateTreeSprite(StoryboardLayer layer)
+        public void GenerateTreeCommands(Action<Action, OsbSprite> action = null)
         {
-            GenerateSprite(Layer ?? layer);
+            GenerateCommands(action);
             foreach (var child in children)
-                child.GenerateTreeSprite(layer);
+                child.GenerateTreeCommands(action);
+        }
+        public void DoTree(Action<Object3d> action)
+        {
+            action(this);
+            foreach (var child in children)
+                child.DoTree(action);
+        }
+        public void DoTreeSprite(Action<OsbSprite> action)
+        {
+            var sprite = (this as HasOsbSprite)?.Sprite;
+            if (sprite != null)
+                action(sprite);
+            foreach (var child in children)
+                child.DoTreeSprite(action);
         }
 
+        public virtual void GenerateSprite(StoryboardLayer layer)
+        {
+        }
         public virtual void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
         {
         }
-        public virtual void GenerateSprite(StoryboardLayer layer)
+        public virtual void GenerateCommands(Action<Action, OsbSprite> action)
         {
         }
     }

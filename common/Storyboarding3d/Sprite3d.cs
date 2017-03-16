@@ -1,14 +1,14 @@
 ﻿using OpenTK;
 using StorybrewCommon.Animations;
-using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
 using System;
 
 namespace StorybrewCommon.Storyboarding3d
 {
-    public class Sprite3d : Node3d
+    public class Sprite3d : Node3d, HasOsbSprite
     {
+        public OsbSprite Sprite { get; private set; }
         public string SpritePath;
         public OsbOrigin SpriteOrigin = OsbOrigin.Centre;
         public bool Additive;
@@ -19,6 +19,11 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<double> SpriteRotation = new KeyframedValue<double>(InterpolatingFunctions.DoubleAngle, 0);
 
         public readonly CommandGenerator Generator = new CommandGenerator();
+
+        public override void GenerateSprite(StoryboardLayer layer)
+        {
+            Sprite = Sprite ?? layer.CreateSprite(SpritePath, SpriteOrigin);
+        }
 
         public override void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
         {
@@ -66,13 +71,12 @@ namespace StorybrewCommon.Storyboarding3d
             });
         }
 
-        public override void GenerateSprite(StoryboardLayer layer)
+        public override void GenerateCommands(Action<Action, OsbSprite> action)
         {
-            var sprite = layer.CreateSprite(SpritePath, SpriteOrigin);
-            if (Generator.GenerateCommands(sprite))
+            if (Generator.GenerateCommands(Sprite, action))
             {
                 if (Additive)
-                    sprite.Additive(sprite.CommandsStartTime, sprite.CommandsEndTime);
+                    Sprite.Additive(Sprite.CommandsStartTime, Sprite.CommandsEndTime);
             }
         }
     }
