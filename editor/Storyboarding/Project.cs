@@ -606,23 +606,6 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static string Migrate(string projectPath, string projectFolderName)
-        {
-            Trace.WriteLine($"Migrating project '{projectPath}' to '{projectFolderName}'");
-
-            using (var project = Load(projectPath, false, false))
-            using (var placeholderProject = Create(projectFolderName, project.MapsetPath, false))
-            {
-                var oldProjectPath = project.projectPath;
-
-                project.projectPath = placeholderProject.projectPath;
-                project.Save();
-
-                File.Move(oldProjectPath, project.projectPath + ".bak");
-                return project.projectPath;
-            }
-        }
-
         /// <summary>
         /// Doesn't run in the main thread
         /// </summary>
