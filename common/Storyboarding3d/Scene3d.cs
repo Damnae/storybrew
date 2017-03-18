@@ -15,7 +15,7 @@ namespace StorybrewCommon.Storyboarding3d
         public void Generate(Camera camera, StoryboardLayer layer, double startTime, double endTime, double timeStep)
         {
             Root.GenerateTreeSprite(layer);
-            for (var time = startTime; time < endTime + 0.005; time += timeStep)
+            for (var time = startTime; time < endTime + 5; time += timeStep)
                 Root.GenerateTreeKeyframes(time, camera.StateAt(time), Object3dState.InitialState);
             Root.GenerateTreeCommands();
         }

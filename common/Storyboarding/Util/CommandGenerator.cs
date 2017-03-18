@@ -117,6 +117,7 @@ namespace StorybrewCommon.Storyboarding.Util
             colors.Simplify3dKeyframes(ColorTolerance, c => new Vector3(c.R, c.G, c.B));
             colors.TransferKeyframes(finalColors);
 
+            if (opacities.StartValue > 0) opacities.Add(opacities.StartTime, 0, before: true);
             opacities.Simplify1dKeyframes(OpacityTolerance, o => o);
             if (opacities.EndValue > 0) opacities.Add(opacities.EndTime, 0);
             opacities.TransferKeyframes(finalOpacities);
@@ -128,7 +129,7 @@ namespace StorybrewCommon.Storyboarding.Util
             finalScales.ForEachPair((startKeyframe, endKeyframe) => sprite.ScaleVec(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), Vector2.One);
             finalRotations.ForEachPair((startKeyframe, endKeyframe) => sprite.Rotate(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), 0);
             finalColors.ForEachPair((startKeyframe, endKeyframe) => sprite.Color(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), CommandColor.White);
-            finalOpacities.ForEachPair((startKeyframe, endKeyframe) => sprite.Fade(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), 2);
+            finalOpacities.ForEachPair((startKeyframe, endKeyframe) => sprite.Fade(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), -1);
         }
 
         private void addKeyframes(State state)

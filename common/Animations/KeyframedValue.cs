@@ -23,18 +23,18 @@ namespace StorybrewCommon.Animations
             this.defaultValue = defaultValue;
         }
 
-        public void Add(Keyframe<TValue> keyframe)
+        public void Add(Keyframe<TValue> keyframe, bool before = false)
         {
             if (keyframes.Count == 0 || keyframes[keyframes.Count - 1].Time < keyframe.Time)
                 keyframes.Add(keyframe);
-            else keyframes.Insert(indexFor(keyframe), keyframe);
+            else keyframes.Insert(indexFor(keyframe, before), keyframe);
         }
 
-        public void Add(double time, TValue value)
-            => Add(time, value, EasingFunctions.Linear);
+        public void Add(double time, TValue value, bool before = false)
+            => Add(time, value, EasingFunctions.Linear, before);
 
-        public void Add(double time, TValue value, Func<double, double> easing)
-            => Add(new Keyframe<TValue>(time, value, easing));
+        public void Add(double time, TValue value, Func<double, double> easing, bool before = false)
+            => Add(new Keyframe<TValue>(time, value, easing), before);
 
         public void AddRange(IEnumerable<Keyframe<TValue>> collection)
         {
@@ -54,7 +54,7 @@ namespace StorybrewCommon.Animations
             if (keyframes.Count == 0) return defaultValue;
             if (keyframes.Count == 1) return keyframes[0].Value;
 
-            var index = indexAt(time);
+            var index = indexAt(time, false);
             if (index == 0)
                 return keyframes[0].Value;
             else if (index == keyframes.Count)
@@ -73,33 +73,49 @@ namespace StorybrewCommon.Animations
         public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair, TValue defaultValue = default(TValue))
         {
             var hasPair = false;
-            var afterStep = true;
-            var previousKeyframe = (Keyframe<TValue>?)null;
+            var previous = (Keyframe<TValue>?)null;
+            var stepStart = (Keyframe<TValue>?)null;
             foreach (var keyframe in keyframes)
             {
-                if (previousKeyframe.HasValue)
+                if (previous.HasValue)
                 {
-                    var isFlat = previousKeyframe.Value.Value.Equals(keyframe.Value);
-                    var isStep = !isFlat && previousKeyframe.Value.Time == keyframe.Time;
+                    var isFlat = previous.Value.Value.Equals(keyframe.Value);
+                    var isStep = !isFlat && previous.Value.Time == keyframe.Time;
+
+                    if (isStep)
+                    {
+                        if (!stepStart.HasValue)
+                            stepStart = previous;
+                    }
+                    else if (stepStart.HasValue)
+                    {
+                        pair(stepStart.Value, previous.Value);
+                        stepStart = null;
+                        hasPair = true;
+                    }
 
                     if (!isStep && !isFlat)
                     {
-                        pair(previousKeyframe.Value, keyframe);
+                        pair(previous.Value, keyframe);
                         hasPair = true;
                     }
-                    else if (afterStep && keyframes.Count > 2)
-                    {
-                        pair(previousKeyframe.Value, previousKeyframe.Value);
-                        hasPair = true;
-                    }
-                    afterStep = isStep;
                 }
-                previousKeyframe = keyframe;
+                previous = keyframe;
             }
 
-            if ((hasPair && afterStep) ||
-                !hasPair && previousKeyframe.HasValue && !previousKeyframe.Value.Value.Equals(defaultValue))
-                pair(previousKeyframe.Value, previousKeyframe.Value);
+            if (stepStart.HasValue)
+            {
+                pair(stepStart.Value, previous.Value);
+                stepStart = null;
+                hasPair = true;
+            }
+
+            if (!hasPair && keyframes.Count > 0)
+            {
+                var first = keyframes[0];
+                if (!first.Value.Equals(defaultValue))
+                    pair(first, first);
+            }
         }
 
         public void Clear() => keyframes.Clear();
@@ -107,14 +123,17 @@ namespace StorybrewCommon.Animations
         public IEnumerator<Keyframe<TValue>> GetEnumerator() => keyframes.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private int indexFor(Keyframe<TValue> keyframe)
+        private int indexFor(Keyframe<TValue> keyframe, bool before)
         {
             var index = keyframes.BinarySearch(keyframe);
             if (index < 0) index = ~index;
-            while (index < keyframes.Count && keyframes[index].Time <= keyframe.Time) index++;
+
+            if (before)
+                while (index > 0 && keyframes[index].Time >= keyframe.Time) index--;
+            else while (index < keyframes.Count && keyframes[index].Time <= keyframe.Time) index++;
             return index;
         }
-        private int indexAt(double time) => indexFor(new Keyframe<TValue>(time));
+        private int indexAt(double time, bool before) => indexFor(new Keyframe<TValue>(time), before);
 
         #region Manipulation
 
