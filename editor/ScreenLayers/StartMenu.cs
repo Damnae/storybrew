@@ -121,7 +121,7 @@ namespace StorybrewEditor.ScreenLayers
                 Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
                 {
                     if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
-                        migrateProject(projectPath);
+                        Manager.ShowMessage("Projects must be placed in a folder inside the 'projects' folder.");
                     else openProject(projectPath);
                 });
             };
@@ -145,23 +145,6 @@ namespace StorybrewEditor.ScreenLayers
             {
                 var project = Project.Load(projectPath, true, true);
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
-            });
-        }
-
-        private void migrateProject(string projectPath)
-        {
-            Manager.ShowPrompt("Project name", "Projects are now placed in their own folder under the 'projects' folder.\n\nThis project will be moved there, please choose a name for it.", (projectFolderName) =>
-            {
-                try
-                {
-                    var newProjectPath = Project.Migrate(projectPath, projectFolderName);
-                    openProject(newProjectPath);
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine($"Project migration for {projectPath} failed:\n{e}");
-                    Manager.ShowMessage($"Project migration failed:\n{e.Message}", () => migrateProject(projectPath));
-                }
             });
         }
 
