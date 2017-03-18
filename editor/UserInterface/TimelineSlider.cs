@@ -134,7 +134,7 @@ namespace StorybrewEditor.UserInterface
             }
 
             // Ticks
-            Beatmap.ForEachTick(project.MainBeatmap, leftTime, rightTime, SnapDivisor, (timingPoint, time, beatCount, tickCount) =>
+            project.MainBeatmap.ForEachTick(leftTime, rightTime, SnapDivisor, (timingPoint, time, beatCount, tickCount) =>
             {
                 var tickColor = tickGrey;
                 var lineSize = new Vector2(pixelSize, bounds.Height * 0.3f);

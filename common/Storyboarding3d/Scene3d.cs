@@ -23,7 +23,7 @@ namespace StorybrewCommon.Storyboarding3d
         public void Generate(Camera camera, StoryboardLayer layer, double startTime, double endTime, Beatmap beatmap, int divisor = 4)
         {
             Root.GenerateTreeSprite(layer);
-            Beatmap.ForEachTick(beatmap, (int)startTime, (int)endTime, divisor, (timingPoint, time, beatCount, tickCount) =>
+            beatmap.ForEachTick((int)startTime, (int)endTime, divisor, (timingPoint, time, beatCount, tickCount) =>
                 Root.GenerateTreeKeyframes(time, camera.StateAt(time), Object3dState.InitialState));
             Root.GenerateTreeCommands();
         }

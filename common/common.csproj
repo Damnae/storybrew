@@ -73,6 +73,7 @@
     <Compile Include="Curves\BaseCurve.cs" />
     <Compile Include="Curves\Curve.cs" />
     <Compile Include="Curves\TransformedCurve.cs" />
+    <Compile Include="Mapset\BeatmapExtensions.cs" />
     <Compile Include="Mapset\OsuBreak.cs" />
     <Compile Include="Storyboarding3d\Camera.cs" />
     <Compile Include="Storyboarding3d\CameraState.cs" />
