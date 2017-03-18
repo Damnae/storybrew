@@ -117,8 +117,8 @@ namespace StorybrewCommon.Storyboarding.Util
             colors.Simplify3dKeyframes(ColorTolerance, c => new Vector3(c.R, c.G, c.B));
             colors.TransferKeyframes(finalColors);
 
-            if (opacities.StartValue > 0) opacities.Add(opacities.StartTime, 0, before: true);
             opacities.Simplify1dKeyframes(OpacityTolerance, o => o);
+            if (opacities.StartValue > 0) opacities.Add(opacities.StartTime, 0, before: true);
             if (opacities.EndValue > 0) opacities.Add(opacities.EndTime, 0);
             opacities.TransferKeyframes(finalOpacities);
         }
@@ -170,21 +170,23 @@ namespace StorybrewCommon.Storyboarding.Util
 
                 if (!bounds.Contains(Position))
                 {
+                    var w = width * Scale.X;
+                    var h = height * Scale.Y;
                     Vector2 originVector;
                     switch (origin)
                     {
                         default:
                         case OsbOrigin.TopLeft: originVector = Vector2.Zero; break;
-                        case OsbOrigin.TopCentre: originVector = new Vector2(width * Scale.X * 0.5f, 0); break;
-                        case OsbOrigin.TopRight: originVector = new Vector2(width * Scale.X, 0); break;
-                        case OsbOrigin.CentreLeft: originVector = new Vector2(0, height * 0.5f); break;
-                        case OsbOrigin.Centre: originVector = new Vector2(width * Scale.X * 0.5f, height * Scale.Y * 0.5f); break;
-                        case OsbOrigin.CentreRight: originVector = new Vector2(width * Scale.X, height * Scale.Y * 0.5f); break;
-                        case OsbOrigin.BottomLeft: originVector = new Vector2(0, height); break;
-                        case OsbOrigin.BottomCentre: originVector = new Vector2(width * Scale.X * 0.5f, height * Scale.Y); break;
-                        case OsbOrigin.BottomRight: originVector = new Vector2(width * Scale.X, height * Scale.Y); break;
+                        case OsbOrigin.TopCentre: originVector = new Vector2(w * 0.5f, 0); break;
+                        case OsbOrigin.TopRight: originVector = new Vector2(w, 0); break;
+                        case OsbOrigin.CentreLeft: originVector = new Vector2(0, h * 0.5f); break;
+                        case OsbOrigin.Centre: originVector = new Vector2(w * 0.5f, h * 0.5f); break;
+                        case OsbOrigin.CentreRight: originVector = new Vector2(w, h * 0.5f); break;
+                        case OsbOrigin.BottomLeft: originVector = new Vector2(0, h); break;
+                        case OsbOrigin.BottomCentre: originVector = new Vector2(w * 0.5f, h); break;
+                        case OsbOrigin.BottomRight: originVector = new Vector2(w, h); break;
                     }
-                    var obb = new OrientedBoundingBox(Position, originVector, width * Scale.X, height * Scale.Y, Rotation);
+                    var obb = new OrientedBoundingBox(Position, originVector, w, h, Rotation);
                     if (!obb.Intersects(bounds))
                         return false;
                 }

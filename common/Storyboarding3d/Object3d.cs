@@ -15,6 +15,9 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
         public StoryboardLayer Layer;
 
+        public bool InheritsColor = true;
+        public bool InheritsOpacity = true;
+
         public void Add(Object3d child)
         {
             children.Add(child);
@@ -35,8 +38,8 @@ namespace StorybrewCommon.Storyboarding3d
         {
             var object3dState = new Object3dState(
                 WorldTransformAt(time) * parent3dState.WorldTransform,
-                Coloring.ValueAt(time) * parent3dState.Color,
-                Opacity.ValueAt(time) * parent3dState.Opacity);
+                Coloring.ValueAt(time) * (InheritsColor ? parent3dState.Color : CommandColor.White),
+                Opacity.ValueAt(time) * (InheritsOpacity ? parent3dState.Opacity : 1));
 
             GenerateKeyframes(time, cameraState, object3dState);
             foreach (var child in children)
