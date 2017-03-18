@@ -175,14 +175,14 @@ namespace StorybrewCommon.Storyboarding.Util
                     {
                         default:
                         case OsbOrigin.TopLeft: originVector = Vector2.Zero; break;
-                        case OsbOrigin.TopCentre: originVector = new Vector2(width * 0.5f, 0); break;
-                        case OsbOrigin.TopRight: originVector = new Vector2(width, 0); break;
+                        case OsbOrigin.TopCentre: originVector = new Vector2(width * Scale.X * 0.5f, 0); break;
+                        case OsbOrigin.TopRight: originVector = new Vector2(width * Scale.X, 0); break;
                         case OsbOrigin.CentreLeft: originVector = new Vector2(0, height * 0.5f); break;
-                        case OsbOrigin.Centre: originVector = new Vector2(width * 0.5f, height * 0.5f); break;
-                        case OsbOrigin.CentreRight: originVector = new Vector2(width, height * 0.5f); break;
+                        case OsbOrigin.Centre: originVector = new Vector2(width * Scale.X * 0.5f, height * Scale.Y * 0.5f); break;
+                        case OsbOrigin.CentreRight: originVector = new Vector2(width * Scale.X, height * Scale.Y * 0.5f); break;
                         case OsbOrigin.BottomLeft: originVector = new Vector2(0, height); break;
-                        case OsbOrigin.BottomCentre: originVector = new Vector2(width * 0.5f, height); break;
-                        case OsbOrigin.BottomRight: originVector = new Vector2(width, height); break;
+                        case OsbOrigin.BottomCentre: originVector = new Vector2(width * Scale.X * 0.5f, height * Scale.Y); break;
+                        case OsbOrigin.BottomRight: originVector = new Vector2(width * Scale.X, height * Scale.Y); break;
                     }
                     var obb = new OrientedBoundingBox(Position, originVector, width * Scale.X, height * Scale.Y, Rotation);
                     if (!obb.Intersects(bounds))
