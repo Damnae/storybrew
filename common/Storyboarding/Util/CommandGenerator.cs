@@ -57,10 +57,12 @@ namespace StorybrewCommon.Storyboarding.Util
             var wasVisible = false;
             var everVisible = false;
             var stateAdded = false;
+            var imageSize = Vector2.One;
 
             foreach (var state in states)
             {
                 var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(state.Time));
+                imageSize = new Vector2(bitmap.Width, bitmap.Height);
 
                 var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
                 if (isVisible) everVisible = true;
@@ -75,7 +77,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 else if (wasVisible && !isVisible)
                 {
                     addKeyframes(state);
-                    commitKeyframes();
+                    commitKeyframes(imageSize);
                     stateAdded = true;
                 }
                 else if (isVisible)
@@ -90,7 +92,7 @@ namespace StorybrewCommon.Storyboarding.Util
             }
 
             if (wasVisible)
-                commitKeyframes();
+                commitKeyframes(imageSize);
 
             if (everVisible)
             {
@@ -103,12 +105,12 @@ namespace StorybrewCommon.Storyboarding.Util
             return everVisible;
         }
 
-        private void commitKeyframes()
+        private void commitKeyframes(Vector2 imageSize)
         {
             positions.Simplify2dKeyframes(PositionTolerance, p => p);
             positions.TransferKeyframes(finalPositions);
 
-            scales.Simplify2dKeyframes(ScaleTolerance, s => s);
+            scales.Simplify2dKeyframes(ScaleTolerance, s => new Vector2(s.X * imageSize.X, s.Y * imageSize.Y));
             scales.TransferKeyframes(finalScales);
 
             rotations.Simplify1dKeyframes(RotationTolerance, a => a);
