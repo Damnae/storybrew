@@ -17,6 +17,7 @@ namespace StorybrewCommon.Storyboarding3d
 
         public bool InheritsColor = true;
         public bool InheritsOpacity = true;
+        public bool InheritsLayer = true;
 
         public void Add(Object3d child)
         {
@@ -28,11 +29,12 @@ namespace StorybrewCommon.Storyboarding3d
             return Matrix4.Identity;
         }
 
-        public void GenerateTreeSprite(StoryboardLayer layer)
+        public void GenerateTreeSprite(StoryboardLayer defaultLayer)
         {
-            GenerateSprite(Layer ?? layer);
+            var layer = Layer ?? defaultLayer;
+            GenerateSprite(layer);
             foreach (var child in children)
-                child.GenerateTreeSprite(layer);
+                child.GenerateTreeSprite(InheritsLayer ? layer : defaultLayer);
         }
         public void GenerateTreeKeyframes(double time, CameraState cameraState, Object3dState parent3dState)
         {

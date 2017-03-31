@@ -23,23 +23,28 @@ namespace StorybrewCommon.Animations
             this.defaultValue = defaultValue;
         }
 
-        public void Add(Keyframe<TValue> keyframe, bool before = false)
+        public KeyframedValue<TValue> Add(Keyframe<TValue> keyframe, bool before = false)
         {
             if (keyframes.Count == 0 || keyframes[keyframes.Count - 1].Time < keyframe.Time)
                 keyframes.Add(keyframe);
             else keyframes.Insert(indexFor(keyframe, before), keyframe);
+            return this;
         }
 
-        public void Add(double time, TValue value, bool before = false)
+        public KeyframedValue<TValue> Add(params Keyframe<TValue>[] values)
+            => AddRange(values);
+
+        public KeyframedValue<TValue> Add(double time, TValue value, bool before = false)
             => Add(time, value, EasingFunctions.Linear, before);
 
-        public void Add(double time, TValue value, Func<double, double> easing, bool before = false)
+        public KeyframedValue<TValue> Add(double time, TValue value, Func<double, double> easing, bool before = false)
             => Add(new Keyframe<TValue>(time, value, easing), before);
 
-        public void AddRange(IEnumerable<Keyframe<TValue>> collection)
+        public KeyframedValue<TValue> AddRange(IEnumerable<Keyframe<TValue>> collection)
         {
             foreach (var keyframe in collection)
                 Add(keyframe);
+            return this;
         }
 
         public void TransferKeyframes(KeyframedValue<TValue> to, bool pad = true, bool clear = true)
@@ -81,7 +86,7 @@ namespace StorybrewCommon.Animations
                 if (previous.HasValue)
                 {
                     var startKeyframe = previous.Value;
-                    
+
                     var isFlat = startKeyframe.Value.Equals(endKeyframe.Value);
                     var isStep = !isFlat && startKeyframe.Time == endKeyframe.Time;
 
@@ -121,7 +126,7 @@ namespace StorybrewCommon.Animations
             }
         }
 
-        private static Keyframe<TValue> editKeyframe(Keyframe<TValue> keyframe, Func<TValue, TValue> edit = null) 
+        private static Keyframe<TValue> editKeyframe(Keyframe<TValue> keyframe, Func<TValue, TValue> edit = null)
             => edit != null ? new Keyframe<TValue>(keyframe.Time, edit(keyframe.Value), keyframe.Ease) : keyframe;
 
         public void Clear() => keyframes.Clear();

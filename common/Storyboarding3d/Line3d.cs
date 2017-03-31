@@ -28,17 +28,19 @@ namespace StorybrewCommon.Storyboarding3d
 
         public override void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
         {
-            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
-
             var wvp = object3dState.WorldTransform * cameraState.ViewProjection;
             var startVector = cameraState.ToScreen(wvp, StartPosition.ValueAt(time));
             var endVector = cameraState.ToScreen(wvp, EndPosition.ValueAt(time));
 
-            var delta = endVector - startVector;
+            var delta = endVector.Xy - startVector.Xy;
+            var length = delta.Length;
+            if (length == 0) return;
+
             var angle = Math.Atan2(delta.Y, delta.X);
             var rotation = InterpolatingFunctions.DoubleAngle(Generator.EndState?.Rotation ?? 0, angle, 1);
 
-            var scale = new Vector2(delta.Xy.Length / bitmap.Width, Thickness.ValueAt(time));
+            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
+            var scale = new Vector2(length / bitmap.Width, Thickness.ValueAt(time));
 
             var opacity = startVector.W < 0 && endVector.W < 0 ? 0 : object3dState.Opacity;
             if (UseDistanceFade) opacity *= Math.Max(cameraState.OpacityAt(startVector.W), cameraState.OpacityAt(endVector.W));
@@ -56,7 +58,7 @@ namespace StorybrewCommon.Storyboarding3d
                 case OsbOrigin.TopCentre:
                 case OsbOrigin.Centre: 
                 case OsbOrigin.BottomCentre:
-                    position = startVector.Xy + delta.Xy * 0.5f;
+                    position = startVector.Xy + delta * 0.5f;
                     break;
 
                 case OsbOrigin.TopRight:
