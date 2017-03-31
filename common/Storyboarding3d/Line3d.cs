@@ -45,11 +45,11 @@ namespace StorybrewCommon.Storyboarding3d
             Generator.Add(new CommandGenerator.State()
             {
                 Time = time,
-                Position = new Vector2((float)Math.Round(startVector.X * 10) / 10, (float)Math.Round(startVector.Y * 10) / 10),
-                Scale = new Vector2((float)Math.Round(scale.X * 1000) / 1000f, (float)Math.Round(scale.Y * 1000) / 1000f),
-                Rotation = (float)Math.Round(rotation * 1000) / 1000,
+                Position = startVector.Xy,
+                Scale = scale,
+                Rotation = rotation,
                 Color = object3dState.Color,
-                Opacity = (float)Math.Round(opacity * 100f) / 100,
+                Opacity = opacity,
             });
         }
 

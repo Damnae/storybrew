@@ -90,12 +90,12 @@ namespace StorybrewScripts
                 scaleX = (float)Math.Floor(scaleX * 10) / 10.0f;
 
                 var hasScale = false;
-                keyframes.ForEachPair((startKeyframe, endKeyframe) =>
+                keyframes.ForEachPair((start, end) =>
                 {
                     hasScale = true;
-                    bar.ScaleVec(startKeyframe.Time, endKeyframe.Time,
-                        scaleX, startKeyframe.Value,
-                        scaleX, endKeyframe.Value);
+                    bar.ScaleVec(start.Time, end.Time,
+                        scaleX, start.Value,
+                        scaleX, end.Value);
                 }, MinimalHeight);
                 if (!hasScale) bar.ScaleVec(startTime, scaleX, MinimalHeight);
             }

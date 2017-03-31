@@ -70,37 +70,40 @@ namespace StorybrewCommon.Animations
             }
         }
 
-        public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair, TValue defaultValue = default(TValue))
+        public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair, TValue defaultValue = default(TValue), Func<TValue, TValue> edit = null)
         {
             var hasPair = false;
             var previous = (Keyframe<TValue>?)null;
             var stepStart = (Keyframe<TValue>?)null;
             foreach (var keyframe in keyframes)
             {
+                var endKeyframe = editKeyframe(keyframe, edit);
                 if (previous.HasValue)
                 {
-                    var isFlat = previous.Value.Value.Equals(keyframe.Value);
-                    var isStep = !isFlat && previous.Value.Time == keyframe.Time;
+                    var startKeyframe = previous.Value;
+                    
+                    var isFlat = startKeyframe.Value.Equals(endKeyframe.Value);
+                    var isStep = !isFlat && startKeyframe.Time == endKeyframe.Time;
 
                     if (isStep)
                     {
                         if (!stepStart.HasValue)
-                            stepStart = previous;
+                            stepStart = startKeyframe;
                     }
                     else if (stepStart.HasValue)
                     {
-                        pair(stepStart.Value, previous.Value);
+                        pair(stepStart.Value, startKeyframe);
                         stepStart = null;
                         hasPair = true;
                     }
 
                     if (!isStep && !isFlat)
                     {
-                        pair(previous.Value, keyframe);
+                        pair(startKeyframe, endKeyframe);
                         hasPair = true;
                     }
                 }
-                previous = keyframe;
+                previous = endKeyframe;
             }
 
             if (stepStart.HasValue)
@@ -112,11 +115,14 @@ namespace StorybrewCommon.Animations
 
             if (!hasPair && keyframes.Count > 0)
             {
-                var first = keyframes[0];
+                var first = editKeyframe(keyframes[0], edit);
                 if (!first.Value.Equals(defaultValue))
                     pair(first, first);
             }
         }
+
+        private static Keyframe<TValue> editKeyframe(Keyframe<TValue> keyframe, Func<TValue, TValue> edit = null) 
+            => edit != null ? new Keyframe<TValue>(keyframe.Time, edit(keyframe.Value), keyframe.Ease) : keyframe;
 
         public void Clear() => keyframes.Clear();
 

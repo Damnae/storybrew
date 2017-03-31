@@ -1,6 +1,7 @@
 ﻿
 #if DEBUG
 using OpenTK;
+using OpenTK.Graphics;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
@@ -35,6 +36,11 @@ namespace StorybrewCommon.Storyboarding.Util
         public double RotationTolerance = 0.001;
         public double ColorTolerance = 1f / 255;
         public double OpacityTolerance = 0.01;
+
+        public int PositionDecimals = 1;
+        public int ScaleDecimals = 2;
+        public int RotationDecimals = 3;
+        public int OpacityDecimals = 2;
 
         public void Add(State state)
         {
@@ -127,11 +133,16 @@ namespace StorybrewCommon.Storyboarding.Util
 
         private void convertToCommands(OsbSprite sprite)
         {
-            finalPositions.ForEachPair((startKeyframe, endKeyframe) => sprite.Move(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), new Vector2(320, 240));
-            finalScales.ForEachPair((startKeyframe, endKeyframe) => sprite.ScaleVec(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), Vector2.One);
-            finalRotations.ForEachPair((startKeyframe, endKeyframe) => sprite.Rotate(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), 0);
-            finalColors.ForEachPair((startKeyframe, endKeyframe) => sprite.Color(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), CommandColor.White);
-            finalOpacities.ForEachPair((startKeyframe, endKeyframe) => sprite.Fade(startKeyframe.Time, endKeyframe.Time, startKeyframe.Value, endKeyframe.Value), -1);
+            finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240), 
+                p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)));
+            finalScales.ForEachPair((start, end) => sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value), Vector2.One,
+                s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
+            finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0, 
+                r => (float)Math.Round(r, RotationDecimals));
+            finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White, 
+                c => CommandColor.FromRgb(c.R, c.G, c.B));
+            finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1, 
+                o => (float)Math.Round(o, OpacityDecimals));
         }
 
         private void addKeyframes(State state)
