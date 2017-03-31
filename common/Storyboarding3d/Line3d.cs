@@ -11,6 +11,7 @@ namespace StorybrewCommon.Storyboarding3d
     {
         public OsbSprite Sprite { get; private set; }
         public string SpritePath;
+        public OsbOrigin SpriteOrigin = OsbOrigin.CentreLeft;
         public bool Additive;
         public bool UseDistanceFade = true;
         
@@ -22,7 +23,7 @@ namespace StorybrewCommon.Storyboarding3d
 
         public override void GenerateSprite(StoryboardLayer layer)
         {
-            Sprite = Sprite ?? layer.CreateSprite(SpritePath, OsbOrigin.CentreLeft);
+            Sprite = Sprite ?? layer.CreateSprite(SpritePath, SpriteOrigin);
         }
 
         public override void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
@@ -33,8 +34,8 @@ namespace StorybrewCommon.Storyboarding3d
             var startVector = cameraState.ToScreen(wvp, StartPosition.ValueAt(time));
             var endVector = cameraState.ToScreen(wvp, EndPosition.ValueAt(time));
 
-            var delta = startVector - endVector;
-            var angle = Math.PI + Math.Atan2(delta.Y, delta.X);
+            var delta = endVector - startVector;
+            var angle = Math.Atan2(delta.Y, delta.X);
             var rotation = InterpolatingFunctions.DoubleAngle(Generator.EndState?.Rotation ?? 0, angle, 1);
 
             var scale = new Vector2(delta.Xy.Length / bitmap.Width, Thickness.ValueAt(time));
@@ -42,10 +43,33 @@ namespace StorybrewCommon.Storyboarding3d
             var opacity = startVector.W < 0 && endVector.W < 0 ? 0 : object3dState.Opacity;
             if (UseDistanceFade) opacity *= Math.Max(cameraState.OpacityAt(startVector.W), cameraState.OpacityAt(endVector.W));
 
+            Vector2 position;
+            switch (Sprite.Origin)
+            {
+                default:
+                case OsbOrigin.TopLeft:
+                case OsbOrigin.CentreLeft:
+                case OsbOrigin.BottomLeft:
+                    position = startVector.Xy;
+                    break;
+
+                case OsbOrigin.TopCentre:
+                case OsbOrigin.Centre: 
+                case OsbOrigin.BottomCentre:
+                    position = startVector.Xy + delta.Xy * 0.5f;
+                    break;
+
+                case OsbOrigin.TopRight:
+                case OsbOrigin.CentreRight:
+                case OsbOrigin.BottomRight:
+                    position = endVector.Xy;
+                    break;
+            }
+
             Generator.Add(new CommandGenerator.State()
             {
                 Time = time,
-                Position = startVector.Xy,
+                Position = position,
                 Scale = scale,
                 Rotation = rotation,
                 Color = object3dState.Color,
