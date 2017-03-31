@@ -45,6 +45,9 @@ namespace StorybrewScripts
         public double Tolerance = 0.2;
 
         [Configurable]
+        public int CommandDecimals = 1;
+
+        [Configurable]
         public float MinimalHeight = 0.05f;
 
         [Configurable]
@@ -68,7 +71,6 @@ namespace StorybrewScripts
                 for (var i = 0; i < BarCount; i++)
                 {
                     var height = (float)Math.Log10(1 + fft[i] * LogScale) * Scale.Y / bitmap.Height;
-                    height = (float)Math.Floor(height * 10) / 10.0f;
                     if (height < MinimalHeight) height = MinimalHeight;
 
                     heightKeyframes[i].Add(time, height);
@@ -90,13 +92,17 @@ namespace StorybrewScripts
                 scaleX = (float)Math.Floor(scaleX * 10) / 10.0f;
 
                 var hasScale = false;
-                keyframes.ForEachPair((start, end) =>
-                {
-                    hasScale = true;
-                    bar.ScaleVec(start.Time, end.Time,
-                        scaleX, start.Value,
-                        scaleX, end.Value);
-                }, MinimalHeight);
+                keyframes.ForEachPair(
+                    (start, end) =>
+                    {
+                        hasScale = true;
+                        bar.ScaleVec(start.Time, end.Time,
+                            scaleX, start.Value,
+                            scaleX, end.Value);
+                    },
+                    MinimalHeight,
+                    s => (float)Math.Round(s, CommandDecimals)
+                );
                 if (!hasScale) bar.ScaleVec(startTime, scaleX, MinimalHeight);
             }
         }
