@@ -112,7 +112,6 @@
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
     <None Include="OpenTK.dll.config" />
-    <None Include="Resources\projecttemplate.zip" />
     <None Include="Resources\scripttemplate.csx" />
     <Compile Include="ScreenLayers\Test\FlowLayoutTest.cs" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
@@ -184,6 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icon.ico" />
+    <Content Include="Resources\project\scripts.csproj" />
+    <Content Include="Resources\project\storyboard.sln" />
     <Content Include="Resources\ui-line.png" />
     <Content Include="Resources\ui-rounded-borders.png" />
   </ItemGroup>
@@ -216,11 +217,11 @@
   </Target>
   <Target Name="CopyRoslynFiles" AfterTargets="AfterBuild">
     <ItemGroup>
-      <RoslynFiles Include="$(OutDir)\roslyn\*"/>
+      <RoslynFiles Include="$(OutDir)\roslyn\*" />
     </ItemGroup>
-	<MakeDir Directories="$(OutDir)\bin\roslyn" />
-	<Move SourceFiles="@(RoslynFiles)" DestinationFolder="$(OutDir)\bin\roslyn" />
-	<RemoveDir Directories="$(OutDir)\roslyn" />
+    <MakeDir Directories="$(OutDir)\bin\roslyn" />
+    <Move SourceFiles="@(RoslynFiles)" DestinationFolder="$(OutDir)\bin\roslyn" />
+    <RemoveDir Directories="$(OutDir)\roslyn" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

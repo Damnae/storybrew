@@ -136,12 +136,6 @@
   <data name="FontAwesome" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\fontawesome.ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="scripttemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\scripttemplate.csx;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="projecttemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\projecttemplate.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="skin_constants" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\skin_constants.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -159,5 +153,14 @@
   </data>
   <data name="ui_rounded_borders_opt" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\ui-rounded-borders-opt.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="project_scripts_csproj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\project\scripts.csproj;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="project_storyboard_sln" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\project\storyboard.sln;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="scripttemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\scripttemplate.csx;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

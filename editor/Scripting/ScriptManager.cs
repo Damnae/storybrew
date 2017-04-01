@@ -1,9 +1,12 @@
-﻿using StorybrewCommon.Scripting;
+﻿using BrewLib.Util;
+using StorybrewCommon.Scripting;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Xml;
 
 namespace StorybrewEditor.Scripting
 {
@@ -33,6 +36,8 @@ namespace StorybrewEditor.Scripting
             this.referencedAssemblies = referencedAssemblies;
             this.compiledScriptsPath = compiledScriptsPath;
 
+            updateSolutionFiles();
+
             scriptWatcher = new FileSystemWatcher()
             {
                 Filter = "*.cs",
@@ -42,6 +47,7 @@ namespace StorybrewEditor.Scripting
             scriptWatcher.Created += scriptWatcher_Changed;
             scriptWatcher.Changed += scriptWatcher_Changed;
             scriptWatcher.Renamed += scriptWatcher_Changed;
+            scriptWatcher.Deleted += scriptWatcher_Changed;
             scriptWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (script): {e.GetException()}");
             scriptWatcher.EnableRaisingEvents = true;
             Trace.WriteLine($"Watching (script): {scriptsSourcePath}");
@@ -55,6 +61,7 @@ namespace StorybrewEditor.Scripting
             libraryWatcher.Created += libraryWatcher_Changed;
             libraryWatcher.Changed += libraryWatcher_Changed;
             libraryWatcher.Renamed += libraryWatcher_Changed;
+            libraryWatcher.Deleted += libraryWatcher_Changed;
             libraryWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (library): {e.GetException()}");
             libraryWatcher.EnableRaisingEvents = true;
             Trace.WriteLine($"Watching (library): {scriptsLibraryPath}");
@@ -111,13 +118,18 @@ namespace StorybrewEditor.Scripting
                 if (disposedValue)
                     return;
 
+                Trace.WriteLine($"Watched script file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
+
+                if (e.ChangeType != WatcherChangeTypes.Changed)
+                    updateSolutionFiles();
+
                 var scriptName = Path.GetFileNameWithoutExtension(e.Name);
 
                 ScriptContainer<TScript> container;
                 if (scriptContainers.TryGetValue(scriptName, out container))
                 {
-                    Trace.WriteLine($"Watched script file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
-                    container.ReloadScript();
+                    if (e.ChangeType != WatcherChangeTypes.Deleted)
+                        container.ReloadScript();
                 }
             });
         }
@@ -130,9 +142,47 @@ namespace StorybrewEditor.Scripting
                     return;
 
                 Trace.WriteLine($"Watched library file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
-                foreach (var container in scriptContainers.Values)
-                    container.ReloadScript();
+
+                if (e.ChangeType != WatcherChangeTypes.Changed)
+                    updateSolutionFiles();
+
+                if (e.ChangeType != WatcherChangeTypes.Deleted)
+                    foreach (var container in scriptContainers.Values)
+                        container.ReloadScript();
             });
+        }
+
+        private void updateSolutionFiles()
+        {
+            Trace.WriteLine($"Updating solution files");
+
+            var slnPath = Path.Combine(scriptsSourcePath, "storyboard.sln");
+            File.WriteAllBytes(slnPath, Resources.project_storyboard_sln);
+
+            var csProjPath = Path.Combine(scriptsSourcePath, "scripts.csproj");
+            var document = new XmlDocument() { PreserveWhitespace = false, };
+            try
+            {
+                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Resources.project_scripts_csproj)))
+                    document.Load(stream);
+
+                var xmlns = document.DocumentElement.GetAttribute("xmlns");
+                var compileGroup = document.CreateElement("ItemGroup", xmlns);
+                document.DocumentElement.AppendChild(compileGroup);
+                foreach (var path in Directory.EnumerateFiles(scriptsSourcePath, "*.cs", SearchOption.AllDirectories))
+                {
+                    var relativePath = PathHelper.GetRelativePath(scriptsSourcePath, path);
+
+                    var compileNode = document.CreateElement("Compile", xmlns);
+                    compileNode.SetAttribute("Include", relativePath);
+                    compileGroup.AppendChild(compileNode);
+                }
+                document.Save(csProjPath);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Failed to update scripts.csproj: {e}");
+            }
         }
 
         #region IDisposable Support
