@@ -16,7 +16,7 @@ namespace StorybrewCommon.Storyboarding3d
         {
             Root.GenerateTreeSprite(defaultLayer);
             for (var time = startTime; time < endTime + 5; time += timeStep)
-                Root.GenerateTreeKeyframes(time, camera.StateAt(time), Object3dState.InitialState);
+                Root.GenerateTreeStates(time, camera);
             Root.GenerateTreeCommands();
         }
 
@@ -24,7 +24,7 @@ namespace StorybrewCommon.Storyboarding3d
         {
             Root.GenerateTreeSprite(defaultLayer);
             beatmap.ForEachTick((int)startTime, (int)endTime, divisor, (timingPoint, time, beatCount, tickCount) =>
-                Root.GenerateTreeKeyframes(time, camera.StateAt(time), Object3dState.InitialState));
+                Root.GenerateTreeStates(time, camera));
             Root.GenerateTreeCommands();
         }
     }

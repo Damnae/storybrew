@@ -27,7 +27,7 @@ namespace StorybrewCommon.Mapset
                         timingPoint = nextTimingPoint;
                         continue;
                     }
-                    if (timingPoint != leftTimingPoint && endTime < timingPoint.Offset) break;
+                    if (timingPoint != leftTimingPoint && endTime + Beatmap.ControlPointLeniency < timingPoint.Offset) break;
 
                     int tickCount = 0, beatCount = 0;
                     var step = timingPoint.BeatDuration / snapDivisor;

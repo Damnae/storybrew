@@ -25,7 +25,7 @@ namespace StorybrewCommon.Storyboarding3d
             Sprite = Sprite ?? layer.CreateSprite(SpritePath, SpriteOrigin);
         }
 
-        public override void GenerateKeyframes(double time, CameraState cameraState, Object3dState object3dState)
+        public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
         {
             var wvp = object3dState.WorldTransform * cameraState.ViewProjection;
             var screenPosition = cameraState.ToScreen(wvp, Vector3.Zero);
@@ -71,9 +71,9 @@ namespace StorybrewCommon.Storyboarding3d
             });
         }
 
-        public override void GenerateCommands(Action<Action, OsbSprite> action)
+        public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
         {
-            if (Generator.GenerateCommands(Sprite, action))
+            if (Generator.GenerateCommands(Sprite, action, timeOffset))
             {
                 if (Additive)
                     Sprite.Additive(Sprite.CommandsStartTime, Sprite.CommandsEndTime);

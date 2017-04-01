@@ -53,10 +53,13 @@ namespace StorybrewCommon.Storyboarding.Util
             }
         }
 
-        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null)
-            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action);
+        public void ClearStates()
+            => states.Clear();
 
-        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null)
+        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double timeOffset = 0)
+            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action, timeOffset);
+
+        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double timeOffset = 0)
         {
             var previousState = (State)null;
             var wasVisible = false;
@@ -66,7 +69,7 @@ namespace StorybrewCommon.Storyboarding.Util
 
             foreach (var state in states)
             {
-                var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(state.Time));
+                var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(state.Time + timeOffset));
                 imageSize = new Vector2(bitmap.Width, bitmap.Height);
 
                 var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
@@ -75,19 +78,19 @@ namespace StorybrewCommon.Storyboarding.Util
                 if (!wasVisible && isVisible)
                 {
                     if (!stateAdded && previousState != null)
-                        addKeyframes(previousState);
-                    addKeyframes(state);
+                        addKeyframes(previousState, timeOffset);
+                    addKeyframes(state, timeOffset);
                     stateAdded = true;
                 }
                 else if (wasVisible && !isVisible)
                 {
-                    addKeyframes(state);
+                    addKeyframes(state, timeOffset);
                     commitKeyframes(imageSize);
                     stateAdded = true;
                 }
                 else if (isVisible)
                 {
-                    addKeyframes(state);
+                    addKeyframes(state, timeOffset);
                     stateAdded = true;
                 }
                 else stateAdded = false;
@@ -132,21 +135,21 @@ namespace StorybrewCommon.Storyboarding.Util
 
         private void convertToCommands(OsbSprite sprite)
         {
-            finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240), 
+            finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240),
                 p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)));
             finalScales.ForEachPair((start, end) => sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value), Vector2.One,
                 s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
-            finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0, 
+            finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0,
                 r => (float)Math.Round(r, RotationDecimals));
-            finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White, 
+            finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White,
                 c => CommandColor.FromRgb(c.R, c.G, c.B));
-            finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1, 
+            finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1,
                 o => (float)Math.Round(o, OpacityDecimals));
         }
 
-        private void addKeyframes(State state)
+        private void addKeyframes(State state, double timeOffset)
         {
-            var time = state.Time;
+            var time = state.Time + timeOffset;
             positions.Add(time, state.Position);
             scales.Add(time, state.Scale);
             rotations.Add(time, (float)state.Rotation);

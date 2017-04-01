@@ -29,7 +29,7 @@ namespace StorybrewCommon.Storyboarding
                     frame = Math.Min(frame, FrameCount - 1);
                     break;
             }
-            return (int)frame;
+            return Math.Max(0, (int)frame);
         }
 
         protected override void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
