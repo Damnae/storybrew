@@ -118,6 +118,24 @@ namespace StorybrewEditor.Storyboarding
         public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre)
             => CreateAnimation(path, frameCount, frameDelay, loopType, origin, OsbSprite.DefaultPosition);
 
+
+        public override OsbVideo CreateVideo(string path, int starttime, Vector2 initialPosition)
+        {
+            var storyboardObject = new EditorOsbVideo()
+            {
+                TexturePath = path,
+                Starttime = starttime,
+                InitialPosition = initialPosition,
+            };
+            storyboardObjects.Add(storyboardObject);
+            displayableObjects.Add(storyboardObject);
+            storyboardObject.Fade(starttime, 1);
+            return storyboardObject;
+        }
+
+        public override OsbVideo CreateVideo(string path, int starttime)
+            => CreateVideo(path, starttime, OsbVideo.DefaultPosition);
+       
 #if DEBUG
         public override OsbScene3d CreateScene3d()
         {
