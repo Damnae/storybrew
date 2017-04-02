@@ -20,6 +20,9 @@ namespace StorybrewCommon.Storyboarding
         public abstract OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition);
         public abstract OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre);
 
+        public abstract OsbVideo CreateVideo(string path, int starttime, Vector2 initialPosition);
+        public abstract OsbVideo CreateVideo(string path, int starttime);
+
 #if DEBUG
         public abstract OsbScene3d CreateScene3d();
 #endif
