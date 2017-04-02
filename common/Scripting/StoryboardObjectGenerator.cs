@@ -169,6 +169,7 @@ namespace StorybrewCommon.Scripting
         private SrtParser srtParser = new SrtParser();
         private AssParser assParser = new AssParser();
         private SbvParser sbvParser = new SbvParser();
+        private OstParser ostParser = new OstParser();
 
         private HashSet<string> fontDirectories = new HashSet<string>();
 
@@ -183,6 +184,7 @@ namespace StorybrewCommon.Scripting
                 case ".ssa":
                 case ".ass": return assParser.Parse(path);
                 case ".sbv": return sbvParser.Parse(path);
+                case ".ost": return ostParser.Parse(path);
             }
             throw new NotSupportedException($"{Path.GetExtension(path)} isn't a supported subtitle format");
         }
