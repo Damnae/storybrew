@@ -71,6 +71,9 @@ namespace StorybrewScripts
         [Configurable]
         public bool Debug = false;
 
+        [Configurable]
+        public OsbOrigin Origin = OsbOrigin.Centre;
+
         public override void Generate()
         {
             var font = LoadFont(SpritesPath, new FontDescription()
@@ -137,11 +140,10 @@ namespace StorybrewScripts
             foreach (var line in subtitles.Lines)
             {
                 var texture = font.GetTexture(line.Text);
+                var position = new Vector2(320 - texture.BaseWidth * FontScale * 0.5f, SubtitleY)
+                    + texture.OffsetFor(Origin) * FontScale;
 
-                var x = texture.OffsetX * FontScale + 320 - texture.BaseWidth * FontScale * 0.5f;
-                var y = texture.OffsetY * FontScale + SubtitleY;
-
-                var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopLeft, new Vector2(x, y));
+                var sprite = layer.CreateSprite(texture.Path, Origin, position);
                 sprite.Scale(line.StartTime, FontScale);
                 sprite.Fade(line.StartTime - 200, line.StartTime, 0, 1);
                 sprite.Fade(line.EndTime - 200, line.EndTime, 1, 0);
@@ -171,10 +173,10 @@ namespace StorybrewScripts
                         var texture = font.GetTexture(letter.ToString());
                         if (!texture.IsEmpty)
                         {
-                            var x = texture.OffsetX * FontScale + letterX;
-                            var y = texture.OffsetY * FontScale + letterY;
+                            var position = new Vector2(letterX, letterY)
+                                + texture.OffsetFor(Origin) * FontScale;
 
-                            var sprite = layer.CreateSprite(texture.Path, OsbOrigin.TopLeft, new Vector2(x, y));
+                            var sprite = layer.CreateSprite(texture.Path, Origin, position);
                             sprite.Scale(subtitleLine.StartTime, FontScale);
                             sprite.Fade(subtitleLine.StartTime - 200, subtitleLine.StartTime, 0, 1);
                             sprite.Fade(subtitleLine.EndTime - 200, subtitleLine.EndTime, 1, 0);

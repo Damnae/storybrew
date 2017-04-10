@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,23 @@ namespace StorybrewCommon.Subtitles
             this.baseHeight = baseHeight;
             this.width = width;
             this.height = height;
+        }
+
+        public Vector2 OffsetFor(OsbOrigin origin)
+        {
+            switch (origin)
+            {
+                default:
+                case OsbOrigin.TopLeft: return new Vector2(offsetX, offsetY);
+                case OsbOrigin.TopCentre: return new Vector2(offsetX + width * 0.5f, offsetY);
+                case OsbOrigin.TopRight: return new Vector2(offsetX + width, offsetY);
+                case OsbOrigin.CentreLeft: return new Vector2(offsetX, offsetY + height * 0.5f);
+                case OsbOrigin.Centre: return new Vector2(offsetX + width * 0.5f, offsetY + height * 0.5f);
+                case OsbOrigin.CentreRight: return new Vector2(offsetX + width, offsetY + height * 0.5f);
+                case OsbOrigin.BottomLeft: return new Vector2(offsetX, offsetY + height);
+                case OsbOrigin.BottomCentre: return new Vector2(offsetX + width * 0.5f, offsetY + height);
+                case OsbOrigin.BottomRight: return new Vector2(offsetX + width, offsetY + height);
+            }
         }
     }
 
@@ -183,6 +201,8 @@ namespace StorybrewCommon.Subtitles
                             {
                                 offsetX += trimBounds.Left;
                                 offsetY += trimBounds.Top;
+                                width = trimmedBitmap.Width;
+                                height = trimmedBitmap.Height;
                                 using (var trimGraphics = Graphics.FromImage(trimmedBitmap))
                                     trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
                                 Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));

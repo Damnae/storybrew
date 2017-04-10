@@ -143,7 +143,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             Manager.AsyncLoading("Loading project", () =>
             {
-                var project = Project.Load(projectPath, true, true);
+                var project = Project.Load(projectPath, true);
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
             });
         }

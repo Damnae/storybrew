@@ -14,11 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -464,7 +462,7 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectPath, bool withCommonScripts, bool updateSolution)
+        public static Project Load(string projectPath, bool withCommonScripts)
         {
             var project = new Project(projectPath, withCommonScripts);
             using (var stream = new FileStream(projectPath, FileMode.Open))
@@ -540,7 +538,6 @@ namespace StorybrewEditor.Storyboarding
                     });
                 }
             }
-            if (updateSolution) updateSolutionFiles(Path.GetDirectoryName(projectPath));
             return project;
         }
 
@@ -565,8 +562,6 @@ namespace StorybrewEditor.Storyboarding
                 throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
-            updateSolutionFiles(projectFolderPath);
-
             var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts)
             {
                 MapsetPath = mapsetPath,
@@ -574,36 +569,6 @@ namespace StorybrewEditor.Storyboarding
             project.Save();
 
             return project;
-        }
-
-        private static void updateSolutionFiles(string projectFolderPath)
-        {
-            using (var stream = new MemoryStream(Resources.projecttemplate))
-            using (var zip = new ZipArchive(stream))
-                zip.ExtractToDirectoryOverwrite(projectFolderPath);
-
-            var csProjPath = Path.Combine(projectFolderPath, "scripts.csproj");
-            var document = new XmlDocument() { PreserveWhitespace = false, };
-            try
-            {
-                document.Load(csProjPath);
-                var xmlns = document.DocumentElement.GetAttribute("xmlns");
-                var compileGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.EnumerateFiles(projectFolderPath, "*.cs", SearchOption.AllDirectories))
-                {
-                    var relativePath = PathHelper.GetRelativePath(projectFolderPath, path);
-
-                    var compileNode = document.CreateElement("Compile", xmlns);
-                    compileNode.SetAttribute("Include", relativePath);
-                    compileGroup.AppendChild(compileNode);
-                }
-                document.Save(csProjPath);
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine($"Failed to update scripts.csproj: {e}");
-            }
         }
 
         /// <summary>
