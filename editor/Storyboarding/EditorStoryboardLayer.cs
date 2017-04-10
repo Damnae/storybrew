@@ -141,12 +141,12 @@ namespace StorybrewEditor.Storyboarding
             return storyboardObject;
         }
 
-        public void TriggerEvents(double startTime, double endTime)
+        public void TriggerEvents(double fromTime, double toTime)
         {
             if (!Visible) return;
             foreach (var eventObject in eventObjects)
-                if (startTime < eventObject.EventTime && eventObject.EventTime <= endTime)
-                    eventObject.TriggerEvent(effect.Project, endTime);
+                if (fromTime <= eventObject.EventTime && eventObject.EventTime < toTime)
+                    eventObject.TriggerEvent(effect.Project, toTime);
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
