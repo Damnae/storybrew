@@ -127,16 +127,7 @@ namespace StorybrewEditor.ScreenLayers
             bottomLayout.Pack(600);
             bottomRightLayout.Pack((1024 - bottomLayout.Width) / 2);
         }
-
-        private void openProject(string projectPath)
-        {
-            Manager.AsyncLoading("Loading project", () =>
-            {
-                var project = Project.Load(projectPath, true);
-                Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
-            });
-        }
-
+        
         private void checkLatestVersion()
         {
             NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases?per_page=10&page=1", "cache/net/releases", 15 * 60,
