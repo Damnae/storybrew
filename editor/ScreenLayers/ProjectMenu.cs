@@ -357,6 +357,9 @@ namespace StorybrewEditor.ScreenLayers
                     case Key.Space:
                         playPauseButton.Click();
                         return true;
+                    case Key.O:
+                        withSavePrompt(() => Manager.ShowOpenProject());
+                        return true;
                     case Key.S:
                         if (e.Control)
                         {
@@ -461,17 +464,19 @@ namespace StorybrewEditor.ScreenLayers
         }
 
         public override void Close()
+            => withSavePrompt(() => Manager.GetContext<Editor>().Restart());
+
+        private void withSavePrompt(Action action)
         {
             if (project.Changed)
             {
                 Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving", () =>
                 {
                     project.Save();
-                    Program.Schedule(() => Manager.GetContext<Editor>().Restart());
-                }),
-                () => Manager.GetContext<Editor>().Restart(), true);
+                    action();
+                }), action, true);
             }
-            else Manager.GetContext<Editor>().Restart();
+            else action();
         }
 
         private void project_OnMapsetPathChanged(object sender, EventArgs e)

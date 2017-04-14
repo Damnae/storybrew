@@ -113,18 +113,7 @@ namespace StorybrewEditor.ScreenLayers
             });
 
             newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
-            openProjectButton.OnClick += (sender, e) =>
-            {
-                if (!Directory.Exists(Project.ProjectsFolder))
-                    Directory.CreateDirectory(Project.ProjectsFolder);
-
-                Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
-                {
-                    if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
-                        Manager.ShowMessage("Projects must be placed in a folder inside the 'projects' folder.");
-                    else openProject(projectPath);
-                });
-            };
+            openProjectButton.OnClick += (sender, e) => Manager.ShowOpenProject();
             wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
             discordButton.OnClick += (sender, e) => Process.Start(Program.DiscordUrl);
             closeButton.OnClick += (sender, e) => Exit();
