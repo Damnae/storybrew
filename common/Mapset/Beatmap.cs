@@ -56,10 +56,5 @@ namespace StorybrewCommon.Mapset
         /// Finds the timing point (red line) active at a specific time.
         /// </summary>
         public abstract ControlPoint GetTimingPointAt(int time);
-
-        /// <summary>
-        /// Calls tickAction with timingPoint, time, beatCount, tickCount
-        /// </summary>
-        public abstract void ForEachTick(int startTime, int endTime, int snapDivisor, Action<ControlPoint, double, int, int> tickAction);
     }
 }

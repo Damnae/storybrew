@@ -5,6 +5,7 @@ using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using StorybrewCommon.Mapset;
 using StorybrewEditor.Storyboarding;
 using System;
 

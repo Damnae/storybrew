@@ -3,8 +3,6 @@ using BrewLib.Graphics.Cameras;
 using BrewLib.Util;
 using OpenTK;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Storyboarding3d;
-using StorybrewEditor.Storyboarding3d;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -117,17 +115,7 @@ namespace StorybrewEditor.Storyboarding
 
         public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre)
             => CreateAnimation(path, frameCount, frameDelay, loopType, origin, OsbSprite.DefaultPosition);
-
-#if DEBUG
-        public override OsbScene3d CreateScene3d()
-        {
-            var storyboardObject = new EditorOsbScene3d();
-            storyboardObjects.Add(storyboardObject);
-            displayableObjects.Add(storyboardObject);
-            return storyboardObject;
-        }
-#endif
-
+        
         public override OsbSample CreateSample(string path, double time, double volume)
         {
             var storyboardObject = new EditorOsbSample()

@@ -13,7 +13,7 @@ namespace StorybrewEditor
     public class Builder
     {
         private static string mainExecutablePath = "StorybrewEditor.exe";
-        private static string[] ignoredPaths = { @"scripts\Scene3dTest.cs", };
+        private static string[] ignoredPaths = { };
 
         public static void Build()
         {
