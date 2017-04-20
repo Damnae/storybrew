@@ -1,4 +1,5 @@
-﻿using StorybrewCommon.Storyboarding;
+﻿#if DEBUG
+using StorybrewCommon.Storyboarding;
 
 namespace StorybrewCommon.Storyboarding3d
 {
@@ -7,3 +8,4 @@ namespace StorybrewCommon.Storyboarding3d
         OsbSprite Sprite { get; }
     }
 }
+#endif

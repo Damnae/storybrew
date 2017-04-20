@@ -1,4 +1,5 @@
-﻿using StorybrewCommon.Mapset;
+﻿#if DEBUG
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
 
 namespace StorybrewCommon.Storyboarding3d
@@ -29,3 +30,4 @@ namespace StorybrewCommon.Storyboarding3d
         }
     }
 }
+#endif
