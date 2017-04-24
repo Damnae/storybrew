@@ -473,7 +473,7 @@ namespace StorybrewEditor.ScreenLayers
                 Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving", () =>
                 {
                     project.Save();
-                    action();
+                    Program.Schedule(() => action());
                 }), action, true);
             }
             else action();
