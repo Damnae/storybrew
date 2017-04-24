@@ -38,6 +38,16 @@ namespace StorybrewEditor
                 return;
             }
 
+            try
+            {
+                updateData(destinationFolder, fromVersion);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Failed to update data: {e}");
+                MessageBox.Show($"Failed to update data.\n\n{e}", Program.FullName);
+            }
+
             // Start the updated process
             var relativeProcessPath = PathHelper.GetRelativePath(sourceFolder, updaterPath);
             var processPath = Path.Combine(destinationFolder, relativeProcessPath);
@@ -48,6 +58,14 @@ namespace StorybrewEditor
                 FileName = processPath,
                 WorkingDirectory = destinationFolder,
             });
+        }
+
+        private static void updateData(string destinationFolder, Version fromVersion)
+        {
+            var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
+            if (fromVersion < new Version(1, 46))
+                settings.UseRoslyn.Set(false);
+            settings.Save();
         }
 
         public static void NotifyEditorRun()
@@ -78,8 +96,6 @@ namespace StorybrewEditor
 
             foreach (var scriptFilename in Directory.GetFiles("scripts", "*.cs", SearchOption.TopDirectoryOnly))
                 File.SetAttributes(scriptFilename, FileAttributes.ReadOnly);
-
-            Program.Settings.UseRoslyn.Set(false);
         }
 
         private static void replaceFiles(string sourceFolder, string destinationFolder, Version fromVersion)
