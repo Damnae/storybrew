@@ -42,6 +42,8 @@ namespace BrewLib.UserInterface.Skinning
 
         public WidgetStyle GetStyle(Type type, string name)
         {
+            if (name == null) name = "default";
+
             Dictionary<string, WidgetStyle> styles;
             if (!stylesPerType.TryGetValue(type, out styles))
                 return null;
@@ -119,20 +121,21 @@ namespace BrewLib.UserInterface.Skinning
 
         private JObject resolveIncludes(JObject data, ResourceManager resourceManager)
         {
-            var mergedData = data;
             if (data["include"] != null)
-                foreach (var include in data["include"])
+            {
+                var snapshot = new List<JToken>(data["include"]);
+                foreach (var include in snapshot)
                 {
                     var path = include.Value<string>();
                     var includedData = loadJson(path, resourceManager);
-                    includedData.Merge(mergedData, new JsonMergeSettings()
+                    data.Merge(includedData, new JsonMergeSettings()
                     {
                         MergeArrayHandling = MergeArrayHandling.Union,
                         MergeNullValueHandling = MergeNullValueHandling.Merge,
                     });
-                    mergedData = includedData;
                 }
-            return mergedData;
+            }
+            return data;
         }
 
         private void loadDrawables(JToken data)
@@ -349,6 +352,7 @@ namespace BrewLib.UserInterface.Skinning
             return null;
         }
 
+        private static System.Drawing.ColorConverter colorConverter = new System.Drawing.ColorConverter();
         private static Dictionary<Type, Func<JToken, Skin, object>> fieldParsers = new Dictionary<Type, Func<JToken, Skin, object>>()
         {
             [typeof(string)] = (data, skin) => data.Value<string>(),
@@ -369,6 +373,12 @@ namespace BrewLib.UserInterface.Skinning
                 if (data.Type == JTokenType.String)
                 {
                     var value = data.Value<string>();
+                    if (value.StartsWith("#"))
+                    {
+                        var color = (System.Drawing.Color)colorConverter.ConvertFromString(value);
+                        return new Color4(color.R, color.G, color.B, color.A);
+                    }
+
                     var colorMethod = typeof(Color4).GetMethod($"get_{value}");
                     if (colorMethod?.ReturnType == typeof(Color4))
                         return colorMethod.Invoke(null, null);

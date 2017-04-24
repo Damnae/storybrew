@@ -6,6 +6,9 @@ namespace BrewLib.Graphics
 {
     public class VertexDeclaration : IEnumerable<VertexAttribute>
     {
+        private static int nextId;
+        public readonly int Id = nextId++;
+
         private VertexAttribute[] vertexAttributes;
 
         public VertexAttribute this[int index] => vertexAttributes[index];
