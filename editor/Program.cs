@@ -445,7 +445,7 @@ namespace StorybrewEditor
                 new NameValueCollection()
                 {
                     ["reporttype"] = type,
-                    ["source"] = Settings.Id,
+                    ["source"] = Settings?.Id ?? "-",
                     ["version"] = Version.ToString(),
                     ["content"] = e.ToString(),
                 },

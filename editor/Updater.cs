@@ -35,6 +35,7 @@ namespace StorybrewEditor
                 Trace.WriteLine($"Failed to replace files: {e}");
                 MessageBox.Show($"Update failed, please update manually.\n\n{e}", Program.FullName);
                 OpenLastestReleasePage();
+                Program.Report("updatefail", e);
                 return;
             }
 
@@ -46,6 +47,7 @@ namespace StorybrewEditor
             {
                 Trace.WriteLine($"Failed to update data: {e}");
                 MessageBox.Show($"Failed to update data.\n\n{e}", Program.FullName);
+                Program.Report("updatefail", e);
             }
 
             // Start the updated process
@@ -60,14 +62,6 @@ namespace StorybrewEditor
             });
         }
 
-        private static void updateData(string destinationFolder, Version fromVersion)
-        {
-            var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
-            if (fromVersion < new Version(1, 46))
-                settings.UseRoslyn.Set(false);
-            settings.Save();
-        }
-
         public static void NotifyEditorRun()
         {
             if (File.Exists(FirstRunPath))
@@ -80,6 +74,14 @@ namespace StorybrewEditor
                 Misc.WithRetries(() => File.Delete(UpdateArchivePath), canThrow: false);
             if (Directory.Exists(UpdateFolderPath))
                 Misc.WithRetries(() => Directory.Delete(UpdateFolderPath, true), canThrow: false);
+        }
+
+        private static void updateData(string destinationFolder, Version fromVersion)
+        {
+            var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
+            if (fromVersion < new Version(1, 46))
+                settings.UseRoslyn.Set(false);
+            settings.Save();
         }
 
         private static void firstRun()
