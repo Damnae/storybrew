@@ -217,7 +217,13 @@ namespace StorybrewEditor.ScreenLayers
                 AnchorTo = BoxAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
-            effectsList.OnEffectSelected += (effect) => timeline.Value = (float)effect.StartTime / 1000;
+            effectsList.OnEffectPreselect += effect =>
+            {
+                if (effect != null)
+                    timeline.Highlight(effect.StartTime, effect.EndTime);
+                else timeline.ClearHighlight();
+            };
+            effectsList.OnEffectSelected += effect => timeline.Value = (float)effect.StartTime / 1000;
 
             WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager)
             {
@@ -226,7 +232,13 @@ namespace StorybrewEditor.ScreenLayers
                 AnchorTo = BoxAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
-            layersList.OnLayerSelected += (layer) => timeline.Value = (float)layer.StartTime / 1000;
+            layersList.OnLayerPreselect += layer =>
+            {
+                if (layer != null)
+                    timeline.Highlight(layer.StartTime, layer.EndTime);
+                else timeline.ClearHighlight();
+            };
+            layersList.OnLayerSelected += layer => timeline.Value = (float)layer.StartTime / 1000;
 
             WidgetManager.Root.Add(statusLayout = new LinearLayout(WidgetManager)
             {
