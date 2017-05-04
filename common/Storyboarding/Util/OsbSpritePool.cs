@@ -5,10 +5,10 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbSpritePool : IDisposable
     {
-        protected StoryboardLayer layer;
-        protected string path;
-        protected OsbOrigin origin;
-        protected Action<OsbSprite, double, double> finalizeSprite;
+        private StoryboardLayer layer;
+        private string path;
+        private OsbOrigin origin;
+        private Action<OsbSprite, double, double> finalizeSprite;
 
         private List<PooledSprite> pooledSprites = new List<PooledSprite>();
 
