@@ -7,6 +7,7 @@ namespace StorybrewCommon.Storyboarding.Util
     {
         private StoryboardLayer layer;
         private Dictionary<string, OsbSpritePool> pools = new Dictionary<string, OsbSpritePool>();
+        private Dictionary<string, OsbAnimationPool> animationPools = new Dictionary<string, OsbAnimationPool>();
 
         private int maxPoolDuration = 60000;
         public int MaxPoolDuration
@@ -30,7 +31,10 @@ namespace StorybrewCommon.Storyboarding.Util
         {
             foreach (var pool in pools)
                 pool.Value.Clear();
+            foreach (var pool in animationPools)
+                pool.Value.Clear();
             pools.Clear();
+            animationPools.Clear();
         }
 
         public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin = OsbOrigin.Centre, Action<OsbSprite, double, double> finalizeSprite = null, int poolGroup = 0)
@@ -38,6 +42,12 @@ namespace StorybrewCommon.Storyboarding.Util
 
         public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin, bool additive, int poolGroup = 0)
             => Get(startTime, endTime, path, origin, additive ? (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime, spriteEndTime) : (Action<OsbSprite, double, double>)null, poolGroup);
+
+        public OsbAnimation Get(double startTime, double endTime, string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre, Action<OsbSprite, double, double> finalizeSprite = null, int poolGroup = 0)
+            => (OsbAnimation)getPool(path, frameCount, frameDelay, loopType, origin, finalizeSprite, poolGroup).Get(startTime, endTime);
+
+        public OsbAnimation Get(double startTime, double endTime, string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, bool additive, int poolGroup = 0)
+            => Get(startTime, endTime, path, frameCount, frameDelay, loopType, origin, additive ? (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime, spriteEndTime) : (Action<OsbSprite, double, double>)null, poolGroup);
 
         private OsbSpritePool getPool(string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
         {
@@ -50,8 +60,22 @@ namespace StorybrewCommon.Storyboarding.Util
             return pool;
         }
 
+        private OsbAnimationPool getPool(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
+        {
+            var key = getKey(path, frameCount, frameDelay, loopType, origin, finalizeSprite, poolGroup);
+
+            OsbAnimationPool pool;
+            if (!animationPools.TryGetValue(key, out pool))
+                animationPools.Add(key, pool = new OsbAnimationPool(layer, path, frameCount, frameDelay, loopType, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
+
+            return pool;
+        }
+
         private string getKey(string path, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
             => $"{path}#{origin}#{action?.Target}.{action?.Method.Name}#{poolGroup}";
+
+        private string getKey(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
+            => $"{path}#{frameCount}#{frameDelay}#{loopType}#{origin}#{action?.Target}.{action?.Method.Name}#{poolGroup}";
 
         #region IDisposable Support
 
