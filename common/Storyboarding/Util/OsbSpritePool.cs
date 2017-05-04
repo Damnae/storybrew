@@ -61,7 +61,8 @@ namespace StorybrewCommon.Storyboarding.Util
             pooledSprites.Clear();
         }
 
-        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin) => layer.CreateSprite(path, origin);
+        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin)
+            => layer.CreateSprite(path, origin);
 
         private class PooledSprite
         {
