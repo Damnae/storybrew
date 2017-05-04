@@ -87,6 +87,7 @@
     <Compile Include="Storyboarding3d\Sprite3d.cs" />
     <Compile Include="Storyboarding\Util\CommandGenerator.cs" />
     <Compile Include="Storyboarding\OsbSample.cs" />
+    <Compile Include="Storyboarding\Util\OsbAnimationPool.cs" />
     <Compile Include="Subtitles\FontEffect.cs" />
     <Compile Include="Subtitles\FontGenerator.cs" />
     <Compile Include="Subtitles\FontOutline.cs" />
