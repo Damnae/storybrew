@@ -31,7 +31,10 @@ namespace StorybrewCommon.Storyboarding.Util
         {
             foreach (var pool in pools)
                 pool.Value.Clear();
+            foreach (var pool in animationPools)
+                pool.Value.Clear();
             pools.Clear();
+            animationPools.Clear();
         }
 
         public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin = OsbOrigin.Centre, Action<OsbSprite, double, double> finalizeSprite = null, int poolGroup = 0)
