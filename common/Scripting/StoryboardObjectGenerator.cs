@@ -28,7 +28,7 @@ namespace StorybrewCommon.Scripting
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
         /// Layers will be sorted by the order in which they are first retrieved.
         /// </summary>
-        public StoryboardLayer GetLayer(string identifier) => context.GetLayer(identifier);
+        public StoryboardLayer GetLayer(string identifier, OsbLayer osbLayer = OsbLayer.Background) => context.GetLayer(identifier, osbLayer);
 
         public Beatmap Beatmap => context.Beatmap;
         public Beatmap GetBeatmap(string name)

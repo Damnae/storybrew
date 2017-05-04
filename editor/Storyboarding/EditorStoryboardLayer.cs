@@ -39,7 +39,7 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        private OsbLayer osbLayer = OsbLayer.Background;
+        private OsbLayer osbLayer;
         public OsbLayer OsbLayer
         {
             get { return osbLayer; }
@@ -72,9 +72,10 @@ namespace StorybrewEditor.Storyboarding
         protected void RaiseChanged(string propertyName)
             => EventHelper.InvokeStrict(() => OnChanged, d => ((ChangedHandler)d)(this, new ChangedEventArgs(propertyName)));
 
-        public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
+        public EditorStoryboardLayer(string identifier, Effect effect, OsbLayer osbLayer = OsbLayer.Background) : base(identifier)
         {
             this.effect = effect;
+            this.osbLayer = Enum.IsDefined(typeof(OsbLayer), (int)osbLayer) ? osbLayer : OsbLayer.Background;
         }
 
         private List<StoryboardObject> storyboardObjects = new List<StoryboardObject>();

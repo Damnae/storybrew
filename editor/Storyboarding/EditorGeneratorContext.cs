@@ -51,10 +51,10 @@ namespace StorybrewEditor.Storyboarding
             this.watcher = watcher;
         }
 
-        public override StoryboardLayer GetLayer(string identifier)
+        public override StoryboardLayer GetLayer(string identifier, OsbLayer osbLayer = OsbLayer.Background)
         {
             var layer = EditorLayers.Find(l => l.Identifier == identifier);
-            if (layer == null) EditorLayers.Add(layer = new EditorStoryboardLayer(identifier, effect));
+            if (layer == null) EditorLayers.Add(layer = new EditorStoryboardLayer(identifier, effect, osbLayer));
             return layer;
         }
 

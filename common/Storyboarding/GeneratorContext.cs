@@ -14,7 +14,7 @@ namespace StorybrewCommon.Storyboarding
 
         public abstract Beatmap Beatmap { get; }
         public abstract IEnumerable<Beatmap> Beatmaps { get; }
-        public abstract StoryboardLayer GetLayer(string identifier);
+        public abstract StoryboardLayer GetLayer(string identifier, OsbLayer osbLayer);
 
         public abstract double AudioDuration { get; }
 
