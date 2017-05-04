@@ -19,6 +19,6 @@ namespace StorybrewCommon.Storyboarding.Util
         {
         }
 
-        protected override OsbSprite createSprite(StoryboardLayer layer, string path, OsbOrigin origin) => layer.CreateAnimation(path, frameCount, frameDelay, loopType, origin);
+        protected override OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin) => layer.CreateAnimation(path, frameCount, frameDelay, loopType, origin);
     }
 }

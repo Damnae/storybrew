@@ -10,7 +10,7 @@ namespace StorybrewCommon.Storyboarding.Util
         protected OsbOrigin origin;
         protected Action<OsbSprite, double, double> finalizeSprite;
 
-        protected List<PooledSprite> pooledSprites = new List<PooledSprite>();
+        private List<PooledSprite> pooledSprites = new List<PooledSprite>();
 
         public int MaxPoolDuration = 60000;
 
@@ -44,7 +44,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 return result.Sprite;
             }
 
-            var sprite = createSprite(layer, path, origin);
+            var sprite = CreateSprite(layer, path, origin);
             pooledSprites.Add(new PooledSprite(sprite, startTime, endTime));
             return sprite;
         }
@@ -61,9 +61,9 @@ namespace StorybrewCommon.Storyboarding.Util
             pooledSprites.Clear();
         }
 
-        protected virtual OsbSprite createSprite(StoryboardLayer layer, string path, OsbOrigin origin) => layer.CreateSprite(path, origin);
+        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin) => layer.CreateSprite(path, origin);
 
-        protected class PooledSprite
+        private class PooledSprite
         {
             public OsbSprite Sprite;
             public double StartTime;
