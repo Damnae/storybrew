@@ -17,7 +17,7 @@ namespace StorybrewEditor
         public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
         public readonly Setting<bool> VerboseVsCode = new Setting<bool>(false);
-        public readonly Setting<bool> UseRoslyn = new Setting<bool>(false);
+        public readonly Setting<bool> UseRoslyn = new Setting<bool>(true);
 
         private readonly string path;
 
