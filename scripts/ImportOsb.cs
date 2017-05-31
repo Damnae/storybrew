@@ -67,7 +67,7 @@ namespace StorybrewScripts
                             var x = float.Parse(values[4], CultureInfo.InvariantCulture);
                             var y = float.Parse(values[5], CultureInfo.InvariantCulture);
                             var frameCount = int.Parse(values[6]);
-                            var frameDelay = int.Parse(values[7]);
+                            var frameDelay = double.Parse(values[7], CultureInfo.InvariantCulture);
                             var loopType = (OsbLoopType)Enum.Parse(typeof(OsbLoopType), values[8]);
                             osbSprite = GetLayer(layerName).CreateAnimation(path, frameCount, frameDelay, loopType, origin, new Vector2(x, y));
                         }

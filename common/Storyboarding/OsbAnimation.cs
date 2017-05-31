@@ -6,7 +6,7 @@ namespace StorybrewCommon.Storyboarding
     public class OsbAnimation : OsbSprite
     {
         public int FrameCount;
-        public int FrameDelay;
+        public double FrameDelay;
         public OsbLoopType LoopType;
 
         public override string GetTexturePathAt(double time)

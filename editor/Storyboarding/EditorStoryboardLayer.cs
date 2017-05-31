@@ -97,7 +97,7 @@ namespace StorybrewEditor.Storyboarding
         public override OsbSprite CreateSprite(string path, OsbOrigin origin)
             => CreateSprite(path, origin, OsbSprite.DefaultPosition);
 
-        public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition)
+        public override OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition)
         {
             var storyboardObject = new EditorOsbAnimation()
             {
@@ -113,7 +113,7 @@ namespace StorybrewEditor.Storyboarding
             return storyboardObject;
         }
 
-        public override OsbAnimation CreateAnimation(string path, int frameCount, int frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre)
+        public override OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre)
             => CreateAnimation(path, frameCount, frameDelay, loopType, origin, OsbSprite.DefaultPosition);
         
         public override OsbSample CreateSample(string path, double time, double volume)
