@@ -8,6 +8,7 @@ using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Util
 {
@@ -137,8 +138,14 @@ namespace StorybrewCommon.Storyboarding.Util
         {
             finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240),
                 p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)));
-            finalScales.ForEachPair((start, end) => sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value), Vector2.One,
-                s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
+            var useVectorScaling = finalScales.Any(k => k.Value.X != k.Value.Y);
+            finalScales.ForEachPair((start, end) =>
+                {
+                    if (useVectorScaling)
+                        sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value);
+                    else sprite.Scale(start.Time, end.Time, start.Value.X, end.Value.X);
+
+                }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
             finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0,
                 r => (float)Math.Round(r, RotationDecimals));
             finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White,
