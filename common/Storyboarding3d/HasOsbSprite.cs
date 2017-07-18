@@ -1,11 +1,12 @@
 ﻿#if DEBUG
 using StorybrewCommon.Storyboarding;
+using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding3d
 {
-    public interface HasOsbSprite
+    public interface HasOsbSprites
     {
-        OsbSprite Sprite { get; }
+        IEnumerable<OsbSprite> Sprites { get; }
     }
 }
 #endif
