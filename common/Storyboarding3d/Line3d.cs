@@ -6,7 +6,6 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StorybrewCommon.Storyboarding3d
 {
@@ -44,7 +43,7 @@ namespace StorybrewCommon.Storyboarding3d
             var angle = Math.Atan2(delta.Y, delta.X);
             var rotation = InterpolatingFunctions.DoubleAngle(Generator.EndState?.Rotation ?? 0, angle, 1);
 
-            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(SpritePath);
+            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(time));
             var scale = new Vector2(length / bitmap.Width, Thickness.ValueAt(time));
 
             var opacity = startVector.W < 0 && endVector.W < 0 ? 0 : object3dState.Opacity;
