@@ -79,6 +79,7 @@
     <Compile Include="Storyboarding3d\Camera.cs" />
     <Compile Include="Storyboarding3d\CameraState.cs" />
     <Compile Include="Storyboarding3d\HasOsbSprite.cs" />
+    <Compile Include="Storyboarding3d\Line3dEx.cs" />
     <Compile Include="Storyboarding3d\Line3d.cs" />
     <Compile Include="Storyboarding3d\Node3d.cs" />
     <Compile Include="Storyboarding3d\Object3d.cs" />
