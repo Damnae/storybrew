@@ -28,6 +28,9 @@ namespace StorybrewCommon.Storyboarding.Util
         private readonly KeyframedValue<CommandColor> finalColors = new KeyframedValue<CommandColor>(InterpolatingFunctions.CommandColor);
         private readonly KeyframedValue<float> finalOpacities = new KeyframedValue<float>(InterpolatingFunctions.Float);
 
+        private readonly KeyframedValue<bool> flipH = new KeyframedValue<bool>(InterpolatingFunctions.BoolFrom);
+        private readonly KeyframedValue<bool> flipV = new KeyframedValue<bool>(InterpolatingFunctions.BoolFrom);
+
         public State StartState => states.Count == 0 ? null : states[0];
         public State EndState => states.Count == 0 ? null : states[states.Count - 1];
 
@@ -140,18 +143,21 @@ namespace StorybrewCommon.Storyboarding.Util
                 p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)));
             var useVectorScaling = finalScales.Any(k => k.Value.X != k.Value.Y);
             finalScales.ForEachPair((start, end) =>
-                {
-                    if (useVectorScaling)
-                        sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value);
-                    else sprite.Scale(start.Time, end.Time, start.Value.X, end.Value.X);
+            {
+                if (useVectorScaling)
+                    sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value);
+                else sprite.Scale(start.Time, end.Time, start.Value.X, end.Value.X);
 
-                }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
+            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
             finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0,
                 r => (float)Math.Round(r, RotationDecimals));
             finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White,
                 c => CommandColor.FromRgb(c.R, c.G, c.B));
             finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1,
                 o => (float)Math.Round(o, OpacityDecimals));
+
+            flipH.ForEachFlag((startTime, endTime) => sprite.FlipH(startTime, endTime));
+            flipV.ForEachFlag((startTime, endTime) => sprite.FlipV(startTime, endTime));
         }
 
         private void addKeyframes(State state, double timeOffset)
@@ -162,6 +168,8 @@ namespace StorybrewCommon.Storyboarding.Util
             rotations.Add(time, (float)state.Rotation);
             colors.Add(time, state.Color);
             opacities.Add(time, (float)state.Opacity);
+            flipH.Add(time, state.FlipH);
+            flipV.Add(time, state.FlipV);
         }
 
         private void clearFinalKeyframes()
@@ -171,6 +179,8 @@ namespace StorybrewCommon.Storyboarding.Util
             finalRotations.Clear();
             finalColors.Clear();
             finalOpacities.Clear();
+            flipH.Clear();
+            flipV.Clear();
         }
 
         public class State : IComparable<State>
@@ -181,6 +191,8 @@ namespace StorybrewCommon.Storyboarding.Util
             public double Rotation = 0;
             public CommandColor Color = CommandColor.White;
             public double Opacity = 1;
+            public bool FlipH;
+            public bool FlipV;
 
             public bool IsVisible(int width, int height, OsbOrigin origin, Box2 bounds)
             {

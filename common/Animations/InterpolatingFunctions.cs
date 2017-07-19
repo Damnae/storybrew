@@ -14,6 +14,11 @@ namespace StorybrewCommon.Animations
         public static Func<Vector3, Vector3, double, Vector3> Vector3 = (from, to, progress) => from + (to - from) * (float)progress;
         public static Func<Quaternion, Quaternion, double, Quaternion> QuaternionSlerp = (from, to, progress) => OpenTK.Quaternion.Slerp(from, to, (float)progress);
 
+        public static Func<bool, bool, double, bool> BoolFrom = (from, to, progress) => from;
+        public static Func<bool, bool, double, bool> BoolTo = (from, to, progress) => to;
+        public static Func<bool, bool, double, bool> BoolAny = (from, to, progress) => from || to;
+        public static Func<bool, bool, double, bool> BoolBoth = (from, to, progress) => from && to;
+
         public static Func<CommandColor, CommandColor, double, CommandColor> CommandColor = (from, to, progress) => from + (to - from) * (float)progress;
 
         private static double getShortestAngleDelta(double from, double to)
