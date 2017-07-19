@@ -6,6 +6,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         OsbEasing Easing { get; }
         TValue StartValue { get; }
         TValue EndValue { get; }
+        double Duration { get; }
 
         TValue ValueAtTime(double time);
     }

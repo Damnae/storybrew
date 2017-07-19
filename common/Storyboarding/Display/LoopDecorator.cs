@@ -16,6 +16,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
         public double StartTime => startTime;
         public double EndTime => startTime + RepeatDuration * repeats;
+        public double Duration => EndTime - StartTime;
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
         public bool Active => true;
