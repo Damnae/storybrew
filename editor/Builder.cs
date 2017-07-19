@@ -64,6 +64,7 @@ namespace StorybrewEditor
                 addFile(archive, "bin/roslyn/csc.rsp", appDirectory);
                 addFile(archive, "bin/roslyn/Microsoft.CodeAnalysis.CSharp.dll", appDirectory);
                 addFile(archive, "bin/roslyn/Microsoft.CodeAnalysis.dll", appDirectory);
+                addFile(archive, "bin/roslyn/System.Collections.Immutable.dll", appDirectory);
                 addFile(archive, "bin/roslyn/System.Reflection.Metadata.dll", appDirectory);
 
                 // Scripts

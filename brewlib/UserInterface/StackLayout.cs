@@ -43,7 +43,8 @@ namespace BrewLib.UserInterface
 
             foreach (var child in Children)
             {
-                if (child.AnchorTarget != null || child.AnchorFrom != child.AnchorTo) continue;
+                if (child.AnchorTarget != null) continue;
+                if (child.AnchorFrom != child.AnchorTo) continue; // ?
 
                 var preferredSize = child.PreferredSize;
                 var minSize = child.MinSize;

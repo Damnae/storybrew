@@ -25,6 +25,7 @@ namespace StorybrewEditor.UserInterface
         private static readonly Color4 breakColor = new Color4(255, 255, 255, 140);
         private static readonly Color4 bookmarkColor = new Color4(58, 110, 170, 240);
         private static readonly Color4 repeatColor = new Color4(58, 110, 170, 80);
+        private static readonly Color4 highlightColor = new Color4(255, 0, 0, 80);
 
         private Sprite line;
         private Label beatmapLabel;
@@ -40,6 +41,9 @@ namespace StorybrewEditor.UserInterface
         private float repeatEnd;
         public float RepeatStart => repeatStart;
         public float RepeatEnd => repeatEnd;
+
+        private double highlightStart;
+        private double highlightEnd;
 
         public TimelineSlider(WidgetManager manager, Project project) : base(manager)
         {
@@ -59,6 +63,17 @@ namespace StorybrewEditor.UserInterface
             StyleName = "timeline";
 
             project.OnMainBeatmapChanged += project_OnMainBeatmapChanged;
+        }
+
+        public void Highlight(double startTime, double endTime)
+        {
+            highlightStart = startTime;
+            highlightEnd = endTime;
+        }
+
+        public void ClearHighlight()
+        {
+            highlightStart = highlightEnd = 0;
         }
 
         private void project_OnMainBeatmapChanged(object sender, EventArgs e)
@@ -131,6 +146,15 @@ namespace StorybrewEditor.UserInterface
                     breakRight = breakLeft + pixelSize;
 
                 line.Draw(drawContext, Manager.Camera, new Box2(breakLeft, offset.Y + bounds.Height * 0.3f, breakRight, offset.Y + bounds.Height * 0.4f), actualOpacity);
+            }
+
+            // Effect / layer highlight
+            line.Color = highlightColor;
+            if (highlightStart != highlightEnd)
+            {
+                var left = timeToXTop(highlightStart * 0.001);
+                var right = timeToXTop(highlightEnd * 0.001);
+                line.Draw(drawContext, Manager.Camera, new Box2(left, offset.Y + bounds.Height * 0.1f, right, offset.Y + bounds.Height * 0.4f), actualOpacity);
             }
 
             // Ticks

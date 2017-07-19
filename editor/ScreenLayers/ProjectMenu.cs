@@ -217,7 +217,13 @@ namespace StorybrewEditor.ScreenLayers
                 AnchorTo = BoxAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
-            effectsList.OnEffectSelected += (effect) => timeline.Value = (float)effect.StartTime / 1000;
+            effectsList.OnEffectPreselect += effect =>
+            {
+                if (effect != null)
+                    timeline.Highlight(effect.StartTime, effect.EndTime);
+                else timeline.ClearHighlight();
+            };
+            effectsList.OnEffectSelected += effect => timeline.Value = (float)effect.StartTime / 1000;
 
             WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager)
             {
@@ -226,7 +232,13 @@ namespace StorybrewEditor.ScreenLayers
                 AnchorTo = BoxAlignment.TopRight,
                 Offset = new Vector2(-16, 0),
             });
-            layersList.OnLayerSelected += (layer) => timeline.Value = (float)layer.StartTime / 1000;
+            layersList.OnLayerPreselect += layer =>
+            {
+                if (layer != null)
+                    timeline.Highlight(layer.StartTime, layer.EndTime);
+                else timeline.ClearHighlight();
+            };
+            layersList.OnLayerSelected += layer => timeline.Value = (float)layer.StartTime / 1000;
 
             WidgetManager.Root.Add(statusLayout = new LinearLayout(WidgetManager)
             {
@@ -357,6 +369,9 @@ namespace StorybrewEditor.ScreenLayers
                     case Key.Space:
                         playPauseButton.Click();
                         return true;
+                    case Key.O:
+                        withSavePrompt(() => Manager.ShowOpenProject());
+                        return true;
                     case Key.S:
                         if (e.Control)
                         {
@@ -461,17 +476,19 @@ namespace StorybrewEditor.ScreenLayers
         }
 
         public override void Close()
+            => withSavePrompt(() => Manager.GetContext<Editor>().Restart());
+
+        private void withSavePrompt(Action action)
         {
             if (project.Changed)
             {
                 Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving", () =>
                 {
                     project.Save();
-                    Program.Schedule(() => Manager.GetContext<Editor>().Restart());
-                }),
-                () => Manager.GetContext<Editor>().Restart(), true);
+                    Program.Schedule(() => action());
+                }), action, true);
             }
-            else Manager.GetContext<Editor>().Restart();
+            else action();
         }
 
         private void project_OnMapsetPathChanged(object sender, EventArgs e)

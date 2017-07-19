@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿#if DEBUG
+using OpenTK;
 using StorybrewCommon.Mapset;
 using System;
 
@@ -56,3 +57,4 @@ namespace StorybrewCommon.Storyboarding3d
         }
     }
 }
+#endif

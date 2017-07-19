@@ -11,6 +11,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public OsbEasing Easing { get; set; }
         public double StartTime { get; set; }
         public double EndTime { get; set; }
+        public double Duration => EndTime - StartTime;
         public TValue StartValue { get; set; }
         public TValue EndValue { get; set; }
         public bool Active => true;

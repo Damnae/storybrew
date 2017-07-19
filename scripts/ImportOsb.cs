@@ -3,6 +3,7 @@ using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
@@ -13,6 +14,8 @@ namespace StorybrewScripts
         [Configurable]
         public string Path = "storyboard.osb";
 
+        private Dictionary<string, string> variables = new Dictionary<string, string>();
+
         public override void Generate()
         {
             using (var stream = OpenProjectFile(Path))
@@ -21,9 +24,20 @@ namespace StorybrewScripts
                 {
                     switch (sectionName)
                     {
+                        case "Variables": parseVariablesSection(reader); break;
                         case "Events": parseEventsSection(reader); break;
                     }
                 });
+        }
+
+        private void parseVariablesSection(StreamReader reader)
+        {
+            reader.ParseSectionLines(line =>
+            {
+                var values = line.Split('=');
+                if (values.Length == 2)
+                    variables.Add(values[0], values[1]);
+            });
         }
 
         private void parseEventsSection(StreamReader reader)
@@ -38,7 +52,7 @@ namespace StorybrewScripts
                 while (line.Substring(depth).StartsWith(" "))
                     ++depth;
 
-                var trimmedLine = line.Trim();
+                var trimmedLine = applyVariables(line.Trim());
                 var values = trimmedLine.Split(',');
 
                 if (inCommandGroup && depth < 2)
@@ -67,7 +81,7 @@ namespace StorybrewScripts
                             var x = float.Parse(values[4], CultureInfo.InvariantCulture);
                             var y = float.Parse(values[5], CultureInfo.InvariantCulture);
                             var frameCount = int.Parse(values[6]);
-                            var frameDelay = int.Parse(values[7]);
+                            var frameDelay = double.Parse(values[7], CultureInfo.InvariantCulture);
                             var loopType = (OsbLoopType)Enum.Parse(typeof(OsbLoopType), values[8]);
                             osbSprite = GetLayer(layerName).CreateAnimation(path, frameCount, frameDelay, loopType, origin, new Vector2(x, y));
                         }
@@ -202,6 +216,17 @@ namespace StorybrewScripts
         private static string removePathQuotes(string path)
         {
             return path.StartsWith("\"") && path.EndsWith("\"") ? path.Substring(1, path.Length - 2) : path;
+        }
+
+        private string applyVariables(string line)
+        {
+            if (!line.Contains("$"))
+                return line;
+
+            foreach (var entry in variables)
+                line = line.Replace(entry.Key, entry.Value);
+
+            return line;
         }
     }
 }

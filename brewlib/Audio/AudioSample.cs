@@ -21,7 +21,7 @@ namespace BrewLib.Audio
             Manager = audioManager;
             this.path = path;
 
-            sample = Bass.SampleLoad(path, 0, 0, MaxSimultaneousPlayBacks, BassFlags.Default);
+            sample = Bass.SampleLoad(path, 0, 0, MaxSimultaneousPlayBacks, BassFlags.SampleOverrideLongestPlaying);
             if (sample == 0)
             {
                 Trace.WriteLine($"Failed to load audio sample ({path}): {Bass.LastError}");

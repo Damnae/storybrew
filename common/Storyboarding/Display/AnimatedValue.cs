@@ -10,6 +10,7 @@ namespace StorybrewCommon.Storyboarding.Display
         where TValue : CommandValue
     {
         public TValue DefaultValue;
+        private bool strict;
 
         private List<ITypedCommand<TValue>> commands = new List<ITypedCommand<TValue>>();
         public IEnumerable<ITypedCommand<TValue>> Commands => commands;
@@ -19,6 +20,7 @@ namespace StorybrewCommon.Storyboarding.Display
 
         public double StartTime => commands.Count > 0 ? commands[0].StartTime : 0;
         public double EndTime => commands.Count > 0 ? commands[commands.Count - 1].EndTime : 0;
+        public double Duration => EndTime - StartTime;
         public TValue StartValue => commands.Count > 0 ? commands[0].StartValue : DefaultValue;
         public TValue EndValue => commands.Count > 0 ? commands[commands.Count - 1].EndValue : DefaultValue;
 
@@ -26,9 +28,10 @@ namespace StorybrewCommon.Storyboarding.Display
         {
         }
 
-        public AnimatedValue(TValue defaultValue)
+        public AnimatedValue(TValue defaultValue, bool strict = false)
         {
             DefaultValue = defaultValue;
+            this.strict = strict;
         }
 
         public void Add(ITypedCommand<TValue> command)
@@ -41,6 +44,12 @@ namespace StorybrewCommon.Storyboarding.Display
 
                 int index;
                 findCommandIndex(command.StartTime, out index);
+                while (index < commands.Count)
+                {
+                    if (commands[index].StartTime <= command.StartTime)
+                        index++;
+                    else break;
+                }
 
                 if (index > 0 && command.StartTime < commands[index - 1].EndTime)
                 {
@@ -72,7 +81,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue ValueAtTime(double time)
         {
             if (commands.Count == 0) return DefaultValue;
-            if (time >= EndTime) return EndValue;
+            if (!strict && time >= EndTime) return EndValue;
 
             int index;
             if (!findCommandIndex(time, out index) && index > 0)
@@ -86,7 +95,11 @@ namespace StorybrewCommon.Storyboarding.Display
                         break;
                     }
 
-            return commands[index].ValueAtTime(time);
+            var command = commands[index];
+            if (strict && (time < command.StartTime || time > command.EndTime && command.Duration != 0))
+                return DefaultValue;
+
+            return command.ValueAtTime(time);
         }
 
         private bool findCommandIndex(double time, out int index)

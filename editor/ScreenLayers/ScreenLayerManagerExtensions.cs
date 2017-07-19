@@ -1,5 +1,7 @@
 ﻿using BrewLib.ScreenLayers;
+using BrewLib.Util;
 using StorybrewEditor.ScreenLayers.Util;
+using StorybrewEditor.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -98,5 +100,23 @@ namespace StorybrewEditor.ScreenLayers
 
         public static void ShowContextMenu<T>(this ScreenLayerManager screenLayerManager, string title, Action<T> action, IEnumerable<T> options)
             => screenLayerManager.Add(new ContextMenu<T>(title, action, options));
+
+        public static void ShowOpenProject(this ScreenLayerManager screenLayerManager)
+        {
+            if (!Directory.Exists(Project.ProjectsFolder))
+                Directory.CreateDirectory(Project.ProjectsFolder);
+
+            screenLayerManager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
+            {
+                if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
+                    screenLayerManager.ShowMessage("Projects must be placed in a folder inside the 'projects' folder.");
+                else
+                    screenLayerManager.AsyncLoading("Loading project", () =>
+                    {
+                        var project = Project.Load(projectPath, true);
+                        Program.Schedule(() => screenLayerManager.Set(new ProjectMenu(project)));
+                    });
+            });
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace BrewLib.Graphics
         public const string TextureCoordAttributeName = "a_textureCoord";
         public const string ColorAttributeName = "a_color";
         public const string BoneWeightAttributeName = "a_boneWeight";
+        public const string PresenceAttributeName = "a_presence";
 
         public string Name;
         public VertexAttribPointerType Type = VertexAttribPointerType.Float;
@@ -65,6 +66,9 @@ namespace BrewLib.Graphics
             => packed ?
                 new VertexAttribute() { Name = name, ComponentCount = 4, ComponentSize = 1, Type = VertexAttribPointerType.UnsignedByte, Normalized = true, Usage = usage } :
                 new VertexAttribute() { Name = name, ComponentCount = 4, Usage = usage };
+
+        public static VertexAttribute CreatePresence()
+            => new VertexAttribute() { Name = PresenceAttributeName, ComponentCount = 1, Usage = AttributeUsage.Presence };
     }
 
     public enum AttributeUsage
@@ -75,6 +79,7 @@ namespace BrewLib.Graphics
         Normal,
         DiffuseMapCoord,
         NormalMapCoord,
-        BoneWeight
+        BoneWeight,
+        Presence
     }
 }

@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿#if DEBUG
+using OpenTK;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Commands;
@@ -78,9 +79,10 @@ namespace StorybrewCommon.Storyboarding3d
         }
         public void DoTreeSprite(Action<OsbSprite> action)
         {
-            var sprite = (this as HasOsbSprite)?.Sprite;
-            if (sprite != null)
-                action(sprite);
+            var sprites = (this as HasOsbSprites)?.Sprites;
+            if (sprites != null)
+                foreach (var sprite in sprites)
+                    action(sprite);
             foreach (var child in children)
                 child.DoTreeSprite(action);
         }
@@ -96,3 +98,4 @@ namespace StorybrewCommon.Storyboarding3d
         }
     }
 }
+#endif

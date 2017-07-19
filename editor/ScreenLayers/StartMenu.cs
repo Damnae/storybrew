@@ -113,18 +113,7 @@ namespace StorybrewEditor.ScreenLayers
             });
 
             newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
-            openProjectButton.OnClick += (sender, e) =>
-            {
-                if (!Directory.Exists(Project.ProjectsFolder))
-                    Directory.CreateDirectory(Project.ProjectsFolder);
-
-                Manager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
-                {
-                    if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
-                        Manager.ShowMessage("Projects must be placed in a folder inside the 'projects' folder.");
-                    else openProject(projectPath);
-                });
-            };
+            openProjectButton.OnClick += (sender, e) => Manager.ShowOpenProject();
             wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
             discordButton.OnClick += (sender, e) => Process.Start(Program.DiscordUrl);
             closeButton.OnClick += (sender, e) => Exit();
@@ -138,16 +127,7 @@ namespace StorybrewEditor.ScreenLayers
             bottomLayout.Pack(600);
             bottomRightLayout.Pack((1024 - bottomLayout.Width) / 2);
         }
-
-        private void openProject(string projectPath)
-        {
-            Manager.AsyncLoading("Loading project", () =>
-            {
-                var project = Project.Load(projectPath, true);
-                Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
-            });
-        }
-
+        
         private void checkLatestVersion()
         {
             NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases?per_page=10&page=1", "cache/net/releases", 15 * 60,

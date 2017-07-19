@@ -1,6 +1,7 @@
 ﻿using BrewLib.UserInterface;
 using OpenTK;
 using System;
+using System.Globalization;
 
 namespace StorybrewEditor.UserInterface
 {
@@ -97,7 +98,7 @@ namespace StorybrewEditor.UserInterface
             float x;
             try
             {
-                x = float.Parse(xCommit);
+                x = float.Parse(xCommit, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -115,7 +116,7 @@ namespace StorybrewEditor.UserInterface
             float y;
             try
             {
-                y = float.Parse(yCommit);
+                y = float.Parse(yCommit, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -128,8 +129,8 @@ namespace StorybrewEditor.UserInterface
 
         private void updateWidgets()
         {
-            xTextbox.SetValueSilent(value.X.ToString());
-            yTextbox.SetValueSilent(value.Y.ToString());
+            xTextbox.SetValueSilent(value.X.ToString(CultureInfo.InvariantCulture));
+            yTextbox.SetValueSilent(value.Y.ToString(CultureInfo.InvariantCulture));
         }
 
         protected override void Layout()

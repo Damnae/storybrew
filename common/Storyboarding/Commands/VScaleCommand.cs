@@ -14,13 +14,5 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public override CommandScale Midpoint(Command<CommandScale> endCommand, double progress)
             => new CommandScale(StartValue.X + (endCommand.EndValue.X - StartValue.X) * progress, StartValue.Y + (endCommand.EndValue.Y - StartValue.Y) * progress);
-
-        public override string ToOsbString(ExportSettings exportSettings)
-        {
-            if (StartValue.X == StartValue.Y && EndValue.X == EndValue.Y)
-                return new ScaleCommand(Easing, StartTime, EndTime, StartValue.X, EndValue.X).ToOsbString(exportSettings);
-
-            return base.ToOsbString(exportSettings);
-        }
     }
 }

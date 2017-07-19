@@ -10,25 +10,31 @@ namespace StorybrewEditor
 {
     public class Settings
     {
+        public const string DefaultPath = "settings.cfg";
+
         public readonly Setting<string> Id = new Setting<string>(Guid.NewGuid().ToString("N"));
         public readonly Setting<float> Volume = new Setting<float>(0.5f);
         public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
         public readonly Setting<bool> VerboseVsCode = new Setting<bool>(false);
-        public readonly Setting<bool> UseRoslyn = new Setting<bool>(false);
+        public readonly Setting<bool> UseRoslyn = new Setting<bool>(true);
 
-        public const string SettingsFilename = "settings.cfg";
+        private readonly string path;
 
-        public Settings()
+        public Settings(string path = DefaultPath)
         {
-            if (!File.Exists(SettingsFilename))
+            this.path = path;
+
+            if (!File.Exists(path))
             {
                 Save();
                 return;
             }
 
+            Trace.WriteLine($"Loading settings from '{path}'");
+
             var type = GetType();
-            using (var stream = new FileStream(SettingsFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
                 reader.ParseKeyValueSection((key, value) =>
                 {
@@ -50,7 +56,9 @@ namespace StorybrewEditor
 
         public void Save()
         {
-            using (var stream = new SafeWriteStream(SettingsFilename))
+            Trace.WriteLine($"Saving settings at '{path}'");
+
+            using (var stream = new SafeWriteStream(path))
             using (var writer = new StreamWriter(stream, System.Text.Encoding.UTF8))
             {
                 foreach (var field in GetType().GetFields())

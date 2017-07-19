@@ -113,42 +113,47 @@ namespace StorybrewEditor.Scripting
 
         private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            scheduler?.Schedule(e.FullPath, (key) =>
-            {
-                if (disposedValue)
-                    return;
+            var change = e.ChangeType.ToString().ToLowerInvariant();
+            Trace.WriteLine($"Watched script file {change}: {e.FullPath}");
 
-                Trace.WriteLine($"Watched script file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
+            if (e.ChangeType != WatcherChangeTypes.Changed)
+                scheduleSolutionUpdate();
 
-                if (e.ChangeType != WatcherChangeTypes.Changed)
-                    updateSolutionFiles();
-
-                var scriptName = Path.GetFileNameWithoutExtension(e.Name);
-
-                ScriptContainer<TScript> container;
-                if (scriptContainers.TryGetValue(scriptName, out container))
+            if (e.ChangeType != WatcherChangeTypes.Deleted)
+                scheduler?.Schedule(e.FullPath, key =>
                 {
-                    if (e.ChangeType != WatcherChangeTypes.Deleted)
+                    if (disposedValue) return;
+                    var scriptName = Path.GetFileNameWithoutExtension(e.Name);
+
+                    ScriptContainer<TScript> container;
+                    if (scriptContainers.TryGetValue(scriptName, out container))
                         container.ReloadScript();
-                }
-            });
+                });
         }
 
         private void libraryWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            scheduler?.Schedule(e.FullPath, (key) =>
-            {
-                if (disposedValue)
-                    return;
+            var change = e.ChangeType.ToString().ToLowerInvariant();
+            Trace.WriteLine($"Watched library file {change}: {e.FullPath}");
 
-                Trace.WriteLine($"Watched library file {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
+            if (e.ChangeType != WatcherChangeTypes.Changed)
+                scheduleSolutionUpdate();
 
-                if (e.ChangeType != WatcherChangeTypes.Changed)
-                    updateSolutionFiles();
-
-                if (e.ChangeType != WatcherChangeTypes.Deleted)
+            if (e.ChangeType != WatcherChangeTypes.Deleted)
+                scheduler?.Schedule(e.FullPath, key =>
+                {
+                    if (disposedValue) return;
                     foreach (var container in scriptContainers.Values)
                         container.ReloadScript();
+                });
+        }
+
+        private void scheduleSolutionUpdate()
+        {
+            scheduler?.Schedule($"*{nameof(updateSolutionFiles)}", key =>
+            {
+                if (disposedValue) return;
+                updateSolutionFiles();
             });
         }
 

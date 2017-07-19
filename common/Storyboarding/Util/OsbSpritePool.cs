@@ -44,7 +44,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 return result.Sprite;
             }
 
-            var sprite = layer.CreateSprite(path, origin);
+            var sprite = CreateSprite(layer, path, origin);
             pooledSprites.Add(new PooledSprite(sprite, startTime, endTime));
             return sprite;
         }
@@ -60,6 +60,9 @@ namespace StorybrewCommon.Storyboarding.Util
 
             pooledSprites.Clear();
         }
+
+        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin)
+            => layer.CreateSprite(path, origin);
 
         private class PooledSprite
         {

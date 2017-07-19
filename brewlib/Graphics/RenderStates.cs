@@ -155,7 +155,8 @@ namespace BrewLib.Graphics
         private bool write;
 
         public static DepthState Default2d = new DepthState(null, false);
-        public static DepthState Default3d = new DepthState(DepthFunction.Less, true);
+        public static DepthState Default3dOpaque = new DepthState(DepthFunction.Less, true);
+        public static DepthState Default3dTransparent = new DepthState(DepthFunction.Less, false);
 
         public DepthState(DepthFunction? test, bool write)
         {

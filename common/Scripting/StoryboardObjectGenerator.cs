@@ -62,24 +62,24 @@ namespace StorybrewCommon.Scripting
         /// Returns a Bitmap from the project's directory.
         /// Do not call Dispose, it will be disposed automatically when the script ends.
         /// </summary>
-        public Bitmap GetProjectBitmap(string path)
-            => getBitmap(Path.Combine(context.ProjectPath, path));
+        public Bitmap GetProjectBitmap(string path, bool watch = true)
+            => getBitmap(Path.Combine(context.ProjectPath, path), watch);
 
         /// <summary>
         /// Returns a Bitmap from the mapset's directory.
         /// Do not call Dispose, it will be disposed automatically when the script ends.
         /// </summary>
-        public Bitmap GetMapsetBitmap(string path)
-            => getBitmap(Path.Combine(context.MapsetPath, path));
+        public Bitmap GetMapsetBitmap(string path, bool watch = true)
+            => getBitmap(Path.Combine(context.MapsetPath, path), watch);
 
-        private Bitmap getBitmap(string path)
+        private Bitmap getBitmap(string path, bool watch)
         {
             path = Path.GetFullPath(path);
 
             Bitmap bitmap;
             if (!bitmaps.TryGetValue(path, out bitmap))
             {
-                context.AddDependency(path);
+                if (watch) context.AddDependency(path);
                 bitmaps.Add(path, bitmap = Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
             }
             return bitmap;
@@ -89,20 +89,20 @@ namespace StorybrewCommon.Scripting
         /// Opens a project file in read-only mode. 
         /// You are responsible for disposing it.
         /// </summary>
-        public Stream OpenProjectFile(string path)
-            => openFile(Path.Combine(context.ProjectPath, path));
+        public Stream OpenProjectFile(string path, bool watch = true)
+            => openFile(Path.Combine(context.ProjectPath, path), watch);
 
         /// <summary>
         /// Opens a mapset file in read-only mode. 
         /// You are responsible for disposing it.
         /// </summary>
-        public Stream OpenMapsetFile(string path)
-            => openFile(Path.Combine(context.MapsetPath, path));
+        public Stream OpenMapsetFile(string path, bool watch = true)
+            => openFile(Path.Combine(context.MapsetPath, path), watch);
 
-        private Stream openFile(string path)
+        private Stream openFile(string path, bool watch)
         {
             path = Path.GetFullPath(path);
-            context.AddDependency(path);
+            if (watch) context.AddDependency(path);
             return Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
