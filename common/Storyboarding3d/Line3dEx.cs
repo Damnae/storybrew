@@ -9,13 +9,13 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding3d
 {
-    public class Line3dEx : Object3d, HasOsbSprites
+    public class Line3dEx : Node3d, HasOsbSprites
     {
         public OsbSprite spriteBody;
-        public OsbSprite spriteEdgeTop;
-        public OsbSprite spriteEdgeBottom;
-        public OsbSprite spriteCapLeft;
-        public OsbSprite spriteCapRight;
+        public OsbSprite spriteTopEdge;
+        public OsbSprite spriteBottomEdge;
+        public OsbSprite spriteStartCap;
+        public OsbSprite spriteEndCapEnd;
         public IEnumerable<OsbSprite> Sprites
         {
             get
@@ -23,13 +23,13 @@ namespace StorybrewCommon.Storyboarding3d
                 yield return spriteBody;
                 if (SpritePathEdge != null)
                 {
-                    yield return spriteEdgeTop;
-                    yield return spriteEdgeBottom;
+                    yield return spriteTopEdge;
+                    yield return spriteBottomEdge;
                 }
                 if (SpritePathCap != null)
                 {
-                    yield return spriteCapLeft;
-                    yield return spriteCapRight;
+                    yield return spriteStartCap;
+                    yield return spriteEndCapEnd;
                 }
             }
         }
@@ -41,8 +41,8 @@ namespace StorybrewCommon.Storyboarding3d
         public bool UseDistanceFade = true;
 
         public float EdgeOverlap = 0.5f;
-        public bool EnableLeftCap = true;
-        public bool EnableRightCap = true;
+        public bool EnableStartCap = true;
+        public bool EnableEndCap = true;
         public bool OrientedCaps;
         public float CapOverlap = 0.2f;
 
@@ -53,23 +53,34 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<float> EndThickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
 
         public readonly CommandGenerator GeneratorBody = new CommandGenerator();
-        public readonly CommandGenerator GeneratorTop = new CommandGenerator();
-        public readonly CommandGenerator GeneratorBottom = new CommandGenerator();
-        public readonly CommandGenerator GeneratorLeft = new CommandGenerator();
-        public readonly CommandGenerator GeneratorRight = new CommandGenerator();
+        public readonly CommandGenerator GeneratorTopEdge = new CommandGenerator();
+        public readonly CommandGenerator GeneratorBottomEdge = new CommandGenerator();
+        public readonly CommandGenerator GeneratorStartCap = new CommandGenerator();
+        public readonly CommandGenerator GeneratorEndCap = new CommandGenerator();
+        public override IEnumerable<CommandGenerator> CommandGenerators
+        {
+            get
+            {
+                yield return GeneratorBody;
+                yield return GeneratorTopEdge;
+                yield return GeneratorBottomEdge;
+                yield return GeneratorStartCap;
+                yield return GeneratorEndCap;
+            }
+        }
 
         public override void GenerateSprite(StoryboardLayer layer)
         {
             spriteBody = spriteBody ?? layer.CreateSprite(SpritePathBody, OsbOrigin.Centre);
             if (SpritePathEdge != null)
             {
-                spriteEdgeTop = spriteEdgeTop ?? layer.CreateSprite(SpritePathEdge, OsbOrigin.BottomCentre);
-                spriteEdgeBottom = spriteEdgeBottom ?? layer.CreateSprite(SpritePathEdge, OsbOrigin.TopCentre);
+                spriteTopEdge = spriteTopEdge ?? layer.CreateSprite(SpritePathEdge, OsbOrigin.BottomCentre);
+                spriteBottomEdge = spriteBottomEdge ?? layer.CreateSprite(SpritePathEdge, OsbOrigin.TopCentre);
             }
             if (SpritePathCap != null)
             {
-                spriteCapLeft = spriteCapLeft ?? layer.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreLeft : OsbOrigin.Centre);
-                spriteCapRight = spriteCapRight ?? layer.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreRight : OsbOrigin.Centre);
+                spriteStartCap = spriteStartCap ?? layer.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreLeft : OsbOrigin.Centre);
+                spriteEndCapEnd = spriteEndCapEnd ?? layer.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreRight : OsbOrigin.Centre);
             }
         }
 
@@ -124,7 +135,7 @@ namespace StorybrewCommon.Storyboarding3d
 
             if (SpritePathEdge != null)
             {
-                var bitmapEdge = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteEdgeTop.GetTexturePathAt(time));
+                var bitmapEdge = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteTopEdge.GetTexturePathAt(time));
                 var edgeScale = new Vector2(length / bitmapEdge.Width, edgeHeight / bitmapEdge.Height);
 
                 var edgeOffset = new Vector2((float)Math.Cos(angle - Math.PI * 0.5), (float)Math.Sin(angle - Math.PI * 0.5)) * (bodyHeight * 0.5f - EdgeOverlap);
@@ -133,7 +144,7 @@ namespace StorybrewCommon.Storyboarding3d
 
                 var edgeOpacity = ignoreEdges ? 0 : opacity;
 
-                GeneratorTop.Add(new CommandGenerator.State()
+                GeneratorTopEdge.Add(new CommandGenerator.State()
                 {
                     Time = time,
                     Position = positionTop,
@@ -143,7 +154,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Opacity = edgeOpacity,
                     FlipH = flip,
                 });
-                GeneratorBottom.Add(new CommandGenerator.State()
+                GeneratorBottomEdge.Add(new CommandGenerator.State()
                 {
                     Time = time,
                     Position = positionBottom,
@@ -160,38 +171,38 @@ namespace StorybrewCommon.Storyboarding3d
 
             if (SpritePathCap != null)
             {
-                var bitmapCap = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteCapLeft.GetTexturePathAt(time));
-                var leftCapScale = new Vector2(startScale / bitmapCap.Width, startScale / bitmapCap.Height);
-                var rightCapScale = new Vector2(endScale / bitmapCap.Width, endScale / bitmapCap.Height);
+                var bitmapCap = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteStartCap.GetTexturePathAt(time));
+                var startCapScale = new Vector2(startScale / bitmapCap.Width, startScale / bitmapCap.Height);
+                var endCapScale = new Vector2(endScale / bitmapCap.Width, endScale / bitmapCap.Height);
 
                 var capOffset = OrientedCaps ? new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * CapOverlap : Vector2.Zero;
 
                 if (OrientedCaps)
                 {
-                    leftCapScale.X *= 0.5f;
-                    rightCapScale.X *= 0.5f;
+                    startCapScale.X *= 0.5f;
+                    endCapScale.X *= 0.5f;
                 }
 
-                var leftCapOpacity = startScale > 0.5f ? opacity : 0;
-                var rightCapOpacity = endScale > 0.5f ? opacity : 0;
+                var startCapOpacity = startScale > 0.5f ? opacity : 0;
+                var endCapOpacity = endScale > 0.5f ? opacity : 0;
 
-                GeneratorLeft.Add(new CommandGenerator.State()
+                GeneratorStartCap.Add(new CommandGenerator.State()
                 {
                     Time = time,
                     Position = startVector.Xy + capOffset,
-                    Scale = leftCapScale,
+                    Scale = startCapScale,
                     Rotation = OrientedCaps ? rotation + Math.PI : 0,
                     Color = object3dState.Color,
-                    Opacity = leftCapOpacity,
+                    Opacity = startCapOpacity,
                 });
-                GeneratorRight.Add(new CommandGenerator.State()
+                GeneratorEndCap.Add(new CommandGenerator.State()
                 {
                     Time = time,
                     Position = endVector.Xy - capOffset,
-                    Scale = rightCapScale,
+                    Scale = endCapScale,
                     Rotation = OrientedCaps ? rotation + Math.PI : 0,
                     Color = object3dState.Color,
-                    Opacity = rightCapOpacity,
+                    Opacity = endCapOpacity,
                     FlipH = OrientedCaps,
                 });
             }
@@ -204,18 +215,18 @@ namespace StorybrewCommon.Storyboarding3d
 
             if (SpritePathEdge != null)
             {
-                if (GeneratorTop.GenerateCommands(spriteEdgeTop, action, timeOffset))
-                    if (Additive) spriteEdgeTop.Additive(spriteEdgeTop.CommandsStartTime, spriteEdgeTop.CommandsEndTime);
-                if (GeneratorBottom.GenerateCommands(spriteEdgeBottom, action, timeOffset))
-                    if (Additive) spriteEdgeBottom.Additive(spriteEdgeBottom.CommandsStartTime, spriteEdgeBottom.CommandsEndTime);
+                if (GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, timeOffset))
+                    if (Additive) spriteTopEdge.Additive(spriteTopEdge.CommandsStartTime, spriteTopEdge.CommandsEndTime);
+                if (GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, timeOffset))
+                    if (Additive) spriteBottomEdge.Additive(spriteBottomEdge.CommandsStartTime, spriteBottomEdge.CommandsEndTime);
             }
 
             if (SpritePathCap != null)
             {
-                if (EnableLeftCap && GeneratorLeft.GenerateCommands(spriteCapLeft, action, timeOffset))
-                    if (Additive) spriteCapLeft.Additive(spriteCapLeft.CommandsStartTime, spriteCapLeft.CommandsEndTime);
-                if (EnableRightCap && GeneratorRight.GenerateCommands(spriteCapRight, action, timeOffset))
-                    if (Additive) spriteCapRight.Additive(spriteCapRight.CommandsStartTime, spriteCapRight.CommandsEndTime);
+                if (EnableStartCap && GeneratorStartCap.GenerateCommands(spriteStartCap, action, timeOffset))
+                    if (Additive) spriteStartCap.Additive(spriteStartCap.CommandsStartTime, spriteStartCap.CommandsEndTime);
+                if (EnableEndCap && GeneratorEndCap.GenerateCommands(spriteEndCapEnd, action, timeOffset))
+                    if (Additive) spriteEndCapEnd.Additive(spriteEndCapEnd.CommandsStartTime, spriteEndCapEnd.CommandsEndTime);
             }
         }
     }
