@@ -383,7 +383,7 @@ namespace StorybrewEditor.ScreenLayers
                         if (e.Control)
                         {
                             if (e.Shift)
-                                ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(audio.Time * 1000)).ToString(@"h\:mm\:ss\.ff"));
+                                ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(audio.Time * 1000)).ToString(Program.Settings.TimeCopyFormat));
                             else ClipboardHelper.SetText(((int)(audio.Time * 1000)).ToString());
                             return true;
                         }
