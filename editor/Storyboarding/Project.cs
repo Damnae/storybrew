@@ -692,8 +692,10 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (disposing)
                 {
-                    mapsetManager?.Dispose();
+                    // Always dispose this first to ensure updates aren't happening while the project is being disposed
                     effectUpdateQueue.Dispose();
+
+                    mapsetManager?.Dispose();
                     scriptManager.Dispose();
                     textureContainer.Dispose();
                     audioContainer.Dispose();
