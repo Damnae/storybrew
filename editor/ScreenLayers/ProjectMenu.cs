@@ -382,7 +382,9 @@ namespace StorybrewEditor.ScreenLayers
                     case Key.C:
                         if (e.Control)
                         {
-                            ClipboardHelper.SetText(((int)(audio.Time * 1000)).ToString());
+                            if (e.Shift)
+                                ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(audio.Time * 1000)).ToString(Program.Settings.TimeCopyFormat));
+                            else ClipboardHelper.SetText(((int)(audio.Time * 1000)).ToString());
                             return true;
                         }
                         break;

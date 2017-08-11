@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding3d
 {
-    public class Line3d : Object3d, HasOsbSprites
+    public class Line3d : Node3d, HasOsbSprites
     {
         public OsbSprite sprite;
         public IEnumerable<OsbSprite> Sprites { get { yield return sprite; } }
@@ -24,6 +24,7 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<float> Thickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
 
         public readonly CommandGenerator Generator = new CommandGenerator();
+        public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator; } }
 
         public override void GenerateSprite(StoryboardLayer layer)
         {

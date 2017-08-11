@@ -4,6 +4,7 @@ using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
+using StorybrewCommon.Storyboarding.Util;
 using System;
 using System.Collections.Generic;
 
@@ -20,6 +21,8 @@ namespace StorybrewCommon.Storyboarding3d
         public bool InheritsColor = true;
         public bool InheritsOpacity = true;
         public bool InheritsLayer = true;
+
+        public virtual IEnumerable<CommandGenerator> CommandGenerators { get { yield break; } }
 
         public void Add(Object3d child)
         {
@@ -95,6 +98,12 @@ namespace StorybrewCommon.Storyboarding3d
         }
         public virtual void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
         {
+        }
+
+        public void ConfigureGenerators(Action<CommandGenerator> action)
+        {
+            foreach (var generator in CommandGenerators)
+                action(generator);
         }
     }
 }

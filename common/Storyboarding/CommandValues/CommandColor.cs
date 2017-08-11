@@ -20,6 +20,9 @@ namespace StorybrewCommon.Storyboarding.CommandValues
 
         public CommandColor(double r, double g, double b)
         {
+            if (r > 1.0001 || g > 1.0001 || b > 1.0001)
+                throw new ArgumentOutOfRangeException("Color components must be between 0 and 1");
+
             this.r = r;
             this.g = g;
             this.b = b;

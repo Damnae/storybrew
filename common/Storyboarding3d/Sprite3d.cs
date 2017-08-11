@@ -23,6 +23,7 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<double> SpriteRotation = new KeyframedValue<double>(InterpolatingFunctions.DoubleAngle, 0);
 
         public readonly CommandGenerator Generator = new CommandGenerator();
+        public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator; } }
 
         public override void GenerateSprite(StoryboardLayer layer)
         {

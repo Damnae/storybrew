@@ -18,6 +18,7 @@ namespace StorybrewEditor
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
         public readonly Setting<bool> VerboseVsCode = new Setting<bool>(false);
         public readonly Setting<bool> UseRoslyn = new Setting<bool>(true);
+        public readonly Setting<string> TimeCopyFormat = new Setting<string>(@"h\:mm\:ss\.ff");
 
         private readonly string path;
 

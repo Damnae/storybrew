@@ -47,6 +47,15 @@ namespace StorybrewCommon.Animations
             return this;
         }
 
+        public KeyframedValue<TValue> Add(double time)
+            => Add(time, ValueAt(time));
+
+        public KeyframedValue<TValue> Until(double time)
+        {
+            var index = indexAt(time, false);
+            return Add(time, keyframes[index == keyframes.Count ? keyframes.Count - 1 : index].Value);
+        }
+
         public void TransferKeyframes(KeyframedValue<TValue> to, bool pad = true, bool clear = true)
         {
             if (pad && to.Count > 0) to.Add(StartTime, to.EndValue);
@@ -144,7 +153,8 @@ namespace StorybrewCommon.Animations
             else while (index < keyframes.Count && keyframes[index].Time <= keyframe.Time) index++;
             return index;
         }
-        private int indexAt(double time, bool before) => indexFor(new Keyframe<TValue>(time), before);
+        private int indexAt(double time, bool before) 
+            => indexFor(new Keyframe<TValue>(time), before);
 
         #region Manipulation
 
