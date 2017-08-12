@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding3d
 {
-    public class Triangle3d : Object3d, HasOsbSprites
+    public class Triangle3d : Node3d, HasOsbSprites
     {
         public OsbSprite sprite0;
         public OsbSprite sprite1;
@@ -39,39 +39,85 @@ namespace StorybrewCommon.Storyboarding3d
             var vector1 = cameraState.ToScreen(wvp, Position1.ValueAt(time));
             var vector2 = cameraState.ToScreen(wvp, Position2.ValueAt(time));
 
-            var delta = vector2.Xy - vector0.Xy;
-
-            var angle = Math.Atan2(delta.Y, delta.X);
-            var rotation = InterpolatingFunctions.DoubleAngle(Generator0.EndState?.Rotation ?? 0, angle, 1);
-
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite0.GetTexturePathAt(time));
 
-            var position = project(vector0.Xy, vector2.Xy, vector1.Xy);
-            var scale0 = new Vector2((vector2.Xy - position).Length / bitmap.Width, (vector1.Xy - position).Length / bitmap.Height);
-            var scale1 = new Vector2((vector0.Xy - position).Length / bitmap.Width, scale0.Y);
-
-            var opacity = vector0.W < 0 && vector1.W < 0 && vector2.W < 0 ? 0 : object3dState.Opacity;
-            if (UseDistanceFade) opacity *= (cameraState.OpacityAt(vector0.W) + cameraState.OpacityAt(vector1.W) + cameraState.OpacityAt(vector2.W)) / 3;
-
-            Generator0.Add(new CommandGenerator.State()
+            for (var i = 0; i < 3; i++)
             {
-                Time = time,
-                Position = position,
-                Scale = scale0,
-                Rotation = rotation,
-                Color = object3dState.Color,
-                Opacity = opacity,
-            });
-            Generator1.Add(new CommandGenerator.State()
-            {
-                Time = time,
-                Position = position,
-                Scale = scale1,
-                Rotation = rotation,
-                Color = object3dState.Color,
-                Opacity = opacity,
-                FlipH = true,
-            });
+                var cross = (vector2.X - vector0.X) * (vector1.Y - vector0.Y)
+                    - (vector2.Y - vector0.Y) * (vector1.X - vector0.X);
+
+                if (cross > 0)
+                {
+                    if (Generator0.EndState != null)
+                        Generator0.Add(new CommandGenerator.State()
+                        {
+                            Time = time,
+                            Position = Generator0.EndState.Position,
+                            Scale = Generator0.EndState.Scale,
+                            Rotation = Generator0.EndState.Rotation,
+                            Color = object3dState.Color,
+                            Opacity = 0,
+                        });
+                    if (Generator1.EndState != null)
+                        Generator1.Add(new CommandGenerator.State()
+                        {
+                            Time = time,
+                            Position = Generator1.EndState.Position,
+                            Scale = Generator1.EndState.Scale,
+                            Rotation = Generator1.EndState.Rotation,
+                            Color = object3dState.Color,
+                            Opacity = 0,
+                            FlipH = true,
+                        });
+                    break;
+                }
+
+                var delta = vector2.Xy - vector0.Xy;
+                var deltaLength = delta.Length;
+                var normalizedDelta = delta / deltaLength;
+
+                var delta2 = vector1.Xy - vector0.Xy;
+                var dot = Vector2.Dot(normalizedDelta, delta2);
+                if (dot <= 0 || dot > deltaLength)
+                {
+                    var temp = vector0;
+                    vector0 = vector1;
+                    vector1 = vector2;
+                    vector2 = temp;
+                    continue;
+                }
+
+                var position = project(vector0.Xy, vector2.Xy, vector1.Xy);
+                var scale0 = new Vector2((vector2.Xy - position).Length / bitmap.Width, (vector1.Xy - position).Length / bitmap.Height);
+                var scale1 = new Vector2((vector0.Xy - position).Length / bitmap.Width, scale0.Y);
+
+                var angle = Math.Atan2(delta.Y, delta.X);
+                var rotation = InterpolatingFunctions.DoubleAngle(Generator0.EndState?.Rotation ?? 0, angle, 1);
+
+                var opacity = vector0.W < 0 && vector1.W < 0 && vector2.W < 0 ? 0 : object3dState.Opacity;
+                if (UseDistanceFade) opacity *= (cameraState.OpacityAt(vector0.W) + cameraState.OpacityAt(vector1.W) + cameraState.OpacityAt(vector2.W)) / 3;
+
+                Generator0.Add(new CommandGenerator.State()
+                {
+                    Time = time,
+                    Position = position,
+                    Scale = scale0,
+                    Rotation = rotation,
+                    Color = object3dState.Color,
+                    Opacity = opacity,
+                });
+                Generator1.Add(new CommandGenerator.State()
+                {
+                    Time = time,
+                    Position = position,
+                    Scale = scale1,
+                    Rotation = rotation,
+                    Color = object3dState.Color,
+                    Opacity = opacity,
+                    FlipH = true,
+                });
+                break;
+            }
         }
 
         public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
