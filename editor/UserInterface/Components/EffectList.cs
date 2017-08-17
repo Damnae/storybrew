@@ -111,7 +111,7 @@ namespace StorybrewEditor.UserInterface.Components
             {
                 Widget effectRoot;
                 Label nameLabel;
-                Button renameButton, statusButton, configButton, editButton, removeButton;
+                Button renameButton, statusButton, configButton, editButton, removeButton, copyDownButton;
                 effectsLayout.Add(effectRoot = new LinearLayout(Manager)
                 {
                     AnchorFrom = BoxAlignment.Centre,
@@ -168,6 +168,15 @@ namespace StorybrewEditor.UserInterface.Components
                             AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
+                        copyDownButton = new Button(Manager)
+                        {
+                            StyleName = "icon",
+                            Icon = IconFont.Copy,
+                            Tooltip = "Duplicate effect and copy fields",
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
+                            CanGrow = false,
+                        },
                         editButton = new Button(Manager)
                         {
                             StyleName = "icon",
@@ -217,7 +226,7 @@ namespace StorybrewEditor.UserInterface.Components
                 };
 
                 statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
-                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", (newName) =>
+                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", ef.Name, (newName) =>
                 {
                     ef.Name = newName;
                     refreshEffects();
@@ -232,10 +241,30 @@ namespace StorybrewEditor.UserInterface.Components
                     }
                     else effectConfigUi.Displayed = false;
                 };
+                copyDownButton.OnClick += (sender, e) =>
+                {
+                    Effect copiedEffect = ef;
+                    Manager.ScreenLayerManager.ShowPrompt("Name of duplicated effect", $"Change name for {ef.Name}", ef.Name, (newName) =>
+                    {
+                        effectConfigUi.Effect = ef;
+                        effectConfigUi.copyConfiguration();
+                        copiedEffect = project.AddEffect(ef.BaseName);
+                        effectConfigUi.Effect = copiedEffect;
+                        effectConfigUi.Displayed = true;
+                        copiedEffect.Name = newName;
+                        refreshEffects();
+                        pasteConfigAfterCopy(copiedEffect);
+                    });
+                };
                 removeButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Remove {ef.Name}?", () => project.Remove(ef), true);
             }
         }
-
+        private void pasteConfigAfterCopy(Effect effect)
+        {
+            effectConfigUi.Effect = effect;
+            effectConfigUi.pasteConfiguration();
+            Manager.ScreenLayerManager.ShowMessage($"WHY");
+        }
         private static void updateStatusButton(Button button, Effect effect)
         {
             button.Disabled = string.IsNullOrWhiteSpace(effect.StatusMessage);
