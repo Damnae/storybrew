@@ -290,7 +290,7 @@ namespace StorybrewEditor.UserInterface.Components
                 effect.Refresh();
         }
 
-        private void copyConfiguration()
+        public void copyConfiguration()
         {
             using (var stream = new MemoryStream())
             using (var writer = new BinaryWriter(stream))
@@ -305,7 +305,7 @@ namespace StorybrewEditor.UserInterface.Components
             }
         }
 
-        private void pasteConfiguration()
+        public void pasteConfiguration()
         {
             var changed = false;
             try
