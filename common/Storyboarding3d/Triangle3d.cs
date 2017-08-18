@@ -26,6 +26,8 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly CommandGenerator Generator0 = new CommandGenerator();
         public readonly CommandGenerator Generator1 = new CommandGenerator();
 
+        private int edgeIndex = 0;
+
         public override void GenerateSprite(StoryboardLayer layer)
         {
             sprite0 = sprite0 ?? layer.CreateSprite(SpritePath, OsbOrigin.BottomLeft);
@@ -35,9 +37,27 @@ namespace StorybrewCommon.Storyboarding3d
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
         {
             var wvp = object3dState.WorldTransform * cameraState.ViewProjection;
-            var vector0 = cameraState.ToScreen(wvp, Position0.ValueAt(time));
-            var vector1 = cameraState.ToScreen(wvp, Position1.ValueAt(time));
-            var vector2 = cameraState.ToScreen(wvp, Position2.ValueAt(time));
+
+            Vector4 vector0, vector1, vector2;
+            switch (edgeIndex)
+            {
+                case 0:
+                    vector0 = cameraState.ToScreen(wvp, Position0.ValueAt(time));
+                    vector1 = cameraState.ToScreen(wvp, Position1.ValueAt(time));
+                    vector2 = cameraState.ToScreen(wvp, Position2.ValueAt(time));
+                    break;
+                case 1:
+                    vector2 = cameraState.ToScreen(wvp, Position0.ValueAt(time));
+                    vector0 = cameraState.ToScreen(wvp, Position1.ValueAt(time));
+                    vector1 = cameraState.ToScreen(wvp, Position2.ValueAt(time));
+                    break;
+                case 2:
+                    vector1 = cameraState.ToScreen(wvp, Position0.ValueAt(time));
+                    vector2 = cameraState.ToScreen(wvp, Position1.ValueAt(time));
+                    vector0 = cameraState.ToScreen(wvp, Position2.ValueAt(time));
+                    break;
+                default: throw new InvalidOperationException();
+            }
 
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite0.GetTexturePathAt(time));
 
@@ -84,6 +104,7 @@ namespace StorybrewCommon.Storyboarding3d
                     vector0 = vector1;
                     vector1 = vector2;
                     vector2 = temp;
+                    edgeIndex = (edgeIndex + 1) % 3;
                     continue;
                 }
 
