@@ -142,7 +142,8 @@ namespace StorybrewEditor.Storyboarding
             OnMainBeatmapChanged += (sender, e) =>
             {
                 foreach (var effect in effects)
-                    QueueEffectUpdate(effect);
+                    if (effect.BeatmapDependant)
+                        QueueEffectUpdate(effect);
             };
         }
 

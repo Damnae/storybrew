@@ -31,10 +31,27 @@ namespace StorybrewEditor.Storyboarding
         }
 
         private EditorBeatmap beatmap;
-        public override Beatmap Beatmap => beatmap;
+        public override Beatmap Beatmap
+        {
+            get
+            {
+                beatmapDependent = true;
+                return beatmap;
+            }
+        }
 
         private IEnumerable<EditorBeatmap> beatmaps;
-        public override IEnumerable<Beatmap> Beatmaps => beatmaps;
+        public override IEnumerable<Beatmap> Beatmaps
+        {
+            get
+            {
+                beatmapDependent = true;
+                return beatmaps;
+            }
+        }
+
+        private bool beatmapDependent;
+        public bool BeatmapDependent => beatmapDependent;
 
         private StringBuilder log = new StringBuilder();
         public string Log => log.ToString();
@@ -77,7 +94,7 @@ namespace StorybrewEditor.Storyboarding
 
             return audioStream;
         }
-        
+
         public override double AudioDuration
             => getFftStream(effect.Project.AudioPath).Duration * 1000;
 

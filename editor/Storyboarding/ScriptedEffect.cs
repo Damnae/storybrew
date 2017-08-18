@@ -40,6 +40,9 @@ namespace StorybrewEditor.Storyboarding
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
 
+        private bool beatmapDependant = true;
+        public override bool BeatmapDependant => beatmapDependant;
+
         public override double StartTime => layers.Select(l => l.StartTime).DefaultIfEmpty().Min();
         public override double EndTime => layers.Select(l => l.EndTime).DefaultIfEmpty().Max();
 
@@ -98,6 +101,7 @@ namespace StorybrewEditor.Storyboarding
                 changeStatus(EffectStatus.Configuring);
                 Program.RunMainThread(() =>
                 {
+                    beatmapDependant = true;
                     if (script.Identifier != configScriptIdentifier)
                     {
                         script.UpdateConfiguration(Config);
@@ -164,6 +168,7 @@ namespace StorybrewEditor.Storyboarding
                     return;
                 }
 
+                beatmapDependant = context.BeatmapDependent;
                 dependencyWatcher?.Dispose();
                 dependencyWatcher = newDependencyWatcher;
 

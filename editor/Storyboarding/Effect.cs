@@ -14,6 +14,8 @@ namespace StorybrewEditor.Storyboarding
 
         public virtual EffectStatus Status { get; }
         public virtual string StatusMessage { get; }
+        
+        public virtual bool BeatmapDependant { get; }
 
         public abstract double StartTime { get; }
         public abstract double EndTime { get; }
