@@ -199,6 +199,7 @@ namespace StorybrewEditor
             var previousTime = 0.0;
             var fixedRateTime = 0.0;
             var averageFrameTime = 0.0;
+            var averageActiveTime = 0.0;
             var longestFrameTime = 0.0;
             var lastStatTime = 0.0;
             var windowDisplayed = false;
@@ -252,11 +253,12 @@ namespace StorybrewEditor
                 // Stats
 
                 averageFrameTime = (frameTime + averageFrameTime) / 2;
+                averageActiveTime = (activeDuration + averageActiveTime) / 2;
                 longestFrameTime = Math.Max(frameTime, longestFrameTime);
 
                 if (lastStatTime + 1 < currentTime)
                 {
-                    stats = $"fps:{1 / averageFrameTime:0} (avg:{averageFrameTime * 1000:0}ms hi:{longestFrameTime * 1000:0}ms)";
+                    stats = $"fps:{1 / averageFrameTime:0}/{1 / averageActiveTime:0} (act:{averageActiveTime * 1000:0} avg:{averageFrameTime * 1000:0} hi:{longestFrameTime * 1000:0})";
                     if (false) Debug.Print($"TexBinds - {DrawState.TextureBinds}, {editor.GetStats()}");
 
                     longestFrameTime = 0;
