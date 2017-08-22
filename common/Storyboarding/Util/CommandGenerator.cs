@@ -37,7 +37,7 @@ namespace StorybrewCommon.Storyboarding.Util
         public double PositionTolerance = 1;
         public double ScaleTolerance = 0.1;
         public double RotationTolerance = 0.001;
-        public double ColorTolerance = 1f / 255;
+        public double ColorTolerance = 2;
         public double OpacityTolerance = 0.01;
 
         public int PositionDecimals = 1;
