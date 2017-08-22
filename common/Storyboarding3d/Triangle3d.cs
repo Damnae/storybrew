@@ -25,6 +25,7 @@ namespace StorybrewCommon.Storyboarding3d
 
         public readonly CommandGenerator Generator0 = new CommandGenerator();
         public readonly CommandGenerator Generator1 = new CommandGenerator();
+        public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator0; yield return Generator1; } }
 
         private int edgeIndex = 0;
 
