@@ -45,6 +45,9 @@ namespace StorybrewEditor.Storyboarding
 
         public override double StartTime => layers.Select(l => l.StartTime).DefaultIfEmpty().Min();
         public override double EndTime => layers.Select(l => l.EndTime).DefaultIfEmpty().Max();
+        
+        private int estimatedSize;
+        public override int EstimatedSize => estimatedSize;
 
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {
@@ -114,6 +117,9 @@ namespace StorybrewEditor.Storyboarding
 
                 changeStatus(EffectStatus.Updating);
                 script.Generate(context);
+                foreach (var layer in context.EditorLayers)
+                    layer.PostProcess();
+                
                 success = true;
             }
             catch (RemotingException e)
@@ -183,6 +189,7 @@ namespace StorybrewEditor.Storyboarding
                 else Project.LayerManager.Replace(layers, context.EditorLayers);
                 layers = context.EditorLayers;
                 refreshLayerNames();
+                refreshEstimatedSize();
             });
         }
 
@@ -199,6 +206,13 @@ namespace StorybrewEditor.Storyboarding
         {
             foreach (var layer in layers)
                 layer.Name = string.IsNullOrWhiteSpace(layer.Identifier) ? $"{name}" : $"{name} ({layer.Identifier})";
+        }
+
+        private void refreshEstimatedSize()
+        {
+            estimatedSize = 0;
+            foreach (var layer in layers)
+                estimatedSize += layer.EstimatedSize;
         }
 
         private void changeStatus(EffectStatus status, string message = null, string log = null)

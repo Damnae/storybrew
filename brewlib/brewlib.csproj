@@ -177,10 +177,12 @@
     <Compile Include="Util\Misc.cs" />
     <Compile Include="Util\Native.cs" />
     <Compile Include="Util\PathHelper.cs" />
+    <Compile Include="Util\ByteCounterStream.cs" />
     <Compile Include="Util\SafeWriteStream.cs" />
     <Compile Include="Util\ScaleMode.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\BoxAlignment.cs" />
+    <Compile Include="Util\StringHelper.cs" />
     <Compile Include="Util\TraceLogger.cs" />
     <Compile Include="Util\ZipArchiveExtensions.cs" />
   </ItemGroup>

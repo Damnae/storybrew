@@ -21,6 +21,8 @@ namespace StorybrewEditor.Storyboarding
         public abstract double EndTime { get; }
         public bool Highlight;
 
+        public abstract int EstimatedSize { get; }
+
         public event EventHandler OnChanged;
         protected void RaiseChanged()
             => OnChanged?.Invoke(this, EventArgs.Empty);

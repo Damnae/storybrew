@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -67,6 +68,9 @@ namespace StorybrewEditor.Storyboarding
         public double EndTime => storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty().Max();
 
         public bool Highlight;
+
+        private int estimatedSize;
+        public int EstimatedSize => estimatedSize;
 
         public event ChangedHandler OnChanged;
         protected void RaiseChanged(string propertyName)
@@ -155,6 +159,11 @@ namespace StorybrewEditor.Storyboarding
             Visible = other.Visible;
         }
 
+        public void PostProcess()
+        {
+            calculateSize();
+        }
+
         public void WriteOsbSprites(TextWriter writer, ExportSettings exportSettings)
         {
             foreach (var sbo in storyboardObjects)
@@ -166,6 +175,21 @@ namespace StorybrewEditor.Storyboarding
             var value = osbLayer - other.osbLayer;
             if (value == 0) value = (other.diffSpecific ? 1 : 0) - (diffSpecific ? 1 : 0);
             return value;
+        }
+
+        private void calculateSize()
+        {
+            estimatedSize = 0;
+
+            var exportSettings = new ExportSettings();
+            using (var stream = new ByteCounterStream())
+            {
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                    foreach (var sbo in storyboardObjects)
+                        sbo.WriteOsb(writer, exportSettings, osbLayer);
+
+                estimatedSize = (int)stream.Length;
+            }
         }
 
         public override string ToString() => $"name:{name}, id:{Identifier}, layer:{osbLayer}, diffSpec:{diffSpecific}";

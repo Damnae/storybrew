@@ -94,7 +94,7 @@ namespace StorybrewEditor.UserInterface.Components
                 var effect = layer.Effect;
 
                 Widget layerRoot;
-                Label nameLabel, effectNameLabel;
+                Label nameLabel, detailsLabel;
                 Button moveUpButton, moveDownButton, moveToTopButton, moveToBottomButton, diffSpecificButton, osbLayerButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
                 {
@@ -117,10 +117,10 @@ namespace StorybrewEditor.UserInterface.Components
                                     AnchorFrom = BoxAlignment.Left,
                                     AnchorTo = BoxAlignment.Left,
                                 },
-                                effectNameLabel = new Label(Manager)
+                                detailsLabel = new Label(Manager)
                                 {
                                     StyleName = "listItemSecondary",
-                                    Text = $"using {effect.BaseName}",
+                                    Text = getLayerDetails(layer, effect),
                                     AnchorFrom = BoxAlignment.Left,
                                     AnchorTo = BoxAlignment.Left,
                                 },
@@ -226,7 +226,7 @@ namespace StorybrewEditor.UserInterface.Components
                     showHideButton.Icon = la.Visible ? IconFont.Eye : IconFont.EyeSlash;
                     showHideButton.Checked = la.Visible;
                 };
-                effect.OnChanged += effectChangedHandler = (sender, e) => effectNameLabel.Text = $"using {effect.BaseName}";
+                effect.OnChanged += effectChangedHandler = (sender, e) => detailsLabel.Text = getLayerDetails(la, effect);
                 layerRoot.OnHovered += (sender, e) =>
                 {
                     la.Highlight = e.Hovered;
@@ -254,5 +254,10 @@ namespace StorybrewEditor.UserInterface.Components
                 index++;
             }
         }
+
+        private static string getLayerDetails(EditorStoryboardLayer layer, Effect effect)
+            => layer.EstimatedSize > 1024 ?
+                $"using {effect.BaseName}, {StringHelper.ToByteSize(layer.EstimatedSize)}" :
+                $"using {effect.BaseName}";
     }
 }
