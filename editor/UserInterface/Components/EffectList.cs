@@ -110,7 +110,7 @@ namespace StorybrewEditor.UserInterface.Components
             foreach (var effect in project.Effects.OrderBy(e => e.Name))
             {
                 Widget effectRoot;
-                Label nameLabel;
+                Label nameLabel, detailsLabel;
                 Button renameButton, statusButton, configButton, editButton, removeButton;
                 effectsLayout.Add(effectRoot = new LinearLayout(Manager)
                 {
@@ -142,10 +142,10 @@ namespace StorybrewEditor.UserInterface.Components
                                     AnchorFrom = BoxAlignment.Left,
                                     AnchorTo = BoxAlignment.Left,
                                 },
-                                new Label(Manager)
+                                detailsLabel = new Label(Manager)
                                 {
                                     StyleName = "listItemSecondary",
-                                    Text = $"using {effect.BaseName}",
+                                    Text = getEffectDetails(effect),
                                     AnchorFrom = BoxAlignment.Left,
                                     AnchorTo = BoxAlignment.Left,
                                 },
@@ -198,6 +198,7 @@ namespace StorybrewEditor.UserInterface.Components
                 effect.OnChanged += changedHandler = (sender, e) =>
                 {
                     nameLabel.Text = ef.Name;
+                    detailsLabel.Text = getEffectDetails(ef);
                     updateStatusButton(statusButton, ef);
                 };
                 effectRoot.OnHovered += (sender, e) =>
@@ -354,5 +355,10 @@ namespace StorybrewEditor.UserInterface.Components
             Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing)",
                     () => Process.Start("https://code.visualstudio.com/"), true);
         }
+
+        private static string getEffectDetails(Effect effect)
+            => effect.EstimatedSize > 40 * 1024 ?
+                $"using {effect.BaseName} ({StringHelper.ToByteSize(effect.EstimatedSize)})" :
+                $"using {effect.BaseName}";
     }
 }

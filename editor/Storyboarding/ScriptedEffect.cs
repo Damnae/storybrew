@@ -213,6 +213,7 @@ namespace StorybrewEditor.Storyboarding
             estimatedSize = 0;
             foreach (var layer in layers)
                 estimatedSize += layer.EstimatedSize;
+            RaiseChanged();
         }
 
         private void changeStatus(EffectStatus status, string message = null, string log = null)

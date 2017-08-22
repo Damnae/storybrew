@@ -256,8 +256,8 @@ namespace StorybrewEditor.UserInterface.Components
         }
 
         private static string getLayerDetails(EditorStoryboardLayer layer, Effect effect)
-            => layer.EstimatedSize > 1024 ?
-                $"using {effect.BaseName}, {StringHelper.ToByteSize(layer.EstimatedSize)}" :
+            => layer.EstimatedSize > 40 * 1024 ?
+                $"using {effect.BaseName} ({StringHelper.ToByteSize(layer.EstimatedSize)})" :
                 $"using {effect.BaseName}";
     }
 }
