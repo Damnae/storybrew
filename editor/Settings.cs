@@ -13,6 +13,8 @@ namespace StorybrewEditor
         public const string DefaultPath = "settings.cfg";
 
         public readonly Setting<string> Id = new Setting<string>(Guid.NewGuid().ToString("N"));
+        public readonly Setting<int> FrameRate = new Setting<int>(0);
+        public readonly Setting<int> UpdateRate = new Setting<int>(60);
         public readonly Setting<float> Volume = new Setting<float>(0.5f);
         public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);

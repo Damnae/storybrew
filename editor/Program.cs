@@ -107,7 +107,7 @@ namespace StorybrewEditor
                 };
 
                 editor.Initialize();
-                runMainLoop(window, editor, 1 / 60.0, 1 / displayDevice.RefreshRate);
+                runMainLoop(window, editor, 1.0 / Settings.UpdateRate, 1.0 / (Settings.FrameRate > 0 ? Settings.FrameRate : displayDevice.RefreshRate));
 
                 settings.Save();
             }
