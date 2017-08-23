@@ -307,9 +307,25 @@ namespace StorybrewEditor.ScreenLayers
             };
             audioTimeFactorButton.OnClick += (sender, e) =>
             {
-                var speed = audio.TimeFactor * 0.5;
-                if (speed < 0.2) speed = 1;
-                audio.TimeFactor = speed;
+                if (e == MouseButton.Left)
+                {
+                    var speed = audio.TimeFactor;
+                    if (speed > 1) speed = 2;
+                    speed *= 0.5;
+                    if (speed < 0.2) speed = 1;
+                    audio.TimeFactor = speed;
+                }
+                else if (e == MouseButton.Right)
+                {
+                    var speed = audio.TimeFactor;
+                    if (speed < 1) speed = 1;
+                    speed += speed >= 2 ? 1 : 0.5;
+                    if (speed > 8) speed = 1;
+                    audio.TimeFactor = speed;
+                }
+                else if (e == MouseButton.Middle)
+                    audio.TimeFactor = audio.TimeFactor == 8 ? 1 : 8;
+
                 audioTimeFactorButton.Text = $"{audio.TimeFactor:P0}";
             };
 
