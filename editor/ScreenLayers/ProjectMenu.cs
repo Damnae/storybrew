@@ -462,6 +462,7 @@ namespace StorybrewEditor.ScreenLayers
                 project.TriggerEvents(mainStoryboardDrawable.Time, time);
 
             mainStoryboardDrawable.Time = time;
+            mainStoryboardDrawable.Clip = !Manager.GetContext<Editor>().InputManager.Alt;
             if (previewContainer.Visible)
                 previewDrawable.Time = timeline.GetValueForPosition(Manager.GetContext<Editor>().InputManager.MousePosition);
         }
