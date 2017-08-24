@@ -62,6 +62,7 @@ namespace StorybrewCommon.Storyboarding3d
 
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite0.GetTexturePathAt(time));
 
+            var switchedEdge = false;
             for (var i = 0; i < 3; i++)
             {
                 var cross = (vector2.X - vector0.X) * (vector1.Y - vector0.Y)
@@ -78,6 +79,7 @@ namespace StorybrewCommon.Storyboarding3d
                             Rotation = Generator0.EndState.Rotation,
                             Color = object3dState.Color,
                             Opacity = 0,
+                            Additive = Additive,
                         });
                     if (Generator1.EndState != null)
                         Generator1.Add(new CommandGenerator.State()
@@ -88,6 +90,7 @@ namespace StorybrewCommon.Storyboarding3d
                             Rotation = Generator1.EndState.Rotation,
                             Color = object3dState.Color,
                             Opacity = 0,
+                            Additive = Additive,
                             FlipH = true,
                         });
                     break;
@@ -106,6 +109,7 @@ namespace StorybrewCommon.Storyboarding3d
                     vector1 = vector2;
                     vector2 = temp;
                     edgeIndex = (edgeIndex + 1) % 3;
+                    switchedEdge = true;
                     continue;
                 }
 
@@ -119,6 +123,12 @@ namespace StorybrewCommon.Storyboarding3d
                 var opacity = vector0.W < 0 && vector1.W < 0 && vector2.W < 0 ? 0 : object3dState.Opacity;
                 if (UseDistanceFade) opacity *= (cameraState.OpacityAt(vector0.W) + cameraState.OpacityAt(vector1.W) + cameraState.OpacityAt(vector2.W)) / 3;
 
+                if (switchedEdge)
+                {
+                    if (Generator0.EndState != null) Generator0.EndState.Opacity = 0;
+                    if (Generator1.EndState != null) Generator1.EndState.Opacity = 0;
+                }
+
                 Generator0.Add(new CommandGenerator.State()
                 {
                     Time = time,
@@ -126,7 +136,8 @@ namespace StorybrewCommon.Storyboarding3d
                     Scale = scale0,
                     Rotation = rotation,
                     Color = object3dState.Color,
-                    Opacity = opacity,
+                    Opacity = switchedEdge ? 0 : opacity,
+                    Additive = Additive,
                 });
                 Generator1.Add(new CommandGenerator.State()
                 {
@@ -135,7 +146,8 @@ namespace StorybrewCommon.Storyboarding3d
                     Scale = scale1,
                     Rotation = rotation,
                     Color = object3dState.Color,
-                    Opacity = opacity,
+                    Opacity = switchedEdge ? 0 : opacity,
+                    Additive = Additive,
                     FlipH = true,
                 });
                 break;
@@ -144,10 +156,8 @@ namespace StorybrewCommon.Storyboarding3d
 
         public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
         {
-            if (Generator0.GenerateCommands(sprite0, action, timeOffset))
-                if (Additive) sprite0.Additive(sprite0.CommandsStartTime, sprite0.CommandsEndTime);
-            if (Generator1.GenerateCommands(sprite1, action, timeOffset))
-                if (Additive) sprite1.Additive(sprite1.CommandsStartTime, sprite1.CommandsEndTime);
+            Generator0.GenerateCommands(sprite0, action, timeOffset);
+            Generator1.GenerateCommands(sprite1, action, timeOffset);
         }
 
         private static Vector2 project(Vector2 line1, Vector2 line2, Vector2 toProject)

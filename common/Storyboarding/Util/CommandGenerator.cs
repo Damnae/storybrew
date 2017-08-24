@@ -30,6 +30,7 @@ namespace StorybrewCommon.Storyboarding.Util
 
         private readonly KeyframedValue<bool> flipH = new KeyframedValue<bool>(InterpolatingFunctions.BoolFrom);
         private readonly KeyframedValue<bool> flipV = new KeyframedValue<bool>(InterpolatingFunctions.BoolFrom);
+        private readonly KeyframedValue<bool> additive = new KeyframedValue<bool>(InterpolatingFunctions.BoolFrom);
 
         public State StartState => states.Count == 0 ? null : states[0];
         public State EndState => states.Count == 0 ? null : states[states.Count - 1];
@@ -44,6 +45,8 @@ namespace StorybrewCommon.Storyboarding.Util
         public int ScaleDecimals = 2;
         public int RotationDecimals = 3;
         public int OpacityDecimals = 2;
+
+        public Func<State, bool> PostProcess;
 
         public void Add(State state)
         {
@@ -73,28 +76,30 @@ namespace StorybrewCommon.Storyboarding.Util
 
             foreach (var state in states)
             {
-                var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(state.Time + timeOffset));
+                var time = state.Time + timeOffset;
+                var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(time));
                 imageSize = new Vector2(bitmap.Width, bitmap.Height);
 
-                var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
-                if (isVisible) everVisible = true;
+                var isVisible = PostProcess == null || PostProcess(state);
+                isVisible &= state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
 
+                if (isVisible) everVisible = true;
                 if (!wasVisible && isVisible)
                 {
                     if (!stateAdded && previousState != null)
-                        addKeyframes(previousState, timeOffset);
-                    addKeyframes(state, timeOffset);
+                        addKeyframes(previousState, time);
+                    addKeyframes(state, time);
                     stateAdded = true;
                 }
                 else if (wasVisible && !isVisible)
                 {
-                    addKeyframes(state, timeOffset);
+                    addKeyframes(state, time);
                     commitKeyframes(imageSize);
                     stateAdded = true;
                 }
                 else if (isVisible)
                 {
-                    addKeyframes(state, timeOffset);
+                    addKeyframes(state, time);
                     stateAdded = true;
                 }
                 else stateAdded = false;
@@ -158,11 +163,11 @@ namespace StorybrewCommon.Storyboarding.Util
 
             flipH.ForEachFlag((startTime, endTime) => sprite.FlipH(startTime, endTime));
             flipV.ForEachFlag((startTime, endTime) => sprite.FlipV(startTime, endTime));
+            additive.ForEachFlag((startTime, endTime) => sprite.Additive(startTime, endTime));
         }
 
-        private void addKeyframes(State state, double timeOffset)
+        private void addKeyframes(State state, double time)
         {
-            var time = state.Time + timeOffset;
             positions.Add(time, state.Position);
             scales.Add(time, state.Scale);
             rotations.Add(time, (float)state.Rotation);
@@ -170,6 +175,7 @@ namespace StorybrewCommon.Storyboarding.Util
             opacities.Add(time, (float)state.Opacity);
             flipH.Add(time, state.FlipH);
             flipV.Add(time, state.FlipV);
+            additive.Add(time, state.Additive);
         }
 
         private void clearFinalKeyframes()
@@ -181,6 +187,7 @@ namespace StorybrewCommon.Storyboarding.Util
             finalOpacities.Clear();
             flipH.Clear();
             flipV.Clear();
+            additive.Clear();
         }
 
         public class State : IComparable<State>
@@ -193,6 +200,7 @@ namespace StorybrewCommon.Storyboarding.Util
             public double Opacity = 1;
             public bool FlipH;
             public bool FlipV;
+            public bool Additive;
 
             public bool IsVisible(int width, int height, OsbOrigin origin, Box2 bounds)
             {
@@ -200,6 +208,9 @@ namespace StorybrewCommon.Storyboarding.Util
                     return false;
 
                 if (Scale.X == 0 || Scale.Y == 0)
+                    return false;
+
+                if (Additive && Color.R == 0 && Color.G == 0 && Color.B == 0)
                     return false;
 
                 if (!bounds.Contains(Position))

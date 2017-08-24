@@ -73,16 +73,13 @@ namespace StorybrewCommon.Storyboarding3d
                 Rotation = rotation,
                 Color = object3dState.Color,
                 Opacity = opacity,
+                Additive = Additive,
             });
         }
 
         public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
         {
-            if (Generator.GenerateCommands(sprite, action, timeOffset))
-            {
-                if (Additive)
-                    sprite.Additive(sprite.CommandsStartTime, sprite.CommandsEndTime);
-            }
+            Generator.GenerateCommands(sprite, action, timeOffset);
         }
     }
 

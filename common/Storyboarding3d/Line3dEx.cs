@@ -129,6 +129,7 @@ namespace StorybrewCommon.Storyboarding3d
                 Rotation = rotation,
                 Color = object3dState.Color,
                 Opacity = bodyOpacity,
+                Additive = Additive,
             });
 
             // Edges
@@ -153,6 +154,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Color = object3dState.Color,
                     Opacity = edgeOpacity,
                     FlipH = flip,
+                    Additive = Additive,
                 });
                 GeneratorBottomEdge.Add(new CommandGenerator.State()
                 {
@@ -162,6 +164,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Rotation = rotation,
                     Color = object3dState.Color,
                     Opacity = edgeOpacity,
+                    Additive = Additive,
                     FlipH = flip,
                     FlipV = true,
                 });
@@ -194,6 +197,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Rotation = OrientedCaps ? rotation + Math.PI : 0,
                     Color = object3dState.Color,
                     Opacity = startCapOpacity,
+                    Additive = Additive,
                 });
                 GeneratorEndCap.Add(new CommandGenerator.State()
                 {
@@ -203,6 +207,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Rotation = OrientedCaps ? rotation + Math.PI : 0,
                     Color = object3dState.Color,
                     Opacity = endCapOpacity,
+                    Additive = Additive,
                     FlipH = OrientedCaps,
                 });
             }
@@ -210,23 +215,16 @@ namespace StorybrewCommon.Storyboarding3d
 
         public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
         {
-            if (GeneratorBody.GenerateCommands(spriteBody, action, timeOffset))
-                if (Additive) spriteBody.Additive(spriteBody.CommandsStartTime, spriteBody.CommandsEndTime);
-
+            GeneratorBody.GenerateCommands(spriteBody, action, timeOffset);
             if (SpritePathEdge != null)
             {
-                if (GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, timeOffset))
-                    if (Additive) spriteTopEdge.Additive(spriteTopEdge.CommandsStartTime, spriteTopEdge.CommandsEndTime);
-                if (GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, timeOffset))
-                    if (Additive) spriteBottomEdge.Additive(spriteBottomEdge.CommandsStartTime, spriteBottomEdge.CommandsEndTime);
+                GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, timeOffset);
+                GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, timeOffset);
             }
-
             if (SpritePathCap != null)
             {
-                if (EnableStartCap && GeneratorStartCap.GenerateCommands(spriteStartCap, action, timeOffset))
-                    if (Additive) spriteStartCap.Additive(spriteStartCap.CommandsStartTime, spriteStartCap.CommandsEndTime);
-                if (EnableEndCap && GeneratorEndCap.GenerateCommands(spriteEndCapEnd, action, timeOffset))
-                    if (Additive) spriteEndCapEnd.Additive(spriteEndCapEnd.CommandsStartTime, spriteEndCapEnd.CommandsEndTime);
+                if (EnableStartCap) GeneratorStartCap.GenerateCommands(spriteStartCap, action, timeOffset);
+                if (EnableEndCap) GeneratorEndCap.GenerateCommands(spriteEndCapEnd, action, timeOffset);
             }
         }
     }
