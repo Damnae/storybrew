@@ -38,10 +38,16 @@ namespace StorybrewCommon.Storyboarding.Display
 
             var repeatDuration = RepeatDuration;
             var repeatTime = time - StartTime;
+            var repeated = false;
             while (repeatTime > repeatDuration)
+            {
                 repeatTime -= repeatDuration;
+                repeated = true;
+            }
 
-            if (repeatTime < command.StartTime) return command.StartValue;
+            if (repeatTime < command.StartTime)
+                if (repeated && repeatTime < command.StartTime) return command.EndValue;
+                else return command.StartValue;
             if (command.EndTime < repeatTime) return command.EndValue;
             return command.ValueAtTime(repeatTime);
         }
