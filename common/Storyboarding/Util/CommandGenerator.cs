@@ -46,7 +46,7 @@ namespace StorybrewCommon.Storyboarding.Util
         public int RotationDecimals = 3;
         public int OpacityDecimals = 2;
 
-        public Func<State, bool> PostProcess;
+        public Action<State> PostProcess;
 
         public void Add(State state)
         {
@@ -80,8 +80,8 @@ namespace StorybrewCommon.Storyboarding.Util
                 var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.GetTexturePathAt(time));
                 imageSize = new Vector2(bitmap.Width, bitmap.Height);
 
-                var isVisible = PostProcess == null || PostProcess(state);
-                isVisible &= state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
+                PostProcess?.Invoke(state);
+                var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
 
                 if (isVisible) everVisible = true;
                 if (!wasVisible && isVisible)
