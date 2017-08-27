@@ -48,9 +48,21 @@ namespace StorybrewCommon.Animations
             return keyframes;
         }
 
+        public static KeyframedValue<Vector2> Add(this KeyframedValue<Vector2> keyframes, double time, float scale, Func<double, double> easing = null)
+        {
+            keyframes.Add(time, new Vector2(scale), easing);
+            return keyframes;
+        }
+
         public static KeyframedValue<Vector3> Add(this KeyframedValue<Vector3> keyframes, double time, float x, float y, float z, Func<double, double> easing = null)
         {
             keyframes.Add(time, new Vector3(x, y, z), easing);
+            return keyframes;
+        }
+
+        public static KeyframedValue<Vector3> Add(this KeyframedValue<Vector3> keyframes, double time, float scale, Func<double, double> easing = null)
+        {
+            keyframes.Add(time, new Vector3(scale), easing);
             return keyframes;
         }
 
