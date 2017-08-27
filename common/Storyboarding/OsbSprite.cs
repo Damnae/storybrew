@@ -267,9 +267,12 @@ namespace StorybrewCommon.Storyboarding
         protected virtual void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             writer.Write($"Sprite,{layer},{Origin.ToString()},\"{TexturePath}\"");
-            if (!moveTimeline.HasCommands && !(moveXTimeline.HasCommands || moveYTimeline.HasCommands))
-                writer.WriteLine($",{ InitialPosition.X.ToString(exportSettings.NumberFormat)},{ InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
-            else writer.WriteLine($",0,0");
+            if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
+                writer.Write($",{ InitialPosition.X.ToString(exportSettings.NumberFormat)}");
+            else writer.Write($",0");
+            if (!moveTimeline.HasCommands && !moveYTimeline.HasCommands)
+                writer.WriteLine($",{ InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+            else writer.WriteLine($",0");
         }
 
         public override double StartTime => CommandsStartTime;
