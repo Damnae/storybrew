@@ -63,10 +63,10 @@ namespace StorybrewCommon.Storyboarding.Util
         public void ClearStates()
             => states.Clear();
 
-        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double timeOffset = 0)
+        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double timeOffset = 0, bool loopable = false)
             => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action, timeOffset);
 
-        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double timeOffset = 0)
+        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double timeOffset = 0, bool loopable = false)
         {
             var previousState = (State)null;
             var wasVisible = false;
@@ -94,7 +94,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 else if (wasVisible && !isVisible)
                 {
                     addKeyframes(state, time);
-                    commitKeyframes(imageSize);
+                    commitKeyframes(imageSize, loopable);
                     stateAdded = true;
                 }
                 else if (isVisible)
@@ -109,7 +109,7 @@ namespace StorybrewCommon.Storyboarding.Util
             }
 
             if (wasVisible)
-                commitKeyframes(imageSize);
+                commitKeyframes(imageSize, loopable);
 
             if (everVisible)
             {
@@ -122,22 +122,22 @@ namespace StorybrewCommon.Storyboarding.Util
             return everVisible;
         }
 
-        private void commitKeyframes(Vector2 imageSize)
+        private void commitKeyframes(Vector2 imageSize, bool loopable)
         {
             positions.Simplify2dKeyframes(PositionTolerance, p => p);
-            positions.MakeLoopable();
+            if (loopable) positions.MakeLoopable();
             positions.TransferKeyframes(finalPositions);
 
             scales.Simplify2dKeyframes(ScaleTolerance, s => new Vector2(s.X * imageSize.X, s.Y * imageSize.Y));
-            scales.MakeLoopable();
+            if (loopable) scales.MakeLoopable();
             scales.TransferKeyframes(finalScales);
 
             rotations.Simplify1dKeyframes(RotationTolerance, a => a);
-            rotations.MakeLoopable();
+            if (loopable) rotations.MakeLoopable();
             rotations.TransferKeyframes(finalRotations);
 
             colors.Simplify3dKeyframes(ColorTolerance, c => new Vector3(c.R, c.G, c.B));
-            colors.MakeLoopable();
+            if (loopable) colors.MakeLoopable();
             colors.TransferKeyframes(finalColors);
 
             opacities.Simplify1dKeyframes(OpacityTolerance, o => o);

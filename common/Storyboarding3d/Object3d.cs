@@ -56,11 +56,11 @@ namespace StorybrewCommon.Storyboarding3d
             foreach (var child in children)
                 child.GenerateTreeStates(time, cameraState, object3dState);
         }
-        public void GenerateTreeCommands(Action<Action, OsbSprite> action = null, double timeOffset = 0)
+        public void GenerateTreeCommands(Action<Action, OsbSprite> action = null, double timeOffset = 0, bool loopable = false)
         {
-            GenerateCommands(action, timeOffset);
+            GenerateCommands(action, timeOffset, loopable);
             foreach (var child in children)
-                child.GenerateTreeCommands(action, timeOffset);
+                child.GenerateTreeCommands(action, timeOffset, loopable);
         }
 
         public void GenerateTreeLoopCommands(double startTime, int loopCount, Action<LoopCommand, OsbSprite> action = null, bool offsetCommands = true)
@@ -71,7 +71,7 @@ namespace StorybrewCommon.Storyboarding3d
                 createCommands();
                 action?.Invoke(loop, s);
                 s.EndGroup();
-            }, offsetCommands ? -startTime : 0);
+            }, offsetCommands ? -startTime : 0, true);
         }
 
         public void DoTree(Action<Object3d> action)
@@ -96,7 +96,7 @@ namespace StorybrewCommon.Storyboarding3d
         public virtual void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
         {
         }
-        public virtual void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
+        public virtual void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset, bool loopable)
         {
         }
 

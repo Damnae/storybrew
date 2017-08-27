@@ -77,9 +77,9 @@ namespace StorybrewCommon.Storyboarding3d
             });
         }
 
-        public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
+        public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset, bool loopable)
         {
-            Generator.GenerateCommands(sprite, action, timeOffset);
+            Generator.GenerateCommands(sprite, action, timeOffset, loopable);
         }
     }
 

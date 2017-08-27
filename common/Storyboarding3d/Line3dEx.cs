@@ -213,18 +213,18 @@ namespace StorybrewCommon.Storyboarding3d
             }
         }
 
-        public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset)
+        public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset, bool loopable)
         {
-            GeneratorBody.GenerateCommands(spriteBody, action, timeOffset);
+            GeneratorBody.GenerateCommands(spriteBody, action, timeOffset, loopable);
             if (SpritePathEdge != null)
             {
-                GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, timeOffset);
-                GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, timeOffset);
+                GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, timeOffset, loopable);
+                GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, timeOffset, loopable);
             }
             if (SpritePathCap != null)
             {
-                if (EnableStartCap) GeneratorStartCap.GenerateCommands(spriteStartCap, action, timeOffset);
-                if (EnableEndCap) GeneratorEndCap.GenerateCommands(spriteEndCapEnd, action, timeOffset);
+                if (EnableStartCap) GeneratorStartCap.GenerateCommands(spriteStartCap, action, timeOffset, loopable);
+                if (EnableEndCap) GeneratorEndCap.GenerateCommands(spriteEndCapEnd, action, timeOffset, loopable);
             }
         }
     }
