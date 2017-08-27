@@ -33,6 +33,9 @@ namespace StorybrewCommon.Storyboarding
 
         public void UpdateField(string name, string displayName, int order, Type fieldType, object defaultValue, NamedValue[] allowedValues)
         {
+            if (fieldType == null)
+                return;
+
             ConfigField field;
             var value = fields.TryGetValue(name, out field) ?
                 convertFieldValue(field.Value, field.Type, fieldType, defaultValue) :

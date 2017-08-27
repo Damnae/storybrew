@@ -516,7 +516,7 @@ namespace StorybrewEditor.Storyboarding
                                     Value = allowedValue,
                                 };
                             }
-                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldIndex, fieldValue.GetType(), fieldValue, allowedValues);
+                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldIndex, fieldValue?.GetType(), fieldValue, allowedValues);
                         }
                     }
                 }

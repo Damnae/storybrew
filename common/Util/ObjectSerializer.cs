@@ -39,7 +39,7 @@ namespace StorybrewCommon.Util
                 var alpha = r.ReadByte();
                 return new Color4(red, green, blue, alpha);
             },
-            (w, v) => 
+            (w, v) =>
             {
                 var color = (Color4)v;
                 w.Write((byte)(color.R * 255));
@@ -52,6 +52,9 @@ namespace StorybrewCommon.Util
         public static object Read(BinaryReader reader)
         {
             var typeName = reader.ReadString();
+            if (typeName == string.Empty)
+                return null;
+
             var serializer = GetSerializer(typeName);
             if (serializer == null)
                 throw new NotSupportedException($"Cannot read objects of type {typeName}");
@@ -61,6 +64,12 @@ namespace StorybrewCommon.Util
 
         public static void Write(BinaryWriter writer, object value)
         {
+            if (value == null)
+            {
+                writer.Write(string.Empty);
+                return;
+            }
+
             var typeName = value.GetType().FullName;
 
             var serializer = GetSerializer(typeName);
@@ -80,7 +89,7 @@ namespace StorybrewCommon.Util
             return null;
         }
 
-        public static bool Supports(string typeName) 
+        public static bool Supports(string typeName)
             => GetSerializer(typeName) != null;
     }
 
