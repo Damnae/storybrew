@@ -125,15 +125,19 @@ namespace StorybrewCommon.Storyboarding.Util
         private void commitKeyframes(Vector2 imageSize)
         {
             positions.Simplify2dKeyframes(PositionTolerance, p => p);
+            positions.MakeLoopable();
             positions.TransferKeyframes(finalPositions);
 
             scales.Simplify2dKeyframes(ScaleTolerance, s => new Vector2(s.X * imageSize.X, s.Y * imageSize.Y));
+            scales.MakeLoopable();
             scales.TransferKeyframes(finalScales);
 
             rotations.Simplify1dKeyframes(RotationTolerance, a => a);
+            rotations.MakeLoopable();
             rotations.TransferKeyframes(finalRotations);
 
             colors.Simplify3dKeyframes(ColorTolerance, c => new Vector3(c.R, c.G, c.B));
+            colors.MakeLoopable();
             colors.TransferKeyframes(finalColors);
 
             opacities.Simplify1dKeyframes(OpacityTolerance, o => o);
