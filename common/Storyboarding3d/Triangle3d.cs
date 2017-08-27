@@ -28,7 +28,8 @@ namespace StorybrewCommon.Storyboarding3d
         public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator0; yield return Generator1; } }
 
         private int edgeIndex = 0;
-
+        public int FixedEdge = -1;
+        
         public override void GenerateSprite(StoryboardLayer layer)
         {
             sprite0 = sprite0 ?? layer.CreateSprite(SpritePath, OsbOrigin.BottomLeft);
@@ -38,6 +39,9 @@ namespace StorybrewCommon.Storyboarding3d
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
         {
             var wvp = object3dState.WorldTransform * cameraState.ViewProjection;
+
+            if (FixedEdge >= 0)
+                edgeIndex = FixedEdge;
 
             Vector4 vector0, vector1, vector2;
             switch (edgeIndex)
@@ -60,41 +64,21 @@ namespace StorybrewCommon.Storyboarding3d
                 default: throw new InvalidOperationException();
             }
 
+            var cross = (vector2.X - vector0.X) * (vector1.Y - vector0.Y)
+                - (vector2.Y - vector0.Y) * (vector1.X - vector0.X);
+
+            if (cross > 0)
+            {
+                if (Generator0.EndState != null) Generator0.EndState.Opacity = 0;
+                if (Generator1.EndState != null) Generator1.EndState.Opacity = 0;
+                return;
+            }
+
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite0.GetTexturePathAt(time));
 
             var switchedEdge = false;
             for (var i = 0; i < 3; i++)
             {
-                var cross = (vector2.X - vector0.X) * (vector1.Y - vector0.Y)
-                    - (vector2.Y - vector0.Y) * (vector1.X - vector0.X);
-
-                if (cross > 0)
-                {
-                    if (Generator0.EndState != null)
-                        Generator0.Add(new CommandGenerator.State()
-                        {
-                            Time = time,
-                            Position = Generator0.EndState.Position,
-                            Scale = Generator0.EndState.Scale,
-                            Rotation = Generator0.EndState.Rotation,
-                            Color = object3dState.Color,
-                            Opacity = 0,
-                            Additive = Additive,
-                        });
-                    if (Generator1.EndState != null)
-                        Generator1.Add(new CommandGenerator.State()
-                        {
-                            Time = time,
-                            Position = Generator1.EndState.Position,
-                            Scale = Generator1.EndState.Scale,
-                            Rotation = Generator1.EndState.Rotation,
-                            Color = object3dState.Color,
-                            Opacity = 0,
-                            Additive = Additive,
-                            FlipH = true,
-                        });
-                    break;
-                }
 
                 var delta = vector2.Xy - vector0.Xy;
                 var deltaLength = delta.Length;
@@ -104,6 +88,13 @@ namespace StorybrewCommon.Storyboarding3d
                 var dot = Vector2.Dot(normalizedDelta, delta2);
                 if (dot <= 0 || dot > deltaLength)
                 {
+                    if (FixedEdge >= 0)
+                    {
+                        if (Generator0.EndState != null) Generator0.EndState.Opacity = 0;
+                        if (Generator1.EndState != null) Generator1.EndState.Opacity = 0;
+                        break;
+                    }
+
                     var temp = vector0;
                     vector0 = vector1;
                     vector1 = vector2;
