@@ -340,8 +340,6 @@ namespace StorybrewEditor.ScreenLayers
                 audioTimeFactorButton.Text = $"{audio.TimeFactor:P0}";
             };
 
-            //helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
-
             MakeTabs(
                 new Button[] { settingsButton, effectsButton, layersButton },
                 new Widget[] { settingsMenu, effectsList, layersList });

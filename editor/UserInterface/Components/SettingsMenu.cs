@@ -3,6 +3,7 @@ using BrewLib.Util;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace StorybrewEditor.UserInterface.Components
         public SettingsMenu(WidgetManager manager) : base(manager)
         {
             Button foo, baz, qux;
+
+            Button helpButton;
 
             Add(layout = new LinearLayout(manager)
             {
@@ -59,10 +62,18 @@ namespace StorybrewEditor.UserInterface.Components
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre,
                             },
+                            helpButton = new Button(manager)
+                            {
+                                Text = "Help!",
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
+                            },
                         }
                     }
                 },
             });
+
+            helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
         }
 
         protected override void Dispose(bool disposing)
