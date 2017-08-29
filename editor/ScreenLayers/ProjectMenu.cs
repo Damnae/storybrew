@@ -43,11 +43,13 @@ namespace StorybrewEditor.ScreenLayers
         private Button saveButton;
         private Button exportButton;
 
-        private Button helpButton;
+        private Button settingsButton;
         private Button effectsButton;
         private Button layersButton;
 
         private EffectConfigUi effectConfigUi;
+
+        private SettingsMenu settingsMenu;
         private EffectList effectsList;
         private LayerList layersList;
 
@@ -151,9 +153,10 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    helpButton = new Button(WidgetManager)
+                    settingsButton = new Button(WidgetManager)
                     {
-                        Text = "Help!",
+                        StyleName = "small",
+                        Text = "Settings",
                     },
                     effectsButton = new Button(WidgetManager)
                     {
@@ -209,6 +212,14 @@ namespace StorybrewEditor.ScreenLayers
                 Displayed = false,
             });
             effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
+
+            WidgetManager.Root.Add(settingsMenu = new SettingsMenu(WidgetManager)
+            {
+                AnchorTarget = bottomRightLayout,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.TopRight,
+                Offset = new Vector2(-16, 0),
+            });
 
             WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
             {
@@ -329,10 +340,11 @@ namespace StorybrewEditor.ScreenLayers
                 audioTimeFactorButton.Text = $"{audio.TimeFactor:P0}";
             };
 
-            helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
+            //helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
+
             MakeTabs(
-                new Button[] { effectsButton, layersButton },
-                new Widget[] { effectsList, layersList });
+                new Button[] { settingsButton, effectsButton, layersButton },
+                new Widget[] { settingsMenu, effectsList, layersList });
             projectFolderButton.OnClick += (sender, e) =>
             {
                 var path = Path.GetFullPath(project.ProjectFolderPath);
@@ -474,6 +486,7 @@ namespace StorybrewEditor.ScreenLayers
             bottomRightLayout.Pack(374);
             bottomLeftLayout.Pack(WidgetManager.Size.X - bottomRightLayout.Width);
 
+            settingsMenu.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
             effectsList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
             layersList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
 
