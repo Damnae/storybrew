@@ -215,7 +215,7 @@ namespace StorybrewEditor.ScreenLayers
             });
             effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
 
-            WidgetManager.Root.Add(referencedAssemblyUi = new ReferencedAssemblyUi(WidgetManager)
+            WidgetManager.Root.Add(referencedAssemblyUi = new ReferencedAssemblyUi(WidgetManager, project)
             {
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = BoxAlignment.TopLeft,

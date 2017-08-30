@@ -3,6 +3,7 @@ using BrewLib.Util;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using StorybrewEditor.ScreenLayers;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;

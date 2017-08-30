@@ -2,6 +2,7 @@
 using BrewLib.Util;
 using OpenTK;
 using StorybrewEditor.ScreenLayers;
+using StorybrewEditor.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +15,17 @@ namespace StorybrewEditor.UserInterface.Components
     {
         private LinearLayout layout;
         private LinearLayout assembliesLayout;
+        private Project project;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
-        public ReferencedAssemblyUi(WidgetManager manager) : base(manager)
+        public ReferencedAssemblyUi(WidgetManager manager, Project project) : base(manager)
         {
-            Button addAssemblyButton, closeButton;
+            this.project = project;
+
+            Button addAssemblyButton, closeButton, debugButton;
             Add(layout = new LinearLayout(manager)
             {
                 StyleName = "panel",
@@ -37,7 +41,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Horizontal = true,
                         CanGrow = false,
                         Children = new Widget[]
-                        {                            
+                        {
                             new Label(manager)
                             {
                                 Text = "Referenced Assemblies",
@@ -70,6 +74,12 @@ namespace StorybrewEditor.UserInterface.Components
                             AnchorFrom = BoxAlignment.Centre,
                             AnchorTo = BoxAlignment.Centre,
                         },
+                        debugButton = new Button(manager)
+                        {
+                            Text = "(^_-)-☆",
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
+                        },
                        },
                    },
                 }
@@ -78,9 +88,11 @@ namespace StorybrewEditor.UserInterface.Components
             closeButton.OnClick += (sender, e) => Displayed = false;
 
             // Prompt to find DLL
-            // Ask for name
             // And bam, it's added to the list.
-            addAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Library name", name => Manager.ScreenLayerManager.ShowMessage($"{name} is lovely."));
+            // TODO: Validation.
+            addAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.OpenFilePicker("", "", Project.ProjectsFolder, ".dll files (*.dll)|*.dll", (path) => project.AddReferencedAssembly(path));
+
+            debugButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage(project.GetReferencedAssemblies());
         }
 
         protected override void Dispose(bool disposing)

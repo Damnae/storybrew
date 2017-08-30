@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -678,6 +679,84 @@ namespace StorybrewEditor.Storyboarding
                 {
                     Trace.WriteLine($"{filename} couldn't be deleted: {e.Message}");
                 }
+        }
+
+        #endregion
+
+        #region Settings
+
+        // Referenced assemblies
+        private static List<String> defaultReferencedAssemblies = new List<String>
+            {
+                "System.dll",
+                "System.Core.dll",
+                "System.Drawing.dll",
+                "OpenTK.dll",
+                Assembly.GetAssembly(typeof(Script)).Location,
+            };
+        private List<String> importedAssemblies = new List<String>();
+        private string[] referencedAssemblies => defaultReferencedAssemblies.Concat(importedAssemblies).ToArray();
+        public string[] ReferencedAssemblies => referencedAssemblies;
+
+        // TODO: was for debug, kill off when ready
+        public string GetReferencedAssemblies()
+        {
+            var message = "";
+            foreach (var a in referencedAssemblies)
+                message += a + "\n";
+            return message;
+        }
+
+        public void AddReferencedAssembly(string referencedAssembly)
+        {
+            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+
+            importedAssemblies.Add(referencedAssembly);
+
+            // We need to add a reloadScripts here that calls the script manager stuff again
+            // reloadScripts();
+        }
+
+        public void RemoveReferencedAssembly(string referencedAssembly)
+        {
+            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+
+            importedAssemblies.Remove(referencedAssembly);
+
+            // We need to add a reloadScripts here that calls the script manager stuff again
+            // reloadScripts();
+        }
+
+        // NOTE: I feel averse to refreshing an entire ScriptsManager
+        private void reloadScripts(bool withCommonScripts = true)
+        {
+
+            scriptsSourcePath = Path.GetDirectoryName(projectPath);
+            if (withCommonScripts)
+            {
+                commonScriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
+                if (!Directory.Exists(commonScriptsSourcePath))
+                {
+                    commonScriptsSourcePath = Path.GetFullPath("scripts");
+                    if (!Directory.Exists(commonScriptsSourcePath))
+                        Directory.CreateDirectory(commonScriptsSourcePath);
+                }
+            }
+            scriptsLibraryPath = Path.Combine(scriptsSourcePath, "scriptslibrary");
+            if (!Directory.Exists(scriptsLibraryPath))
+                Directory.CreateDirectory(scriptsLibraryPath);
+
+            Trace.WriteLine($"Scripts path - project:{scriptsSourcePath}, common:{commonScriptsSourcePath}, library:{scriptsLibraryPath}");
+
+            var compiledScriptsPath = Path.GetFullPath("cache/scripts");
+            if (!Directory.Exists(compiledScriptsPath))
+                Directory.CreateDirectory(compiledScriptsPath);
+            else
+            {
+                cleanupFolder(compiledScriptsPath, "*.dll");
+                cleanupFolder(compiledScriptsPath, "*.pdb");
+            }
+            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
         }
 
         #endregion
