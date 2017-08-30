@@ -104,6 +104,7 @@
     <Compile Include="Processes\ProcessWorker.cs" />
     <Compile Include="Storyboarding\EditorOsbSample.cs" />
     <Compile Include="Storyboarding\EventObject.cs" />
+    <Compile Include="UserInterface\Components\ReferencedAssemblyUi.cs" />
     <Compile Include="UserInterface\Components\SettingsMenu.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />

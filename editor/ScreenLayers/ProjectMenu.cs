@@ -50,6 +50,8 @@ namespace StorybrewEditor.ScreenLayers
         private EffectConfigUi effectConfigUi;
 
         private SettingsMenu settingsMenu;
+        private ReferencedAssemblyUi referencedAssemblyUi;
+
         private EffectList effectsList;
         private LayerList layersList;
 
@@ -213,7 +215,16 @@ namespace StorybrewEditor.ScreenLayers
             });
             effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
 
-            WidgetManager.Root.Add(settingsMenu = new SettingsMenu(WidgetManager)
+            WidgetManager.Root.Add(referencedAssemblyUi = new ReferencedAssemblyUi(WidgetManager)
+            {
+                AnchorTarget = WidgetManager.Root,
+                AnchorFrom = BoxAlignment.TopLeft,
+                AnchorTo = BoxAlignment.TopLeft,
+                Offset = new Vector2(16, 16),
+                Displayed = false,
+            });
+
+            WidgetManager.Root.Add(settingsMenu = new SettingsMenu(WidgetManager, referencedAssemblyUi)
             {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = BoxAlignment.BottomRight,
@@ -489,6 +500,7 @@ namespace StorybrewEditor.ScreenLayers
             layersList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
 
             effectConfigUi.Pack(bottomRightLayout.Width, WidgetManager.Root.Height - bottomLeftLayout.Height - 16);
+            referencedAssemblyUi.Pack(bottomRightLayout.Width, WidgetManager.Root.Height - bottomLeftLayout.Height - 16);
 
             resizeStoryboard();
         }

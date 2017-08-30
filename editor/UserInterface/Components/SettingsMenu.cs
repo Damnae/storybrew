@@ -13,16 +13,17 @@ namespace StorybrewEditor.UserInterface.Components
     class SettingsMenu : Widget
     {
         private LinearLayout layout;
+        private ReferencedAssemblyUi referencedAssemblyUi;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
-        public SettingsMenu(WidgetManager manager) : base(manager)
+        public SettingsMenu(WidgetManager manager, ReferencedAssemblyUi referencedAssemblyUi) : base(manager)
         {
-            Button foo, baz, qux;
+            this.referencedAssemblyUi = referencedAssemblyUi;
 
-            Button helpButton;
+            Button referencedAssemblyButton, helpButton;
 
             Add(layout = new LinearLayout(manager)
             {
@@ -44,21 +45,9 @@ namespace StorybrewEditor.UserInterface.Components
                         CanGrow = false,
                         Children = new Widget[]
                         {
-                            foo = new Button(manager)
+                            referencedAssemblyButton = new Button(manager)
                             {
-                                Text = "Foo",
-                                AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
-                            },
-                            baz = new Button(manager)
-                            {
-                                Text = "Baz",
-                                AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
-                            },
-                            qux = new Button(manager)
-                            {
-                                Text = "Qux",
+                                Text = "Referenced Assemblies",
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre,
                             },
@@ -74,6 +63,20 @@ namespace StorybrewEditor.UserInterface.Components
             });
 
             helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
+            referencedAssemblyButton.OnClick += (sender, e) =>
+            {
+                // NOTE: We may need to keep in mind about the effect config UI.
+                // If it's not necessary, then we can just use a toggle statement here.
+
+                // TODO: This item will be on top of the effect config UI. The effect config UI may need
+                // to be tightly coupled with the referenced assembly UI (bad), or there needs to be some
+                // other consideration around all of this.
+                if (!referencedAssemblyUi.Displayed)
+                {
+                    referencedAssemblyUi.Displayed = true;
+                }
+                else referencedAssemblyUi.Displayed = false;
+            };
         }
 
         protected override void Dispose(bool disposing)
