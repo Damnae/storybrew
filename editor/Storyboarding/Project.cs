@@ -126,14 +126,7 @@ namespace StorybrewEditor.Storyboarding
                 cleanupFolder(compiledScriptsPath, "*.dll");
                 cleanupFolder(compiledScriptsPath, "*.pdb");
             }
-            var referencedAssemblies = new string[]
-            {
-                "System.dll",
-                "System.Core.dll",
-                "System.Drawing.dll",
-                "OpenTK.dll",
-                Assembly.GetAssembly(typeof(Script)).Location,
-            };
+
             scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
@@ -392,7 +385,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 4;
+        public const int Version = 5;
 
         private bool changed;
         public bool Changed => changed;
@@ -457,6 +450,12 @@ namespace StorybrewEditor.Storyboarding
                     w.Write(layer.DiffSpecific);
                     w.Write((int)layer.OsbLayer);
                     w.Write(layer.Visible);
+                }
+
+                w.Write(importedAssemblies.Count);
+                foreach (var assembly in importedAssemblies)
+                {
+                    w.Write(assembly);
                 }
 
                 stream.Commit();
@@ -538,6 +537,16 @@ namespace StorybrewEditor.Storyboarding
                         OsbLayer = osbLayer,
                         Visible = visible,
                     });
+                }
+
+                if (version >= 5)
+                {
+                    var assemblyCount = r.ReadInt32();
+                    for (int assemblyIndex = 0; assemblyIndex < assemblyCount; assemblyIndex++)
+                    {
+                        var assembly = r.ReadString();
+                        project.AddReferencedAssembly(assembly);
+                    }
                 }
             }
             return project;
