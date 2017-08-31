@@ -17,7 +17,18 @@ namespace StorybrewEditor.Scripting
         public string CompiledScriptsPath => compiledScriptsPath;
 
         private string[] referencedAssemblies;
-        public string[] ReferencedAssemblies => referencedAssemblies;
+        public string[] ReferencedAssemblies
+        {
+            get
+            {
+                return referencedAssemblies;
+            }
+            set
+            {
+                referencedAssemblies = value;
+                ReloadScript();
+            }
+        }
 
         private ScriptProvider<TScript> scriptProvider;
 

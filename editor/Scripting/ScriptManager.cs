@@ -111,6 +111,20 @@ namespace StorybrewEditor.Scripting
             }
         }
 
+        public void UpdateReferencedAssemblies(string[] referencedAssemblies)
+        {
+            this.referencedAssemblies = referencedAssemblies;
+
+            // NOTE: Ideally only update the effects that have a missing assembly.
+            foreach(var entry in scriptContainers)
+            {
+                var scriptContainer = (ScriptContainerAppDomain<TScript>)entry.Value;
+                scriptContainer.ReferencedAssemblies = referencedAssemblies;
+            }
+
+            updateSolutionFiles();
+        }
+
         private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var change = e.ChangeType.ToString().ToLowerInvariant();

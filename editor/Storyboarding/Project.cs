@@ -712,9 +712,7 @@ namespace StorybrewEditor.Storyboarding
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
             importedAssemblies.Add(referencedAssembly);
-
-            // We need to add a reloadScripts here that calls the script manager stuff again
-            // reloadScripts();
+            scriptManager.UpdateReferencedAssemblies(ReferencedAssemblies);
         }
 
         public void RemoveReferencedAssembly(string referencedAssembly)
@@ -722,41 +720,7 @@ namespace StorybrewEditor.Storyboarding
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
             importedAssemblies.Remove(referencedAssembly);
-
-            // We need to add a reloadScripts here that calls the script manager stuff again
-            // reloadScripts();
-        }
-
-        // NOTE: I feel averse to refreshing an entire ScriptsManager
-        private void reloadScripts(bool withCommonScripts = true)
-        {
-
-            scriptsSourcePath = Path.GetDirectoryName(projectPath);
-            if (withCommonScripts)
-            {
-                commonScriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
-                if (!Directory.Exists(commonScriptsSourcePath))
-                {
-                    commonScriptsSourcePath = Path.GetFullPath("scripts");
-                    if (!Directory.Exists(commonScriptsSourcePath))
-                        Directory.CreateDirectory(commonScriptsSourcePath);
-                }
-            }
-            scriptsLibraryPath = Path.Combine(scriptsSourcePath, "scriptslibrary");
-            if (!Directory.Exists(scriptsLibraryPath))
-                Directory.CreateDirectory(scriptsLibraryPath);
-
-            Trace.WriteLine($"Scripts path - project:{scriptsSourcePath}, common:{commonScriptsSourcePath}, library:{scriptsLibraryPath}");
-
-            var compiledScriptsPath = Path.GetFullPath("cache/scripts");
-            if (!Directory.Exists(compiledScriptsPath))
-                Directory.CreateDirectory(compiledScriptsPath);
-            else
-            {
-                cleanupFolder(compiledScriptsPath, "*.dll");
-                cleanupFolder(compiledScriptsPath, "*.pdb");
-            }
-            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
+            scriptManager.UpdateReferencedAssemblies(ReferencedAssemblies);
         }
 
         #endregion
