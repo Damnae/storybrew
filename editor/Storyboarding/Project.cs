@@ -697,7 +697,7 @@ namespace StorybrewEditor.Storyboarding
         #region Settings
 
         // Referenced assemblies
-        private static List<String> defaultReferencedAssemblies = new List<String>
+        public static List<String> DefaultReferencedAssemblies = new List<String>
             {
                 "System.dll",
                 "System.Core.dll",
@@ -707,7 +707,7 @@ namespace StorybrewEditor.Storyboarding
             };
         private List<String> importedAssemblies = new List<String>();
         public List<String> ImportedAssemblies => importedAssemblies;
-        private string[] referencedAssemblies => defaultReferencedAssemblies.Concat(importedAssemblies).ToArray();
+        private string[] referencedAssemblies => DefaultReferencedAssemblies.Concat(importedAssemblies).ToArray();
         public string[] ReferencedAssemblies => referencedAssemblies;
 
         public void SetImportedAssemblies(List<String> importedAssemblies)

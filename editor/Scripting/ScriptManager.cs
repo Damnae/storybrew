@@ -1,10 +1,13 @@
 ﻿using BrewLib.Util;
 using StorybrewCommon.Scripting;
+using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 
@@ -115,7 +118,6 @@ namespace StorybrewEditor.Scripting
         {
             this.referencedAssemblies = referencedAssemblies;
 
-            // NOTE: Ideally only update the effects that have a missing assembly.
             foreach(var entry in scriptContainers)
             {
                 var scriptContainer = (ScriptContainerAppDomain<TScript>)entry.Value;
@@ -195,6 +197,21 @@ namespace StorybrewEditor.Scripting
                     var compileNode = document.CreateElement("Compile", xmlns);
                     compileNode.SetAttribute("Include", relativePath);
                     compileGroup.AppendChild(compileNode);
+                }
+
+                var importedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
+                document.DocumentElement.AppendChild(importedAssembliesGroup);
+                var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultReferencedAssemblies.Contains(e));
+                foreach (var path in importedAssemblies)
+                {
+                    var relativePath = PathHelper.GetRelativePath(scriptsSourcePath, path);
+
+                    var compileNode = document.CreateElement("Reference", xmlns);
+                    compileNode.SetAttribute("Include", AssemblyName.GetAssemblyName(path).Name);
+                    var hintPath = document.CreateElement("HintPath", xmlns);
+                    hintPath.AppendChild(document.CreateTextNode(relativePath));
+                    compileNode.AppendChild(hintPath);
+                    importedAssembliesGroup.AppendChild(compileNode);
                 }
                 document.Save(csProjPath);
             }
