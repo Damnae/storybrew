@@ -120,7 +120,7 @@ namespace StorybrewEditor.Scripting
 
             foreach(var entry in scriptContainers)
             {
-                var scriptContainer = (ScriptContainerAppDomain<TScript>)entry.Value;
+                var scriptContainer = entry.Value;
                 scriptContainer.ReferencedAssemblies = referencedAssemblies;
             }
 
