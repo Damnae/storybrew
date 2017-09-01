@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace StorybrewEditor.UserInterface.Components
 {
-    class ReferencedAssemblyConfig : UiScreenLayer
+    public class ReferencedAssemblyConfig : UiScreenLayer
     {
         private LinearLayout layout;
         private LinearLayout assembliesLayout;
@@ -26,7 +26,6 @@ namespace StorybrewEditor.UserInterface.Components
 
         private Project project;
         private List<String> currentAssemblies;
-        private bool changed => currentAssemblies != project.ImportedAssemblies;
 
         public ReferencedAssemblyConfig(Project project)
         {
@@ -105,14 +104,13 @@ namespace StorybrewEditor.UserInterface.Components
                         return;
                     }
 
-                    var assembly = isRelativePath(path) ? path : copyReferencedAssembly(path);
+                    var assembly = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
                     addReferencedAssembly(assembly);
                 });
 
             okButton.OnClick += (sender, e) =>
             {
-                if (changed)
-                    project.SetImportedAssemblies(currentAssemblies);
+                project.SetImportedAssemblies(currentAssemblies);
                 Exit();
             };
             cancelButton.OnClick += (sender, e) => Exit();
@@ -123,18 +121,18 @@ namespace StorybrewEditor.UserInterface.Components
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);
-            layout.Pack(400, 600, 0, 600);
+            layout.Pack(Math.Min(400, width), Math.Min(600, height));
         }
 
         private string getAssemblyName(string assembly) => AssemblyName.GetAssemblyName(assembly).Name;
 
-        private string getRelativePath(string assembly) => (isRelativePath(assembly)) ? assembly : Path.Combine(project.ProjectFolderPath, Path.GetFileName(assembly));
+        private string getRelativePath(string assembly) => PathHelper.FolderContainsPath(project.ProjectFolderPath, assembly) ? assembly : Path.Combine(project.ProjectFolderPath, Path.GetFileName(assembly));
 
         private bool isValidAssembly(string assembly)
         {
             try
             {
-                var testAssembly = AssemblyName.GetAssemblyName(assembly);
+                AssemblyName.GetAssemblyName(assembly);
             }
             catch
             {
@@ -146,9 +144,7 @@ namespace StorybrewEditor.UserInterface.Components
         private bool assemblyImported(string assembly) =>
             currentAssemblies.Select(ass => getAssemblyName(ass))
             .Contains(getAssemblyName(assembly));
-
-        private bool isRelativePath(string assembly) => assembly.Contains(project.ProjectFolderPath);
-
+        
         private string copyReferencedAssembly(string assembly)
         {
             var newPath = getRelativePath(assembly);
@@ -185,7 +181,7 @@ namespace StorybrewEditor.UserInterface.Components
                         return;
                     }
 
-                    var newPath = isRelativePath(path) ? path : copyReferencedAssembly(path);
+                    var newPath = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
 
                     if (path == assembly)
                         return;

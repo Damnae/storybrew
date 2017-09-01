@@ -25,8 +25,11 @@ namespace StorybrewEditor.Scripting
             }
             set
             {
-                referencedAssemblies = value;
-                ReloadScript();
+                if (value.Except(referencedAssemblies).Any())
+                {
+                    referencedAssemblies = value;
+                    ReloadScript();
+                }
             }
         }
 

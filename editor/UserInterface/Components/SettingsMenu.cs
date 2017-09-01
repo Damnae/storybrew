@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace StorybrewEditor.UserInterface.Components
 {
-    class SettingsMenu : Widget
+    public class SettingsMenu : Widget
     {
         private LinearLayout layout;
         private Project project;
