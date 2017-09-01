@@ -31,7 +31,7 @@ namespace StorybrewEditor.UserInterface.Components
         public ReferencedAssemblyConfig(Project project)
         {
             this.project = project;
-            this.currentAssemblies = new List<String>(project.ImportedAssemblies);
+            this.currentAssemblies = new List<string>(project.ImportedAssemblies);
         }
 
         public override void Load()
@@ -101,7 +101,7 @@ namespace StorybrewEditor.UserInterface.Components
 
                     if (assemblyImported(path))
                     {
-                        WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same file name already exists.");
+                        WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
                         return;
                     }
 
@@ -144,7 +144,7 @@ namespace StorybrewEditor.UserInterface.Components
         }
 
         private bool assemblyImported(string assembly) =>
-            currentAssemblies.Select(e => getAssemblyName(e))
+            currentAssemblies.Select(ass => getAssemblyName(ass))
             .Contains(getAssemblyName(assembly));
 
         private bool isRelativePath(string assembly) => assembly.Contains(project.ProjectFolderPath);
@@ -168,7 +168,7 @@ namespace StorybrewEditor.UserInterface.Components
             refreshAssemblies();
         }
 
-        private void modifyReferencedAssembly(string assembly)
+        private void changeReferencedAssembly(string assembly)
         {
             WidgetManager.ScreenLayerManager.OpenFilePicker("", "", Path.GetDirectoryName(assembly), ".NET Assemblies (*.dll)|*.dll",
                 (path) =>
@@ -179,7 +179,7 @@ namespace StorybrewEditor.UserInterface.Components
                         return;
                     }
 
-                    if (currentAssemblies.Where(e => e != assembly).Contains(path))
+                    if (currentAssemblies.Where(ass => ass != assembly).Contains(path))
                     {
                         WidgetManager.ScreenLayerManager.ShowMessage("Cannot change file.  An assembly of the same file name already exists.");
                         return;
@@ -259,12 +259,8 @@ namespace StorybrewEditor.UserInterface.Components
                 });
 
                 var ass = assembly;
-
-                // Work on the changed handler, then callback functions
-                // like when a button is clicked etc.
-                // (Needs to update upon crap happening)
-
-                editButton.OnClick += (sender, e) => modifyReferencedAssembly(ass);
+                
+                editButton.OnClick += (sender, e) => changeReferencedAssembly(ass);
                 removeButton.OnClick += (sender, e) => WidgetManager.ScreenLayerManager.ShowMessage($"Remove {getAssemblyName(ass)}?", () => removeReferencedAssembly(ass), true);
             }
         }
