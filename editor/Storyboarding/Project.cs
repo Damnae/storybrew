@@ -542,11 +542,13 @@ namespace StorybrewEditor.Storyboarding
                 if (version >= 5)
                 {
                     var assemblyCount = r.ReadInt32();
+                    var currentAssemblies = new List<String>();
                     for (int assemblyIndex = 0; assemblyIndex < assemblyCount; assemblyIndex++)
                     {
                         var assembly = r.ReadString();
-                        project.AddReferencedAssembly(assembly);
+                        currentAssemblies.Add(assembly);
                     }
+                    project.SetImportedAssemblies(currentAssemblies);
                 }
             }
             return project;
@@ -704,31 +706,14 @@ namespace StorybrewEditor.Storyboarding
                 Assembly.GetAssembly(typeof(Script)).Location,
             };
         private List<String> importedAssemblies = new List<String>();
+        public List<String> ImportedAssemblies => importedAssemblies;
         private string[] referencedAssemblies => defaultReferencedAssemblies.Concat(importedAssemblies).ToArray();
         public string[] ReferencedAssemblies => referencedAssemblies;
 
-        // TODO: was for debug, kill off when ready
-        public string GetReferencedAssemblies()
-        {
-            var message = "";
-            foreach (var a in referencedAssemblies)
-                message += a + "\n";
-            return message;
-        }
-
-        public void AddReferencedAssembly(string referencedAssembly)
+        public void SetImportedAssemblies(List<String> importedAssemblies)
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
-
-            importedAssemblies.Add(referencedAssembly);
-            scriptManager.UpdateReferencedAssemblies(ReferencedAssemblies);
-        }
-
-        public void RemoveReferencedAssembly(string referencedAssembly)
-        {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
-
-            importedAssemblies.Remove(referencedAssembly);
+            this.importedAssemblies = importedAssemblies;
             scriptManager.UpdateReferencedAssemblies(ReferencedAssemblies);
         }
 

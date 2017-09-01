@@ -3,6 +3,7 @@ using BrewLib.Util;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using StorybrewEditor.Storyboarding;
 using StorybrewEditor.ScreenLayers;
 using System.Diagnostics;
 using System.Linq;
@@ -14,15 +15,15 @@ namespace StorybrewEditor.UserInterface.Components
     class SettingsMenu : Widget
     {
         private LinearLayout layout;
-        private ReferencedAssemblyUi referencedAssemblyUi;
+        private Project project;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
-        public SettingsMenu(WidgetManager manager, ReferencedAssemblyUi referencedAssemblyUi) : base(manager)
+        public SettingsMenu(WidgetManager manager, Project project) : base(manager)
         {
-            this.referencedAssemblyUi = referencedAssemblyUi;
+            this.project = project;
 
             Button referencedAssemblyButton, helpButton;
 
@@ -64,25 +65,12 @@ namespace StorybrewEditor.UserInterface.Components
             });
 
             helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
-            referencedAssemblyButton.OnClick += (sender, e) =>
-            {
-                // NOTE: We may need to keep in mind about the effect config UI.
-                // If it's not necessary, then we can just use a toggle statement here.
-
-                // TODO: This item will be on top of the effect config UI. The effect config UI may need
-                // to be tightly coupled with the referenced assembly UI (bad), or there needs to be some
-                // other consideration around all of this.
-                if (!referencedAssemblyUi.Displayed)
-                {
-                    referencedAssemblyUi.Displayed = true;
-                }
-                else referencedAssemblyUi.Displayed = false;
-            };
+            referencedAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new ReferencedAssemblyConfig(project));
         }
 
         protected override void Dispose(bool disposing)
         {
-            // NOTE: May not be necessary unless we need the other managers
+            project = null;
             base.Dispose(disposing);
         }
 
