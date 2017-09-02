@@ -444,6 +444,8 @@ namespace StorybrewEditor
 #if DEBUG
             return;
 #endif
+
+            return; // rip, server =(
             NetHelper.BlockingPost("http://a-damnae.rhcloud.com/storybrew/report.php",
                 new NameValueCollection()
                 {
