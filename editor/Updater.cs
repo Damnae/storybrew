@@ -81,6 +81,13 @@ namespace StorybrewEditor
             var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
             if (fromVersion < new Version(1, 53)) settings.UseRoslyn.Set(true);
             settings.Save();
+
+            if (fromVersion < new Version(1, 57))
+            {
+                var dllPath = Path.Combine(destinationFolder, "ManagedBass.PInvoke.dll");
+                if (File.Exists(dllPath))
+                    Misc.WithRetries(() => File.Delete(dllPath), canThrow: false);
+            }
         }
 
         private static void firstRun()
