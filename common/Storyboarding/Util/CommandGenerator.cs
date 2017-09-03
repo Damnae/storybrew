@@ -48,14 +48,20 @@ namespace StorybrewCommon.Storyboarding.Util
 
         public Action<State> PostProcess;
 
-        public void Add(State state)
+        public void Add(State state, bool before = false)
         {
             if (states.Count == 0 || states[states.Count - 1].Time < state.Time)
                 states.Add(state);
             else
             {
                 var index = states.BinarySearch(state);
-                if (index < 0) index = ~index;
+                if (index >= 0)
+                {
+                    if (before)
+                        while (index > 0 && states[index].Time >= state.Time) index--;
+                    else while (index < states.Count && states[index].Time <= state.Time) index++;
+                }
+                else index = ~index;
                 states.Insert(index, state);
             }
         }

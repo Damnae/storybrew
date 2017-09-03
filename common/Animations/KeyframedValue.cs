@@ -146,14 +146,16 @@ namespace StorybrewCommon.Animations
         private int indexFor(Keyframe<TValue> keyframe, bool before)
         {
             var index = keyframes.BinarySearch(keyframe);
-            if (index < 0) index = ~index;
-
-            if (before)
-                while (index > 0 && keyframes[index].Time >= keyframe.Time) index--;
-            else while (index < keyframes.Count && keyframes[index].Time <= keyframe.Time) index++;
+            if (index >= 0)
+            {
+                if (before)
+                    while (index > 0 && keyframes[index].Time >= keyframe.Time) index--;
+                else while (index < keyframes.Count && keyframes[index].Time <= keyframe.Time) index++;
+            }
+            else index = ~index;
             return index;
         }
-        private int indexAt(double time, bool before) 
+        private int indexAt(double time, bool before)
             => indexFor(new Keyframe<TValue>(time), before);
 
         #region Manipulation

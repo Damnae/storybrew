@@ -12,7 +12,7 @@ namespace StorybrewCommon.Animations
             : this(time, default(TValue))
         {
         }
-        
+
         public Keyframe(double time, TValue value, Func<double, double> easing = null)
         {
             Time = time;
