@@ -37,7 +37,7 @@ namespace StorybrewEditor.UserInterface.Components
         {
             base.Load();
 
-            Button addAssemblyButton;
+            Button addAssemblyButton, addSystemAssemblyButton;
 
             WidgetManager.Root.Add(layout = new LinearLayout(WidgetManager)
             {
@@ -62,6 +62,13 @@ namespace StorybrewEditor.UserInterface.Components
                     addAssemblyButton = new Button(WidgetManager)
                     {
                         Text = "Add assembly file",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
+                    addSystemAssemblyButton = new Button(WidgetManager)
+                    {
+                        Text = "Add system assembly",
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
                         CanGrow = false,
@@ -98,15 +105,30 @@ namespace StorybrewEditor.UserInterface.Components
                         return;
                     }
 
+                    if (isDefaultAssembly(path))
+                        return;
+
                     if (assemblyImported(path))
                     {
                         WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
                         return;
                     }
 
-                    var assembly = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
+                    string assembly;
+
+                    if (isSystemAssembly(path))
+                        assembly = Path.GetFileName(path);
+                    else
+                        assembly = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
+
                     addReferencedAssembly(assembly);
                 });
+
+            addSystemAssemblyButton.OnClick += (sender, e) =>
+            {
+                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select System Assembly",
+                    (result) => addReferencedAssembly($"{result}.dll"), getSystemAssemblies());
+            };
 
             okButton.OnClick += (sender, e) =>
             {
@@ -124,7 +146,17 @@ namespace StorybrewEditor.UserInterface.Components
             layout.Pack(Math.Min(400, width), Math.Min(600, height));
         }
 
-        private string getAssemblyName(string assembly) => AssemblyName.GetAssemblyName(assembly).Name;
+        private string getAssemblyName(string assembly)
+        {
+            try
+            {
+                return AssemblyName.GetAssemblyName(assembly).Name;
+            }
+            catch
+            {
+                return Path.GetFileNameWithoutExtension(assembly);
+            }
+        } 
 
         private string getRelativePath(string assembly) => PathHelper.FolderContainsPath(project.ProjectFolderPath, assembly) ? assembly : Path.Combine(project.ProjectFolderPath, Path.GetFileName(assembly));
 
@@ -144,6 +176,28 @@ namespace StorybrewEditor.UserInterface.Components
         private bool assemblyImported(string assembly) =>
             currentAssemblies.Select(ass => getAssemblyName(ass))
             .Contains(getAssemblyName(assembly));
+
+        private bool isDefaultAssembly(string assembly) =>
+            Project.DefaultReferencedAssemblies.Any(
+                ass => getAssemblyName(ass) == getAssemblyName(assembly));
+
+        private bool isSystemAssembly(string assembly) => getAssemblyName(assembly).StartsWith("System");
+
+        private List<String> getSystemAssemblies()
+        {
+            var assemblyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET\\assembly");
+            List<String> systemAssemblies = new List<String>();
+            foreach (var gac in Directory.GetDirectories(assemblyDirectory))
+            {
+                foreach (var assemblyFolder in Directory.GetDirectories(gac))
+                {
+                    var assembly = PathHelper.GetRelativePath(gac, assemblyFolder);
+                    if (assembly.StartsWith("System"))
+                        systemAssemblies.Add(assembly);
+                }
+            }
+            return systemAssemblies;
+        }
         
         private string copyReferencedAssembly(string assembly)
         {
@@ -166,6 +220,9 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void changeReferencedAssembly(string assembly)
         {
+
+            // TODO: Check if System file. If so, open the context menu instead to change.
+
             WidgetManager.ScreenLayerManager.OpenFilePicker("", "", Path.GetDirectoryName(assembly), ".NET Assemblies (*.dll)|*.dll",
                 (path) =>
                 {
@@ -174,6 +231,9 @@ namespace StorybrewEditor.UserInterface.Components
                         WidgetManager.ScreenLayerManager.ShowMessage("Invalid assembly file. Are you sure that the file is intended for .NET?");
                         return;
                     }
+
+                    if (isDefaultAssembly(path))
+                        return;
 
                     if (currentAssemblies.Where(ass => ass != assembly).Contains(path))
                     {
@@ -196,7 +256,8 @@ namespace StorybrewEditor.UserInterface.Components
         private void refreshAssemblies()
         {
             assembliesLayout.ClearWidgets();
-            foreach (var assembly in currentAssemblies.OrderBy(e => getAssemblyName(e)))
+            var assemblies = currentAssemblies.OrderBy(e => isSystemAssembly(e) ? $"_{e}" : getAssemblyName(e));
+            foreach (var assembly in assemblies)
             {
                 Widget assemblyRoot;
                 Label nameLabel;
