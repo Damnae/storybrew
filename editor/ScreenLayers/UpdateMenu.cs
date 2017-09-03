@@ -1,6 +1,5 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
-using StorybrewEditor.UserInterface;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;

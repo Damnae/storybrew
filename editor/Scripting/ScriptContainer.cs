@@ -1,5 +1,6 @@
-﻿using System;
-using StorybrewCommon.Scripting;
+﻿using StorybrewCommon.Scripting;
+using System;
+using System.Collections.Generic;
 
 namespace StorybrewEditor.Scripting
 {
@@ -9,7 +10,7 @@ namespace StorybrewEditor.Scripting
         string Name { get; }
         string ScriptTypeName { get; }
         string MainSourcePath { get; }
-        string[] ReferencedAssemblies { get; set; }
+        IEnumerable<string> ReferencedAssemblies { get; set; }
         bool HasScript { get; }
 
         event EventHandler OnScriptChanged;

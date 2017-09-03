@@ -21,7 +21,19 @@ namespace StorybrewEditor.Scripting
         private string commonScriptsPath;
         private string scriptsLibraryPath;
         private string compiledScriptsPath;
-        private string[] referencedAssemblies;
+
+        private List<string> referencedAssemblies = new List<string>();
+        public IEnumerable<string> ReferencedAssemblies
+        {
+            get { return referencedAssemblies; }
+            set
+            {
+                referencedAssemblies = new List<string>(value);
+                foreach (var scriptContainer in scriptContainers.Values)
+                    scriptContainer.ReferencedAssemblies = referencedAssemblies;
+                updateSolutionFiles();
+            }
+        }
 
         private FileSystemWatcher scriptWatcher;
         private FileSystemWatcher libraryWatcher;
@@ -30,16 +42,15 @@ namespace StorybrewEditor.Scripting
 
         public string ScriptsPath => scriptsSourcePath;
 
-        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string scriptsLibraryPath, string compiledScriptsPath, params string[] referencedAssemblies)
+        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string scriptsLibraryPath, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
         {
             this.scriptsNamespace = scriptsNamespace;
             this.scriptsSourcePath = scriptsSourcePath;
             this.commonScriptsPath = commonScriptsPath;
             this.scriptsLibraryPath = scriptsLibraryPath;
-            this.referencedAssemblies = referencedAssemblies;
             this.compiledScriptsPath = compiledScriptsPath;
 
-            updateSolutionFiles();
+            ReferencedAssemblies = referencedAssemblies;
 
             scriptWatcher = new FileSystemWatcher()
             {
@@ -114,19 +125,6 @@ namespace StorybrewEditor.Scripting
             }
         }
 
-        public void UpdateReferencedAssemblies(string[] referencedAssemblies)
-        {
-            this.referencedAssemblies = referencedAssemblies;
-
-            foreach(var entry in scriptContainers)
-            {
-                var scriptContainer = entry.Value;
-                scriptContainer.ReferencedAssemblies = referencedAssemblies;
-            }
-
-            updateSolutionFiles();
-        }
-
         private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var change = e.ChangeType.ToString().ToLowerInvariant();
@@ -199,9 +197,9 @@ namespace StorybrewEditor.Scripting
                     compileGroup.AppendChild(compileNode);
                 }
 
-                var importedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(importedAssembliesGroup);
-                var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultReferencedAssemblies.Contains(e));
+                var referencedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
+                document.DocumentElement.AppendChild(referencedAssembliesGroup);
+                var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultAssemblies.Contains(e));
                 foreach (var path in importedAssemblies)
                 {
                     var relativePath = PathHelper.GetRelativePath(scriptsSourcePath, path);
@@ -211,7 +209,7 @@ namespace StorybrewEditor.Scripting
                     var hintPath = document.CreateElement("HintPath", xmlns);
                     hintPath.AppendChild(document.CreateTextNode(relativePath));
                     compileNode.AppendChild(hintPath);
-                    importedAssembliesGroup.AppendChild(compileNode);
+                    referencedAssembliesGroup.AppendChild(compileNode);
                 }
                 document.Save(csProjPath);
             }

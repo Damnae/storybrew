@@ -127,7 +127,7 @@ namespace StorybrewEditor.Storyboarding
                 cleanupFolder(compiledScriptsPath, "*.pdb");
             }
 
-            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
+            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, ReferencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
             layerManager.OnLayersChanged +=
@@ -383,6 +383,36 @@ namespace StorybrewEditor.Storyboarding
 
         #endregion
 
+        #region Assemblies
+
+        private static List<string> defaultAssemblies = new List<string>()
+        {
+            "System.dll",
+            "System.Core.dll",
+            "System.Drawing.dll",
+            "OpenTK.dll",
+            Assembly.GetAssembly(typeof(Script)).Location,
+        };
+        public static IEnumerable<string> DefaultAssemblies => defaultAssemblies;
+
+        private List<string> importedAssemblies = new List<string>();
+        public IEnumerable<string> ImportedAssemblies
+        {
+            get { return importedAssemblies; }
+            set
+            {
+                if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+
+                importedAssemblies = new List<string>(value);
+                scriptManager.ReferencedAssemblies = ReferencedAssemblies;
+            }
+        }
+
+        public IEnumerable<string> ReferencedAssemblies
+            => DefaultAssemblies.Concat(importedAssemblies);
+
+        #endregion
+
         #region Save / Load / Export
 
         public const int Version = 5;
@@ -454,9 +484,7 @@ namespace StorybrewEditor.Storyboarding
 
                 w.Write(importedAssemblies.Count);
                 foreach (var assembly in importedAssemblies)
-                {
                     w.Write(assembly);
-                }
 
                 stream.Commit();
                 changed = false;
@@ -522,7 +550,7 @@ namespace StorybrewEditor.Storyboarding
                 }
 
                 var layerCount = r.ReadInt32();
-                for (int layerIndex = 0; layerIndex < layerCount; layerIndex++)
+                for (var layerIndex = 0; layerIndex < layerCount; layerIndex++)
                 {
                     var identifier = r.ReadString();
                     var effectIndex = r.ReadInt32();
@@ -542,13 +570,13 @@ namespace StorybrewEditor.Storyboarding
                 if (version >= 5)
                 {
                     var assemblyCount = r.ReadInt32();
-                    var currentAssemblies = new List<String>();
-                    for (int assemblyIndex = 0; assemblyIndex < assemblyCount; assemblyIndex++)
+                    var importedAssemblies = new List<string>();
+                    for (var assemblyIndex = 0; assemblyIndex < assemblyCount; assemblyIndex++)
                     {
                         var assembly = r.ReadString();
-                        currentAssemblies.Add(assembly);
+                        importedAssemblies.Add(assembly);
                     }
-                    project.SetImportedAssemblies(currentAssemblies);
+                    project.ImportedAssemblies = importedAssemblies;
                 }
             }
             return project;
@@ -690,31 +718,6 @@ namespace StorybrewEditor.Storyboarding
                 {
                     Trace.WriteLine($"{filename} couldn't be deleted: {e.Message}");
                 }
-        }
-
-        #endregion
-
-        #region Settings
-
-        // Referenced assemblies
-        public static List<String> DefaultReferencedAssemblies = new List<String>
-            {
-                "System.dll",
-                "System.Core.dll",
-                "System.Drawing.dll",
-                "OpenTK.dll",
-                Assembly.GetAssembly(typeof(Script)).Location,
-            };
-        private List<String> importedAssemblies = new List<String>();
-        public List<String> ImportedAssemblies => importedAssemblies;
-        private string[] referencedAssemblies => DefaultReferencedAssemblies.Concat(importedAssemblies).ToArray();
-        public string[] ReferencedAssemblies => referencedAssemblies;
-
-        public void SetImportedAssemblies(List<String> importedAssemblies)
-        {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
-            this.importedAssemblies = importedAssemblies;
-            scriptManager.UpdateReferencedAssemblies(ReferencedAssemblies);
         }
 
         #endregion

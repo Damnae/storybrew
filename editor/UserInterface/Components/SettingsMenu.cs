@@ -1,14 +1,8 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
-using System;
-using System.Collections.Generic;
 using StorybrewEditor.Storyboarding;
-using StorybrewEditor.ScreenLayers;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StorybrewEditor.UserInterface.Components
 {

@@ -1,7 +1,6 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
-using StorybrewEditor.UserInterface;
 
 namespace StorybrewEditor.ScreenLayers.Test
 {

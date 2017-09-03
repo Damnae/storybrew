@@ -1,12 +1,10 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
 using Newtonsoft.Json.Linq;
-using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace StorybrewEditor.ScreenLayers

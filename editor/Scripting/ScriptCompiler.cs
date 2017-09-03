@@ -12,7 +12,7 @@ namespace StorybrewEditor.Scripting
     {
         private static int nextId;
 
-        public static void Compile(string[] sourcePaths, string outputPath, params string[] referencedAssemblies)
+        public static void Compile(string[] sourcePaths, string outputPath, IEnumerable<string> referencedAssemblies)
         {
             var setup = new AppDomainSetup()
             {
@@ -36,7 +36,7 @@ namespace StorybrewEditor.Scripting
             }
         }
 
-        private void compile(string[] sourcePaths, string outputPath, bool useRoslyn, params string[] referencedAssemblies)
+        private void compile(string[] sourcePaths, string outputPath, bool useRoslyn, IEnumerable<string> referencedAssemblies)
         {
             var parameters = new CompilerParameters()
             {
