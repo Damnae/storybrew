@@ -20,6 +20,12 @@ namespace StorybrewCommon.Animations
             Ease = easing ?? EasingFunctions.Linear;
         }
 
+        public Keyframe<TValue> WithTime(double time)
+            => new Keyframe<TValue>(time, Value, Ease);
+
+        public Keyframe<TValue> WithValue(TValue value)
+            => new Keyframe<TValue>(Time, value, Ease);
+
         public int CompareTo(Keyframe<TValue> other)
         {
             return Math.Sign(Time - other.Time);

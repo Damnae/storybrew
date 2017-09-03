@@ -100,7 +100,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 else if (wasVisible && !isVisible)
                 {
                     addKeyframes(state, time);
-                    commitKeyframes(imageSize, loopable);
+                    commitKeyframes(imageSize);
                     stateAdded = true;
                 }
                 else if (isVisible)
@@ -115,35 +115,31 @@ namespace StorybrewCommon.Storyboarding.Util
             }
 
             if (wasVisible)
-                commitKeyframes(imageSize, loopable);
+                commitKeyframes(imageSize);
 
             if (everVisible)
             {
                 if (action != null)
-                    action(() => convertToCommands(sprite), sprite);
-                else convertToCommands(sprite);
+                    action(() => convertToCommands(sprite, timeOffset, loopable), sprite);
+                else convertToCommands(sprite, timeOffset, loopable);
             }
 
             clearFinalKeyframes();
             return everVisible;
         }
 
-        private void commitKeyframes(Vector2 imageSize, bool loopable)
+        private void commitKeyframes(Vector2 imageSize)
         {
             positions.Simplify2dKeyframes(PositionTolerance, p => p);
-            if (loopable) positions.MakeLoopable();
             positions.TransferKeyframes(finalPositions);
 
             scales.Simplify2dKeyframes(ScaleTolerance, s => new Vector2(s.X * imageSize.X, s.Y * imageSize.Y));
-            if (loopable) scales.MakeLoopable();
             scales.TransferKeyframes(finalScales);
 
             rotations.Simplify1dKeyframes(RotationTolerance, a => a);
-            if (loopable) rotations.MakeLoopable();
             rotations.TransferKeyframes(finalRotations);
 
             colors.Simplify3dKeyframes(ColorTolerance, c => new Vector3(c.R, c.G, c.B));
-            if (loopable) colors.MakeLoopable();
             colors.TransferKeyframes(finalColors);
 
             opacities.Simplify1dKeyframes(OpacityTolerance, o => o);
@@ -152,24 +148,26 @@ namespace StorybrewCommon.Storyboarding.Util
             opacities.TransferKeyframes(finalOpacities);
         }
 
-        private void convertToCommands(OsbSprite sprite)
+        private void convertToCommands(OsbSprite sprite, double timeOffset, bool loopable)
         {
+            var startStateTime = loopable ? StartState.Time + timeOffset : (double?)null;
+            var endStateTime = loopable ? EndState.Time + timeOffset : (double?)null;
+
             finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240),
-                p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)));
+                p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startStateTime);
             var useVectorScaling = finalScales.Any(k => k.Value.X != k.Value.Y);
             finalScales.ForEachPair((start, end) =>
             {
                 if (useVectorScaling)
                     sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value);
                 else sprite.Scale(start.Time, end.Time, start.Value.X, end.Value.X);
-
-            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)));
+            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)), startStateTime);
             finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0,
-                r => (float)Math.Round(r, RotationDecimals));
+                r => (float)Math.Round(r, RotationDecimals), startStateTime);
             finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White,
-                c => CommandColor.FromRgb(c.R, c.G, c.B));
+                c => CommandColor.FromRgb(c.R, c.G, c.B), startStateTime);
             finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1,
-                o => (float)Math.Round(o, OpacityDecimals));
+                o => (float)Math.Round(o, OpacityDecimals), startStateTime, endStateTime);
 
             flipH.ForEachFlag((startTime, endTime) => sprite.FlipH(startTime, endTime));
             flipV.ForEachFlag((startTime, endTime) => sprite.FlipV(startTime, endTime));

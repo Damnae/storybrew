@@ -31,17 +31,6 @@ namespace StorybrewCommon.Animations
                 action(startTime, lastKeyframeTime);
         }
 
-        public static void MakeLoopable<TValue>(this KeyframedValue<TValue> keyframes)
-        {
-            var startValue = keyframes.StartValue;
-            var endValue = keyframes.EndValue;
-            if (startValue.Equals(endValue))
-                return;
-
-            keyframes.Add(keyframes.StartTime, endValue, before: true);
-            keyframes.Add(keyframes.EndTime, startValue);
-        }
-
         public static KeyframedValue<Vector2> Add(this KeyframedValue<Vector2> keyframes, double time, float x, float y, Func<double, double> easing = null)
         {
             keyframes.Add(time, new Vector2(x, y), easing);
