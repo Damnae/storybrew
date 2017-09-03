@@ -124,10 +124,8 @@ namespace StorybrewEditor.UserInterface.Components
                     (result) =>
                     {
                         var path = $"{result}.dll";
-
                         if (validateAssembly(path))
                             addReferencedAssembly(path);
-                        
                     }, getSystemAssemblies());
             };
 
