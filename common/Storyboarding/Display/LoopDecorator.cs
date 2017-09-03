@@ -46,9 +46,12 @@ namespace StorybrewCommon.Storyboarding.Display
             }
 
             if (repeatTime < command.StartTime)
-                if (repeated && repeatTime < command.StartTime) return command.EndValue;
+                if (repeated && repeatTime < command.StartTime)
+                    return command.EndValue;
                 else return command.StartValue;
-            if (command.EndTime < repeatTime) return command.EndValue;
+
+            if (command.EndTime < repeatTime)
+                return command.EndValue;
             return command.ValueAtTime(repeatTime);
         }
 
