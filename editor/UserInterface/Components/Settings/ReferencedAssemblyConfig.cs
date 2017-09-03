@@ -127,7 +127,22 @@ namespace StorybrewEditor.UserInterface.Components
             addSystemAssemblyButton.OnClick += (sender, e) =>
             {
                 WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select System Assembly",
-                    (result) => addReferencedAssembly($"{result}.dll"), getSystemAssemblies());
+                    (result) =>
+                    {
+                        var path = $"{result}.dll";
+
+                        if (isDefaultAssembly(path))
+                            return;
+
+                        if (assemblyImported(path))
+                        {
+                            WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
+                            return;
+                        }
+
+                        addReferencedAssembly(path);
+
+                    }, getSystemAssemblies());
             };
 
             okButton.OnClick += (sender, e) =>
@@ -220,37 +235,59 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void changeReferencedAssembly(string assembly)
         {
-
-            // TODO: Check if System file. If so, open the context menu instead to change.
-
-            WidgetManager.ScreenLayerManager.OpenFilePicker("", "", Path.GetDirectoryName(assembly), ".NET Assemblies (*.dll)|*.dll",
-                (path) =>
-                {
-                    if (!isValidAssembly(path))
+            if (isSystemAssembly(assembly))
+            {
+                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select System Assembly",
+                    (result) =>
                     {
-                        WidgetManager.ScreenLayerManager.ShowMessage("Invalid assembly file. Are you sure that the file is intended for .NET?");
-                        return;
-                    }
+                        var newPath = $"{result}.dll";
 
-                    if (isDefaultAssembly(path))
-                        return;
+                        if (isDefaultAssembly(newPath))
+                            return;
 
-                    if (currentAssemblies.Where(ass => ass != assembly).Contains(path))
+                        if (currentAssemblies.Where(ass => ass != assembly).Contains(newPath))
+                        {
+                            WidgetManager.ScreenLayerManager.ShowMessage("Cannot change file.  An assembly of the same file name already exists.");
+                            return;
+                        }
+
+                        currentAssemblies.Remove(assembly);
+                        currentAssemblies.Add(newPath);
+
+                        refreshAssemblies();
+                    }, getSystemAssemblies());
+            }
+            else
+            {
+                WidgetManager.ScreenLayerManager.OpenFilePicker("", "", Path.GetDirectoryName(assembly), ".NET Assemblies (*.dll)|*.dll",
+                    (path) =>
                     {
-                        WidgetManager.ScreenLayerManager.ShowMessage("Cannot change file.  An assembly of the same file name already exists.");
-                        return;
-                    }
+                        if (!isValidAssembly(path))
+                        {
+                            WidgetManager.ScreenLayerManager.ShowMessage("Invalid assembly file. Are you sure that the file is intended for .NET?");
+                            return;
+                        }
 
-                    var newPath = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
+                        if (isDefaultAssembly(path))
+                            return;
 
-                    if (path == assembly)
-                        return;
+                        if (currentAssemblies.Where(ass => ass != assembly).Contains(path))
+                        {
+                            WidgetManager.ScreenLayerManager.ShowMessage("Cannot change file.  An assembly of the same file name already exists.");
+                            return;
+                        }
 
-                    currentAssemblies.Remove(assembly);
-                    currentAssemblies.Add(newPath);
+                        var newPath = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
 
-                    refreshAssemblies();
-                });
+                        if (path == assembly)
+                            return;
+
+                        currentAssemblies.Remove(assembly);
+                        currentAssemblies.Add(newPath);
+
+                        refreshAssemblies();
+                    });
+            }
         }
 
         private void refreshAssemblies()
