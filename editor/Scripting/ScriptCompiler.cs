@@ -64,9 +64,13 @@ namespace StorybrewEditor.Scripting
                     for (var i = 0; i < errors.Count; i++)
                     {
                         var error = errors[i];
-                        message.AppendLine($"{error.FileName}, line {error.Line}: {error.ErrorText}");
-                        if (i == errors.Count - 1 || error.Line != errors[i + 1].Line)
-                            message.AppendLine(sourceLines[error.FileName.ToLowerInvariant()][error.Line - 1]);
+                        if (!string.IsNullOrWhiteSpace(error.FileName))
+                        {
+                            message.AppendLine($"{error.FileName}, line {error.Line}: {error.ErrorText}");
+                            if (i == errors.Count - 1 || error.Line != errors[i + 1].Line)
+                                message.AppendLine(sourceLines[error.FileName.ToLowerInvariant()][error.Line - 1]);
+                        }
+                        else message.AppendLine(error.ErrorText);
                     }
                     throw new ScriptCompilationException(message.ToString());
                 }
