@@ -9,6 +9,7 @@ namespace StorybrewEditor.Scripting
         string Name { get; }
         string ScriptTypeName { get; }
         string MainSourcePath { get; }
+        string[] ReferencedAssemblies { get; set; }
         bool HasScript { get; }
 
         event EventHandler OnScriptChanged;
