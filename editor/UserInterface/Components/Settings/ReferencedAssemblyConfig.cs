@@ -120,13 +120,17 @@ namespace StorybrewEditor.UserInterface.Components
 
             addSystemAssemblyButton.OnClick += (sender, e) =>
             {
-                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select Assembly",
+                tryCatchSystemAssemblies(() =>
+                {
+                    var systemAssemblies = getSystemAssemblies();
+                    WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select Assembly",
                     (result) =>
                     {
                         var path = $"{result}.dll";
                         if (validateAssembly(path))
                             addReferencedAssembly(path);
-                    }, getSystemAssemblies());
+                    }, systemAssemblies);
+                });
             };
 
             okButton.OnClick += (sender, e) =>
@@ -185,17 +189,7 @@ namespace StorybrewEditor.UserInterface.Components
         private bool isSystemAssembly(string assembly) => getAssemblyName(assembly).StartsWith("System");
 
         private bool validateAssembly(string assembly, List<String> assemblies)
-        {
-            if (isDefaultAssembly(assembly))
-                return false;
-
-            if (assemblyImported(assembly, assemblies))
-            {
-                WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
-                return false;
-            }
-            return true;
-        }
+            => !(isDefaultAssembly(assembly) || assemblyImported(assembly, assemblies));
 
         private bool validateAssembly(string assembly) => validateAssembly(assembly, currentAssemblies);
 
@@ -203,16 +197,17 @@ namespace StorybrewEditor.UserInterface.Components
         {
             var assemblyDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET\\assembly");
             List<String> systemAssemblies = new List<String>();
+            var badSuffixes = new[] { "resources", "Resources", "Printing", "Speech", "VisualStudio.11.0" };
             foreach (var gac in Directory.GetDirectories(assemblyDirectory))
             {
                 foreach (var assemblyFolder in Directory.GetDirectories(gac))
                 {
                     var assembly = PathHelper.GetRelativePath(gac, assemblyFolder);
-                    if (assembly.StartsWith("System"))
+                    if (assembly.StartsWith("System") && !badSuffixes.Any(token => assembly.EndsWith(token)))
                         systemAssemblies.Add(assembly);
                 }
             }
-            return systemAssemblies;
+            return systemAssemblies.Distinct().OrderBy(e => e).ToList();
         }
         
         private string copyReferencedAssembly(string assembly)
@@ -238,7 +233,10 @@ namespace StorybrewEditor.UserInterface.Components
         {
             if (isSystemAssembly(assembly))
             {
-                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select Assembly",
+                tryCatchSystemAssemblies(() =>
+                {
+                    var systemAssemblies = getSystemAssemblies();
+                    WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select Assembly",
                     (result) =>
                     {
                         var newPath = $"{result}.dll";
@@ -249,8 +247,9 @@ namespace StorybrewEditor.UserInterface.Components
                             currentAssemblies.Remove(assembly);
                             currentAssemblies.Add(newPath);
                             refreshAssemblies();
-                        }                        
-                    }, getSystemAssemblies());
+                        }
+                    }, systemAssemblies);
+                });
             }
             else
             {
@@ -277,6 +276,22 @@ namespace StorybrewEditor.UserInterface.Components
                             refreshAssemblies();
                         }
                     });
+            }
+        }
+
+        private void tryCatchSystemAssemblies(Action a)
+        {
+            try
+            {
+                a.Invoke();
+            }
+            catch (DirectoryNotFoundException)
+            {
+                WidgetManager.ScreenLayerManager.ShowMessage("Cannot find Global Assembly Cache folders. Consider your installation of the .NET framework.");
+            }
+            catch (Exception exception)
+            {
+                WidgetManager.ScreenLayerManager.ShowMessage($"An error occurred. Check your .NET Framework installation.\nException:\n{exception}");
             }
         }
 
