@@ -145,10 +145,10 @@ namespace StorybrewCommon.Storyboarding3d
             }
         }
 
-        public override void GenerateCommands(Action<Action, OsbSprite> action, double timeOffset, bool loopable)
+        public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
-            Generator0.GenerateCommands(sprite0, action, timeOffset, loopable);
-            Generator1.GenerateCommands(sprite1, action, timeOffset, loopable);
+            Generator0.GenerateCommands(sprite0, action, startTime, endTime, timeOffset, loopable);
+            Generator1.GenerateCommands(sprite1, action, startTime, endTime, timeOffset, loopable);
         }
 
         private static Vector2 project(Vector2 line1, Vector2 line2, Vector2 toProject)

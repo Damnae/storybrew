@@ -36,7 +36,7 @@ namespace StorybrewCommon.Storyboarding3d
             Root.GenerateTreeSprite(defaultLayer);
             for (var time = startTime; time < endTime + 5; time += timeStep)
                 Root.GenerateTreeStates(time, camera);
-            Root.GenerateTreeLoopCommands(startTime, loopCount, action, offsetCommands: true);
+            Root.GenerateTreeLoopCommands(startTime, endTime, loopCount, action, offsetCommands: true);
         }
     }
 }

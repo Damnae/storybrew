@@ -69,10 +69,10 @@ namespace StorybrewCommon.Storyboarding.Util
         public void ClearStates()
             => states.Clear();
 
-        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double timeOffset = 0, bool loopable = false)
-            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action, timeOffset);
+        public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
+            => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action, startTime, endTime, timeOffset, loopable);
 
-        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double timeOffset = 0, bool loopable = false)
+        public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
         {
             var previousState = (State)null;
             var wasVisible = false;
@@ -120,8 +120,8 @@ namespace StorybrewCommon.Storyboarding.Util
             if (everVisible)
             {
                 if (action != null)
-                    action(() => convertToCommands(sprite, timeOffset, loopable), sprite);
-                else convertToCommands(sprite, timeOffset, loopable);
+                    action(() => convertToCommands(sprite, startTime, endTime, timeOffset, loopable), sprite);
+                else convertToCommands(sprite, startTime, endTime, timeOffset, loopable);
             }
 
             clearFinalKeyframes();
@@ -148,10 +148,10 @@ namespace StorybrewCommon.Storyboarding.Util
             opacities.TransferKeyframes(finalOpacities);
         }
 
-        private void convertToCommands(OsbSprite sprite, double timeOffset, bool loopable)
+        private void convertToCommands(OsbSprite sprite, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
-            var startStateTime = loopable ? StartState.Time + timeOffset : (double?)null;
-            var endStateTime = loopable ? EndState.Time + timeOffset : (double?)null;
+            var startStateTime = loopable ? (startTime ?? StartState.Time) + timeOffset : (double?)null;
+            var endStateTime = loopable ? (endTime ?? EndState.Time) + timeOffset : (double?)null;
 
             finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240),
                 p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startStateTime);
@@ -169,9 +169,9 @@ namespace StorybrewCommon.Storyboarding.Util
             finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1,
                 o => (float)Math.Round(o, OpacityDecimals), startStateTime, endStateTime);
 
-            flipH.ForEachFlag((startTime, endTime) => sprite.FlipH(startTime, endTime));
-            flipV.ForEachFlag((startTime, endTime) => sprite.FlipV(startTime, endTime));
-            additive.ForEachFlag((startTime, endTime) => sprite.Additive(startTime, endTime));
+            flipH.ForEachFlag((fromTime, toTime) => sprite.FlipH(fromTime, toTime));
+            flipV.ForEachFlag((fromTime, toTime) => sprite.FlipV(fromTime, toTime));
+            additive.ForEachFlag((fromTime, toTime) => sprite.Additive(fromTime, toTime));
         }
 
         private void addKeyframes(State state, double time)
