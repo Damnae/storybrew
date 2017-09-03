@@ -105,43 +105,29 @@ namespace StorybrewEditor.UserInterface.Components
                         return;
                     }
 
-                    if (isDefaultAssembly(path))
-                        return;
-
-                    if (assemblyImported(path))
+                    if (validateAssembly(path))
                     {
-                        WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
-                        return;
+                        string assembly;
+
+                        if (isSystemAssembly(path))
+                            assembly = Path.GetFileName(path);
+                        else
+                            assembly = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
+
+                        addReferencedAssembly(assembly);
                     }
-
-                    string assembly;
-
-                    if (isSystemAssembly(path))
-                        assembly = Path.GetFileName(path);
-                    else
-                        assembly = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
-
-                    addReferencedAssembly(assembly);
                 });
 
             addSystemAssemblyButton.OnClick += (sender, e) =>
             {
-                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select System Assembly",
+                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select Assembly",
                     (result) =>
                     {
                         var path = $"{result}.dll";
 
-                        if (isDefaultAssembly(path))
-                            return;
-
-                        if (assemblyImported(path))
-                        {
-                            WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
-                            return;
-                        }
-
-                        addReferencedAssembly(path);
-
+                        if (validateAssembly(path))
+                            addReferencedAssembly(path);
+                        
                     }, getSystemAssemblies());
             };
 
@@ -188,15 +174,32 @@ namespace StorybrewEditor.UserInterface.Components
             return true;
         }
 
-        private bool assemblyImported(string assembly) =>
-            currentAssemblies.Select(ass => getAssemblyName(ass))
+        private bool assemblyImported(string assembly, List<String> assemblies) =>
+            assemblies.Select(ass => getAssemblyName(ass))
             .Contains(getAssemblyName(assembly));
+
+        private bool assemblyImported(string assembly) => assemblyImported(assembly, currentAssemblies);
 
         private bool isDefaultAssembly(string assembly) =>
             Project.DefaultReferencedAssemblies.Any(
                 ass => getAssemblyName(ass) == getAssemblyName(assembly));
 
         private bool isSystemAssembly(string assembly) => getAssemblyName(assembly).StartsWith("System");
+
+        private bool validateAssembly(string assembly, List<String> assemblies)
+        {
+            if (isDefaultAssembly(assembly))
+                return false;
+
+            if (assemblyImported(assembly, assemblies))
+            {
+                WidgetManager.ScreenLayerManager.ShowMessage("Cannot import assembly file. An assembly of the same name already exists.");
+                return false;
+            }
+            return true;
+        }
+
+        private bool validateAssembly(string assembly) => validateAssembly(assembly, currentAssemblies);
 
         private List<String> getSystemAssemblies()
         {
@@ -237,24 +240,18 @@ namespace StorybrewEditor.UserInterface.Components
         {
             if (isSystemAssembly(assembly))
             {
-                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select System Assembly",
+                WidgetManager.ScreenLayerManager.ShowContextMenu<string>("Select Assembly",
                     (result) =>
                     {
                         var newPath = $"{result}.dll";
+                        var assemblies = currentAssemblies.Where(ass => ass != assembly).ToList();
 
-                        if (isDefaultAssembly(newPath))
-                            return;
-
-                        if (currentAssemblies.Where(ass => ass != assembly).Contains(newPath))
+                        if (validateAssembly(newPath, assemblies))
                         {
-                            WidgetManager.ScreenLayerManager.ShowMessage("Cannot change file.  An assembly of the same file name already exists.");
-                            return;
-                        }
-
-                        currentAssemblies.Remove(assembly);
-                        currentAssemblies.Add(newPath);
-
-                        refreshAssemblies();
+                            currentAssemblies.Remove(assembly);
+                            currentAssemblies.Add(newPath);
+                            refreshAssemblies();
+                        }                        
                     }, getSystemAssemblies());
             }
             else
@@ -268,24 +265,19 @@ namespace StorybrewEditor.UserInterface.Components
                             return;
                         }
 
-                        if (isDefaultAssembly(path))
-                            return;
+                        var assemblies = currentAssemblies.Where(ass => ass != assembly).ToList();
 
-                        if (currentAssemblies.Where(ass => ass != assembly).Contains(path))
+                        if (validateAssembly(path, assemblies))
                         {
-                            WidgetManager.ScreenLayerManager.ShowMessage("Cannot change file.  An assembly of the same file name already exists.");
-                            return;
+                            var newPath = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
+
+                            if (path == assembly)
+                                return;
+
+                            currentAssemblies.Remove(assembly);
+                            currentAssemblies.Add(newPath);
+                            refreshAssemblies();
                         }
-
-                        var newPath = PathHelper.FolderContainsPath(project.ProjectFolderPath, path) ? path : copyReferencedAssembly(path);
-
-                        if (path == assembly)
-                            return;
-
-                        currentAssemblies.Remove(assembly);
-                        currentAssemblies.Add(newPath);
-
-                        refreshAssemblies();
                     });
             }
         }
