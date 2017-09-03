@@ -1,6 +1,6 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
-using StorybrewEditor.UserInterface;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 
@@ -14,6 +14,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private LinearLayout mainLayout;
         private LinearLayout optionsLayout;
+        private Textbox searchTextbox;
         private Button cancelButton;
 
         public override bool IsPopup => true;
@@ -65,6 +66,11 @@ namespace StorybrewEditor.ScreenLayers
                             {
                                 Text = title,
                             },
+                            searchTextbox = new Textbox(WidgetManager)
+                            {
+                                AnchorFrom = BoxAlignment.Centre,
+                                DefaultSize = new Vector2(120, 0),
+                            },
                             cancelButton = new Button(WidgetManager)
                             {
                                 StyleName = "icon",
@@ -82,8 +88,18 @@ namespace StorybrewEditor.ScreenLayers
             });
             cancelButton.OnClick += (sender, e) => Exit();
 
+            searchTextbox.OnValueChanged += (sender, e) => refreshOptions();
+            refreshOptions();
+        }
+        
+        private void refreshOptions()
+        {
+            optionsLayout.ClearWidgets();
             foreach (var option in options)
             {
+                if (!string.IsNullOrEmpty(searchTextbox.Value) && !option.Name.ToLowerInvariant().Contains(searchTextbox.Value.ToLowerInvariant()))
+                    continue;
+
                 Button button;
                 optionsLayout.Add(button = new Button(WidgetManager)
                 {
@@ -99,6 +115,12 @@ namespace StorybrewEditor.ScreenLayers
                     Exit();
                 };
             }
+        }
+
+        public override void OnTransitionIn()
+        {
+            base.OnTransitionIn();
+            WidgetManager.KeyboardFocus = searchTextbox;
         }
 
         public override void Resize(int width, int height)

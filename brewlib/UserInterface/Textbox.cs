@@ -52,10 +52,10 @@ namespace BrewLib.UserInterface
             {
                 var contentSize = content.PreferredSize;
                 if (string.IsNullOrWhiteSpace(label.Text))
-                    return new Vector2(Math.Max(contentSize.X, 200), contentSize.Y);
+                    return new Vector2(Math.Max(contentSize.X, DefaultSize.X), contentSize.Y);
 
                 var labelSize = label.PreferredSize;
-                return new Vector2(Math.Max(labelSize.X, 200), labelSize.Y + contentSize.Y);
+                return new Vector2(Math.Max(labelSize.X, DefaultSize.X), labelSize.Y + contentSize.Y);
             }
         }
 
@@ -109,6 +109,8 @@ namespace BrewLib.UserInterface
 
         public Textbox(WidgetManager manager) : base(manager)
         {
+            DefaultSize = new Vector2(200, 0);
+
             cursorLine = new Sprite()
             {
                 Texture = DrawState.WhitePixel,

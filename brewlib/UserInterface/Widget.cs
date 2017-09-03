@@ -445,7 +445,9 @@ namespace BrewLib.UserInterface
 
         public virtual Vector2 MinSize => PreferredSize;
         public virtual Vector2 MaxSize => Vector2.Zero;
-        public virtual Vector2 PreferredSize => Vector2.Zero;
+        public virtual Vector2 PreferredSize => DefaultSize;
+
+        public Vector2 DefaultSize = Vector2.Zero;
 
         private bool canGrow = true;
         public bool CanGrow
