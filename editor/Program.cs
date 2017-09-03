@@ -186,9 +186,10 @@ namespace StorybrewEditor
 
         private static AudioManager createAudioManager(GameWindow window)
         {
-            var audioManager = new AudioManager(window.GetWindowHandle());
-
-            audioManager.Volume = Settings.Volume;
+            var audioManager = new AudioManager(window.GetWindowHandle())
+            {
+                Volume = Settings.Volume,
+            };
             Settings.Volume.OnValueChanged += (sender, e) => audioManager.Volume = Settings.Volume;
 
             return audioManager;
@@ -443,6 +444,8 @@ namespace StorybrewEditor
 #if DEBUG
             return;
 #endif
+
+            return; // rip, server =(
             NetHelper.BlockingPost("http://a-damnae.rhcloud.com/storybrew/report.php",
                 new NameValueCollection()
                 {
