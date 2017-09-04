@@ -85,7 +85,7 @@ namespace StorybrewCommon.Animations
 
         public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair,
             TValue defaultValue = default(TValue), Func<TValue, TValue> edit = null,
-            double? explicitStartTime = null, double? explicitEndTime = null)
+            double? explicitStartTime = null, double? explicitEndTime = null, bool loopable = false)
         {
             var startTime = explicitStartTime ?? keyframes[0].Time;
             var endTime = explicitEndTime ?? keyframes[keyframes.Count - 1].Time;
@@ -113,22 +113,22 @@ namespace StorybrewCommon.Animations
                     {
                         if (!hasPair && explicitStartTime.HasValue && startTime < stepStart.Value.Time)
                         {
-                            var initialPair = new Keyframe<TValue>(startTime, stepStart.Value.Value);
-                            pair(initialPair, initialPair);
+                                var initialPair = stepStart.Value.WithTime(startTime);
+                                pair(initialPair, loopable ? stepStart.Value : initialPair);
                         }
-
-                        pair(stepStart.Value, startKeyframe);
-                        previousPairEnd = startKeyframe;
-                        stepStart = null;
-                        hasPair = true;
+                        
+                            pair(stepStart.Value, startKeyframe);
+                            previousPairEnd = startKeyframe;
+                            stepStart = null;
+                            hasPair = true;
                     }
 
                     if (!isStep && !isFlat)
                     {
                         if (!hasPair && explicitStartTime.HasValue && startTime < startKeyframe.Time)
                         {
-                            var initialPair = new Keyframe<TValue>(startTime, startKeyframe.Value);
-                            pair(initialPair, initialPair);
+                            var initialPair = startKeyframe.WithTime(startTime);
+                            pair(initialPair, loopable ? startKeyframe : initialPair);
                         }
 
                         pair(startKeyframe, endKeyframe);
@@ -143,9 +143,13 @@ namespace StorybrewCommon.Animations
             {
                 if (!hasPair && explicitStartTime.HasValue && startTime < stepStart.Value.Time)
                 {
-                    var initialPair = new Keyframe<TValue>(startTime, stepStart.Value.Value);
-                    pair(initialPair, initialPair);
+                    var initialPair = stepStart.Value.WithTime(startTime);
+                    pair(loopable && previousPairEnd.HasValue ? previousPairEnd.Value : initialPair, initialPair);
                 }
+                /*
+                else if (loopable && previous.Value.Time == endTime && previousPairEnd.HasValue && previousPairEnd.Value.Time < stepStart.Value.Time)
+                    pair(previousPairEnd.Value, stepStart.Value);
+                 */
 
                 pair(stepStart.Value, previous.Value);
                 previousPairEnd = previous.Value;
@@ -158,8 +162,9 @@ namespace StorybrewCommon.Animations
                 var first = editKeyframe(keyframes[0], edit).WithTime(startTime);
                 if (!first.Value.Equals(defaultValue))
                 {
-                    pair(first, first);
-                    previousPairEnd = first;
+                    var last = loopable ? first.WithTime(endTime) : first;
+                    pair(first, last);
+                    previousPairEnd = last;
                     hasPair = true;
                 }
             }
@@ -167,7 +172,7 @@ namespace StorybrewCommon.Animations
             if (hasPair && explicitEndTime.HasValue && previousPairEnd.Value.Time < endTime)
             {
                 var endPair = previousPairEnd.Value.WithTime(endTime);
-                pair(endPair, endPair);
+                pair(loopable ? previousPairEnd.Value : endPair, endPair);
             }
         }
 

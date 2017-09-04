@@ -154,20 +154,20 @@ namespace StorybrewCommon.Storyboarding.Util
             var endStateTime = loopable ? (endTime ?? EndState.Time) + timeOffset : (double?)null;
 
             finalPositions.ForEachPair((start, end) => sprite.Move(start.Time, end.Time, start.Value, end.Value), new Vector2(320, 240),
-                p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startStateTime);
+                p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startStateTime, loopable: loopable);
             var useVectorScaling = finalScales.Any(k => k.Value.X != k.Value.Y);
             finalScales.ForEachPair((start, end) =>
             {
                 if (useVectorScaling)
                     sprite.ScaleVec(start.Time, end.Time, start.Value, end.Value);
                 else sprite.Scale(start.Time, end.Time, start.Value.X, end.Value.X);
-            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)), startStateTime);
+            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)), startStateTime, loopable: loopable);
             finalRotations.ForEachPair((start, end) => sprite.Rotate(start.Time, end.Time, start.Value, end.Value), 0,
-                r => (float)Math.Round(r, RotationDecimals), startStateTime);
+                r => (float)Math.Round(r, RotationDecimals), startStateTime, loopable: loopable);
             finalColors.ForEachPair((start, end) => sprite.Color(start.Time, end.Time, start.Value, end.Value), CommandColor.White,
-                c => CommandColor.FromRgb(c.R, c.G, c.B), startStateTime);
+                c => CommandColor.FromRgb(c.R, c.G, c.B), startStateTime, loopable: loopable);
             finalOpacities.ForEachPair((start, end) => sprite.Fade(start.Time, end.Time, start.Value, end.Value), -1,
-                o => (float)Math.Round(o, OpacityDecimals), startStateTime, endStateTime);
+                o => (float)Math.Round(o, OpacityDecimals), startStateTime, endStateTime, loopable: loopable);
 
             flipH.ForEachFlag((fromTime, toTime) => sprite.FlipH(fromTime, toTime));
             flipV.ForEachFlag((fromTime, toTime) => sprite.FlipV(fromTime, toTime));
