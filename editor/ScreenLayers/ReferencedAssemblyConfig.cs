@@ -1,6 +1,5 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
-using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace StorybrewEditor.UserInterface.Components
+namespace StorybrewEditor.ScreenLayers
 {
     public class ReferencedAssemblyConfig : UiScreenLayer
     {

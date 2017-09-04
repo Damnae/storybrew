@@ -102,7 +102,7 @@
     <Compile Include="Processes\ProcessWorker.cs" />
     <Compile Include="Storyboarding\EditorOsbSample.cs" />
     <Compile Include="Storyboarding\EventObject.cs" />
-    <Compile Include="UserInterface\Components\Settings\ReferencedAssemblyConfig.cs" />
+    <Compile Include="ScreenLayers\ReferencedAssemblyConfig.cs" />
     <Compile Include="UserInterface\Components\SettingsMenu.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />
