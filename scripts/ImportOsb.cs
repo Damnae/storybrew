@@ -88,10 +88,10 @@ namespace StorybrewScripts
                         break;
                     case "Sample":
                         {
-                            var layerName = values[1];
-                            var path = removePathQuotes(values[2]);
-                            var time = double.Parse(values[3], CultureInfo.InvariantCulture);
-                            var volume = double.Parse(values[3], CultureInfo.InvariantCulture);
+                            var time = double.Parse(values[1], CultureInfo.InvariantCulture);
+                            var layerName = values[2];
+                            var path = removePathQuotes(values[3]);
+                            var volume = float.Parse(values[4], CultureInfo.InvariantCulture);
                             GetLayer(layerName).CreateSample(path, time, volume);
                         }
                         break;
