@@ -47,12 +47,11 @@ namespace StorybrewEditor.ScreenLayers
         private Button effectsButton;
         private Button layersButton;
 
-        private EffectConfigUi effectConfigUi;
-
-        private SettingsMenu settingsMenu;
-
         private EffectList effectsList;
         private LayerList layersList;
+        private SettingsMenu settingsMenu;
+
+        private EffectConfigUi effectConfigUi;
 
         private AudioStream audio;
 
@@ -154,11 +153,6 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    settingsButton = new Button(WidgetManager)
-                    {
-                        StyleName = "small",
-                        Text = "Settings",
-                    },
                     effectsButton = new Button(WidgetManager)
                     {
                         StyleName = "small",
@@ -168,6 +162,11 @@ namespace StorybrewEditor.ScreenLayers
                     {
                         StyleName = "small",
                         Text = "Layers",
+                    },
+                    settingsButton = new Button(WidgetManager)
+                    {
+                        StyleName = "small",
+                        Text = "Settings",
                     },
                     projectFolderButton = new Button(WidgetManager)
                     {
@@ -214,14 +213,6 @@ namespace StorybrewEditor.ScreenLayers
             });
             effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
 
-            WidgetManager.Root.Add(settingsMenu = new SettingsMenu(WidgetManager, project)
-            {
-                AnchorTarget = bottomRightLayout,
-                AnchorFrom = BoxAlignment.BottomRight,
-                AnchorTo = BoxAlignment.TopRight,
-                Offset = new Vector2(-16, 0),
-            });
-
             WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
             {
                 AnchorTarget = bottomRightLayout,
@@ -251,6 +242,14 @@ namespace StorybrewEditor.ScreenLayers
                 else timeline.ClearHighlight();
             };
             layersList.OnLayerSelected += layer => timeline.Value = (float)layer.StartTime / 1000;
+
+            WidgetManager.Root.Add(settingsMenu = new SettingsMenu(WidgetManager, project)
+            {
+                AnchorTarget = bottomRightLayout,
+                AnchorFrom = BoxAlignment.BottomRight,
+                AnchorTo = BoxAlignment.TopRight,
+                Offset = new Vector2(-16, 0),
+            });
 
             WidgetManager.Root.Add(statusLayout = new LinearLayout(WidgetManager)
             {

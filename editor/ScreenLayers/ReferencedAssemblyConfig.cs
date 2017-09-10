@@ -265,11 +265,11 @@ namespace StorybrewEditor.ScreenLayers
             var badSystemAssemblySuffixes = new[] { "resources", "Resources", "Printing", "Speech", "VisualStudio.11.0" };
 
             var systemAssemblies = new List<string>();
-            foreach (var gac in Directory.GetDirectories(assemblyDirectory))
+            foreach (var gacFolder in Directory.GetDirectories(assemblyDirectory))
             {
-                foreach (var assemblyFolder in Directory.GetDirectories(gac))
+                foreach (var assemblyFolder in Directory.GetDirectories(gacFolder))
                 {
-                    var assembly = PathHelper.GetRelativePath(gac, assemblyFolder);
+                    var assembly = PathHelper.GetRelativePath(gacFolder, assemblyFolder);
 
                     if (!assembly.StartsWith("System.")) continue;
                     if (badSystemAssemblySuffixes.Any(suffix => assembly.EndsWith(suffix))) continue;
