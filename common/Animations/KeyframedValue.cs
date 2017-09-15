@@ -91,6 +91,7 @@ namespace StorybrewCommon.Animations
             var endTime = explicitEndTime ?? keyframes[keyframes.Count - 1].Time;
 
             var hasPair = false;
+            var forceNextFlat = loopable;
             var previous = (Keyframe<TValue>?)null;
             var stepStart = (Keyframe<TValue>?)null;
             var previousPairEnd = (Keyframe<TValue>?)null;
@@ -113,17 +114,17 @@ namespace StorybrewCommon.Animations
                     {
                         if (!hasPair && explicitStartTime.HasValue && startTime < stepStart.Value.Time)
                         {
-                                var initialPair = stepStart.Value.WithTime(startTime);
-                                pair(initialPair, loopable ? stepStart.Value : initialPair);
+                            var initialPair = stepStart.Value.WithTime(startTime);
+                            pair(initialPair, loopable ? stepStart.Value : initialPair);
                         }
-                        
-                            pair(stepStart.Value, startKeyframe);
-                            previousPairEnd = startKeyframe;
-                            stepStart = null;
-                            hasPair = true;
+
+                        pair(stepStart.Value, startKeyframe);
+                        previousPairEnd = startKeyframe;
+                        stepStart = null;
+                        hasPair = true;
                     }
 
-                    if (!isStep && !isFlat)
+                    if (!isStep && (!isFlat || forceNextFlat))
                     {
                         if (!hasPair && explicitStartTime.HasValue && startTime < startKeyframe.Time)
                         {
@@ -134,6 +135,7 @@ namespace StorybrewCommon.Animations
                         pair(startKeyframe, endKeyframe);
                         previousPairEnd = endKeyframe;
                         hasPair = true;
+                        forceNextFlat = false;
                     }
                 }
                 previous = endKeyframe;
