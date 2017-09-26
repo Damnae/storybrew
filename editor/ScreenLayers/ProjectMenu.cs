@@ -3,6 +3,7 @@ using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Input;
+using StorybrewCommon.Mapset;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;
@@ -56,6 +57,7 @@ namespace StorybrewEditor.ScreenLayers
         private AudioStream audio;
 
         private int snapDivisor = 4;
+        private Vector2 storyboardPosition;
 
         public ProjectMenu(Project project)
         {
@@ -419,6 +421,17 @@ namespace StorybrewEditor.ScreenLayers
             return base.OnKeyDown(e);
         }
 
+        public override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            var bounds = mainStoryboardContainer.Bounds;
+            var scale = OsuHitObject.StoryboardSize.Y / bounds.Height;
+
+            storyboardPosition = (WidgetManager.MousePosition - new Vector2(bounds.Left, bounds.Top)) * scale;
+            storyboardPosition.X -= (bounds.Width * scale - OsuHitObject.StoryboardSize.X) / 2;
+        }
+
         public override bool OnMouseWheel(MouseWheelEventArgs e)
         {
             var inputManager = Manager.GetContext<Editor>().InputManager;
@@ -466,7 +479,9 @@ namespace StorybrewEditor.ScreenLayers
 
             timeline.SetValueSilent(time);
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
-                timeButton.Text = $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
+                timeButton.Text = Manager.GetContext<Editor>().InputManager.Alt ?
+                    $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
+                    $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
             if (audio.Playing && mainStoryboardDrawable.Time < time)
                 project.TriggerEvents(mainStoryboardDrawable.Time, time);
