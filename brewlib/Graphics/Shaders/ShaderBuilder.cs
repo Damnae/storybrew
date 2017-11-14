@@ -23,15 +23,27 @@ namespace BrewLib.Graphics.Shaders
         public ShaderType AddStruct()
             => ProgramScope.AddStruct();
 
+        /// <summary>
+        /// Adds a shader input variable.
+        /// </summary>
         public ShaderVariable AddUniform(string name, string shaderTypeName, int count = -1)
             => ProgramScope.AddUniform(Context, name, shaderTypeName, count);
 
+        /// <summary>
+        /// Adds a variable shared between the vertex and fragment shaders.
+        /// </summary>
         public ShaderVariable AddVarying(string shaderTypeName)
             => ProgramScope.AddVarying(Context, shaderTypeName);
 
+        /// <summary>
+        /// Adds a variable to the vertex shaders.
+        /// </summary>
         public ShaderVariable AddVertexVariable(string shaderTypeName)
             => VertexShaderScope.AddVariable(Context, shaderTypeName);
 
+        /// <summary>
+        /// Adds a variable to the fragment shaders.
+        /// </summary>
         public ShaderVariable AddFragmentVariable(string shaderTypeName)
             => FragmentShaderScope.AddVariable(Context, shaderTypeName);
 

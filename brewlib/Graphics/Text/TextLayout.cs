@@ -76,7 +76,7 @@ namespace BrewLib.Graphics.Text
                     return line.GetGlyph(index);
                 index -= line.GlyphCount;
             }
-            return getlastGlyph();
+            return getLastGlyph();
         }
 
         public int GetCharacterIndexAt(Vector2 position)
@@ -138,7 +138,7 @@ namespace BrewLib.Graphics.Text
                 index -= line.GlyphCount;
                 lineIndex++;
             }
-            return getlastGlyph().Index;
+            return getLastGlyph().Index;
         }
 
         public int GetCharacterIndexBelow(int index)
@@ -161,10 +161,10 @@ namespace BrewLib.Graphics.Text
                 index -= line.GlyphCount;
                 lineIndex++;
             }
-            return getlastGlyph().Index;
+            return getLastGlyph().Index;
         }
 
-        private TextLayoutGlyph getlastGlyph()
+        private TextLayoutGlyph getLastGlyph()
         {
             var lastLine = lines[lines.Count - 1];
             return lastLine.GetGlyph(lastLine.GlyphCount - 1);

@@ -103,6 +103,7 @@
     <Compile Include="Graphics\Shaders\ShaderType.cs" />
     <Compile Include="Graphics\Shaders\ShaderVariable.cs" />
     <Compile Include="Graphics\Shaders\Snippets\Assign.cs" />
+    <Compile Include="Graphics\Shaders\Snippets\Condition.cs" />
     <Compile Include="Graphics\Shaders\Snippets\CustomSnippet.cs" />
     <Compile Include="Graphics\Shaders\Snippets\Sequence.cs" />
     <Compile Include="Graphics\Shaders\Snippets\TextureSampling.cs" />

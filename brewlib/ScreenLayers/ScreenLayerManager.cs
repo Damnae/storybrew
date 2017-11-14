@@ -173,7 +173,7 @@ namespace BrewLib.ScreenLayers
 
             if (width == 0 || height == 0) return;
 
-            foreach (var layer in layers)
+            foreach (ScreenLayer layer in layers)
                 layer.Resize(width, height);
         }
 

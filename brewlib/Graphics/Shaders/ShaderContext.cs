@@ -11,7 +11,9 @@ namespace BrewLib.Graphics.Shaders
 
         private Dictionary<ShaderVariable, HashSet<ShaderVariable>> dependencies = new Dictionary<ShaderVariable, HashSet<ShaderVariable>>();
         private HashSet<ShaderVariable> usedVariables = new HashSet<ShaderVariable>();
+        private HashSet<ShaderVariable> flowVariables = new HashSet<ShaderVariable>();
         private ShaderVariable[] dependantVariables;
+        private bool flowDependant;
         private StringBuilder code;
         private bool canReceiveCommands;
 
@@ -19,18 +21,23 @@ namespace BrewLib.Graphics.Shaders
 
         public void RecordDependency(ShaderVariable referencedVariable)
         {
-            if (dependantVariables == null) throw new InvalidOperationException("Cannot reference variables while dependencies aren't defined");
+            if (dependantVariables == null && !flowDependant)
+                throw new InvalidOperationException("Cannot reference variables while dependencies aren't defined");
 
-            foreach (var dependentVariable in dependantVariables)
-            {
-                if (referencedVariable == dependentVariable)
-                    continue;
+            if (flowDependant)
+                flowVariables.Add(referencedVariable);
 
-                if (!dependencies.TryGetValue(dependentVariable, out HashSet<ShaderVariable> existingDependencies))
-                    existingDependencies = dependencies[dependentVariable] = new HashSet<ShaderVariable>();
+            if (dependantVariables != null)
+                foreach (var dependentVariable in dependantVariables)
+                {
+                    if (referencedVariable == dependentVariable)
+                        continue;
 
-                existingDependencies.Add(referencedVariable);
-            }
+                    if (!dependencies.TryGetValue(dependentVariable, out HashSet<ShaderVariable> existingDependencies))
+                        existingDependencies = dependencies[dependentVariable] = new HashSet<ShaderVariable>();
+
+                    existingDependencies.Add(referencedVariable);
+                }
         }
 
         public void MarkUsedVariables(Action action, params ShaderVariable[] outputVariables)
@@ -40,6 +47,9 @@ namespace BrewLib.Graphics.Shaders
             canReceiveCommands = true;
             action();
             canReceiveCommands = false;
+
+            foreach (var flowVariable in flowVariables)
+                markUsed(flowVariable);
 
             foreach (var outputVariable in outputVariables)
                 markUsed(outputVariable);
@@ -90,6 +100,29 @@ namespace BrewLib.Graphics.Shaders
         public void Assign(ShaderVariable result, VertexAttribute value, string components = null)
             => assign(result, () => value.Name, false, components);
 
+        public void Condition(Func<string> expression, ShaderSnippet trueSnippet, ShaderSnippet falseSnippet)
+        {
+            checkCanReceiveCommands();
+
+            if (code != null)
+            {
+                FlowDependant(() => $"if ({expression()})\n{{");
+                trueSnippet.Generate(this);
+                if (falseSnippet != null)
+                {
+                    code.AppendLine("}\nelse\n{");
+                    falseSnippet.Generate(this);
+                }
+                code.AppendLine("}");
+            }
+            else
+            {
+                FlowDependant(expression);
+                trueSnippet.Generate(this);
+                falseSnippet?.Generate(this);
+            }
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="expression"></param>
@@ -105,6 +138,19 @@ namespace BrewLib.Graphics.Shaders
             else expression();
 
             this.dependantVariables = previousDependentVariables;
+        }
+
+        public void FlowDependant(Func<string> expression)
+        {
+            checkCanReceiveCommands();
+
+            var previousFlowDependant = flowDependant;
+            flowDependant = true;
+
+            if (code != null) code.AppendLine($"{expression()}");
+            else expression();
+
+            flowDependant = previousFlowDependant;
         }
 
         public void Comment(string line)
