@@ -36,8 +36,7 @@ namespace StorybrewCommon.Storyboarding
             if (fieldType == null)
                 return;
 
-            ConfigField field;
-            var value = fields.TryGetValue(name, out field) ?
+            var value = fields.TryGetValue(name, out ConfigField field) ?
                 convertFieldValue(field.Value, field.Type, fieldType, defaultValue) :
                 defaultValue;
 

@@ -39,8 +39,7 @@ namespace BrewLib.Graphics
 
             if (UseSrgb && HasCapabilities(3, 0, "GL_ARB_framebuffer_object"))
             {
-                int defaultFramebufferColorEncoding;
-                GL.GetFramebufferAttachmentParameter(FramebufferTarget.Framebuffer, FramebufferAttachment.BackLeft, FramebufferParameterName.FramebufferAttachmentColorEncoding, out defaultFramebufferColorEncoding);
+                GL.GetFramebufferAttachmentParameter(FramebufferTarget.Framebuffer, FramebufferAttachment.BackLeft, FramebufferParameterName.FramebufferAttachmentColorEncoding, out int defaultFramebufferColorEncoding);
                 if (defaultFramebufferColorEncoding == (int)0x8C40)
                 {
                     SetCapability(EnableCap.FramebufferSrgb, true);
@@ -407,8 +406,7 @@ namespace BrewLib.Graphics
         private static Dictionary<EnableCap, bool> capabilityCache = new Dictionary<EnableCap, bool>();
         internal static void SetCapability(EnableCap capability, bool enable)
         {
-            bool isEnabled;
-            if (capabilityCache.TryGetValue(capability, out isEnabled) && isEnabled == enable)
+            if (capabilityCache.TryGetValue(capability, out bool isEnabled) && isEnabled == enable)
                 return;
 
             if (enable) GL.Enable(capability);

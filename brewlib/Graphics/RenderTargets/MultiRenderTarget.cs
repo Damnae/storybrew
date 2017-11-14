@@ -74,8 +74,7 @@ namespace BrewLib.Graphics.RenderTargets
 
             DrawState.FlushRenderer();
 
-            int currentFrameBufferId;
-            GL.GetInteger(GetPName.FramebufferBinding, out currentFrameBufferId);
+            GL.GetInteger(GetPName.FramebufferBinding, out int currentFrameBufferId);
             if (currentFrameBufferId != frameBufferId)
                 throw new InvalidOperationException("Invalid current frame buffer");
 

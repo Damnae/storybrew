@@ -18,8 +18,7 @@ namespace BrewLib.Graphics.Textures
 
         public Texture2d Get(string filename)
         {
-            Texture2d texture;
-            if (!textures.TryGetValue(filename, out texture))
+            if (!textures.TryGetValue(filename, out Texture2d texture))
             {
                 texture = Texture2d.Load(filename, resourceManager, textureOptions);
                 textures.Add(filename, texture);

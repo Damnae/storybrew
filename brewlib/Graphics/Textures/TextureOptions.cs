@@ -90,10 +90,9 @@ namespace BrewLib.Graphics.Textures
             if (fieldType.IsEnum)
                 return data => Enum.Parse(fieldType, data.Value<string>());
 
-            Func<JToken, object> parser;
             while (fieldType != typeof(object))
             {
-                if (fieldParsers.TryGetValue(fieldType, out parser))
+                if (fieldParsers.TryGetValue(fieldType, out Func<JToken, object> parser))
                     return parser;
 
                 fieldType = fieldType.BaseType;

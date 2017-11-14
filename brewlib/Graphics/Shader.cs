@@ -112,8 +112,7 @@ namespace BrewLib.Graphics
 
         public int GetAttributeLocation(string name)
         {
-            Property<ActiveAttribType> property;
-            if (attributes.TryGetValue(name, out property))
+            if (attributes.TryGetValue(name, out Property<ActiveAttribType> property))
                 return property.Location;
 
             return -1;
@@ -123,8 +122,7 @@ namespace BrewLib.Graphics
         {
             var identifier = GetUniformIdentifier(name, index, field);
 
-            Property<ActiveUniformType> property;
-            if (uniforms.TryGetValue(identifier, out property))
+            if (uniforms.TryGetValue(identifier, out Property<ActiveUniformType> property))
                 return property.Location;
 
             throw new ArgumentException($"{identifier} isn't a valid uniform identifier");
@@ -163,8 +161,7 @@ namespace BrewLib.Graphics
             GL.ShaderSource(id, code);
             GL.CompileShader(id);
 
-            int compileStatus;
-            GL.GetShader(id, ShaderParameter.CompileStatus, out compileStatus);
+            GL.GetShader(id, ShaderParameter.CompileStatus, out int compileStatus);
             if (compileStatus == 0)
             {
                 log += $"--- {type} ---\n{addLineExtracts(GL.GetShaderInfoLog(id), code)}";
@@ -181,8 +178,7 @@ namespace BrewLib.Graphics
             GL.AttachShader(id, fragmentShaderId);
             GL.LinkProgram(id);
 
-            int linkStatus;
-            GL.GetProgram(id, GetProgramParameterName.LinkStatus, out linkStatus);
+            GL.GetProgram(id, GetProgramParameterName.LinkStatus, out int linkStatus);
             if (linkStatus == 0)
             {
                 log += GL.GetProgramInfoLog(id);
@@ -194,15 +190,12 @@ namespace BrewLib.Graphics
 
         private void retrieveAttributes()
         {
-            int attributeCount;
-            GL.GetProgram(programId, GetProgramParameterName.ActiveAttributes, out attributeCount);
+            GL.GetProgram(programId, GetProgramParameterName.ActiveAttributes, out int attributeCount);
 
             attributes = new Dictionary<string, Property<ActiveAttribType>>(attributeCount);
             for (int i = 0; i < attributeCount; i++)
             {
-                int size;
-                ActiveAttribType type;
-                var name = GL.GetActiveAttrib(programId, i, out size, out type);
+                var name = GL.GetActiveAttrib(programId, i, out int size, out ActiveAttribType type);
                 var location = GL.GetAttribLocation(programId, name);
                 attributes[name] = new Property<ActiveAttribType>(name, size, type, location);
             }
@@ -210,15 +203,12 @@ namespace BrewLib.Graphics
 
         private void retrieveUniforms()
         {
-            int uniformCount;
-            GL.GetProgram(programId, GetProgramParameterName.ActiveUniforms, out uniformCount);
+            GL.GetProgram(programId, GetProgramParameterName.ActiveUniforms, out int uniformCount);
 
             uniforms = new Dictionary<string, Property<ActiveUniformType>>(uniformCount);
             for (int i = 0; i < uniformCount; i++)
             {
-                int size;
-                ActiveUniformType type;
-                var name = GL.GetActiveUniform(programId, i, out size, out type);
+                var name = GL.GetActiveUniform(programId, i, out int size, out ActiveUniformType type);
                 var location = GL.GetUniformLocation(programId, name);
                 uniforms[name] = new Property<ActiveUniformType>(name, size, type, location);
             }

@@ -19,8 +19,7 @@ namespace BrewLib.Audio
 
         public AudioSample Get(string filename)
         {
-            AudioSample sample;
-            if (!samples.TryGetValue(filename, out sample))
+            if (!samples.TryGetValue(filename, out AudioSample sample))
             {
                 sample = audioManager.LoadSample(filename, resourceManager);
                 samples.Add(filename, sample);

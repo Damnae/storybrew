@@ -32,8 +32,7 @@ namespace StorybrewEditor.Util
                 watchedFilenames.Add(filename);
             }
 
-            FileSystemWatcher watcher;
-            if (!folderWatchers.TryGetValue(directoryPath, out watcher))
+            if (!folderWatchers.TryGetValue(directoryPath, out FileSystemWatcher watcher))
             {
                 folderWatchers.Add(directoryPath, watcher = new FileSystemWatcher()
                 {

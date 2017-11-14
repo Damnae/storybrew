@@ -42,8 +42,7 @@ namespace StorybrewCommon.Storyboarding.Display
                 if (command.EndTime < command.StartTime)
                     Debug.Print($"'{command}' ends before it starts");
 
-                int index;
-                findCommandIndex(command.StartTime, out index);
+                findCommandIndex(command.StartTime, out int index);
                 while (index < commands.Count)
                 {
                     if (commands[index].StartTime <= command.StartTime)
@@ -83,8 +82,7 @@ namespace StorybrewCommon.Storyboarding.Display
             if (commands.Count == 0) return DefaultValue;
             if (!strict && time >= EndTime) return EndValue;
 
-            int index;
-            if (!findCommandIndex(time, out index) && index > 0)
+            if (!findCommandIndex(time, out int index) && index > 0)
                 index--;
 
             if (hasOverlap)
@@ -127,8 +125,7 @@ namespace StorybrewCommon.Storyboarding.Display
             commands.Remove(command);
             if (command.Active)
             {
-                int index;
-                findCommandIndex(command.StartTime, out index);
+                findCommandIndex(command.StartTime, out int index);
                 commands.Insert(index, command);
             }
         }

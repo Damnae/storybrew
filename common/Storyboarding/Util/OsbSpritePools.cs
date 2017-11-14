@@ -53,8 +53,7 @@ namespace StorybrewCommon.Storyboarding.Util
         {
             var key = getKey(path, origin, finalizeSprite, poolGroup);
 
-            OsbSpritePool pool;
-            if (!pools.TryGetValue(key, out pool))
+            if (!pools.TryGetValue(key, out OsbSpritePool pool))
                 pools.Add(key, pool = new OsbSpritePool(layer, path, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
 
             return pool;
@@ -64,8 +63,7 @@ namespace StorybrewCommon.Storyboarding.Util
         {
             var key = getKey(path, frameCount, frameDelay, loopType, origin, finalizeSprite, poolGroup);
 
-            OsbAnimationPool pool;
-            if (!animationPools.TryGetValue(key, out pool))
+            if (!animationPools.TryGetValue(key, out OsbAnimationPool pool))
                 animationPools.Add(key, pool = new OsbAnimationPool(layer, path, frameCount, frameDelay, loopType, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
 
             return pool;

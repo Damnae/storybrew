@@ -98,8 +98,7 @@ namespace StorybrewCommon.Subtitles
 
         public FontTexture GetTexture(string text)
         {
-            FontTexture texture;
-            if (!letters.TryGetValue(text, out texture))
+            if (!letters.TryGetValue(text, out FontTexture texture))
                 letters.Add(text, texture = generateTexture(text));
             return texture;
         }

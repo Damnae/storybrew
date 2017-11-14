@@ -12,12 +12,10 @@ namespace BrewLib.Graphics.Text
         {
             var identifier = $"{fontName}|{fontSize}|{scaling}";
 
-            TextFont font;
-            if (!fonts.TryGetValue(identifier, out font))
+            if (!fonts.TryGetValue(identifier, out TextFont font))
                 fonts.Add(identifier, font = new TextFontAtlased(fontName, fontSize * scaling));
 
-            int refCount;
-            if (references.TryGetValue(identifier, out refCount))
+            if (references.TryGetValue(identifier, out int refCount))
                 references[identifier] = refCount + 1;
             else references[identifier] = 1;
 

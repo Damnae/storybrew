@@ -88,8 +88,7 @@ namespace StorybrewEditor.Storyboarding
         {
             path = Path.GetFullPath(path);
 
-            FftStream audioStream;
-            if (!fftAudioStreams.TryGetValue(path, out audioStream))
+            if (!fftAudioStreams.TryGetValue(path, out FftStream audioStream))
                 fftAudioStreams[path] = audioStream = new FftStream(path);
 
             return audioStream;

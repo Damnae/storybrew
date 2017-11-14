@@ -116,8 +116,7 @@ namespace BrewLib.Graphics.Text
 
             var identifier = $"{resourceName}|{emSize}|{(int)style}";
 
-            Font font;
-            if (fonts.TryGetValue(identifier, out font))
+            if (fonts.TryGetValue(identifier, out Font font))
             {
                 recentlyUsedFonts.Remove(identifier);
                 recentlyUsedFonts.AddFirst(identifier);
@@ -135,8 +134,7 @@ namespace BrewLib.Graphics.Text
                     fonts.Remove(lastFontIdentifier);
                 }
 
-            FontFamily fontFamily;
-            if (!fontFamilies.TryGetValue(resourceName, out fontFamily))
+            if (!fontFamilies.TryGetValue(resourceName, out FontFamily fontFamily))
             {
                 var bytes = (byte[])resourceManager.GetObject(resourceName);
                 if (bytes != null)
@@ -144,8 +142,7 @@ namespace BrewLib.Graphics.Text
                     GCHandle pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                     try
                     {
-                        PrivateFontCollection fontCollection;
-                        if (!fontCollections.TryGetValue(resourceName, out fontCollection))
+                        if (!fontCollections.TryGetValue(resourceName, out PrivateFontCollection fontCollection))
                             fontCollections.Add(resourceName, fontCollection = new PrivateFontCollection());
 
                         IntPtr ptr = pinnedArray.AddrOfPinnedObject();

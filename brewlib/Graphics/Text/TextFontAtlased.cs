@@ -26,8 +26,7 @@ namespace BrewLib.Graphics.Text
 
         public FontGlyph GetGlyph(char c)
         {
-            FontGlyph glyph;
-            if (!glyphs.TryGetValue(c, out glyph))
+            if (!glyphs.TryGetValue(c, out FontGlyph glyph))
                 glyphs.Add(c, glyph = generateGlyph(c));
             return glyph;
         }

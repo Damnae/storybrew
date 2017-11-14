@@ -27,8 +27,7 @@ namespace BrewLib.Graphics
             {
                 var newState = (RenderState)field.GetValue(this);
 
-                RenderState currentState;
-                if (currentStates.TryGetValue(field.FieldType, out currentState) && currentState.Equals(newState))
+                if (currentStates.TryGetValue(field.FieldType, out RenderState currentState) && currentState.Equals(newState))
                     continue;
 
                 if (!flushed)

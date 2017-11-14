@@ -30,8 +30,7 @@ namespace BrewLib.UserInterface.Skinning
 
         public Drawable GetDrawable(string name)
         {
-            Drawable drawable;
-            if (drawables.TryGetValue(name, out drawable))
+            if (drawables.TryGetValue(name, out Drawable drawable))
                 return drawable;
 
             return NullDrawable.Instance;
@@ -44,15 +43,13 @@ namespace BrewLib.UserInterface.Skinning
         {
             if (name == null) name = "default";
 
-            Dictionary<string, WidgetStyle> styles;
-            if (!stylesPerType.TryGetValue(type, out styles))
+            if (!stylesPerType.TryGetValue(type, out Dictionary<string, WidgetStyle> styles))
                 return null;
 
             var n = name;
-            WidgetStyle style;
             while (n != null)
             {
-                if (styles.TryGetValue(n, out style))
+                if (styles.TryGetValue(n, out WidgetStyle style))
                     return style;
 
                 n = getImplicitParentStyleName(n);
@@ -212,8 +209,7 @@ namespace BrewLib.UserInterface.Skinning
                     var widgetType = ResolveWidgetType(styleTypeName);
                     var styleType = ResolveStyleType($"{styleTypeName}Style");
 
-                    Dictionary<string, WidgetStyle> styles;
-                    if (!stylesPerType.TryGetValue(styleType, out styles))
+                    if (!stylesPerType.TryGetValue(styleType, out Dictionary<string, WidgetStyle> styles))
                         stylesPerType.Add(styleType, styles = new Dictionary<string, WidgetStyle>());
 
                     WidgetStyle defaultStyle = null;
@@ -341,10 +337,9 @@ namespace BrewLib.UserInterface.Skinning
             if (fieldType.IsEnum)
                 return (data, skin) => Enum.Parse(fieldType, data.Value<string>());
 
-            Func<JToken, Skin, object> parser;
             while (fieldType != typeof(object))
             {
-                if (fieldParsers.TryGetValue(fieldType, out parser))
+                if (fieldParsers.TryGetValue(fieldType, out Func<JToken, Skin, object> parser))
                     return parser;
 
                 fieldType = fieldType.BaseType;

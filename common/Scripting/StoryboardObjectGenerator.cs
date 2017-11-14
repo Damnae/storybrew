@@ -76,8 +76,7 @@ namespace StorybrewCommon.Scripting
         {
             path = Path.GetFullPath(path);
 
-            Bitmap bitmap;
-            if (!bitmaps.TryGetValue(path, out bitmap))
+            if (!bitmaps.TryGetValue(path, out Bitmap bitmap))
             {
                 if (watch) context.AddDependency(path);
                 bitmaps.Add(path, bitmap = Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));

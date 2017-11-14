@@ -85,8 +85,7 @@ namespace StorybrewEditor.Scripting
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(ScriptManager<TScript>));
 
-            ScriptContainer<TScript> scriptContainer;
-            if (scriptContainers.TryGetValue(scriptName, out scriptContainer))
+            if (scriptContainers.TryGetValue(scriptName, out ScriptContainer<TScript> scriptContainer))
                 return scriptContainer;
 
             var scriptTypeName = $"{scriptsNamespace}.{scriptName}";
@@ -139,8 +138,7 @@ namespace StorybrewEditor.Scripting
                     if (disposedValue) return;
                     var scriptName = Path.GetFileNameWithoutExtension(e.Name);
 
-                    ScriptContainer<TScript> container;
-                    if (scriptContainers.TryGetValue(scriptName, out container))
+                    if (scriptContainers.TryGetValue(scriptName, out ScriptContainer<TScript> container))
                         container.ReloadScript();
                 });
         }

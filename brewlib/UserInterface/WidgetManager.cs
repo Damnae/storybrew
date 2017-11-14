@@ -157,8 +157,7 @@ namespace BrewLib.UserInterface
 
         public void UnregisterTooltip(Widget widget)
         {
-            Widget tooltip;
-            if (tooltips.TryGetValue(widget, out tooltip))
+            if (tooltips.TryGetValue(widget, out Widget tooltip))
             {
                 tooltips.Remove(widget);
                 tooltip.Dispose();
@@ -290,8 +289,7 @@ namespace BrewLib.UserInterface
         }
         public bool OnClickUp(MouseButtonEventArgs e)
         {
-            Widget dragTarget;
-            if (dragTargets.TryGetValue(e.Button, out dragTarget))
+            if (dragTargets.TryGetValue(e.Button, out Widget dragTarget))
                 dragTargets[e.Button] = null;
 
             var target = dragTarget ?? hoveredWidget ?? root;

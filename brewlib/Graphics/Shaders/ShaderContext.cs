@@ -26,8 +26,7 @@ namespace BrewLib.Graphics.Shaders
                 if (referencedVariable == dependentVariable)
                     continue;
 
-                HashSet<ShaderVariable> existingDependencies;
-                if (!dependencies.TryGetValue(dependentVariable, out existingDependencies))
+                if (!dependencies.TryGetValue(dependentVariable, out HashSet<ShaderVariable> existingDependencies))
                     existingDependencies = dependencies[dependentVariable] = new HashSet<ShaderVariable>();
 
                 existingDependencies.Add(referencedVariable);
@@ -144,8 +143,7 @@ namespace BrewLib.Graphics.Shaders
         {
             if (usedVariables.Add(variable))
             {
-                HashSet<ShaderVariable> variableDependencies;
-                if (dependencies.TryGetValue(variable, out variableDependencies))
+                if (dependencies.TryGetValue(variable, out HashSet<ShaderVariable> variableDependencies))
                     foreach (var variableDependency in variableDependencies)
                         markUsed(variableDependency);
             }

@@ -292,8 +292,7 @@ namespace StorybrewEditor.ScreenLayers
 
             timeButton.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", value =>
             {
-                var time = 0.0f;
-                if (float.TryParse(value, out time)) timeline.Value = time / 1000;
+                if (float.TryParse(value, out float time)) timeline.Value = time / 1000;
             });
 
             timeline.MaxValue = (float)audio.Duration;
