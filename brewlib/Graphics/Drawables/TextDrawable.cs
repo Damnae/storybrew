@@ -211,18 +211,13 @@ namespace BrewLib.Graphics.Drawables
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    font?.Dispose();
-                }
-                font = null;
-                disposedValue = true;
+                font?.Dispose();
             }
+            font = null;
         }
 
         public void Dispose()

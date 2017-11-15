@@ -8,6 +8,7 @@ namespace BrewLib.Graphics.Textures
     public class TextureMultiAtlas2d : IDisposable
     {
         private Stack<TextureAtlas2d> atlases = new Stack<TextureAtlas2d>();
+        private List<Texture2d> oversizeTextures;
 
         private int width;
         private int height;
@@ -29,7 +30,13 @@ namespace BrewLib.Graphics.Textures
         public Texture2dRegion AddRegion(Bitmap bitmap, string description)
         {
             if (bitmap.Width > width || bitmap.Height > height)
-                throw new InvalidOperationException("Bitmap doesn't fit in this atlas");
+            {
+                Trace.WriteLine($"Bitmap \"{description}\" doesn't fit in atlas {this.description}");
+
+                var texture = Texture2d.Load(bitmap, description, textureOptions);
+                (oversizeTextures ?? (oversizeTextures = new List<Texture2d>())).Add(texture);
+                return texture;
+            }
 
             var atlas = atlases.Peek();
             var region = atlas.AddRegion(bitmap, description);
@@ -61,8 +68,13 @@ namespace BrewLib.Graphics.Textures
                 {
                     while (atlases.Count > 0)
                         atlases.Pop().Dispose();
+
+                    if (oversizeTextures != null)
+                        foreach (var texture in oversizeTextures)
+                            texture.Dispose();
                 }
                 atlases = null;
+                oversizeTextures = null;
                 disposedValue = true;
             }
         }

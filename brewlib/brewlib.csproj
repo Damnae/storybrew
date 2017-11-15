@@ -113,6 +113,7 @@
     <Compile Include="Graphics\Textures\Texture2dRegion.cs" />
     <Compile Include="Graphics\Textures\TextureAtlas2d.cs" />
     <Compile Include="Graphics\Textures\TextureContainer.cs" />
+    <Compile Include="Graphics\Textures\TextureContainerAtlas.cs" />
     <Compile Include="Graphics\Textures\TextureContainerSeparate.cs" />
     <Compile Include="Graphics\Textures\TextureMultiAtlas2d.cs" />
     <Compile Include="Graphics\Textures\TextureOptions.cs" />

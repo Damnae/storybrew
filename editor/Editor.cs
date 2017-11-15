@@ -49,7 +49,7 @@ namespace StorybrewEditor
             DrawState.Initialize(Resources.ResourceManager, window.Width, window.Height);
             drawContext = new DrawContext();
             drawContext.Register(this, false);
-            drawContext.Register<TextureContainer>(new TextureContainerSeparate(Resources.ResourceManager), true);
+            drawContext.Register<TextureContainer>(new TextureContainerAtlas(Resources.ResourceManager), true);
             drawContext.Register<SpriteRenderer>(new SpriteRendererBuffered(), true);
             drawContext.Register<LineRenderer>(new LineRendererBuffered(), true);
 

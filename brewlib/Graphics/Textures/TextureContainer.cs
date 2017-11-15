@@ -4,6 +4,6 @@ namespace BrewLib.Graphics.Textures
 {
     public interface TextureContainer : IDisposable
     {
-        Texture2d Get(string filename);
+        Texture2dRegion Get(string filename);
     }
 }

@@ -9,7 +9,7 @@ namespace BrewLib.Graphics.Drawables
 {
     public class NinePatch : Drawable
     {
-        public Texture2d Texture;
+        public Texture2dRegion Texture;
         public readonly RenderStates RenderStates = new RenderStates();
         public Color4 Color = Color4.White;
         public FourSide Borders;
@@ -85,14 +85,12 @@ namespace BrewLib.Graphics.Drawables
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposing)
             {
-                Texture = null;
-                disposedValue = true;
             }
+            Texture = null;
         }
 
         public void Dispose()

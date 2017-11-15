@@ -12,7 +12,7 @@ namespace BrewLib.UserInterface
         
         public override Vector2 PreferredSize => sprite.Texture?.Size ?? Vector2.Zero;
 
-        public Texture2d Texture { get { return sprite.Texture; } set { sprite.Texture = value; } }
+        public Texture2dRegion Texture { get { return sprite.Texture; } set { sprite.Texture = value; } }
 
         public Image(WidgetManager manager) : base(manager)
         {

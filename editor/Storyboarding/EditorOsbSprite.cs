@@ -1,12 +1,12 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics;
+using BrewLib.Graphics.Cameras;
+using BrewLib.Graphics.Renderers;
+using BrewLib.Graphics.Textures;
+using BrewLib.Util;
+using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
-using BrewLib.Graphics;
-using BrewLib.Graphics.Cameras;
-using BrewLib.Graphics.Textures;
 using System.IO;
-using BrewLib.Util;
-using BrewLib.Graphics.Renderers;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -32,7 +32,7 @@ namespace StorybrewEditor.Storyboarding
             if (sprite.FlipVAt(time)) scale.Y = -scale.Y;
 
             var fullPath = Path.Combine(project.MapsetPath, sprite.GetTexturePathAt(time));
-            Texture2d texture = null;
+            Texture2dRegion texture = null;
             try
             {
                 texture = project.TextureContainer.Get(fullPath);

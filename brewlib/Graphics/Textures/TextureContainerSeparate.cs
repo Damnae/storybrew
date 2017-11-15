@@ -16,7 +16,7 @@ namespace BrewLib.Graphics.Textures
             this.textureOptions = textureOptions;
         }
 
-        public Texture2d Get(string filename)
+        public Texture2dRegion Get(string filename)
         {
             if (!textures.TryGetValue(filename, out Texture2d texture))
             {

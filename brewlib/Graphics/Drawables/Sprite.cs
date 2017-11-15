@@ -10,7 +10,7 @@ namespace BrewLib.Graphics.Drawables
 {
     public class Sprite : Drawable
     {
-        public Texture2d Texture;
+        public Texture2dRegion Texture;
         public readonly RenderStates RenderStates = new RenderStates();
         public float Rotation;
         public Color4 Color = Color4.White;
@@ -26,10 +26,10 @@ namespace BrewLib.Graphics.Drawables
             var renderer = DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, RenderStates);
             var color = Color.WithOpacity(opacity);
 
-            float textureX0 = 0;
-            float textureY0 = 0;
-            float textureX1 = Texture.Width;
-            float textureY1 = Texture.Height;
+            var textureX0 = 0.0f;
+            var textureY0 = 0.0f;
+            var textureX1 = Texture.Width;
+            var textureY1 = Texture.Height;
 
             var scaleH = bounds.Width / Texture.Width;
             var scaleV = bounds.Height / Texture.Height;
@@ -83,15 +83,12 @@ namespace BrewLib.Graphics.Drawables
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
-
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposing)
             {
-                Texture = null;
-                disposedValue = true;
             }
+            Texture = null;
         }
 
         public void Dispose()

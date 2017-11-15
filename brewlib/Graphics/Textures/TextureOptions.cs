@@ -9,7 +9,7 @@ using System.Resources;
 
 namespace BrewLib.Graphics.Textures
 {
-    public class TextureOptions
+    public class TextureOptions : IEquatable<TextureOptions>
     {
         public static readonly TextureOptions Default = new TextureOptions();
 
@@ -35,6 +35,20 @@ namespace BrewLib.Graphics.Textures
             GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)TextureWrapT);
             DrawState.CheckError("applying texture parameters");
         }
+
+        public bool Equals(TextureOptions other)
+        {
+            return Srgb == other.Srgb &&
+                GenerateMipmaps == other.GenerateMipmaps &&
+                TextureLodBias == other.TextureLodBias &&
+                TextureMinFilter == other.TextureMinFilter &&
+                TextureMagFilter == other.TextureMagFilter &&
+                TextureWrapS == other.TextureWrapS &&
+                TextureWrapT == other.TextureWrapT;
+        }
+
+        public override int GetHashCode()
+            => TextureLodBias + (int)TextureMinFilter + (int)TextureMagFilter + (int)TextureWrapS + (int)TextureWrapT;
 
         public static string GetOptionsFilename(string textureFilename)
             => Path.Combine(Path.GetDirectoryName(textureFilename), Path.GetFileNameWithoutExtension(textureFilename) + "-opt.json");

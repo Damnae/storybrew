@@ -64,37 +64,40 @@ namespace BrewLib.Graphics.Textures
 
         #endregion
 
-        public static Texture2d Load(string filename, ResourceManager resourceManager = null, TextureOptions textureOptions = null)
+        public static Bitmap LoadBitmap(string filename, ResourceManager resourceManager = null)
         {
-            try
-            {
-                textureOptions = textureOptions ?? TextureOptions.Load(TextureOptions.GetOptionsFilename(filename), resourceManager);
-            }
-            catch (FileNotFoundException)
-            {
-                Trace.WriteLine($"No texture options for {filename}");
-            }
-
             if (File.Exists(filename))
-                using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    return Load(stream, filename, textureOptions);
+                return (Bitmap)Image.FromFile(filename, false);
 
             if (resourceManager == null) return null;
             var resourceName = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
 
-            using (var bitmap = resourceManager.GetObject(resourceName) as Bitmap)
-                if (bitmap != null) return Load(bitmap, $"file:{filename}", textureOptions);
-                else
-                {
-                    Trace.WriteLine($"Texture not found: {filename} / {resourceName}");
-                    return null;
-                }
+            var bitmap = resourceManager.GetObject(resourceName) as Bitmap;
+            if (bitmap == null)
+            {
+                Trace.WriteLine($"Texture not found: {filename} / {resourceName}");
+                return null;
+            }
+            return bitmap;
         }
 
-        public static Texture2d Load(Stream stream, string filename, TextureOptions textureOptions = null)
+        public static TextureOptions LoadTextureOptions(string forBitmapFilename, ResourceManager resourceManager = null)
         {
-            using (var bitmap = (Bitmap)Image.FromStream(stream, false, false))
-                return Load(bitmap, $"file:{filename}", textureOptions);
+            try
+            {
+                return TextureOptions.Load(TextureOptions.GetOptionsFilename(forBitmapFilename), resourceManager);
+            }
+            catch (FileNotFoundException)
+            {
+                Trace.WriteLine($"No texture options for {forBitmapFilename}");
+            }
+            return null;
+        }
+
+        public static Texture2d Load(string filename, ResourceManager resourceManager = null, TextureOptions textureOptions = null)
+        {
+            using (var bitmap = LoadBitmap(filename, resourceManager))
+                return bitmap != null ? Load(bitmap, $"file:{filename}", textureOptions ?? LoadTextureOptions(filename, resourceManager)) : null;
         }
 
         public static Texture2d Create(Color4 color, string description, int width = 1, int height = 1, TextureOptions textureOptions = null)

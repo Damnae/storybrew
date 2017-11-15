@@ -355,7 +355,7 @@ namespace BrewLib.UserInterface.Skinning
             [typeof(double)] = (data, skin) => data.Value<double>(),
             [typeof(int)] = (data, skin) => data.Value<int>(),
             [typeof(bool)] = (data, skin) => data.Value<bool>(),
-            [typeof(Texture2d)] = (data, skin) => skin.TextureContainer.Get(data.Value<string>()),
+            [typeof(Texture2dRegion)] = (data, skin) => skin.TextureContainer.Get(data.Value<string>()),
             [typeof(Drawable)] = (data, skin) => skin.loadDrawable(data),
             [typeof(Vector2)] = (data, skin) =>
             {
