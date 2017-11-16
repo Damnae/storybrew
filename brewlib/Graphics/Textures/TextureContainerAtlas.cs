@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using BrewLib.Data;
+using System.Collections.Generic;
 using System.Resources;
 
 namespace BrewLib.Graphics.Textures
 {
     public class TextureContainerAtlas : TextureContainer
     {
-        private ResourceManager resourceManager;
+        private ResourceContainer resourceContainer;
         private TextureOptions textureOptions;
         private int width;
         private int height;
@@ -14,9 +15,9 @@ namespace BrewLib.Graphics.Textures
         private Dictionary<string, Texture2dRegion> textures = new Dictionary<string, Texture2dRegion>();
         private Dictionary<TextureOptions, TextureMultiAtlas2d> atlases = new Dictionary<TextureOptions, TextureMultiAtlas2d>();
 
-        public TextureContainerAtlas(ResourceManager resourceManager = null, TextureOptions textureOptions = null, int width = 512, int height = 512, string description = nameof(TextureContainerAtlas))
+        public TextureContainerAtlas(ResourceContainer resourceContainer = null, TextureOptions textureOptions = null, int width = 512, int height = 512, string description = nameof(TextureContainerAtlas))
         {
-            this.resourceManager = resourceManager;
+            this.resourceContainer = resourceContainer;
             this.textureOptions = textureOptions;
             this.width = width;
             this.height = height;
@@ -27,13 +28,15 @@ namespace BrewLib.Graphics.Textures
         {
             if (!textures.TryGetValue(filename, out Texture2dRegion texture))
             {
-                var textureOptions = this.textureOptions ?? Texture2d.LoadTextureOptions(filename, resourceManager) ?? TextureOptions.Default;
+                var textureOptions = this.textureOptions ?? Texture2d.LoadTextureOptions(filename, resourceContainer) ?? TextureOptions.Default;
                 if (!atlases.TryGetValue(textureOptions, out TextureMultiAtlas2d atlas))
                     atlases.Add(textureOptions, atlas = new TextureMultiAtlas2d(width, height, $"{description} (Option set {atlases.Count})", textureOptions));
 
-                using (var bitmap = Texture2d.LoadBitmap(filename, resourceManager))
-                    texture = atlas.AddRegion(bitmap, filename);
-
+                using (var bitmap = Texture2d.LoadBitmap(filename, resourceContainer))
+                {
+                    if (bitmap != null)
+                        texture = atlas.AddRegion(bitmap, filename);
+                }
                 textures.Add(filename, texture);
             }
             return texture;

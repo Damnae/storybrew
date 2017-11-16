@@ -89,11 +89,6 @@
     <Compile Include="Editor.cs" />
     <Compile Include="Processes\RemoteProcessWorkerContainer.cs" />
     <Compile Include="Processes\RemoteProcessWorker.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="ScreenLayers\Test\LineBreakTest.cs" />
     <Compile Include="Scripting\ScriptContainer.cs" />
     <Compile Include="Scripting\ScriptContainerBase.cs" />
@@ -112,7 +107,7 @@
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
     <None Include="OpenTK.dll.config" />
-    <None Include="Resources\scripttemplate.csx" />
+    <EmbeddedResource Include="Resources\scripttemplate.csx" />
     <Compile Include="ScreenLayers\Test\FlowLayoutTest.cs" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
@@ -156,16 +151,16 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Resources\FontAwesome.ttf" />
-    <None Include="Resources\Roboto-Light.ttf" />
-    <None Include="Resources\Roboto-Regular.ttf" />
-    <None Include="Resources\ui-rounded-borders-opt.json" />
-    <None Include="Resources\ui-line-opt.json" />
-    <None Include="Resources\skin_styles.json" />
-    <None Include="Resources\skin_drawables_debug.json" />
-    <None Include="Resources\skin_drawables.json" />
-    <None Include="Resources\skin_constants.json" />
-    <None Include="Resources\skin.json" />
+    <EmbeddedResource Include="Resources\FontAwesome.ttf" />
+    <EmbeddedResource Include="Resources\Roboto-Light.ttf" />
+    <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
+    <EmbeddedResource Include="Resources\ui-rounded-borders-opt.json" />
+    <EmbeddedResource Include="Resources\ui-line-opt.json" />
+    <EmbeddedResource Include="Resources\skin_styles.json" />
+    <EmbeddedResource Include="Resources\skin_drawables_debug.json" />
+    <EmbeddedResource Include="Resources\skin_drawables.json" />
+    <EmbeddedResource Include="Resources\skin_constants.json" />
+    <EmbeddedResource Include="Resources\skin.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\brewlib\brewlib.csproj">
@@ -179,16 +174,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icon.ico" />
-    <Content Include="Resources\project\scripts.csproj" />
-    <Content Include="Resources\project\storyboard.sln" />
-    <Content Include="Resources\ui-line.png" />
-    <Content Include="Resources\ui-rounded-borders.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\project\scripts.csproj" />
+    <EmbeddedResource Include="Resources\project\storyboard.sln" />
+    <EmbeddedResource Include="Resources\ui-line.png" />
+    <EmbeddedResource Include="Resources\ui-rounded-borders.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

@@ -1,4 +1,5 @@
-﻿using BrewLib.Graphics;
+﻿using BrewLib.Data;
+using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Drawables;
 using BrewLib.Graphics.Renderers;
@@ -34,6 +35,7 @@ namespace StorybrewEditor
 
         private DrawContext drawContext;
 
+        public ResourceContainer ResourceContainer;
         public Skin Skin;
         public ScreenLayerManager ScreenLayerManager;
         public InputManager InputManager;
@@ -46,10 +48,12 @@ namespace StorybrewEditor
 
         public void Initialize(ScreenLayer initialLayer = null)
         {
-            DrawState.Initialize(Resources.ResourceManager, window.Width, window.Height);
+            ResourceContainer = new ResourceContainer(Assembly.GetEntryAssembly(), $"{nameof(StorybrewEditor)}.Resources");
+
+            DrawState.Initialize(ResourceContainer, window.Width, window.Height);
             drawContext = new DrawContext();
             drawContext.Register(this, false);
-            drawContext.Register<TextureContainer>(new TextureContainerAtlas(Resources.ResourceManager), true);
+            drawContext.Register<TextureContainer>(new TextureContainerAtlas(ResourceContainer), true);
             drawContext.Register<SpriteRenderer>(new SpriteRendererBuffered(), true);
             drawContext.Register<LineRenderer>(new LineRendererBuffered(), true);
 
@@ -67,7 +71,7 @@ namespace StorybrewEditor
                         Type.GetType($"{nameof(StorybrewEditor)}.{nameof(UserInterface)}.{nameof(UserInterface.Skinning)}.{nameof(UserInterface.Skinning.Styles)}.{styleTypeName}", false, true) ??
                         brewLibAssembly.GetType($"{nameof(BrewLib)}.{nameof(UserInterface)}.{nameof(UserInterface.Skinning)}.{nameof(UserInterface.Skinning.Styles)}.{styleTypeName}", true, true),
                 };
-                Skin.Load("skin.json", Resources.ResourceManager);
+                Skin.Load("skin.json", ResourceContainer);
             }
             catch (Exception e)
             {

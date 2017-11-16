@@ -1,4 +1,5 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.Data;
+using BrewLib.Util;
 using StorybrewCommon.Scripting;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
@@ -16,6 +17,7 @@ namespace StorybrewEditor.Scripting
     public class ScriptManager<TScript> : IDisposable
         where TScript : Script
     {
+        private ResourceContainer resourceContainer;
         private string scriptsNamespace;
         private string scriptsSourcePath;
         private string commonScriptsPath;
@@ -42,8 +44,9 @@ namespace StorybrewEditor.Scripting
 
         public string ScriptsPath => scriptsSourcePath;
 
-        public ScriptManager(string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string scriptsLibraryPath, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
+        public ScriptManager(ResourceContainer resourceContainer, string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string scriptsLibraryPath, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
         {
+            this.resourceContainer = resourceContainer;
             this.scriptsNamespace = scriptsNamespace;
             this.scriptsSourcePath = scriptsSourcePath;
             this.commonScriptsPath = commonScriptsPath;
@@ -174,13 +177,13 @@ namespace StorybrewEditor.Scripting
             Trace.WriteLine($"Updating solution files");
 
             var slnPath = Path.Combine(scriptsSourcePath, "storyboard.sln");
-            File.WriteAllBytes(slnPath, Resources.project_storyboard_sln);
+            File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln"));
 
             var csProjPath = Path.Combine(scriptsSourcePath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
             try
             {
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Resources.project_scripts_csproj)))
+                using (var stream = resourceContainer.GetStream("project/scripts.csproj"))
                     document.Load(stream);
 
                 var xmlns = document.DocumentElement.GetAttribute("xmlns");

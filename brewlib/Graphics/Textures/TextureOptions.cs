@@ -1,4 +1,5 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.Data;
+using BrewLib.Util;
 using Newtonsoft.Json.Linq;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -53,16 +54,13 @@ namespace BrewLib.Graphics.Textures
         public static string GetOptionsFilename(string textureFilename)
             => Path.Combine(Path.GetDirectoryName(textureFilename), Path.GetFileNameWithoutExtension(textureFilename) + "-opt.json");
 
-        public static TextureOptions Load(string filename, ResourceManager resourceManager = null)
+        public static TextureOptions Load(string filename, ResourceContainer resourceContainer = null)
         {
             byte[] data;
             if (File.Exists(filename))
                 data = File.ReadAllBytes(filename);
             else
-            {
-                filename = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
-                data = resourceManager?.GetObject(filename) as byte[];
-            }
+                data = resourceContainer?.GetBytes(filename);
             if (data == null) throw new FileNotFoundException(filename);
             return load(data.ToJObject());
         }

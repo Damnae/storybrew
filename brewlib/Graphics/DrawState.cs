@@ -1,4 +1,5 @@
-﻿using BrewLib.Graphics.Cameras;
+﻿using BrewLib.Data;
+using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Renderers;
 using BrewLib.Graphics.Text;
 using BrewLib.Graphics.Textures;
@@ -29,7 +30,7 @@ namespace BrewLib.Graphics
 
         public static int TextureBinds { get; private set; }
 
-        public static void Initialize(ResourceManager resourceManager, int width, int height)
+        public static void Initialize(ResourceContainer resourceContainer, int width, int height)
         {
             retrieveRendererInfo();
             setupDebugOutput();
@@ -68,7 +69,7 @@ namespace BrewLib.Graphics
 
             whitePixel = Texture2d.Create(Color4.White, "whitepixel");
             normalPixel = Texture2d.Create(new Color4(0.5f, 0.5f, 1, 1), "normalpixel", 1, 1, new TextureOptions() { Srgb = false, });
-            textGenerator = new TextGenerator(resourceManager);
+            textGenerator = new TextGenerator(resourceContainer);
             textFontManager = new TextFontManager();
 
             Viewport = new Rectangle(0, 0, width, height);

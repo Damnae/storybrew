@@ -113,7 +113,9 @@ namespace StorybrewEditor.ScreenLayers
                 else
                     screenLayerManager.AsyncLoading("Loading project", () =>
                     {
-                        var project = Project.Load(projectPath, true);
+                        var resourceContainer = screenLayerManager.GetContext<Editor>().ResourceContainer;
+
+                        var project = Project.Load(projectPath, true, resourceContainer);
                         Program.Schedule(() => screenLayerManager.Set(new ProjectMenu(project)));
                     });
             });

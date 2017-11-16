@@ -1,4 +1,5 @@
-﻿using BrewLib.Graphics.Drawables;
+﻿using BrewLib.Data;
+using BrewLib.Graphics.Drawables;
 using BrewLib.Graphics.Textures;
 using BrewLib.UserInterface.Skinning.Styles;
 using BrewLib.Util;
@@ -92,31 +93,28 @@ namespace BrewLib.UserInterface.Skinning
 
         #region Loading
 
-        public void Load(string filename, ResourceManager resourceManager = null)
-            => Load(loadJson(filename, resourceManager), resourceManager);
+        public void Load(string filename, ResourceContainer resourceContainer = null)
+            => Load(loadJson(filename, resourceContainer), resourceContainer);
 
-        public void Load(JObject data, ResourceManager resourceManager = null)
+        public void Load(JObject data, ResourceContainer resourceContainer = null)
         {
-            //File.WriteAllText("_skin_debug.json", data.ToString());
+            File.WriteAllText("_skin_debug.json", data.ToString());
             loadDrawables(data["drawables"]);
             loadStyles(data["styles"]);
         }
 
-        private JObject loadJson(string filename, ResourceManager resourceManager)
+        private JObject loadJson(string filename, ResourceContainer resourceContainer)
         {
             byte[] data;
             if (File.Exists(filename))
                 data = File.ReadAllBytes(filename);
             else
-            {
-                filename = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
-                data = resourceManager?.GetObject(filename) as byte[];
-            }
+                data = resourceContainer?.GetBytes(filename);
             if (data == null) throw new FileNotFoundException(filename);
-            return resolveIncludes(data.ToJObject(), resourceManager);
+            return resolveIncludes(data.ToJObject(), resourceContainer);
         }
 
-        private JObject resolveIncludes(JObject data, ResourceManager resourceManager)
+        private JObject resolveIncludes(JObject data, ResourceContainer resourceContainer)
         {
             if (data["include"] != null)
             {
@@ -124,7 +122,7 @@ namespace BrewLib.UserInterface.Skinning
                 foreach (var include in snapshot)
                 {
                     var path = include.Value<string>();
-                    var includedData = loadJson(path, resourceManager);
+                    var includedData = loadJson(path, resourceContainer);
                     data.Merge(includedData, new JsonMergeSettings()
                     {
                         MergeArrayHandling = MergeArrayHandling.Union,

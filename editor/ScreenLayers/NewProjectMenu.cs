@@ -102,7 +102,8 @@ namespace StorybrewEditor.ScreenLayers
         {
             Manager.AsyncLoading("Creating project", () =>
             {
-                var project = Project.Create(projectNameTextbox.Value, mapsetPathSelector.Value, true);
+                var resourceContainer = Manager.GetContext<Editor>().ResourceContainer;
+                var project = Project.Create(projectNameTextbox.Value, mapsetPathSelector.Value, true, resourceContainer);
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
             });
         }

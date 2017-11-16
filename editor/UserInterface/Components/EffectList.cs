@@ -268,6 +268,8 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void createScript(string name)
         {
+            var resourceContainer = Manager.ScreenLayerManager.GetContext<Editor>().ResourceContainer;
+
             name = Regex.Replace(name, @"([A-Z])", " $1");
             name = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(name);
             name = Regex.Replace(name, @"[^0-9a-zA-Z]", "");
@@ -275,7 +277,7 @@ namespace StorybrewEditor.UserInterface.Components
             if (name.Length == 0) name = "EffectScript";
 
             var path = Path.Combine(project.ScriptsPath, $"{name}.cs");
-            var script = Encoding.UTF8.GetString(Resources.scripttemplate).StripUtf8Bom();
+            var script = resourceContainer.GetString("scripttemplate.csx");
             script = script.Replace("%CLASSNAME%", name);
 
             if (File.Exists(path))

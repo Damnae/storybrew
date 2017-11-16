@@ -1,4 +1,5 @@
-﻿using BrewLib.Graphics.Textures;
+﻿using BrewLib.Data;
+using BrewLib.Graphics.Textures;
 using BrewLib.Util;
 using OpenTK;
 using System;
@@ -25,11 +26,11 @@ namespace BrewLib.Graphics.Text
         private Dictionary<string, PrivateFontCollection> fontCollections = new Dictionary<string, PrivateFontCollection>();
         private LinkedList<string> recentlyUsedFonts = new LinkedList<string>();
 
-        private ResourceManager resourceManager;
+        private ResourceContainer resourceContainer;
 
-        public TextGenerator(ResourceManager resourceManager)
+        public TextGenerator(ResourceContainer resourceContainer)
         {
-            this.resourceManager = resourceManager;
+            this.resourceContainer = resourceContainer;
         }
 
         public Bitmap CreateBitmap(string text, string fontName, float fontSize, Vector2 maxSize, Vector2 padding, BoxAlignment alignment, StringTrimming trimming, out Vector2 textureSize, bool measureOnly)
@@ -110,11 +111,7 @@ namespace BrewLib.Graphics.Text
 
         private Font getFont(string name, float emSize, FontStyle style)
         {
-            var resourceName = name.Replace(' ', '_').Replace('-', '_');
-            if (resourceName.Contains("."))
-                resourceName = resourceName.Substring(0, name.LastIndexOf("."));
-
-            var identifier = $"{resourceName}|{emSize}|{(int)style}";
+            var identifier = $"{name}|{emSize}|{(int)style}";
 
             if (fonts.TryGetValue(identifier, out Font font))
             {
@@ -134,16 +131,16 @@ namespace BrewLib.Graphics.Text
                     fonts.Remove(lastFontIdentifier);
                 }
 
-            if (!fontFamilies.TryGetValue(resourceName, out FontFamily fontFamily))
+            if (!fontFamilies.TryGetValue(name, out FontFamily fontFamily))
             {
-                var bytes = (byte[])resourceManager.GetObject(resourceName);
+                var bytes = resourceContainer.GetBytes(name);
                 if (bytes != null)
                 {
                     GCHandle pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                     try
                     {
-                        if (!fontCollections.TryGetValue(resourceName, out PrivateFontCollection fontCollection))
-                            fontCollections.Add(resourceName, fontCollection = new PrivateFontCollection());
+                        if (!fontCollections.TryGetValue(name, out PrivateFontCollection fontCollection))
+                            fontCollections.Add(name, fontCollection = new PrivateFontCollection());
 
                         IntPtr ptr = pinnedArray.AddrOfPinnedObject();
                         fontCollection.AddMemoryFont(ptr, bytes.Length);
@@ -151,20 +148,20 @@ namespace BrewLib.Graphics.Text
                         if (fontCollection.Families.Length == 1)
                         {
                             fontFamily = fontCollection.Families[0];
-                            Trace.WriteLine($"Loaded font {fontFamily.Name} for {name}/{resourceName}");
+                            Trace.WriteLine($"Loaded font {fontFamily.Name} for {name}");
                         }
-                        else Trace.WriteLine($"Failed to load font {name}/{resourceName}: Expected one family, got {fontCollection.Families.Length}");
+                        else Trace.WriteLine($"Failed to load font {name}: Expected one family, got {fontCollection.Families.Length}");
                     }
                     catch (Exception e)
                     {
-                        Trace.WriteLine($"Failed to load font {name}/{resourceName}: {e.Message}");
+                        Trace.WriteLine($"Failed to load font {name}: {e.Message}");
                     }
                     finally
                     {
                         pinnedArray.Free();
                     }
                 }
-                fontFamilies.Add(resourceName, fontFamily);
+                fontFamilies.Add(name, fontFamily);
             }
 
             if (fontFamily != null)
@@ -172,7 +169,7 @@ namespace BrewLib.Graphics.Text
             else
             {
                 font = new Font(name, emSize, style);
-                Trace.WriteLine($"Using font system font for {name}/{resourceName}");
+                Trace.WriteLine($"Using font system font for {name}");
             }
 
             fonts.Add(identifier, font);

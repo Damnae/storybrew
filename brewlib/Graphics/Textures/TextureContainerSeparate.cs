@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using BrewLib.Data;
+using System.Collections.Generic;
 using System.Resources;
 
 namespace BrewLib.Graphics.Textures
 {
     public class TextureContainerSeparate : TextureContainer
     {
-        private ResourceManager resourceManager;
+        private ResourceContainer resourceContainer;
         private TextureOptions textureOptions;
 
         private Dictionary<string, Texture2d> textures = new Dictionary<string, Texture2d>();
 
-        public TextureContainerSeparate(ResourceManager resourceManager = null, TextureOptions textureOptions = null)
+        public TextureContainerSeparate(ResourceContainer resourceContainer = null, TextureOptions textureOptions = null)
         {
-            this.resourceManager = resourceManager;
+            this.resourceContainer = resourceContainer;
             this.textureOptions = textureOptions;
         }
 
@@ -20,7 +21,7 @@ namespace BrewLib.Graphics.Textures
         {
             if (!textures.TryGetValue(filename, out Texture2d texture))
             {
-                texture = Texture2d.Load(filename, resourceManager, textureOptions);
+                texture = Texture2d.Load(filename, resourceContainer, textureOptions);
                 textures.Add(filename, texture);
             }
             return texture;

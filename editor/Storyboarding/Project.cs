@@ -1,4 +1,5 @@
 ﻿using BrewLib.Audio;
+using BrewLib.Data;
 using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Textures;
@@ -96,7 +97,7 @@ namespace StorybrewEditor.Storyboarding
         private LayerManager layerManager = new LayerManager();
         public LayerManager LayerManager => layerManager;
 
-        public Project(string projectPath, bool withCommonScripts)
+        public Project(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
         {
             this.projectPath = projectPath;
 
@@ -129,7 +130,7 @@ namespace StorybrewEditor.Storyboarding
                 cleanupFolder(compiledScriptsPath, "*.pdb");
             }
 
-            scriptManager = new ScriptManager<StoryboardObjectGenerator>("StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, ReferencedAssemblies);
+            scriptManager = new ScriptManager<StoryboardObjectGenerator>(resourceContainer, "StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, ReferencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
             layerManager.OnLayersChanged +=
@@ -186,7 +187,7 @@ namespace StorybrewEditor.Storyboarding
         public IEnumerable<Effect> Effects => effects;
         public event EventHandler OnEffectsChanged;
 
-        public EffectStatus effectsStatus = EffectStatus.Initializing;
+        private EffectStatus effectsStatus = EffectStatus.Initializing;
         public EffectStatus EffectsStatus => effectsStatus;
         public event EventHandler OnEffectsStatusChanged;
 
@@ -493,9 +494,9 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectPath, bool withCommonScripts)
+        public static Project Load(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
         {
-            var project = new Project(projectPath, withCommonScripts);
+            var project = new Project(projectPath, withCommonScripts, resourceContainer);
             using (var stream = new FileStream(projectPath, FileMode.Open))
             using (var r = new BinaryReader(stream, Encoding.UTF8))
             {
@@ -584,7 +585,7 @@ namespace StorybrewEditor.Storyboarding
             return project;
         }
 
-        public static Project Create(string projectFolderName, string mapsetPath, bool withCommonScripts)
+        public static Project Create(string projectFolderName, string mapsetPath, bool withCommonScripts, ResourceContainer resourceContainer)
         {
             if (!Directory.Exists(ProjectsFolder))
                 Directory.CreateDirectory(ProjectsFolder);
@@ -605,7 +606,7 @@ namespace StorybrewEditor.Storyboarding
                 throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
-            var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts)
+            var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts, resourceContainer)
             {
                 MapsetPath = mapsetPath,
             };

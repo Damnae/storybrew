@@ -1,4 +1,5 @@
-﻿using BrewLib.Util;
+﻿using BrewLib.Data;
+using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -64,28 +65,28 @@ namespace BrewLib.Graphics.Textures
 
         #endregion
 
-        public static Bitmap LoadBitmap(string filename, ResourceManager resourceManager = null)
+        public static Bitmap LoadBitmap(string filename, ResourceContainer resourceContainer = null)
         {
             if (File.Exists(filename))
                 return (Bitmap)Image.FromFile(filename, false);
 
-            if (resourceManager == null) return null;
-            var resourceName = filename.Substring(0, filename.LastIndexOf(".")).Replace('-', '_');
-
-            var bitmap = resourceManager.GetObject(resourceName) as Bitmap;
-            if (bitmap == null)
+            if (resourceContainer == null) return null;
+            using (var stream = resourceContainer.GetStream(filename))
             {
-                Trace.WriteLine($"Texture not found: {filename} / {resourceName}");
-                return null;
+                if (stream == null)
+                {
+                    Trace.WriteLine($"Texture not found: {filename}");
+                    return null;
+                }
+                return (Bitmap)Image.FromStream(stream, false);
             }
-            return bitmap;
         }
 
-        public static TextureOptions LoadTextureOptions(string forBitmapFilename, ResourceManager resourceManager = null)
+        public static TextureOptions LoadTextureOptions(string forBitmapFilename, ResourceContainer resourceContainer = null)
         {
             try
             {
-                return TextureOptions.Load(TextureOptions.GetOptionsFilename(forBitmapFilename), resourceManager);
+                return TextureOptions.Load(TextureOptions.GetOptionsFilename(forBitmapFilename), resourceContainer);
             }
             catch (FileNotFoundException)
             {
@@ -94,10 +95,10 @@ namespace BrewLib.Graphics.Textures
             return null;
         }
 
-        public static Texture2d Load(string filename, ResourceManager resourceManager = null, TextureOptions textureOptions = null)
+        public static Texture2d Load(string filename, ResourceContainer resourceContainer = null, TextureOptions textureOptions = null)
         {
-            using (var bitmap = LoadBitmap(filename, resourceManager))
-                return bitmap != null ? Load(bitmap, $"file:{filename}", textureOptions ?? LoadTextureOptions(filename, resourceManager)) : null;
+            using (var bitmap = LoadBitmap(filename, resourceContainer))
+                return bitmap != null ? Load(bitmap, $"file:{filename}", textureOptions ?? LoadTextureOptions(filename, resourceContainer)) : null;
         }
 
         public static Texture2d Create(Color4 color, string description, int width = 1, int height = 1, TextureOptions textureOptions = null)
