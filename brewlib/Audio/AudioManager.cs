@@ -1,4 +1,5 @@
-﻿using ManagedBass;
+﻿using BrewLib.Data;
+using ManagedBass;
 using System;
 using System.Collections.Generic;
 using System.Resources;
@@ -44,15 +45,15 @@ namespace BrewLib.Audio
             }
         }
 
-        public AudioStream LoadStream(string path, ResourceManager resourceManager = null)
+        public AudioStream LoadStream(string path, ResourceContainer resourceContainer = null)
         {
-            var audio = new AudioStream(this, path, resourceManager);
+            var audio = new AudioStream(this, path, resourceContainer);
             RegisterChannel(audio);
             return audio;
         }
 
-        public AudioSample LoadSample(string path, ResourceManager resourceManager = null)
-            => new AudioSample(this, path, resourceManager);
+        public AudioSample LoadSample(string path, ResourceContainer resourceContainer = null)
+            => new AudioSample(this, path, resourceContainer);
 
         internal void RegisterChannel(AudioChannel channel)
            => audioChannels.Add(channel);

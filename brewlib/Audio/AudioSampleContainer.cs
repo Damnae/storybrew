@@ -1,27 +1,33 @@
-﻿using System;
+﻿using BrewLib.Data;
+using BrewLib.Util;
+using System;
 using System.Collections.Generic;
-using System.Resources;
+using System.Linq;
 
 namespace BrewLib.Audio
 {
     public class AudioContainer : IDisposable
     {
         private AudioManager audioManager;
-        private ResourceManager resourceManager;
+        private ResourceContainer resourceContainer;
 
         private Dictionary<string, AudioSample> samples = new Dictionary<string, AudioSample>();
 
-        public AudioContainer(AudioManager audioManager, ResourceManager resourceManager = null)
+        public IEnumerable<string> ResourceNames
+            => samples.Where(e => e.Value != null).Select(e => e.Key);
+
+        public AudioContainer(AudioManager audioManager, ResourceContainer resourceContainer = null)
         {
             this.audioManager = audioManager;
-            this.resourceManager = resourceManager;
+            this.resourceContainer = resourceContainer;
         }
 
         public AudioSample Get(string filename)
         {
+            filename = PathHelper.WithStandardSeparators(filename);
             if (!samples.TryGetValue(filename, out AudioSample sample))
             {
-                sample = audioManager.LoadSample(filename, resourceManager);
+                sample = audioManager.LoadSample(filename, resourceContainer);
                 samples.Add(filename, sample);
             }
             return sample;

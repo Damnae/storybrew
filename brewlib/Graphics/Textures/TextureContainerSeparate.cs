@@ -1,6 +1,7 @@
 ﻿using BrewLib.Data;
+using BrewLib.Util;
 using System.Collections.Generic;
-using System.Resources;
+using System.Linq;
 
 namespace BrewLib.Graphics.Textures
 {
@@ -11,6 +12,9 @@ namespace BrewLib.Graphics.Textures
 
         private Dictionary<string, Texture2d> textures = new Dictionary<string, Texture2d>();
 
+        public IEnumerable<string> ResourceNames
+            => textures.Where(e => e.Value != null).Select(e => e.Key);
+
         public TextureContainerSeparate(ResourceContainer resourceContainer = null, TextureOptions textureOptions = null)
         {
             this.resourceContainer = resourceContainer;
@@ -19,6 +23,7 @@ namespace BrewLib.Graphics.Textures
 
         public Texture2dRegion Get(string filename)
         {
+            filename = PathHelper.WithStandardSeparators(filename);
             if (!textures.TryGetValue(filename, out Texture2d texture))
             {
                 texture = Texture2d.Load(filename, resourceContainer, textureOptions);

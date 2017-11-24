@@ -177,13 +177,13 @@ namespace StorybrewEditor.Scripting
             Trace.WriteLine($"Updating solution files");
 
             var slnPath = Path.Combine(scriptsSourcePath, "storyboard.sln");
-            File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln"));
+            File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative));
 
             var csProjPath = Path.Combine(scriptsSourcePath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
             try
             {
-                using (var stream = resourceContainer.GetStream("project/scripts.csproj"))
+                using (var stream = resourceContainer.GetStream("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative))
                     document.Load(stream);
 
                 var xmlns = document.DocumentElement.GetAttribute("xmlns");

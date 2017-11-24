@@ -1,4 +1,5 @@
-﻿using BrewLib.UserInterface;
+﻿using BrewLib.Data;
+using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
 using StorybrewEditor.ScreenLayers;
@@ -277,7 +278,7 @@ namespace StorybrewEditor.UserInterface.Components
             if (name.Length == 0) name = "EffectScript";
 
             var path = Path.Combine(project.ScriptsPath, $"{name}.cs");
-            var script = resourceContainer.GetString("scripttemplate.csx");
+            var script = resourceContainer.GetString("scripttemplate.csx", ResourceSource.Embedded | ResourceSource.Relative);
             script = script.Replace("%CLASSNAME%", name);
 
             if (File.Exists(path))

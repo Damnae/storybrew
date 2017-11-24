@@ -1,7 +1,7 @@
-﻿using ManagedBass;
+﻿using BrewLib.Data;
+using ManagedBass;
 using ManagedBass.Fx;
 using System.Diagnostics;
-using System.Resources;
 
 namespace BrewLib.Audio
 {
@@ -13,7 +13,7 @@ namespace BrewLib.Audio
         private int stream;
         private int decodeStream;
 
-        internal AudioStream(AudioManager manager, string path, ResourceManager resourceManager) : base(manager)
+        internal AudioStream(AudioManager manager, string path, ResourceContainer resourceContainer) : base(manager)
         {
             this.path = path;
 

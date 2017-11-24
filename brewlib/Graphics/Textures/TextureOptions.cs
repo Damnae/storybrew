@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Resources;
 
 namespace BrewLib.Graphics.Textures
 {
@@ -59,10 +58,9 @@ namespace BrewLib.Graphics.Textures
             byte[] data;
             if (File.Exists(filename))
                 data = File.ReadAllBytes(filename);
-            else
-                data = resourceContainer?.GetBytes(filename);
-            if (data == null) throw new FileNotFoundException(filename);
-            return load(data.ToJObject());
+            else data = resourceContainer?.GetBytes(filename);
+
+            return data != null ? load(data.ToJObject()) : null;
         }
 
         private static TextureOptions load(JObject data)

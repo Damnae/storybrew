@@ -68,7 +68,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Load();
 
-            audio = Program.AudioManager.LoadStream(project.AudioPath);
+            audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
 
             WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager)
             {
@@ -538,7 +538,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             var previousAudio = audio;
 
-            audio = Program.AudioManager.LoadStream(project.AudioPath);
+            audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
             timeline.MaxValue = (float)audio.Duration;
 
             if (previousAudio != null)

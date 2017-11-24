@@ -1,7 +1,7 @@
-﻿using ManagedBass;
+﻿using BrewLib.Data;
+using ManagedBass;
 using System;
 using System.Diagnostics;
-using System.Resources;
 
 namespace BrewLib.Audio
 {
@@ -16,17 +16,22 @@ namespace BrewLib.Audio
 
         public readonly AudioManager Manager;
 
-        internal AudioSample(AudioManager audioManager, string path, ResourceManager resourceManager)
+        internal AudioSample(AudioManager audioManager, string path, ResourceContainer resourceContainer)
         {
             Manager = audioManager;
             this.path = path;
 
             sample = Bass.SampleLoad(path, 0, 0, MaxSimultaneousPlayBacks, BassFlags.SampleOverrideLongestPlaying);
-            if (sample == 0)
+            if (sample != 0) return;
+
+            var bytes = resourceContainer?.GetBytes(path);
+            if (bytes != null)
             {
-                Trace.WriteLine($"Failed to load audio sample ({path}): {Bass.LastError}");
-                return;
+                sample = Bass.SampleLoad(bytes, 0, 0, MaxSimultaneousPlayBacks, BassFlags.SampleOverrideLongestPlaying);
+                if (sample != 0) return;
             }
+
+            Trace.WriteLine($"Failed to load audio sample ({path}): {Bass.LastError}");
         }
 
         public void Play(float volume = 1)

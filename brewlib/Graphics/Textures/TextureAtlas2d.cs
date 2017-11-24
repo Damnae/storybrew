@@ -8,19 +8,21 @@ namespace BrewLib.Graphics.Textures
     public class TextureAtlas2d : IDisposable
     {
         private Texture2d texture;
+        private int padding;
         private int currentX;
         private int currentY;
         private int nextY;
 
         public float FillRatio => (texture.Width * currentY + currentX * (nextY - currentY)) / (texture.Width * texture.Height);
 
-        public TextureAtlas2d(Texture2d texture)
+        public TextureAtlas2d(Texture2d texture, int padding = 0)
         {
             this.texture = texture;
+            this.padding = padding;
         }
 
-        public TextureAtlas2d(int width, int height, string description, TextureOptions textureOptions = null)
-            : this(Texture2d.Create(new Color4(0, 0, 0, 0), description, width, height, textureOptions))
+        public TextureAtlas2d(int width, int height, string description, TextureOptions textureOptions = null, int padding = 0)
+            : this(Texture2d.Create(new Color4(0, 0, 0, 0), description, width, height, textureOptions), padding)
         {
         }
 
@@ -40,8 +42,8 @@ namespace BrewLib.Graphics.Textures
             texture.Update(bitmap, currentX, currentY);
             var region = new Texture2dRegion(texture, new Box2(currentX, currentY, currentX + bitmap.Width, currentY + bitmap.Height), description);
 
-            currentX += bitmap.Width;
-            nextY = Math.Max(nextY, currentY + bitmap.Height);
+            currentX += bitmap.Width + padding;
+            nextY = Math.Max(nextY, currentY + bitmap.Height + padding);
 
             return region;
         }

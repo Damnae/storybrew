@@ -64,7 +64,9 @@
     <Compile Include="Audio\AudioSampleContainer.cs" />
     <Compile Include="Audio\AudioStream.cs" />
     <Compile Include="Audio\FftStream.cs" />
+    <Compile Include="Data\AssemblyResourceContainer.cs" />
     <Compile Include="Data\ResourceContainer.cs" />
+    <Compile Include="Data\SubResourceContainer.cs" />
     <Compile Include="Graphics\Cameras\Camera.cs" />
     <Compile Include="Graphics\Cameras\CameraBase.cs" />
     <Compile Include="Graphics\Cameras\CameraIso.cs" />

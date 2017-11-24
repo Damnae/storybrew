@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Resources;
 
 namespace BrewLib.Graphics.Textures
 {
@@ -83,17 +82,7 @@ namespace BrewLib.Graphics.Textures
         }
 
         public static TextureOptions LoadTextureOptions(string forBitmapFilename, ResourceContainer resourceContainer = null)
-        {
-            try
-            {
-                return TextureOptions.Load(TextureOptions.GetOptionsFilename(forBitmapFilename), resourceContainer);
-            }
-            catch (FileNotFoundException)
-            {
-                Trace.WriteLine($"No texture options for {forBitmapFilename}");
-            }
-            return null;
-        }
+            => TextureOptions.Load(TextureOptions.GetOptionsFilename(forBitmapFilename), resourceContainer);
 
         public static Texture2d Load(string filename, ResourceContainer resourceContainer = null, TextureOptions textureOptions = null)
         {

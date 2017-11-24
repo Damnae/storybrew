@@ -48,7 +48,7 @@ namespace StorybrewEditor
 
         public void Initialize(ScreenLayer initialLayer = null)
         {
-            ResourceContainer = new ResourceContainer(Assembly.GetEntryAssembly(), $"{nameof(StorybrewEditor)}.Resources");
+            ResourceContainer = new AssemblyResourceContainer(Assembly.GetEntryAssembly(), $"{nameof(StorybrewEditor)}.Resources", "resources");
 
             DrawState.Initialize(ResourceContainer, window.Width, window.Height);
             drawContext = new DrawContext();
