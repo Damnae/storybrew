@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StorybrewEditor</RootNamespace>
     <AssemblyName>StorybrewEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -174,7 +174,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icon.ico" />
-    <EmbeddedResource Include="Resources\project\scripts.csproj" />
+    <EmbeddedResource Include="Resources\project\scripts.csproj">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\project\storyboard.sln" />
     <EmbeddedResource Include="Resources\ui-line.png" />
     <EmbeddedResource Include="Resources\ui-rounded-borders.png" />
