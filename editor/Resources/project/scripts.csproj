@@ -19,7 +19,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>\</OutputPath>
-	<IntermediateOutputPath>\</IntermediateOutputPath>
+    <IntermediateOutputPath>..\..\cache\obj</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
