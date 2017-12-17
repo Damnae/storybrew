@@ -32,6 +32,12 @@ namespace BrewLib.Graphics.Textures
 
         public void Update(Bitmap bitmap, int x, int y)
         {
+            if (bitmap.Width < 1 || bitmap.Height < 1)
+                throw new InvalidOperationException($"Invalid bitmap size: {bitmap.Width}x{bitmap.Height}");
+
+            if (x + bitmap.Width > Width || y + bitmap.Height > Height)
+                throw new InvalidOperationException($"Invalid update bounds: {bitmap.Width}x{bitmap.Height} at {x},{y} overflows {Width}x{Height}");
+
             DrawState.BindPrimaryTexture(textureId, TexturingModes.Texturing2d);
 
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -92,6 +98,9 @@ namespace BrewLib.Graphics.Textures
 
         public static Texture2d Create(Color4 color, string description, int width = 1, int height = 1, TextureOptions textureOptions = null)
         {
+            if (width < 1 || height < 1)
+                throw new InvalidOperationException($"Invalid texture size: {width}x{height}");
+
             textureOptions = textureOptions ?? TextureOptions.Default;
 
             var textureId = GL.GenTexture();
