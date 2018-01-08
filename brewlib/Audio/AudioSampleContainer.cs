@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace BrewLib.Audio
 {
-    public class AudioContainer : IDisposable
+    public class AudioSampleContainer : IDisposable
     {
         private AudioManager audioManager;
         private ResourceContainer resourceContainer;
@@ -16,7 +16,7 @@ namespace BrewLib.Audio
         public IEnumerable<string> ResourceNames
             => samples.Where(e => e.Value != null).Select(e => e.Key);
 
-        public AudioContainer(AudioManager audioManager, ResourceContainer resourceContainer = null)
+        public AudioSampleContainer(AudioManager audioManager, ResourceContainer resourceContainer = null)
         {
             this.audioManager = audioManager;
             this.resourceContainer = resourceContainer;

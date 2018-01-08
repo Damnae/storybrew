@@ -153,8 +153,8 @@ namespace StorybrewEditor.Storyboarding
         private TextureContainer textureContainer;
         public TextureContainer TextureContainer => textureContainer;
 
-        private AudioContainer audioContainer;
-        public AudioContainer AudioContainer => audioContainer;
+        private AudioSampleContainer audioContainer;
+        public AudioSampleContainer AudioContainer => audioContainer;
 
         public void TriggerEvents(double startTime, double endTime)
         {
@@ -176,7 +176,7 @@ namespace StorybrewEditor.Storyboarding
         private void reloadAudio()
         {
             audioContainer?.Dispose();
-            audioContainer = new AudioContainer(Program.AudioManager, null);
+            audioContainer = new AudioSampleContainer(Program.AudioManager, null);
         }
 
         #endregion
