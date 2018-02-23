@@ -12,6 +12,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -46,6 +47,7 @@ namespace StorybrewEditor
         public static void Main(string[] args)
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             //Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             if (args.Length != 0 && handleArguments(args))
