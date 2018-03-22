@@ -263,7 +263,7 @@ namespace StorybrewCommon.Util
                 return result;
             }
 
-            public bool disposed;
+            private bool disposed;
             public void Dispose()
             {
                 if (disposed) return;

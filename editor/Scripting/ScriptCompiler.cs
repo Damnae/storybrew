@@ -57,8 +57,14 @@ namespace StorybrewEditor.Scripting
                 if (errors.Count > 0)
                 {
                     var sourceLines = new Dictionary<string, string[]>();
-                    foreach (var sourcePath in sourcePaths)
-                        sourceLines[sourcePath.ToLowerInvariant()] = File.ReadAllText(sourcePath).Split('\n');
+                    try
+                    {
+                        foreach (var sourcePath in sourcePaths)
+                            sourceLines[Path.GetFullPath(sourcePath)] = File.ReadAllText(sourcePath).Split('\n');
+                    }
+                    catch
+                    {
+                    }
 
                     var message = new StringBuilder("Compilation error\n\n");
                     for (var i = 0; i < errors.Count; i++)
@@ -68,7 +74,16 @@ namespace StorybrewEditor.Scripting
                         {
                             message.AppendLine($"{error.FileName}, line {error.Line}: {error.ErrorText}");
                             if (i == errors.Count - 1 || error.Line != errors[i + 1].Line)
-                                message.AppendLine(sourceLines[error.FileName.ToLowerInvariant()][error.Line - 1]);
+                            {
+                                try
+                                {
+                                    var filename = Path.GetFullPath(error.FileName);
+                                    message.AppendLine(sourceLines[filename][error.Line - 1]);
+                                }
+                                catch
+                                {
+                                }
+                            }
                         }
                         else message.AppendLine(error.ErrorText);
                     }
