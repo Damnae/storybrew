@@ -10,7 +10,7 @@ namespace StorybrewScripts
         public int StartTime = 0;
 
         [Configurable]
-        public int EndTime = 10000;
+        public int EndTime = 0;
 
         [Configurable]
         public int BeatDivisor = 8;
@@ -29,7 +29,8 @@ namespace StorybrewScripts
             var hitobjectLayer = GetLayer("");
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                if (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime)
+                if ((StartTime != 0 || EndTime != 0) && 
+                    (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime))
                     continue;
 
                 var hSprite = hitobjectLayer.CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position);
