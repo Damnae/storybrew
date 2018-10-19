@@ -72,8 +72,17 @@ namespace BrewLib.Graphics.Textures
 
         public static Bitmap LoadBitmap(string filename, ResourceContainer resourceContainer = null)
         {
-            if (File.Exists(filename))
-                return (Bitmap)Image.FromFile(filename, false);
+            try
+            {
+                if (File.Exists(filename))
+                    return (Bitmap)Image.FromFile(filename, false);
+            }
+            catch (OutOfMemoryException)
+            {
+                // Dumb GDI+ shit
+                Trace.WriteLine($"Texture could not be loaded: {filename}");
+                return null;
+            }
 
             if (resourceContainer == null) return null;
             using (var stream = resourceContainer.GetStream(filename))
