@@ -19,7 +19,7 @@ namespace StorybrewScripts
         public int FadeTime = 200;
 
         [Configurable]
-        public string SpritePath = "sb/pl.png";
+        public string SpritePath = "sb/glow.png";
 
         [Configurable]
         public double SpriteScale = 1;

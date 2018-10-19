@@ -30,7 +30,7 @@ namespace StorybrewScripts
         public int BarCount = 96;
 
         [Configurable]
-        public string SpritePath = "sb/pl.png";
+        public string SpritePath = "sb/bar.png";
 
         [Configurable]
         public OsbOrigin SpriteOrigin = OsbOrigin.CentreLeft;
