@@ -147,7 +147,7 @@ namespace StorybrewScripts
                 sprite.Scale(line.StartTime, FontScale);
                 sprite.Fade(line.StartTime - 200, line.StartTime, 0, 1);
                 sprite.Fade(line.EndTime - 200, line.EndTime, 1, 0);
-                if (additive) sprite.Additive(line.EndTime - 200, line.EndTime);
+                if (additive) sprite.Additive(line.StartTime - 200, line.EndTime);
             }
         }
 
@@ -180,7 +180,7 @@ namespace StorybrewScripts
                             sprite.Scale(subtitleLine.StartTime, FontScale);
                             sprite.Fade(subtitleLine.StartTime - 200, subtitleLine.StartTime, 0, 1);
                             sprite.Fade(subtitleLine.EndTime - 200, subtitleLine.EndTime, 1, 0);
-                            if (additive) sprite.Additive(subtitleLine.EndTime - 200, subtitleLine.EndTime);
+                            if (additive) sprite.Additive(subtitleLine.StartTime - 200, subtitleLine.EndTime);
                         }
                         letterX += texture.BaseWidth * FontScale;
                     }
