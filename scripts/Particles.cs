@@ -90,7 +90,7 @@ namespace StorybrewScripts
             var particleDuration = ParticleDuration > 0 ? ParticleDuration :
                 Beatmap.GetTimingPointAt(StartTime).BeatDuration * 4;
 
-            // This is an exemple of using a sprite pool.
+            // This is an example of using a sprite pool.
             // Sprites using the same layer, path and origin can be reused as if they were multiple sprites.
 
             var layer = GetLayer("");
@@ -99,7 +99,7 @@ namespace StorybrewScripts
                 // This action runs for every sprite created from the pool, after all of them are created (AFTER the for loop below).
 
                 // It is intended to set states common to every sprite:
-                // In this exemple, this handles cases where all sprites will have the same color / opacity / scale / rotation / additive mode.
+                // In this example, this handles cases where all sprites will have the same color / opacity / scale / rotation / additive mode.
 
                 // Note that the pool is in a using block, this is necessary to run this action.
 

@@ -9,7 +9,7 @@ using System;
 namespace StorybrewScripts
 {
     /// <summary>
-    /// An exemple script containing en entire storyboard.
+    /// An example script containing en entire storyboard.
     /// It is best to split yours into multiple effects, or it could take a long time to update in the editor.
     /// 
     /// To be used with https://osu.ppy.sh/s/183628
