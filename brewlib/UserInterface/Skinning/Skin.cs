@@ -97,7 +97,7 @@ namespace BrewLib.UserInterface.Skinning
 
         public void Load(JObject data, ResourceContainer resourceContainer = null)
         {
-            File.WriteAllText("_skin_debug.json", data.ToString());
+            //File.WriteAllText("_skin_debug.json", data.ToString());
             loadDrawables(data["drawables"]);
             loadStyles(data["styles"]);
         }
