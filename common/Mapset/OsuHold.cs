@@ -10,7 +10,7 @@ namespace StorybrewCommon.Mapset
         public double endTime;
         public override double EndTime => endTime;
 
-        public static OsuHold Parse(Beatmap beatmap, string[] values, int x, int y, double startTime, HitObjectFlag flags, HitSoundAddition additions, ControlPoint timingPoint, ControlPoint controlPoint, int sampleType, int sampleAdditionsType, SampleSet sampleSet, float volume)
+        public static OsuHold Parse(Beatmap beatmap, string[] values, int x, int y, double startTime, HitObjectFlag flags, HitSoundAddition additions, ControlPoint timingPoint, ControlPoint controlPoint, SampleSet sampleSet, SampleSet additionsSampleSet, int customSampleSet, float volume)
         {
             string samplePath = string.Empty;
 
@@ -18,24 +18,24 @@ namespace StorybrewCommon.Mapset
             var specialValues = special.Split(':');
 
             var endTime = double.Parse(specialValues[0], CultureInfo.InvariantCulture);
-            var objectSampleType = int.Parse(specialValues[1]);
-            var objectSampleAdditionsType = int.Parse(specialValues[2]);
-            var objectSampleSet = (SampleSet)int.Parse(specialValues[3]);
+            var objectSampleSet = (SampleSet)int.Parse(specialValues[1]);
+            var objectAdditionsSampleSet = (SampleSet)int.Parse(specialValues[2]);
+            var objectCustomSampleSet = int.Parse(specialValues[3]);
             var objectVolume = 0.0f;
             if (specialValues.Length > 4)
                 objectVolume = int.Parse(specialValues[4]);
             if (specialValues.Length > 5)
                 samplePath = specialValues[5];
 
-            if (objectSampleType != 0)
-            {
-                sampleType = objectSampleType;
-                sampleAdditionsType = objectSampleType;
-            }
-            if (objectSampleAdditionsType != 0)
-                sampleAdditionsType = objectSampleAdditionsType;
             if (objectSampleSet != 0)
+            {
                 sampleSet = objectSampleSet;
+                additionsSampleSet = objectSampleSet;
+            }
+            if (objectAdditionsSampleSet != 0)
+                additionsSampleSet = objectAdditionsSampleSet;
+            if (objectCustomSampleSet != 0)
+                customSampleSet = objectCustomSampleSet;
             if (objectVolume > 0.001f)
                 volume = objectVolume;
 
@@ -45,9 +45,9 @@ namespace StorybrewCommon.Mapset
                 StartTime = startTime,
                 Flags = flags,
                 Additions = additions,
-                SampleType = sampleType,
-                SampleAdditionsType = sampleAdditionsType,
                 SampleSet = sampleSet,
+                AdditionsSampleSet = additionsSampleSet,
+                CustomSampleSet = customSampleSet,
                 Volume = volume,
                 SamplePath = samplePath,
                 // Hold specific

@@ -27,9 +27,9 @@ namespace StorybrewCommon.Mapset
 
         public HitObjectFlag Flags;
         public HitSoundAddition Additions;
-        public int SampleType;
-        public int SampleAdditionsType;
         public SampleSet SampleSet;
+        public SampleSet AdditionsSampleSet;
+        public int CustomSampleSet;
         public float Volume;
         public string SamplePath;
 
@@ -59,19 +59,19 @@ namespace StorybrewCommon.Mapset
             var timingPoint = beatmap.GetTimingPointAt((int)startTime);
             var controlPoint = beatmap.GetControlPointAt((int)startTime);
 
-            var sampleType = controlPoint.SampleType;
-            var sampleAdditionsType = controlPoint.SampleType;
             var sampleSet = controlPoint.SampleSet;
+            var additionsSampleSet = controlPoint.SampleSet;
+            var customSampleSet = controlPoint.CustomSampleSet;
             var volume = controlPoint.Volume;
 
             if (flags.HasFlag(HitObjectFlag.Circle))
-                return OsuCircle.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleType, sampleAdditionsType, sampleSet, volume);
+                return OsuCircle.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleSet, additionsSampleSet, customSampleSet, volume);
             else if (flags.HasFlag(HitObjectFlag.Slider))
-                return OsuSlider.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleType, sampleAdditionsType, sampleSet, volume);
+                return OsuSlider.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleSet, additionsSampleSet, customSampleSet, volume);
             else if (flags.HasFlag(HitObjectFlag.Hold))
-                return OsuHold.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleType, sampleAdditionsType, sampleSet, volume);
+                return OsuHold.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleSet, additionsSampleSet, customSampleSet, volume);
             else if (flags.HasFlag(HitObjectFlag.Spinner))
-                return OsuSpinner.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleType, sampleAdditionsType, sampleSet, volume);
+                return OsuSpinner.Parse(beatmap, values, x, y, startTime, flags, additions, timingPoint, controlPoint, sampleSet, additionsSampleSet, customSampleSet, volume);
             return null;
         }
     }
