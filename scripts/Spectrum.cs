@@ -18,7 +18,7 @@ namespace StorybrewScripts
         public int EndTime = 10000;
 
         [Configurable]
-        public Vector2 Position = new Vector2(-107, 240);
+        public Vector2 Position = new Vector2(320, 240);
 
         [Configurable]
         public float Width = 844;
@@ -78,13 +78,17 @@ namespace StorybrewScripts
             }
 
             var layer = GetLayer("Spectrum");
+            
+            var DefaultWidth = (854 - Width) - ((854 - Width) / 2);
+            var PositionX = (Position.X + DefaultWidth) - (320 + 107);
             var barWidth = Width / BarCount;
+            
             for (var i = 0; i < BarCount; i++)
             {
                 var keyframes = heightKeyframes[i];
                 keyframes.Simplify1dKeyframes(Tolerance, h => h);
 
-                var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(Position.X + i * barWidth, Position.Y));
+                var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(PositionX + i * barWidth, Position.Y));
                 bar.ColorHsb(startTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
                 bar.Additive(startTime, endTime);
 
