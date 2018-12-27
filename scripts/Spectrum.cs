@@ -79,8 +79,7 @@ namespace StorybrewScripts
 
             var layer = GetLayer("Spectrum");
             
-            var DefaultWidth = (854 - Width) - ((854 - Width) / 2);
-            var PositionX = (Position.X + DefaultWidth) - (320 + 107);
+            var PositionX = Position.X - (Width / 2);
             var barWidth = Width / BarCount;
             
             for (var i = 0; i < BarCount; i++)
