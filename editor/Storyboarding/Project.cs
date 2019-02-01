@@ -4,6 +4,8 @@ using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenTK;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
@@ -24,11 +26,13 @@ namespace StorybrewEditor.Storyboarding
 {
     public class Project : IDisposable
     {
-        public const string Extension = ".sbp";
-        public const string DefaultFilename = "project" + Extension;
+        public const string BinaryExtension = ".sbp";
+        public const string TextExtension = ".json";
+        public const string DefaultBinaryFilename = "project" + BinaryExtension;
+        public const string DefaultTextFilename = "sbrew-project" + TextExtension;
         public const string ProjectsFolder = "projects";
 
-        public const string FileFilter = "project files (*" + Extension + ")|*" + Extension;
+        public const string FileFilter = "project files|" + DefaultBinaryFilename + ";" + DefaultTextFilename;
 
         private ScriptManager<StoryboardObjectGenerator> scriptManager;
 
@@ -418,7 +422,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 5;
+        public const int Version = 6;
 
         private bool changed;
         public bool Changed => changed;
@@ -437,9 +441,27 @@ namespace StorybrewEditor.Storyboarding
 
         public void Save()
         {
+            var binaryProjectPath = projectPath.Replace(DefaultTextFilename, DefaultBinaryFilename);
+            if (File.Exists(binaryProjectPath))
+                saveBinary(binaryProjectPath);
+
+            saveText(projectPath.Replace(DefaultBinaryFilename, DefaultTextFilename));
+        }
+
+        public static Project Load(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
+        {
+            var project = new Project(projectPath, withCommonScripts, resourceContainer);
+            if (projectPath.EndsWith(BinaryExtension))
+                project.loadBinary();
+            else project.loadText();
+            return project;
+        }
+
+        private void saveBinary(string path)
+        {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
-            using (var stream = new SafeWriteStream(projectPath))
+            using (var stream = new SafeWriteStream(path))
             using (var w = new BinaryWriter(stream, Encoding.UTF8))
             {
                 w.Write(Version);
@@ -454,6 +476,7 @@ namespace StorybrewEditor.Storyboarding
                 w.Write(effects.Count);
                 foreach (var effect in effects)
                 {
+                    w.Write(effect.Guid.ToByteArray());
                     w.Write(effect.BaseName);
                     w.Write(effect.Name);
 
@@ -478,6 +501,7 @@ namespace StorybrewEditor.Storyboarding
                 w.Write(layerManager.LayersCount);
                 foreach (var layer in layerManager.Layers)
                 {
+                    w.Write(layer.Guid.ToByteArray());
                     w.Write(layer.Identifier);
                     w.Write(effects.IndexOf(layer.Effect));
                     w.Write(layer.DiffSpecific);
@@ -494,9 +518,8 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public static Project Load(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
+        private void loadBinary()
         {
-            var project = new Project(projectPath, withCommonScripts, resourceContainer);
             using (var stream = new FileStream(projectPath, FileMode.Open))
             using (var r = new BinaryReader(stream, Encoding.UTF8))
             {
@@ -507,23 +530,25 @@ namespace StorybrewEditor.Storyboarding
                 var savedBy = r.ReadString();
                 Debug.Print($"Loading project saved by {savedBy}");
 
-                project.MapsetPath = r.ReadString();
+                MapsetPath = r.ReadString();
                 if (version >= 1)
                 {
                     var mainBeatmapId = r.ReadInt64();
                     var mainBeatmapName = r.ReadString();
-                    project.SelectBeatmap(mainBeatmapId, mainBeatmapName);
+                    SelectBeatmap(mainBeatmapId, mainBeatmapName);
                 }
 
-                project.OwnsOsb = version >= 4 ? r.ReadBoolean() : true;
+                OwnsOsb = version >= 4 ? r.ReadBoolean() : true;
 
                 var effectCount = r.ReadInt32();
                 for (int effectIndex = 0; effectIndex < effectCount; effectIndex++)
                 {
+                    var guid = version >= 6 ? new Guid(r.ReadBytes(16)) : Guid.NewGuid();
                     var baseName = r.ReadString();
                     var name = r.ReadString();
 
-                    var effect = project.AddEffect(baseName);
+                    var effect = AddEffect(baseName);
+                    effect.Guid = guid;
                     effect.Name = name;
 
                     if (version >= 1)
@@ -555,15 +580,17 @@ namespace StorybrewEditor.Storyboarding
                 var layerCount = r.ReadInt32();
                 for (var layerIndex = 0; layerIndex < layerCount; layerIndex++)
                 {
+                    var guid = version >= 6 ? new Guid(r.ReadBytes(16)) : Guid.NewGuid();
                     var identifier = r.ReadString();
                     var effectIndex = r.ReadInt32();
                     var diffSpecific = version >= 3 ? r.ReadBoolean() : false;
                     var osbLayer = version >= 2 ? (OsbLayer)r.ReadInt32() : OsbLayer.Background;
                     var visible = r.ReadBoolean();
 
-                    var effect = project.effects[effectIndex];
+                    var effect = effects[effectIndex];
                     effect.AddPlaceholder(new EditorStoryboardLayer(identifier, effect)
                     {
+                        Guid = guid,
                         DiffSpecific = diffSpecific,
                         OsbLayer = osbLayer,
                         Visible = visible,
@@ -579,10 +606,158 @@ namespace StorybrewEditor.Storyboarding
                         var assembly = r.ReadString();
                         importedAssemblies.Add(assembly);
                     }
-                    project.ImportedAssemblies = importedAssemblies;
+                    ImportedAssemblies = importedAssemblies;
                 }
             }
-            return project;
+        }
+
+        private void saveText(string path)
+        {
+            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+
+            var root = new JObject
+            {
+                { "FormatVersion", Version },
+                { "Editor", Program.FullName },
+                { "MapsetPath", MapsetPath },
+                { "BeatmapId", MainBeatmap.Id },
+                { "BeatmapName", MainBeatmap.Name },
+                { "OwnsOsb", OwnsOsb },
+                { "Assemblies", new JArray(importedAssemblies) },
+            };
+
+            var effectsRoot = new JObject();
+            root.Add("Effects", effectsRoot);
+
+            foreach (var effect in effects)
+            {
+                var effectRoot = new JObject
+                {
+                    { "Name", effect.Name },
+                    { "Script", effect.BaseName },
+                };
+                effectsRoot.Add(effect.Guid.ToString(), effectRoot);
+
+                var configRoot = new JObject();
+                effectRoot.Add("Config", configRoot);
+
+                foreach (var field in effect.Config.SortedFields)
+                {
+                    var fieldRoot = new JObject
+                    {
+                        { "Type", field.Type.FullName },
+                        { "Value", ObjectSerializer.ToString(field.Type, field.Value)},
+                    };
+                    if (field.DisplayName != field.Name)
+                        fieldRoot.Add("DisplayName", field.DisplayName);
+                    configRoot.Add(field.Name, fieldRoot);
+
+                    if ((field.AllowedValues?.Length ?? 0) > 0)
+                    {
+                        var allowedValuesRoot = new JObject();
+                        fieldRoot.Add("AllowedValues", allowedValuesRoot);
+
+                        foreach (var allowedValue in field.AllowedValues)
+                            allowedValuesRoot.Add(allowedValue.Name, ObjectSerializer.ToString(field.Type, allowedValue.Value));
+                    }
+                }
+            }
+
+            var layersRoot = new JObject();
+            root.Add("Layers", layersRoot);
+
+            foreach (var layer in layerManager.Layers)
+            {
+                var layerRoot = new JObject
+                {
+                    { "Effect", layer.Effect.Guid.ToString() },
+                    { "Name", layer.Identifier },
+                    { "OsbLayer", layer.OsbLayer.ToString() },
+                    { "DiffSpecific", layer.DiffSpecific },
+                    { "Visible", layer.Visible },
+                };
+                layersRoot.Add(layer.Guid.ToString(), layerRoot);
+            }
+
+            using (var stream = new SafeWriteStream(path))
+            using (var streamWriter = new StreamWriter(stream, Encoding.UTF8))
+            using (var w = new JsonTextWriter(streamWriter) { Formatting = Formatting.Indented, })
+            {
+                root.WriteTo(w);
+                stream.Commit();
+                changed = false;
+            }
+        }
+
+        private void loadText()
+        {
+            using (var stream = new FileStream(projectPath, FileMode.Open))
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
+            using (var r = new JsonTextReader(streamReader))
+            {
+                var root = JObject.Load(r);
+
+                var version = root.Value<int>("FormatVersion");
+                if (version > Version)
+                    throw new InvalidOperationException("This project was saved with a more recent version, you need to update to open it");
+
+                var savedBy = root.Value<string>("Editor");
+                Debug.Print($"Loading project saved by {savedBy}");
+
+                MapsetPath = root.Value<string>("MapsetPath");
+                SelectBeatmap(root.Value<long>("BeatmapId"), root.Value<string>("BeatmapName"));
+                OwnsOsb = root.Value<bool>("OwnsOsb");
+                ImportedAssemblies = root
+                        .Value<JArray>("Assemblies")
+                        .Select(p => p.Value<string>())
+                        .ToList();
+
+                var effectsRoot = root.Value<JObject>("Effects");
+                foreach (var effectProperty in effectsRoot.Properties())
+                {
+                    var effectRoot = effectProperty.Value;
+
+                    var effect = AddEffect(effectRoot.Value<string>("Script"));
+                    effect.Guid = Guid.Parse(effectProperty.Name);
+                    effect.Name = effectRoot.Value<string>("Name");
+
+                    var configRoot = effectRoot.Value<JObject>("Config");
+                    var fieldIndex = 0;
+                    foreach (var fieldProperty in configRoot.Properties())
+                    {
+                        var fieldRoot = fieldProperty.Value;
+
+                        var fieldTypeName = fieldRoot.Value<string>("Type");
+                        var fieldContent = fieldRoot.Value<string>("Value");
+                        var fieldValue = ObjectSerializer.FromString(fieldTypeName, fieldContent);
+
+                        var allowedValues = fieldRoot
+                                .Value<JObject>("AllowedValues")?
+                                .Properties()
+                                .Select(p => new NamedValue { Name = p.Name, Value = ObjectSerializer.FromString(fieldTypeName, p.Value.Value<string>()), })
+                                .ToArray();
+
+                        effect.Config.UpdateField(fieldProperty.Name, fieldRoot.Value<string>("DisplayName") ?? fieldProperty.Name, fieldIndex++, fieldValue?.GetType(), fieldValue, allowedValues);
+                    }
+                }
+
+                var layersRoot = root.Value<JObject>("Layers");
+                foreach (var layerProperty in layersRoot.Properties())
+                {
+                    var layerRoot = layerProperty.Value;
+
+                    var effectGuid = Guid.Parse(layerRoot.Value<string>("Effect"));
+                    var effect = effects.First(e => e.Guid == effectGuid);
+
+                    effect.AddPlaceholder(new EditorStoryboardLayer(layerRoot.Value<string>("Name"), effect)
+                    {
+                        Guid = Guid.Parse(layerProperty.Name),
+                        OsbLayer = (OsbLayer)Enum.Parse(typeof(OsbLayer), layerRoot.Value<string>("OsbLayer")),
+                        DiffSpecific = layerRoot.Value<bool>("DiffSpecific"),
+                        Visible = layerRoot.Value<bool>("Visible"),
+                    });
+                }
+            }
         }
 
         public static Project Create(string projectFolderName, string mapsetPath, bool withCommonScripts, ResourceContainer resourceContainer)
@@ -606,7 +781,7 @@ namespace StorybrewEditor.Storyboarding
                 throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
-            var project = new Project(Path.Combine(projectFolderPath, DefaultFilename), withCommonScripts, resourceContainer)
+            var project = new Project(Path.Combine(projectFolderPath, DefaultTextFilename), withCommonScripts, resourceContainer)
             {
                 MapsetPath = mapsetPath,
             };

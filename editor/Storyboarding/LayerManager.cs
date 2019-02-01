@@ -29,7 +29,7 @@ namespace StorybrewEditor.Storyboarding
             var index = layers.IndexOf(oldLayer);
             if (index != -1)
             {
-                newLayer.CopySettings(oldLayer);
+                newLayer.CopySettings(oldLayer, copyGuid: true);
                 newLayer.OnChanged += layer_OnChanged;
                 oldLayer.OnChanged -= layer_OnChanged;
                 layers[index] = newLayer;
@@ -49,7 +49,7 @@ namespace StorybrewEditor.Storyboarding
                     var index = layers.IndexOf(oldLayer);
                     if (index != -1)
                     {
-                        newLayer.CopySettings(layers[index]);
+                        newLayer.CopySettings(layers[index], copyGuid: true);
                         layers[index] = newLayer;
                     }
                     oldLayers.Remove(oldLayer);
@@ -72,7 +72,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 foreach (var newLayer in newLayers)
                 {
-                    newLayer.CopySettings(oldLayer);
+                    newLayer.CopySettings(oldLayer, copyGuid: false);
                     newLayer.OnChanged += layer_OnChanged;
                 }
                 layers.InsertRange(index, newLayers);

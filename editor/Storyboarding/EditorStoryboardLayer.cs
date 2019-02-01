@@ -13,6 +13,8 @@ namespace StorybrewEditor.Storyboarding
 {
     public class EditorStoryboardLayer : StoryboardLayer, IComparable<EditorStoryboardLayer>
     {
+        public Guid Guid { get; set; } = Guid.NewGuid();
+
         private string name = "";
         public string Name
         {
@@ -152,8 +154,10 @@ namespace StorybrewEditor.Storyboarding
                 displayableObject.Draw(drawContext, camera, bounds, opacity, effect.Project);
         }
 
-        public void CopySettings(EditorStoryboardLayer other)
+        public void CopySettings(EditorStoryboardLayer other, bool copyGuid = false)
         {
+            if (copyGuid)
+                Guid = other.Guid;
             DiffSpecific = other.DiffSpecific;
             OsbLayer = other.OsbLayer;
             Visible = other.Visible;

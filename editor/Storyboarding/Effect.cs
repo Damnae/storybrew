@@ -8,6 +8,8 @@ namespace StorybrewEditor.Storyboarding
         private Project project;
         public Project Project => project;
 
+        public Guid Guid { get; set; } = Guid.NewGuid();
+
         public abstract string Name { get; set; }
         public abstract string BaseName { get; }
         public virtual string Path => null;
