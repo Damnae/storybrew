@@ -49,7 +49,7 @@ namespace BrewLib.Data.Tiny
 
         private class ParseContext
         {
-            private readonly Stack<TinyTokenizer.Token> tokenStack;
+            private readonly IEnumerator<TinyTokenizer.Token> tokenEnumerator;
 
             public TinyTokenizer.Token CurrentToken;
             public TinyTokenizer.Token LookaheadToken;
@@ -62,7 +62,7 @@ namespace BrewLib.Data.Tiny
 
             public ParseContext(IEnumerable<TinyTokenizer.Token> tokens, Action<TinyToken> callback)
             {
-                tokenStack = new Stack<TinyTokenizer.Token>(tokens.Reverse());
+                tokenEnumerator = tokens.GetEnumerator();
                 initializeCurrentAndLookahead();
 
                 parserStack = new Stack<Parser>();
@@ -98,7 +98,7 @@ namespace BrewLib.Data.Tiny
             public void ConsumeToken()
             {
                 CurrentToken = LookaheadToken;
-                LookaheadToken = tokenStack.Count > 0 ? tokenStack.Pop() : null;
+                LookaheadToken = tokenEnumerator.MoveNext() ? tokenEnumerator.Current : null;
             }
 
             private void initializeCurrentAndLookahead()
