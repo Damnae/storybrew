@@ -1,43 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 namespace StorybrewEditor.Util
 {
     public class AsyncActionQueue<T> : IDisposable
     {
-        private string threadName;
-        private bool allowDuplicates;
-
-        private Thread thread;
-        private List<ActionContainer> queue = new List<ActionContainer>();
-        private HashSet<string> running = new HashSet<string>();
+        private readonly ActionQueueContext context = new ActionQueueContext();
+        private readonly List<ActionRunner> actionRunners = new List<ActionRunner>();
+        private readonly bool allowDuplicates;
 
         public delegate void ActionFailedEventHandler(T target, Exception e);
-        public event ActionFailedEventHandler OnActionFailed;
+        public event ActionFailedEventHandler OnActionFailed
+        {
+            add => context.OnActionFailed += value;
+            remove => context.OnActionFailed -= value;
+        }
 
-        private bool enabled;
         public bool Enabled
         {
-            get { return enabled; }
-            set
-            {
-                if (enabled == value)
-                    return;
-
-                enabled = value;
-
-                lock (queue)
-                    if (queue.Count > 0)
-                        Monitor.Pulse(queue);
-            }
+            get => context.Enabled;
+            set => context.Enabled = value;
         }
 
         public AsyncActionQueue(string threadName, bool allowDuplicates = false)
         {
-            this.threadName = threadName;
             this.allowDuplicates = allowDuplicates;
+
+            var runnerCount = Math.Max(1, Environment.ProcessorCount - 1);
+            for (var i = 0; i < runnerCount; i++)
+                actionRunners.Add(new ActionRunner(context, $"{threadName} #{i + 1}"));
         }
 
         public void Queue(T target, Action<T> action)
@@ -47,98 +41,30 @@ namespace StorybrewEditor.Util
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(AsyncActionQueue<T>));
 
-            if (thread == null || !thread.IsAlive)
+            foreach (var r in actionRunners)
+                r.EnsureThreadAlive();
+
+            lock (context.Queue)
             {
-                Thread localThread = null;
-                thread = localThread = new Thread(() =>
-                {
-                    while (true)
-                    {
-                        lock (queue)
-                        {
-                            while (!enabled || queue.Count == 0)
-                            {
-                                if (thread != localThread)
-                                {
-                                    Trace.WriteLine($"Stopping {localThread.Name} thread");
-                                    return;
-                                }
-                                Monitor.Wait(queue);
-                            }
+                if (!allowDuplicates && context.Queue.Any(q => q.Target.Equals(target)))
+                    return;
 
-                            var startedTasks = new List<ActionContainer>();
-                            lock (running)
-                                foreach (var task in queue)
-                                {
-                                    if (running.Contains(task.UniqueKey))
-                                        continue;
-
-                                    running.Add(task.UniqueKey);
-                                    startedTasks.Add(task);
-
-                                    var taskToRun = task;
-                                    ThreadPool.QueueUserWorkItem((state) =>
-                                    {
-                                        try
-                                        {
-                                            taskToRun.Action.Invoke(taskToRun.Target);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            var toUpdateTarget = taskToRun.Target;
-                                            Program.Schedule(() =>
-                                            {
-                                                if (OnActionFailed != null) OnActionFailed.Invoke(toUpdateTarget, e);
-                                                else Trace.WriteLine($"Action failed for '{taskToRun.Target}': {e}");
-                                            });
-                                        }
-                                        lock (running)
-                                            running.Remove(taskToRun.UniqueKey);
-                                        lock (queue)
-                                            if (queue.Count > 0)
-                                                Monitor.Pulse(queue);
-                                    });
-                                }
-                            foreach (var startedTask in startedTasks)
-                                queue.Remove(startedTask);
-                        }
-                    }
-                })
-                { Name = threadName, IsBackground = true, };
-
-                Trace.WriteLine($"Starting {localThread.Name} thread");
-                thread.Start();
-            }
-
-            lock (queue)
-            {
-                if (!allowDuplicates)
-                    foreach (var queued in queue)
-                        if (queued.Target.Equals(target))
-                            return;
-
-                queue.Add(new ActionContainer() { Target = target, UniqueKey = uniqueKey, Action = action });
-                Monitor.Pulse(queue);
+                context.Queue.Add(new ActionContainer() { Target = target, UniqueKey = uniqueKey, Action = action });
+                Monitor.PulseAll(context.Queue);
             }
         }
 
         private void cancelQueuedActions()
         {
-            if (thread == null)
-                return;
+            lock (context.Queue)
+                context.Queue.Clear();
 
-            var localThread = thread;
-            lock (queue)
-            {
-                thread = null;
-                queue.Clear();
-                Monitor.Pulse(queue);
-            }
-            if (!localThread.Join(5000))
-            {
-                Trace.WriteLine($"Aborting {threadName} thread.");
-                localThread.Abort();
-            }
+            context.Enabled = false;
+
+            var sw = new Stopwatch();
+            sw.Start();
+            foreach (var r in actionRunners)
+                r.JoinOrAbort(Math.Max(1000, 5000 - (int)sw.ElapsedMilliseconds));
         }
 
         #region IDisposable Support
@@ -161,11 +87,139 @@ namespace StorybrewEditor.Util
 
         #endregion
 
-        private struct ActionContainer
+        private class ActionContainer
         {
             public T Target;
             public string UniqueKey;
             public Action<T> Action;
+        }
+
+        private class ActionQueueContext
+        {
+            public readonly List<ActionContainer> Queue = new List<ActionContainer>();
+            public readonly HashSet<string> Running = new HashSet<string>();
+
+            public event ActionFailedEventHandler OnActionFailed;
+            public bool TriggerActionFailed(T target, Exception e)
+            {
+                if (OnActionFailed == null)
+                    return false;
+
+                OnActionFailed.Invoke(target, e);
+                return true;
+            }
+
+            private bool enabled;
+            public bool Enabled
+            {
+                get => enabled;
+                set
+                {
+                    if (enabled == value)
+                        return;
+
+                    enabled = value;
+
+                    lock (Queue)
+                        if (Queue.Count > 0)
+                            Monitor.PulseAll(Queue);
+                }
+            }
+        }
+
+        private class ActionRunner
+        {
+            private ActionQueueContext context;
+            private string threadName;
+
+            private Thread thread;
+
+            public ActionRunner(ActionQueueContext context, string threadName)
+            {
+                this.context = context;
+                this.threadName = threadName;
+            }
+
+            public void EnsureThreadAlive()
+            {
+                if (thread == null || !thread.IsAlive)
+                {
+                    Thread localThread = null;
+                    thread = localThread = new Thread(() =>
+                    {
+                        while (true)
+                        {
+                            ActionContainer task;
+                            lock (context.Queue)
+                            {
+                                while (!context.Enabled || context.Queue.Count == 0)
+                                {
+                                    if (thread != localThread)
+                                    {
+                                        Trace.WriteLine($"Exiting {localThread.Name} thread.");
+                                        return;
+                                    }
+                                    Monitor.Wait(context.Queue);
+                                }
+
+                                lock (context.Running)
+                                {
+                                    task = context.Queue.FirstOrDefault(t => !context.Running.Contains(t.UniqueKey));
+                                    if (task != null)
+                                    {
+                                        context.Queue.Remove(task);
+                                        context.Running.Add(task.UniqueKey);
+                                    }
+                                }
+                            }
+
+                            if (task != null)
+                            {
+                                Trace.WriteLine($"Running task {task.UniqueKey} on thread {threadName}");
+
+                                try
+                                {
+                                    task.Action.Invoke(task.Target);
+                                }
+                                catch (Exception e)
+                                {
+                                    var toUpdateTarget = task.Target;
+                                    Program.Schedule(() =>
+                                    {
+                                        if (!context.TriggerActionFailed(toUpdateTarget, e))
+                                            Trace.WriteLine($"Action failed for '{task.UniqueKey}': {e}");
+                                    });
+                                }
+
+                                lock (context.Running)
+                                    context.Running.Remove(task.UniqueKey);
+                            }
+                        }
+                    })
+                    { Name = threadName, IsBackground = true, };
+
+                    Trace.WriteLine($"Starting {thread.Name} thread.");
+                    thread.Start();
+                }
+            }
+
+            public void JoinOrAbort(int millisecondsTimeout)
+            {
+                if (thread == null)
+                    return;
+
+                var localThread = thread;
+                thread = null;
+
+                lock (context.Queue)
+                    Monitor.PulseAll(context.Queue);
+
+                if (!localThread.Join(millisecondsTimeout))
+                {
+                    Trace.WriteLine($"Aborting {localThread.Name} thread.");
+                    localThread.Abort();
+                }
+            }
         }
     }
 }
