@@ -21,7 +21,7 @@ namespace StorybrewScripts
         public override void Generate()
         {
             if (BackgroundPath == "") BackgroundPath = Beatmap.BackgroundPath ?? string.Empty;
-            if (StartTime == EndTime) EndTime = (int)(Beatmap.HitObjects.LastOrDefault()?.EndTime ?? AudioDuration * 1000);
+            if (StartTime == EndTime) EndTime = (int)(Beatmap.HitObjects.LastOrDefault()?.EndTime ?? AudioDuration);
 
             var bitmap = GetMapsetBitmap(BackgroundPath);
             var bg = GetLayer("").CreateSprite(BackgroundPath, OsbOrigin.Centre);
