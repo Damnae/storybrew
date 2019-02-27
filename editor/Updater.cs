@@ -86,7 +86,19 @@ namespace StorybrewEditor
             {
                 var dllPath = Path.Combine(destinationFolder, "ManagedBass.PInvoke.dll");
                 if (File.Exists(dllPath))
+                {
+                    Trace.WriteLine($"Removing {dllPath}");
                     Misc.WithRetries(() => File.Delete(dllPath), canThrow: false);
+                }
+            }
+            if (fromVersion < new Version(1, 65))
+            {
+                var oldRoslynFolder = Path.Combine(destinationFolder, "bin");
+                if (Directory.Exists(oldRoslynFolder))
+                {
+                    Trace.WriteLine($"Removing {oldRoslynFolder}");
+                    Misc.WithRetries(() => Directory.Delete(oldRoslynFolder, true), canThrow: false);
+                }
             }
         }
 

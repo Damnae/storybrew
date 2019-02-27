@@ -1,6 +1,7 @@
 ﻿using StorybrewCommon.Scripting;
 using StorybrewEditor.Processes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace StorybrewEditor.Scripting
@@ -10,7 +11,7 @@ namespace StorybrewEditor.Scripting
     {
         private RemoteProcessWorkerContainer workerProcess;
 
-        public ScriptContainerProcess(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, params string[] referencedAssemblies)
+        public ScriptContainerProcess(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
             : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies)
         {
         }

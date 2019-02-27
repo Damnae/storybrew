@@ -59,13 +59,13 @@ namespace StorybrewEditor
                     addFile(archive, path, appDirectory);
 
                 // Roslyn (white-listed, most files seem useless)
-                addFile(archive, "bin/roslyn/csc.exe", appDirectory);
-                addFile(archive, "bin/roslyn/csc.exe.config", appDirectory);
-                addFile(archive, "bin/roslyn/csc.rsp", appDirectory);
-                addFile(archive, "bin/roslyn/Microsoft.CodeAnalysis.CSharp.dll", appDirectory);
-                addFile(archive, "bin/roslyn/Microsoft.CodeAnalysis.dll", appDirectory);
-                addFile(archive, "bin/roslyn/System.Collections.Immutable.dll", appDirectory);
-                addFile(archive, "bin/roslyn/System.Reflection.Metadata.dll", appDirectory);
+                addFile(archive, "roslyn/csc.exe", appDirectory);
+                addFile(archive, "roslyn/csc.exe.config", appDirectory);
+                addFile(archive, "roslyn/csc.rsp", appDirectory);
+                addFile(archive, "roslyn/Microsoft.CodeAnalysis.CSharp.dll", appDirectory);
+                addFile(archive, "roslyn/Microsoft.CodeAnalysis.dll", appDirectory);
+                addFile(archive, "roslyn/System.Collections.Immutable.dll", appDirectory);
+                addFile(archive, "roslyn/System.Reflection.Metadata.dll", appDirectory);
 
                 // Scripts
                 foreach (var path in Directory.EnumerateFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))
