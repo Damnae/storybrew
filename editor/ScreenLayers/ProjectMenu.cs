@@ -519,7 +519,17 @@ namespace StorybrewEditor.ScreenLayers
         }
 
         public override void Close()
-            => withSavePrompt(() => Manager.GetContext<Editor>().Restart());
+        {
+            withSavePrompt(() =>
+            {
+                project.StopEffectUpdates();
+                Manager.AsyncLoading("Stopping effect updates", () =>
+                {
+                    project.CancelEffectUpdates(true);
+                    Program.Schedule(() => Manager.GetContext<Editor>().Restart());
+                });
+            });
+        }
 
         private void withSavePrompt(Action action)
         {

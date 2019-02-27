@@ -196,8 +196,9 @@ namespace StorybrewEditor.Storyboarding
         public event EventHandler OnEffectsStatusChanged;
 
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
-        public void QueueEffectUpdate(Effect effect)
-            => effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());
+        public void QueueEffectUpdate(Effect effect) => effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());
+        public void CancelEffectUpdates(bool stopThreads) => effectUpdateQueue.CancelQueuedActions(stopThreads);
+        public void StopEffectUpdates() => effectUpdateQueue.Enabled = false;
 
         public IEnumerable<string> GetEffectNames()
             => scriptManager.GetScriptNames();

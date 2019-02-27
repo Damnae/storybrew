@@ -54,17 +54,18 @@ namespace StorybrewEditor.Util
             }
         }
 
-        private void cancelQueuedActions()
+        public void CancelQueuedActions(bool stopThreads)
         {
             lock (context.Queue)
                 context.Queue.Clear();
 
-            context.Enabled = false;
-
-            var sw = new Stopwatch();
-            sw.Start();
-            foreach (var r in actionRunners)
-                r.JoinOrAbort(Math.Max(1000, 5000 - (int)sw.ElapsedMilliseconds));
+            if (stopThreads)
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                foreach (var r in actionRunners)
+                    r.JoinOrAbort(Math.Max(1000, 5000 - (int)sw.ElapsedMilliseconds));
+            }
         }
 
         #region IDisposable Support
@@ -75,7 +76,10 @@ namespace StorybrewEditor.Util
             if (!disposedValue)
             {
                 if (disposing)
-                    cancelQueuedActions();
+                {
+                    context.Enabled = false;
+                    CancelQueuedActions(true);
+                }
                 disposedValue = true;
             }
         }
