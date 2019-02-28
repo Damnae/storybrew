@@ -124,9 +124,10 @@ namespace StorybrewEditor.Util
 
                     enabled = value;
 
-                    lock (Queue)
-                        if (Queue.Count > 0)
-                            Monitor.PulseAll(Queue);
+                    if (enabled)
+                        lock (Queue)
+                            if (Queue.Count > 0)
+                                Monitor.PulseAll(Queue);
                 }
             }
         }
@@ -160,7 +161,7 @@ namespace StorybrewEditor.Util
                                 {
                                     if (thread != localThread)
                                     {
-                                        Trace.WriteLine($"Exiting {localThread.Name} thread.");
+                                        Trace.WriteLine($"Exiting thread {localThread.Name}.");
                                         return;
                                     }
                                     Monitor.Wait(context.Queue);
@@ -169,40 +170,35 @@ namespace StorybrewEditor.Util
                                 lock (context.Running)
                                 {
                                     task = context.Queue.FirstOrDefault(t => !context.Running.Contains(t.UniqueKey));
-                                    if (task != null)
-                                    {
-                                        context.Queue.Remove(task);
-                                        context.Running.Add(task.UniqueKey);
-                                    }
+                                    if (task == null)
+                                        continue;
+
+                                    context.Queue.Remove(task);
+                                    context.Running.Add(task.UniqueKey);
                                 }
                             }
 
-                            if (task != null)
+                            try
                             {
-                                Trace.WriteLine($"Running task {task.UniqueKey} on thread {threadName}");
-
-                                try
-                                {
-                                    task.Action.Invoke(task.Target);
-                                }
-                                catch (Exception e)
-                                {
-                                    var toUpdateTarget = task.Target;
-                                    Program.Schedule(() =>
-                                    {
-                                        if (!context.TriggerActionFailed(toUpdateTarget, e))
-                                            Trace.WriteLine($"Action failed for '{task.UniqueKey}': {e}");
-                                    });
-                                }
-
-                                lock (context.Running)
-                                    context.Running.Remove(task.UniqueKey);
+                                task.Action.Invoke(task.Target);
                             }
+                            catch (Exception e)
+                            {
+                                var target = task.Target;
+                                Program.Schedule(() =>
+                                {
+                                    if (!context.TriggerActionFailed(target, e))
+                                        Trace.WriteLine($"Action failed for '{task.UniqueKey}': {e}");
+                                });
+                            }
+
+                            lock (context.Running)
+                                context.Running.Remove(task.UniqueKey);
                         }
                     })
                     { Name = threadName, IsBackground = true, };
 
-                    Trace.WriteLine($"Starting {thread.Name} thread.");
+                    Trace.WriteLine($"Starting thread {thread.Name}.");
                     thread.Start();
                 }
             }
@@ -220,7 +216,7 @@ namespace StorybrewEditor.Util
 
                 if (!localThread.Join(millisecondsTimeout))
                 {
-                    Trace.WriteLine($"Aborting {localThread.Name} thread.");
+                    Trace.WriteLine($"Aborting thread {localThread.Name}.");
                     localThread.Abort();
                 }
             }
