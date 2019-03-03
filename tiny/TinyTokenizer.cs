@@ -14,10 +14,11 @@ namespace Tiny
             new TokenDefinition(TokenType.PropertyQuoted, @"""((?:[^""\\]|\\.)*)"" *:", 4),
             new TokenDefinition(TokenType.WordQuoted, @"""((?:[^""\\]|\\.)*)""", 5),
 
-            new TokenDefinition(TokenType.Property, "([^\\s:-][^\\s:]*) *:", 6),
-            new TokenDefinition(TokenType.Word, "[^\\s:-][^\\s:]*", 7),
-
             new TokenDefinition(TokenType.ArrayIndicator, "- ", 10),
+
+            new TokenDefinition(TokenType.Property, "([^\\s:-][^\\s:]*) *:", 20),
+            new TokenDefinition(TokenType.Word, "[^\\s:]+", 21),
+
             new TokenDefinition(TokenType.EndLine, "\n", 100),
         };
 
