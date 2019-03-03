@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common.csproj", "{F0EDCCEC-4B64-4CE8-801F-1377E3384DC4}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "editor", "editor\editor.csproj", "{FF59AEEA-C133-4BF8-8A0B-620A3C99022B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "brewlib", "brewlib\brewlib.csproj", "{A4F7CC21-B769-424B-AB59-89E93D781762}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tiny", "tiny\tiny.csproj", "{520E33D3-E022-4581-ACD8-BED838BC817E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,8 +44,17 @@ Global
 		{A4F7CC21-B769-424B-AB59-89E93D781762}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4F7CC21-B769-424B-AB59-89E93D781762}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4F7CC21-B769-424B-AB59-89E93D781762}.Release|Any CPU.Build.0 = Release|Any CPU
+		{520E33D3-E022-4581-ACD8-BED838BC817E}.Build|Any CPU.ActiveCfg = Release|Any CPU
+		{520E33D3-E022-4581-ACD8-BED838BC817E}.Build|Any CPU.Build.0 = Release|Any CPU
+		{520E33D3-E022-4581-ACD8-BED838BC817E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{520E33D3-E022-4581-ACD8-BED838BC817E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{520E33D3-E022-4581-ACD8-BED838BC817E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{520E33D3-E022-4581-ACD8-BED838BC817E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E2A5C26-EA58-40BE-9E6A-0913107EE610}
 	EndGlobalSection
 EndGlobal

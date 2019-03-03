@@ -171,6 +171,10 @@
       <Project>{f0edccec-4b64-4ce8-801f-1377e3384dc4}</Project>
       <Name>common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\tiny\tiny.csproj">
+      <Project>{520e33d3-e022-4581-acd8-bed838bc817e}</Project>
+      <Name>tiny</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icon.ico" />

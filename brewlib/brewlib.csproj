@@ -67,13 +67,6 @@
     <Compile Include="Data\AssemblyResourceContainer.cs" />
     <Compile Include="Data\ResourceContainer.cs" />
     <Compile Include="Data\SubResourceContainer.cs" />
-    <Compile Include="Data\Tiny\TinyArray.cs" />
-    <Compile Include="Data\Tiny\TinyObject.cs" />
-    <Compile Include="Data\Tiny\TinyTokenParser.cs" />
-    <Compile Include="Data\Tiny\TinyUtil.cs" />
-    <Compile Include="Data\Tiny\TinyValue.cs" />
-    <Compile Include="Data\Tiny\TinyToken.cs" />
-    <Compile Include="Data\Tiny\TinyTokenizer.cs" />
     <Compile Include="Graphics\Cameras\Camera.cs" />
     <Compile Include="Graphics\Cameras\CameraBase.cs" />
     <Compile Include="Graphics\Cameras\CameraIso.cs" />
@@ -209,7 +202,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace BrewLib.Data.Tiny
+namespace Tiny
 {
     public class TinyUtil
     {

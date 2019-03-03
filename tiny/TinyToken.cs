@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace BrewLib.Data.Tiny
+namespace Tiny
 {
     public abstract class TinyToken
     {

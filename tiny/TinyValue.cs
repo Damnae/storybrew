@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.IO;
 
-namespace BrewLib.Data.Tiny
+namespace Tiny
 {
     public enum TinyTokenType
     {

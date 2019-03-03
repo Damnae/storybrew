@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace BrewLib.Data.Tiny
+namespace Tiny
 {
     internal class TinyTokenParser
     {

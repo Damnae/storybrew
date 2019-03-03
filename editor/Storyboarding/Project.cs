@@ -1,6 +1,5 @@
 ﻿using BrewLib.Audio;
 using BrewLib.Data;
-using BrewLib.Data.Tiny;
 using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Textures;
@@ -20,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tiny;
 
 namespace StorybrewEditor.Storyboarding
 {

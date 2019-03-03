@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 
-namespace BrewLib.Data.Tiny
+namespace Tiny
 {
     public class TinyObject : TinyToken, IEnumerable<KeyValuePair<string, TinyToken>>
     {
