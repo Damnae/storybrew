@@ -163,7 +163,16 @@
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\brewlib\brewlib.csproj">
+      <Project>{A4F7CC21-B769-424B-AB59-89E93D781762}</Project>
+      <Name>brewlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\tiny\tiny.csproj">
+      <Project>{520e33d3-e022-4581-acd8-bed838bc817e}</Project>
+      <Name>tiny</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

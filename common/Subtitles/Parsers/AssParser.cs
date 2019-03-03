@@ -11,7 +11,7 @@ namespace StorybrewCommon.Subtitles.Parsers
     {
         public SubtitleSet Parse(string path)
         {
-            using (var stream = Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var stream = BrewLib.Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 return Parse(stream);
         }
 

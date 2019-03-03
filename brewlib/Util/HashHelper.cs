@@ -22,6 +22,9 @@ namespace BrewLib.Util
             return new string(characters);
         }
 
+        public static string GetFileMd5(string path)
+            => GetMd5(GetFileMd5Bytes(path));
+
         public static byte[] GetFileMd5Bytes(string path)
         {
             using (var md5 = MD5.Create())

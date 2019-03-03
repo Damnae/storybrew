@@ -1,4 +1,5 @@
-﻿using StorybrewCommon.Animations;
+﻿using BrewLib.Util;
+using StorybrewCommon.Animations;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Subtitles;
@@ -13,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Tiny;
 
 namespace StorybrewCommon.Scripting
 {
@@ -80,7 +82,7 @@ namespace StorybrewCommon.Scripting
             if (!bitmaps.TryGetValue(path, out Bitmap bitmap))
             {
                 if (watch) context.AddDependency(path);
-                bitmaps.Add(path, bitmap = Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
+                bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
             }
             return bitmap;
         }
@@ -103,7 +105,7 @@ namespace StorybrewCommon.Scripting
         {
             path = Path.GetFullPath(path);
             if (watch) context.AddDependency(path);
-            return Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+            return BrewLib.Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
         #endregion
@@ -171,6 +173,9 @@ namespace StorybrewCommon.Scripting
         private SbvParser sbvParser = new SbvParser();
 
         private HashSet<string> fontDirectories = new HashSet<string>();
+        private List<FontGenerator> fontGenerators = new List<FontGenerator>();
+
+        private string fontCacheDirectory => Path.Combine(context.ProjectPath, ".cache", "font");
 
         public SubtitleSet LoadSubtitles(string path)
         {
@@ -190,11 +195,41 @@ namespace StorybrewCommon.Scripting
         public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
         {
             var fontDirectory = Path.GetFullPath(Path.Combine(context.MapsetPath, directory));
+
             if (fontDirectories.Contains(fontDirectory))
                 throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
-
             fontDirectories.Add(fontDirectory);
-            return new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+
+            var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+            fontGenerators.Add(fontGenerator);
+
+            var cachePath = fontCacheDirectory;
+            if (Directory.Exists(cachePath))
+            {
+                var path = Path.Combine(cachePath, HashHelper.GetMd5(fontGenerator.Directory) + ".yaml");
+                if (File.Exists(path))
+                {
+                    var cachedFontRoot = TinyToken.Read(path);
+                    fontGenerator.HandleCache(cachedFontRoot);
+                }
+            }
+
+            return fontGenerator;
+        }
+
+        private void saveFontCache()
+        {
+            var cachePath = fontCacheDirectory;
+            if (!Directory.Exists(cachePath))
+                Directory.CreateDirectory(cachePath);
+
+            foreach (var fontGenerator in fontGenerators)
+            {
+                var path = Path.Combine(cachePath, HashHelper.GetMd5(fontGenerator.Directory) + ".yaml");
+
+                var fontRoot = fontGenerator.ToTinyObject();
+                fontRoot.Write(path);
+            }
         }
 
         #endregion
@@ -319,6 +354,8 @@ namespace StorybrewCommon.Scripting
 
                 current = this;
                 Generate();
+
+                saveFontCache();
             }
             finally
             {

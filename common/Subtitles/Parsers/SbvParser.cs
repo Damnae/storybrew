@@ -1,5 +1,4 @@
-﻿using StorybrewCommon.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -11,7 +10,7 @@ namespace StorybrewCommon.Subtitles.Parsers
     {
         public SubtitleSet Parse(string path)
         {
-            using (var stream = Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var stream = BrewLib.Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 return Parse(stream);
         }
 

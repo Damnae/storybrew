@@ -176,6 +176,7 @@
     <Compile Include="Util\JObjectExtensions.cs" />
     <Compile Include="Util\LineBreaker.cs" />
     <Compile Include="Util\ListExtensions.cs" />
+    <Compile Include="Util\MathUtil.cs" />
     <Compile Include="Util\Misc.cs" />
     <Compile Include="Util\Native.cs" />
     <Compile Include="Util\PathHelper.cs" />

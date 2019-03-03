@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using BrewLib.Util;
+using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
@@ -9,6 +10,8 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
+using Tiny;
 
 namespace StorybrewCommon.Subtitles
 {
@@ -66,36 +69,36 @@ namespace StorybrewCommon.Subtitles
 
     public class FontGenerator
     {
+        public string Directory { get; }
         private readonly FontDescription description;
         private readonly FontEffect[] effects;
         private readonly string projectDirectory;
         private readonly string mapsetDirectory;
-        private readonly string directory;
 
-        private Dictionary<string, FontTexture> letters = new Dictionary<string, FontTexture>();
+        private Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
 
-        public FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string mapsetDirectory)
+        internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string mapsetDirectory)
         {
+            Directory = directory;
             this.description = description;
             this.effects = effects;
             this.projectDirectory = projectDirectory;
             this.mapsetDirectory = mapsetDirectory;
-            this.directory = directory;
         }
 
         public FontTexture GetTexture(string text)
         {
-            if (!letters.TryGetValue(text, out FontTexture texture))
-                letters.Add(text, texture = generateTexture(text));
+            if (!textureCache.TryGetValue(text, out FontTexture texture))
+                textureCache.Add(text, texture = generateTexture(text));
             return texture;
         }
 
         private FontTexture generateTexture(string text)
         {
-            var filename = text.Length == 1 ? $"{(int)text[0]:x4}.png" : $"_{letters.Count:x3}.png";
-            var bitmapPath = Path.Combine(mapsetDirectory, directory, filename);
+            var filename = text.Length == 1 ? $"{(int)text[0]:x4}.png" : $"_{textureCache.Count(l => l.Key.Length > 1):x3}.png";
+            var bitmapPath = Path.Combine(mapsetDirectory, Directory, filename);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(bitmapPath));
+            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(bitmapPath));
 
             var fontPath = Path.Combine(projectDirectory, description.FontPath);
             if (!File.Exists(fontPath)) fontPath = description.FontPath;
@@ -158,7 +161,7 @@ namespace StorybrewCommon.Subtitles
 
                             if (description.Debug)
                             {
-                                var r = new Random(letters.Count);
+                                var r = new Random(textureCache.Count);
                                 textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
                             }
 
@@ -191,14 +194,99 @@ namespace StorybrewCommon.Subtitles
                                 height = trimmedBitmap.Height;
                                 using (var trimGraphics = Graphics.FromImage(trimmedBitmap))
                                     trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
-                                Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
+                                BrewLib.Util.Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
                             }
                         }
-                        else Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
+                        else BrewLib.Util.Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
                     }
                 }
             }
-            return new FontTexture(Path.Combine(directory, filename), offsetX, offsetY, baseWidth, baseHeight, width, height);
+            return new FontTexture(Path.Combine(Directory, filename), offsetX, offsetY, baseWidth, baseHeight, width, height);
         }
+
+        internal void HandleCache(TinyToken cachedFontRoot)
+        {
+            if (!matches(cachedFontRoot))
+                return;
+
+            foreach (var cacheEntry in cachedFontRoot.Values<TinyObject>("Cache"))
+            {
+                var path = cacheEntry.Value<string>("Path");
+                var hash = cacheEntry.Value<string>("Hash");
+
+                var fullPath = Path.Combine(mapsetDirectory, path);
+                if (!File.Exists(fullPath) || HashHelper.GetFileMd5(fullPath) != hash)
+                    continue;
+
+                textureCache.Add(cacheEntry.Value<string>("Text"), new FontTexture(
+                    path,
+                    cacheEntry.Value<float>("OffsetX"),
+                    cacheEntry.Value<float>("OffsetY"),
+                    cacheEntry.Value<int>("BaseWidth"),
+                    cacheEntry.Value<int>("BaseHeight"),
+                    cacheEntry.Value<int>("Width"),
+                    cacheEntry.Value<int>("Height")
+                ));
+            }
+        }
+
+        private bool matches(TinyToken cachedFontRoot)
+        {
+            if (cachedFontRoot.Value<string>("FontPath") == description.FontPath &&
+                cachedFontRoot.Value<int>("FontSize") == description.FontSize &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorR"), description.Color.R, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorG"), description.Color.G, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorB"), description.Color.B, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorA"), description.Color.A, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("PaddingX"), description.Padding.X, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("PaddingY"), description.Padding.Y, 0.00001f) &&
+                cachedFontRoot.Value<FontStyle>("FontStyle") == description.FontStyle &&
+                cachedFontRoot.Value<bool>("TrimTransparency") == description.TrimTransparency &&
+                cachedFontRoot.Value<bool>("EffectsOnly") == description.EffectsOnly &&
+                cachedFontRoot.Value<bool>("Debug") == description.Debug)
+            {
+                var effectsRoot = cachedFontRoot.Value<TinyArray>("Effects");
+                if (effectsRoot.Count != effects.Length)
+                    return false;
+
+                for (var i = 0; i < effects.Length; i++)
+                    if (!effects[i].Matches(effectsRoot[i].Value<TinyToken>()))
+                        return false;
+
+                return true;
+            }
+            return false;
+        }
+
+        internal TinyObject ToTinyObject() => new TinyObject
+        {
+            { "FontPath", description.FontPath },
+            { "FontSize", description.FontSize },
+            { "ColorR", description.Color.R },
+            { "ColorG", description.Color.G },
+            { "ColorB", description.Color.B },
+            { "ColorA", description.Color.A },
+            { "PaddingX", description.Padding.X },
+            { "PaddingY", description.Padding.Y },
+            { "FontStyle", description.FontStyle },
+            { "TrimTransparency", description.TrimTransparency },
+            { "EffectsOnly", description.EffectsOnly },
+            { "Debug", description.Debug },
+            { "Effects", effects.Select(e => e.ToTinyObject())},
+            { "Cache", textureCache.Where(l => !l.Value.IsEmpty).Select(l => letterToTinyObject(l))},
+        };
+
+        private TinyObject letterToTinyObject(KeyValuePair<string, FontTexture> letterEntry) => new TinyObject
+        {
+            { "Text", letterEntry.Key },
+            { "Path", letterEntry.Value.Path },
+            { "Hash", HashHelper.GetFileMd5(Path.Combine(mapsetDirectory, letterEntry.Value.Path)) },
+            { "OffsetX", letterEntry.Value.OffsetX },
+            { "OffsetY", letterEntry.Value.OffsetY },
+            { "BaseWidth", letterEntry.Value.BaseWidth },
+            { "BaseHeight", letterEntry.Value.BaseHeight },
+            { "Width", letterEntry.Value.Width },
+            { "Height", letterEntry.Value.Height },
+        };
     }
 }
