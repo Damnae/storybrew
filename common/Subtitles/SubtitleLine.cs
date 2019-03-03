@@ -2,20 +2,15 @@
 {
     public class SubtitleLine
     {
-        private double startTime;
-        public double StartTime => startTime;
-
-        private double endTime;
-        public double EndTime => endTime;
-
-        private string text;
-        public string Text => text;
+        public double StartTime { get; }
+        public double EndTime { get; }
+        public string Text { get; }
 
         public SubtitleLine(double startTime, double endTime, string text)
         {
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.text = text;
+            StartTime = startTime;
+            EndTime = endTime;
+            Text = text;
         }
     }
 }

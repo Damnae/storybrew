@@ -96,9 +96,9 @@
     <Compile Include="Subtitles\FontOutline.cs" />
     <Compile Include="Subtitles\FontGlow.cs" />
     <Compile Include="Subtitles\FontShadow.cs" />
-    <Compile Include="Subtitles\AssParser.cs" />
-    <Compile Include="Subtitles\SbvParser.cs" />
-    <Compile Include="Subtitles\SrtParser.cs" />
+    <Compile Include="Subtitles\Parsers\AssParser.cs" />
+    <Compile Include="Subtitles\Parsers\SbvParser.cs" />
+    <Compile Include="Subtitles\Parsers\SrtParser.cs" />
     <Compile Include="Subtitles\SubtitleLine.cs" />
     <Compile Include="Mapset\ControlPoint.cs" />
     <Compile Include="Mapset\Beatmap.cs" />

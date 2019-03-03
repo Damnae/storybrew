@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace StorybrewCommon.Subtitles
+namespace StorybrewCommon.Subtitles.Parsers
 {
     public class AssParser
     {

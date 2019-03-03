@@ -2,6 +2,7 @@
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Subtitles;
+using StorybrewCommon.Subtitles.Parsers;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;

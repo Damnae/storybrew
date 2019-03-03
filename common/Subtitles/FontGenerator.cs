@@ -14,37 +14,24 @@ namespace StorybrewCommon.Subtitles
 {
     public class FontTexture
     {
-        private string path;
-        public string Path => path;
-        public bool IsEmpty => path == null;
-
-        private float offsetX;
-        public float OffsetX => offsetX;
-
-        private float offsetY;
-        public float OffsetY => offsetY;
-
-        private int baseWidth;
-        public int BaseWidth => baseWidth;
-
-        private int baseHeight;
-        public int BaseHeight => baseHeight;
-
-        private int width;
-        public int Width => width;
-
-        private int height;
-        public int Height => height;
+        public string Path { get; }
+        public bool IsEmpty => Path == null;
+        public float OffsetX { get; }
+        public float OffsetY { get; }
+        public int BaseWidth { get; }
+        public int BaseHeight { get; }
+        public int Width { get; }
+        public int Height { get; }
 
         public FontTexture(string path, float offsetX, float offsetY, int baseWidth, int baseHeight, int width, int height)
         {
-            this.path = path;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
-            this.baseWidth = baseWidth;
-            this.baseHeight = baseHeight;
-            this.width = width;
-            this.height = height;
+            Path = path;
+            OffsetX = offsetX;
+            OffsetY = offsetY;
+            BaseWidth = baseWidth;
+            BaseHeight = baseHeight;
+            Width = width;
+            Height = height;
         }
 
         public Vector2 OffsetFor(OsbOrigin origin)
@@ -52,15 +39,15 @@ namespace StorybrewCommon.Subtitles
             switch (origin)
             {
                 default:
-                case OsbOrigin.TopLeft: return new Vector2(offsetX, offsetY);
-                case OsbOrigin.TopCentre: return new Vector2(offsetX + width * 0.5f, offsetY);
-                case OsbOrigin.TopRight: return new Vector2(offsetX + width, offsetY);
-                case OsbOrigin.CentreLeft: return new Vector2(offsetX, offsetY + height * 0.5f);
-                case OsbOrigin.Centre: return new Vector2(offsetX + width * 0.5f, offsetY + height * 0.5f);
-                case OsbOrigin.CentreRight: return new Vector2(offsetX + width, offsetY + height * 0.5f);
-                case OsbOrigin.BottomLeft: return new Vector2(offsetX, offsetY + height);
-                case OsbOrigin.BottomCentre: return new Vector2(offsetX + width * 0.5f, offsetY + height);
-                case OsbOrigin.BottomRight: return new Vector2(offsetX + width, offsetY + height);
+                case OsbOrigin.TopLeft: return new Vector2(OffsetX, OffsetY);
+                case OsbOrigin.TopCentre: return new Vector2(OffsetX + Width * 0.5f, OffsetY);
+                case OsbOrigin.TopRight: return new Vector2(OffsetX + Width, OffsetY);
+                case OsbOrigin.CentreLeft: return new Vector2(OffsetX, OffsetY + Height * 0.5f);
+                case OsbOrigin.Centre: return new Vector2(OffsetX + Width * 0.5f, OffsetY + Height * 0.5f);
+                case OsbOrigin.CentreRight: return new Vector2(OffsetX + Width, OffsetY + Height * 0.5f);
+                case OsbOrigin.BottomLeft: return new Vector2(OffsetX, OffsetY + Height);
+                case OsbOrigin.BottomCentre: return new Vector2(OffsetX + Width * 0.5f, OffsetY + Height);
+                case OsbOrigin.BottomRight: return new Vector2(OffsetX + Width, OffsetY + Height);
             }
         }
     }
@@ -79,11 +66,11 @@ namespace StorybrewCommon.Subtitles
 
     public class FontGenerator
     {
-        private FontDescription description;
-        private FontEffect[] effects;
-        private string projectDirectory;
-        private string mapsetDirectory;
-        private string directory;
+        private readonly FontDescription description;
+        private readonly FontEffect[] effects;
+        private readonly string projectDirectory;
+        private readonly string mapsetDirectory;
+        private readonly string directory;
 
         private Dictionary<string, FontTexture> letters = new Dictionary<string, FontTexture>();
 
