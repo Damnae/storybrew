@@ -25,6 +25,16 @@ namespace StorybrewEditor.Util
             set => context.Enabled = value;
         }
 
+        public int TaskCount
+        {
+            get
+            {
+                lock (context.Queue)
+                    lock (context.Running)
+                        return context.Queue.Count + context.Running.Count;
+            }
+        }
+
         public AsyncActionQueue(string threadName, bool allowDuplicates = false)
         {
             this.allowDuplicates = allowDuplicates;

@@ -13,6 +13,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -198,7 +199,7 @@ namespace StorybrewEditor.ScreenLayers
                     {
                         StyleName = "icon",
                         Icon = IconFont.PuzzlePiece,
-                        Tooltip = "Export to .osb",
+                        Tooltip = "Export to .osb\n(Right click to export once for each diff)",
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
@@ -358,7 +359,12 @@ namespace StorybrewEditor.ScreenLayers
                 else Process.Start(path);
             };
             saveButton.OnClick += (sender, e) => saveProject();
-            exportButton.OnClick += (sender, e) => exportProject();
+            exportButton.OnClick += (sender, e) =>
+            {
+                if (e == MouseButton.Right)
+                    exportProjectAll();
+                else exportProject();
+           };
 
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
@@ -457,6 +463,33 @@ namespace StorybrewEditor.ScreenLayers
 
         private void exportProject()
             => Manager.AsyncLoading("Exporting", () => project.ExportToOsb());
+
+        private void exportProjectAll()
+        {
+            Manager.AsyncLoading("Exporting", () =>
+            {
+                var first = true;
+                foreach (var beatmap in project.MapsetManager.Beatmaps)
+                {
+                    Program.RunMainThread(() => project.MainBeatmap = beatmap);
+
+                    while (project.EffectsStatus != EffectStatus.Ready)
+                    {
+                        switch (project.EffectsStatus)
+                        {
+                            case EffectStatus.CompilationFailed:
+                            case EffectStatus.ExecutionFailed:
+                            case EffectStatus.LoadingFailed:
+                                throw new Exception($"An effect failed to execute ({project.EffectsStatus})\nCheck its log for the actual error.");
+                        }
+                        Thread.Sleep(200);
+                    }
+
+                    project.ExportToOsb(first);
+                    first = false;
+                }
+            });
+        }
 
         public override void Update(bool isTop, bool isCovered)
         {

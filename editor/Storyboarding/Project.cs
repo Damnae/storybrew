@@ -196,7 +196,11 @@ namespace StorybrewEditor.Storyboarding
         public event EventHandler OnEffectsStatusChanged;
 
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
-        public void QueueEffectUpdate(Effect effect) => effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());
+        public void QueueEffectUpdate(Effect effect)
+        {
+            effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());
+            refreshEffectsStatus();
+        }
         public void CancelEffectUpdates(bool stopThreads) => effectUpdateQueue.CancelQueuedActions(stopThreads);
         public void StopEffectUpdates() => effectUpdateQueue.Enabled = false;
 
@@ -255,7 +259,8 @@ namespace StorybrewEditor.Storyboarding
         private void refreshEffectsStatus()
         {
             var previousStatus = effectsStatus;
-            var isUpdating = false;
+            var pendingTasks = effectUpdateQueue.TaskCount;
+            var isUpdating = pendingTasks > 0;
             var hasError = false;
 
             foreach (var effect in effects)
@@ -852,7 +857,7 @@ namespace StorybrewEditor.Storyboarding
         /// <summary>
         /// Doesn't run in the main thread
         /// </summary>
-        public void ExportToOsb()
+        public void ExportToOsb(bool exportOsb = true)
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(Project));
 
@@ -920,21 +925,24 @@ namespace StorybrewEditor.Storyboarding
                 }
             }
 
-            Debug.Print($"Exporting osb to {osbPath}");
-            using (var stream = new SafeWriteStream(osbPath))
-            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            if (exportOsb)
             {
-                writer.WriteLine("[Events]");
-                writer.WriteLine("//Background and Video events");
-                foreach (var osbLayer in OsbLayers)
+                Debug.Print($"Exporting osb to {osbPath}");
+                using (var stream = new SafeWriteStream(osbPath))
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
                 {
-                    writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
-                    foreach (var layer in localLayers)
-                        if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)
-                            layer.WriteOsbSprites(writer, exportSettings);
+                    writer.WriteLine("[Events]");
+                    writer.WriteLine("//Background and Video events");
+                    foreach (var osbLayer in OsbLayers)
+                    {
+                        writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
+                        foreach (var layer in localLayers)
+                            if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)
+                                layer.WriteOsbSprites(writer, exportSettings);
+                    }
+                    writer.WriteLine("//Storyboard Sound Samples");
+                    stream.Commit();
                 }
-                writer.WriteLine("//Storyboard Sound Samples");
-                stream.Commit();
             }
         }
 
