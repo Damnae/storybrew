@@ -641,7 +641,7 @@ namespace StorybrewEditor.Storyboarding
                     var indexRoot = new TinyObject
                     {
                         { "FormatVersion", Version },
-                        { "MapsetPath", MapsetPath },
+                        { "MapsetPath", PathHelper.WithStandardSeparators(MapsetPath) },
                         { "BeatmapId", MainBeatmap.Id },
                         { "BeatmapName", MainBeatmap.Name },
                         { "Assemblies", importedAssemblies },

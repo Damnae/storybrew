@@ -260,7 +260,7 @@ namespace StorybrewCommon.Subtitles
 
         internal TinyObject ToTinyObject() => new TinyObject
         {
-            { "FontPath", description.FontPath },
+            { "FontPath", PathHelper.WithStandardSeparators(description.FontPath) },
             { "FontSize", description.FontSize },
             { "ColorR", description.Color.R },
             { "ColorG", description.Color.G },
@@ -279,7 +279,7 @@ namespace StorybrewCommon.Subtitles
         private TinyObject letterToTinyObject(KeyValuePair<string, FontTexture> letterEntry) => new TinyObject
         {
             { "Text", letterEntry.Key },
-            { "Path", letterEntry.Value.Path },
+            { "Path", PathHelper.WithStandardSeparators(letterEntry.Value.Path) },
             { "Hash", HashHelper.GetFileMd5(Path.Combine(mapsetDirectory, letterEntry.Value.Path)) },
             { "OffsetX", letterEntry.Value.OffsetX },
             { "OffsetY", letterEntry.Value.OffsetY },
