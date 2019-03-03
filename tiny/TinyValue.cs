@@ -90,6 +90,14 @@ namespace Tiny
                     return (T)(object)new TinyObject();
             }
 
+            if (targetType.IsEnum && (type == TinyTokenType.String || type == TinyTokenType.Integer))
+            {
+                if (value == null)
+                    return default(T);
+
+                return (T)Enum.Parse(targetType, value.ToString());
+            }
+
             if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 if (value == null)

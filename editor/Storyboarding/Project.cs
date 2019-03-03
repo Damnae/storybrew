@@ -707,7 +707,7 @@ namespace StorybrewEditor.Storyboarding
                         var layerRoot = new TinyObject
                         {
                             { "Name", layer.Identifier },
-                            { "OsbLayer", layer.OsbLayer.ToString() },
+                            { "OsbLayer", layer.OsbLayer },
                             { "DiffSpecific", layer.DiffSpecific },
                             { "Visible", layer.Visible },
                         };
@@ -799,7 +799,7 @@ namespace StorybrewEditor.Storyboarding
                         layerInserters.Add(layerGuid, () => layerEffect.AddPlaceholder(new EditorStoryboardLayer(layerRoot.Value<string>("Name"), layerEffect)
                         {
                             Guid = Guid.Parse(layerGuid),
-                            OsbLayer = (OsbLayer)Enum.Parse(typeof(OsbLayer), layerRoot.Value<string>("OsbLayer")),
+                            OsbLayer = layerRoot.Value<OsbLayer>("OsbLayer"),
                             DiffSpecific = layerRoot.Value<bool>("DiffSpecific"),
                             Visible = layerRoot.Value<bool>("Visible"),
                         }));
