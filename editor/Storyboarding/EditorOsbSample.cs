@@ -13,7 +13,7 @@ namespace StorybrewEditor.Storyboarding
             if (EventTime + 1 < currentTime)
                 return;
 
-            var fullPath = Path.Combine(project.MapsetPath, audioPath);
+            var fullPath = Path.Combine(project.MapsetPath, AudioPath);
             AudioSample sample = null;
             try
             {

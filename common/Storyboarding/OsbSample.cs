@@ -4,7 +4,7 @@ namespace StorybrewCommon.Storyboarding
 {
     public class OsbSample : StoryboardObject
     {
-        public string audioPath = "";
+        private string audioPath = "";
         public string AudioPath
         {
             get { return audioPath; }
@@ -23,6 +23,6 @@ namespace StorybrewCommon.Storyboarding
         public override double EndTime => Time;
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
-            => writer.WriteLine($"Sample,{((int)Time).ToString(exportSettings.NumberFormat)},{layer},\"{AudioPath}\",{((int)Volume).ToString(exportSettings.NumberFormat)}");
+            => writer.WriteLine($"Sample,{((int)Time).ToString(exportSettings.NumberFormat)},{layer},\"{AudioPath.Trim()}\",{((int)Volume).ToString(exportSettings.NumberFormat)}");
     }
 }

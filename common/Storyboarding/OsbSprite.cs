@@ -15,7 +15,7 @@ namespace StorybrewCommon.Storyboarding
         private List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
 
-        public string texturePath = "";
+        private string texturePath = "";
         public string TexturePath
         {
             get { return texturePath; }
@@ -266,12 +266,12 @@ namespace StorybrewCommon.Storyboarding
 
         protected virtual void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
-            writer.Write($"Sprite,{layer},{Origin.ToString()},\"{TexturePath}\"");
+            writer.Write($"Sprite,{layer},{Origin.ToString()},\"{TexturePath.Trim()}\"");
             if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
-                writer.Write($",{ InitialPosition.X.ToString(exportSettings.NumberFormat)}");
+                writer.Write($",{InitialPosition.X.ToString(exportSettings.NumberFormat)}");
             else writer.Write($",0");
             if (!moveTimeline.HasCommands && !moveYTimeline.HasCommands)
-                writer.WriteLine($",{ InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+                writer.WriteLine($",{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
             else writer.WriteLine($",0");
         }
 
