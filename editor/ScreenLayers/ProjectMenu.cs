@@ -313,7 +313,8 @@ namespace StorybrewEditor.ScreenLayers
             {
                 snapDivisor++;
                 if (snapDivisor == 5 || snapDivisor == 7) snapDivisor++;
-                if (snapDivisor == 9) snapDivisor = 16;
+                if (snapDivisor == 9) snapDivisor = 12;
+                if (snapDivisor == 13) snapDivisor = 16;
                 if (snapDivisor > 16) snapDivisor = 1;
                 timeline.SnapDivisor = snapDivisor;
                 divisorButton.Text = $"1/{snapDivisor}";
