@@ -52,6 +52,7 @@
       <HintPath>..\packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -60,6 +61,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animations\EasingFunctions.cs" />
@@ -91,11 +93,17 @@
     <Compile Include="Storyboarding\Util\CommandGenerator.cs" />
     <Compile Include="Storyboarding\OsbSample.cs" />
     <Compile Include="Storyboarding\Util\OsbAnimationPool.cs" />
+    <Compile Include="Subtitles\Internal\SimpleTextSource.cs" />
     <Compile Include="Subtitles\FontEffect.cs" />
+    <Compile Include="Subtitles\FontGeneratorMedia.cs" />
+    <Compile Include="Subtitles\FontGeneratorGdi.cs" />
     <Compile Include="Subtitles\FontGenerator.cs" />
     <Compile Include="Subtitles\FontOutline.cs" />
     <Compile Include="Subtitles\FontGlow.cs" />
     <Compile Include="Subtitles\FontShadow.cs" />
+    <Compile Include="Subtitles\Internal\CustomTextParagraphProperties.cs" />
+    <Compile Include="Subtitles\Internal\CustomTextRunProperties.cs" />
+    <Compile Include="Subtitles\Internal\CustomTextRunTypographyProperties.cs" />
     <Compile Include="Subtitles\Parsers\AssParser.cs" />
     <Compile Include="Subtitles\Parsers\SbvParser.cs" />
     <Compile Include="Subtitles\Parsers\SrtParser.cs" />

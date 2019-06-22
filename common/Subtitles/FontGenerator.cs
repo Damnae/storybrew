@@ -2,13 +2,8 @@
 using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Util;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using Tiny;
@@ -65,144 +60,55 @@ namespace StorybrewCommon.Subtitles
         public bool TrimTransparency;
         public bool EffectsOnly;
         public bool Debug;
+        public FontGeneratorVersion GeneratorVersion = FontGeneratorVersion.Gdi;
     }
 
-    public class FontGenerator
+    public enum FontGeneratorVersion
+    {
+        Gdi = 0,
+        Media = 1,
+    }
+
+    public abstract class FontGenerator
     {
         public string Directory { get; }
-        private readonly FontDescription description;
-        private readonly FontEffect[] effects;
-        private readonly string projectDirectory;
-        private readonly string mapsetDirectory;
+
+        protected readonly FontDescription Description;
+        protected readonly FontEffect[] Effects;
+        protected readonly string ProjectDirectory;
+        protected readonly string MapsetDirectory;
 
         private Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
+        protected int TextureCacheSize => textureCache.Count;
 
         internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string mapsetDirectory)
         {
             Directory = directory;
-            this.description = description;
-            this.effects = effects;
-            this.projectDirectory = projectDirectory;
-            this.mapsetDirectory = mapsetDirectory;
+            Description = description;
+            Effects = effects;
+            ProjectDirectory = projectDirectory;
+            MapsetDirectory = mapsetDirectory;
         }
 
         public FontTexture GetTexture(string text)
         {
             if (!textureCache.TryGetValue(text, out FontTexture texture))
-                textureCache.Add(text, texture = generateTexture(text));
+            {
+                var filename = text.Length == 1 ? $"{(int)text[0]:x4}.png" : $"_{textureCache.Count(l => l.Key.Length > 1):x3}.png";
+                var bitmapPath = Path.Combine(Directory, filename);
+
+                var absoluteBitmapPath = Path.Combine(MapsetDirectory, bitmapPath);
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(absoluteBitmapPath));
+
+                var fontPath = Path.Combine(ProjectDirectory, Description.FontPath);
+                if (!File.Exists(fontPath)) fontPath = Description.FontPath;
+
+                textureCache.Add(text, texture = GenerateTexture(text, fontPath, bitmapPath));
+            }
             return texture;
         }
 
-        private FontTexture generateTexture(string text)
-        {
-            var filename = text.Length == 1 ? $"{(int)text[0]:x4}.png" : $"_{textureCache.Count(l => l.Key.Length > 1):x3}.png";
-            var bitmapPath = Path.Combine(mapsetDirectory, Directory, filename);
-
-            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(bitmapPath));
-
-            var fontPath = Path.Combine(projectDirectory, description.FontPath);
-            if (!File.Exists(fontPath)) fontPath = description.FontPath;
-
-            float offsetX = 0, offsetY = 0;
-            int baseWidth, baseHeight, width, height;
-            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
-            using (var stringFormat = new StringFormat(StringFormat.GenericTypographic))
-            using (var textBrush = new SolidBrush(Color.FromArgb(description.Color.ToArgb())))
-            using (var fontCollection = new PrivateFontCollection())
-            {
-                graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-                stringFormat.Alignment = StringAlignment.Center;
-                stringFormat.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.NoClip;
-
-                FontFamily fontFamily = null;
-                if (File.Exists(fontPath))
-                {
-                    fontCollection.AddFontFile(fontPath);
-                    fontFamily = fontCollection.Families[0];
-                }
-
-                var dpiScale = 96f / graphics.DpiY;
-                var fontStyle = description.FontStyle;
-                using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize * dpiScale, fontStyle) : new Font(fontPath, description.FontSize * dpiScale, fontStyle))
-                {
-                    var measuredSize = graphics.MeasureString(text, font, 0, stringFormat);
-                    baseWidth = (int)Math.Ceiling(measuredSize.Width);
-                    baseHeight = (int)Math.Ceiling(measuredSize.Height);
-
-                    var effectsWidth = 0f;
-                    var effectsHeight = 0f;
-                    foreach (var effect in effects)
-                    {
-                        var effectSize = effect.Measure();
-                        effectsWidth = Math.Max(effectsWidth, effectSize.X);
-                        effectsHeight = Math.Max(effectsHeight, effectSize.Y);
-                    }
-                    width = (int)Math.Ceiling(baseWidth + effectsWidth + description.Padding.X * 2);
-                    height = (int)Math.Ceiling(baseHeight + effectsHeight + description.Padding.Y * 2);
-
-                    var paddingX = description.Padding.X + effectsWidth * 0.5f;
-                    var paddingY = description.Padding.Y + effectsHeight * 0.5f;
-                    var textX = paddingX + measuredSize.Width * 0.5f;
-                    var textY = paddingY;
-
-                    offsetX = -paddingX;
-                    offsetY = -paddingY;
-
-                    if (text.Length == 1 && char.IsWhiteSpace(text[0]) || width == 0 || height == 0)
-                        return new FontTexture(null, offsetX, offsetY, baseWidth, baseHeight, width, height);
-
-                    using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
-                    {
-                        using (var textGraphics = Graphics.FromImage(bitmap))
-                        {
-                            textGraphics.TextRenderingHint = graphics.TextRenderingHint;
-                            textGraphics.SmoothingMode = SmoothingMode.HighQuality;
-                            textGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-                            if (description.Debug)
-                            {
-                                var r = new Random(textureCache.Count);
-                                textGraphics.Clear(Color.FromArgb(r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)));
-                            }
-
-                            foreach (var effect in effects)
-                                if (!effect.Overlay)
-                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, textX, textY);
-                            if (!description.EffectsOnly)
-                                textGraphics.DrawString(text, font, textBrush, textX, textY, stringFormat);
-                            foreach (var effect in effects)
-                                if (effect.Overlay)
-                                    effect.Draw(bitmap, textGraphics, font, stringFormat, text, textX, textY);
-
-                            if (description.Debug)
-                                using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
-                                {
-                                    textGraphics.DrawLine(pen, textX, textY, textX, textY + baseHeight);
-                                    textGraphics.DrawLine(pen, textX - baseWidth * 0.5f, textY, textX + baseWidth * 0.5f, textY);
-                                }
-                        }
-
-                        var bounds = description.TrimTransparency ? BitmapHelper.FindTransparencyBounds(bitmap) : null;
-                        if (bounds != null && bounds != new Rectangle(0, 0, bitmap.Width, bitmap.Height))
-                        {
-                            var trimBounds = bounds.Value;
-                            using (var trimmedBitmap = new Bitmap(trimBounds.Width, trimBounds.Height))
-                            {
-                                offsetX += trimBounds.Left;
-                                offsetY += trimBounds.Top;
-                                width = trimmedBitmap.Width;
-                                height = trimmedBitmap.Height;
-                                using (var trimGraphics = Graphics.FromImage(trimmedBitmap))
-                                    trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
-                                BrewLib.Util.Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
-                            }
-                        }
-                        else BrewLib.Util.Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
-                    }
-                }
-            }
-            return new FontTexture(Path.Combine(Directory, filename), offsetX, offsetY, baseWidth, baseHeight, width, height);
-        }
+        protected abstract FontTexture GenerateTexture(string text, string fontPath, string bitmapPath);
 
         internal void HandleCache(TinyToken cachedFontRoot)
         {
@@ -214,7 +120,7 @@ namespace StorybrewCommon.Subtitles
                 var path = cacheEntry.Value<string>("Path");
                 var hash = cacheEntry.Value<string>("Hash");
 
-                var fullPath = Path.Combine(mapsetDirectory, path);
+                var fullPath = Path.Combine(MapsetDirectory, path);
                 if (!File.Exists(fullPath) || HashHelper.GetFileMd5(fullPath) != hash)
                     continue;
 
@@ -232,25 +138,25 @@ namespace StorybrewCommon.Subtitles
 
         private bool matches(TinyToken cachedFontRoot)
         {
-            if (cachedFontRoot.Value<string>("FontPath") == description.FontPath &&
-                cachedFontRoot.Value<int>("FontSize") == description.FontSize &&
-                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorR"), description.Color.R, 0.00001f) &&
-                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorG"), description.Color.G, 0.00001f) &&
-                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorB"), description.Color.B, 0.00001f) &&
-                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorA"), description.Color.A, 0.00001f) &&
-                MathUtil.FloatEquals(cachedFontRoot.Value<float>("PaddingX"), description.Padding.X, 0.00001f) &&
-                MathUtil.FloatEquals(cachedFontRoot.Value<float>("PaddingY"), description.Padding.Y, 0.00001f) &&
-                cachedFontRoot.Value<FontStyle>("FontStyle") == description.FontStyle &&
-                cachedFontRoot.Value<bool>("TrimTransparency") == description.TrimTransparency &&
-                cachedFontRoot.Value<bool>("EffectsOnly") == description.EffectsOnly &&
-                cachedFontRoot.Value<bool>("Debug") == description.Debug)
+            if (cachedFontRoot.Value<string>("FontPath") == Description.FontPath &&
+                cachedFontRoot.Value<int>("FontSize") == Description.FontSize &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorR"), Description.Color.R, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorG"), Description.Color.G, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorB"), Description.Color.B, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("ColorA"), Description.Color.A, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("PaddingX"), Description.Padding.X, 0.00001f) &&
+                MathUtil.FloatEquals(cachedFontRoot.Value<float>("PaddingY"), Description.Padding.Y, 0.00001f) &&
+                cachedFontRoot.Value<FontStyle>("FontStyle") == Description.FontStyle &&
+                cachedFontRoot.Value<bool>("TrimTransparency") == Description.TrimTransparency &&
+                cachedFontRoot.Value<bool>("EffectsOnly") == Description.EffectsOnly &&
+                cachedFontRoot.Value<bool>("Debug") == Description.Debug)
             {
                 var effectsRoot = cachedFontRoot.Value<TinyArray>("Effects");
-                if (effectsRoot.Count != effects.Length)
+                if (effectsRoot.Count != Effects.Length)
                     return false;
 
-                for (var i = 0; i < effects.Length; i++)
-                    if (!effects[i].Matches(effectsRoot[i].Value<TinyToken>()))
+                for (var i = 0; i < Effects.Length; i++)
+                    if (!Effects[i].Matches(effectsRoot[i].Value<TinyToken>()))
                         return false;
 
                 return true;
@@ -260,19 +166,19 @@ namespace StorybrewCommon.Subtitles
 
         internal TinyObject ToTinyObject() => new TinyObject
         {
-            { "FontPath", PathHelper.WithStandardSeparators(description.FontPath) },
-            { "FontSize", description.FontSize },
-            { "ColorR", description.Color.R },
-            { "ColorG", description.Color.G },
-            { "ColorB", description.Color.B },
-            { "ColorA", description.Color.A },
-            { "PaddingX", description.Padding.X },
-            { "PaddingY", description.Padding.Y },
-            { "FontStyle", description.FontStyle },
-            { "TrimTransparency", description.TrimTransparency },
-            { "EffectsOnly", description.EffectsOnly },
-            { "Debug", description.Debug },
-            { "Effects", effects.Select(e => e.ToTinyObject())},
+            { "FontPath", PathHelper.WithStandardSeparators(Description.FontPath) },
+            { "FontSize", Description.FontSize },
+            { "ColorR", Description.Color.R },
+            { "ColorG", Description.Color.G },
+            { "ColorB", Description.Color.B },
+            { "ColorA", Description.Color.A },
+            { "PaddingX", Description.Padding.X },
+            { "PaddingY", Description.Padding.Y },
+            { "FontStyle", Description.FontStyle },
+            { "TrimTransparency", Description.TrimTransparency },
+            { "EffectsOnly", Description.EffectsOnly },
+            { "Debug", Description.Debug },
+            { "Effects", Effects.Select(e => e.ToTinyObject())},
             { "Cache", textureCache.Where(l => !l.Value.IsEmpty).Select(l => letterToTinyObject(l))},
         };
 
@@ -280,7 +186,7 @@ namespace StorybrewCommon.Subtitles
         {
             { "Text", letterEntry.Key },
             { "Path", PathHelper.WithStandardSeparators(letterEntry.Value.Path) },
-            { "Hash", HashHelper.GetFileMd5(Path.Combine(mapsetDirectory, letterEntry.Value.Path)) },
+            { "Hash", HashHelper.GetFileMd5(Path.Combine(MapsetDirectory, letterEntry.Value.Path)) },
             { "OffsetX", letterEntry.Value.OffsetX },
             { "OffsetY", letterEntry.Value.OffsetY },
             { "BaseWidth", letterEntry.Value.BaseWidth },

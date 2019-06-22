@@ -200,11 +200,21 @@ namespace StorybrewCommon.Scripting
                 throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
             fontDirectories.Add(fontDirectory);
 
-            var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+            FontGenerator fontGenerator;
+            switch (description.GeneratorVersion)
+            {
+                case FontGeneratorVersion.Gdi:
+                    fontGenerator = new FontGeneratorGdi(directory, description, effects, context.ProjectPath, context.MapsetPath);
+                    break;
+                case FontGeneratorVersion.Media:
+                default:
+                    fontGenerator = new FontGeneratorMedia(directory, description, effects, context.ProjectPath, context.MapsetPath);
+                    break;
+            }
             fontGenerators.Add(fontGenerator);
 
             var cachePath = fontCacheDirectory;
-            if (Directory.Exists(cachePath))
+            if (Directory.Exists(cachePath) && false) // REMOVE ME STUPID
             {
                 var path = Path.Combine(cachePath, HashHelper.GetMd5(fontGenerator.Directory) + ".yaml");
                 if (File.Exists(path))
