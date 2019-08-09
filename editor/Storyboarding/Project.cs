@@ -150,7 +150,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Audio and Display
 
-        public static readonly OsbLayer[] OsbLayers = new OsbLayer[] { OsbLayer.Background, OsbLayer.Fail, OsbLayer.Pass, OsbLayer.Foreground, };
+        public static readonly OsbLayer[] OsbLayers = (OsbLayer[])Enum.GetValues(typeof(OsbLayer));
 
         public double DisplayTime;
 
@@ -876,10 +876,10 @@ namespace StorybrewEditor.Storyboarding
             });
 
             var exportSettings = new ExportSettings();
+            var usesOverlayLayer = localLayers.Any(l => l.OsbLayer == OsbLayer.Overlay);
 
             if (!string.IsNullOrEmpty(osuPath))
             {
-
                 Debug.Print($"Exporting diff specific events to {osuPath}");
                 using (var stream = new SafeWriteStream(osuPath))
                 using (var writer = new StreamWriter(stream, Encoding.UTF8))
@@ -905,6 +905,9 @@ namespace StorybrewEditor.Storyboarding
                                 {
                                     foreach (var osbLayer in OsbLayers)
                                     {
+                                        if (osbLayer == OsbLayer.Overlay && !usesOverlayLayer)
+                                            continue;
+
                                         writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                                         foreach (var layer in localLayers)
                                             if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
@@ -935,6 +938,9 @@ namespace StorybrewEditor.Storyboarding
                     writer.WriteLine("//Background and Video events");
                     foreach (var osbLayer in OsbLayers)
                     {
+                        if (osbLayer == OsbLayer.Overlay && !usesOverlayLayer)
+                            continue;
+
                         writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                         foreach (var layer in localLayers)
                             if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)

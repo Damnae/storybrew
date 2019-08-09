@@ -295,6 +295,7 @@ namespace StorybrewCommon.Storyboarding
         Fail,
         Pass,
         Foreground,
+        Overlay,
     }
 
     public enum OsbOrigin
