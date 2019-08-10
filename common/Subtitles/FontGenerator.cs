@@ -5,6 +5,7 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -218,7 +219,16 @@ namespace StorybrewCommon.Subtitles
                 if (!File.Exists(fullPath) || HashHelper.GetFileMd5(fullPath) != hash)
                     continue;
 
-                textureCache.Add(cacheEntry.Value<string>("Text"), new FontTexture(
+                var text = cacheEntry.Value<string>("Text");
+                if (text.Contains('\ufffd'))
+                {
+                    Trace.WriteLine($"Ignoring invalid font texture \"{text}\" ({path})");
+                    continue;
+                }
+                if (textureCache.ContainsKey(text))
+                    throw new InvalidDataException($"The font texture for \"{text}\" ({path}) has been cached multiple times");
+
+                textureCache.Add(text, new FontTexture(
                     path,
                     cacheEntry.Value<float>("OffsetX"),
                     cacheEntry.Value<float>("OffsetY"),
