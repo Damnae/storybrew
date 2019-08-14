@@ -96,6 +96,9 @@ namespace StorybrewCommon.Storyboarding.CommandValues
         public static implicit operator CommandColor(Color obj)
             => new CommandColor(obj.R / 255.0, obj.G / 255.0, obj.B / 255.0);
 
+        public static implicit operator CommandColor(string hexCode)
+            => FromHtml(hexCode);
+
         public static CommandColor FromRgb(byte r, byte g, byte b)
             => new CommandColor(r / 255.0, g / 255.0, b / 255.0);
 
@@ -119,6 +122,9 @@ namespace StorybrewCommon.Storyboarding.CommandValues
 
         public static CommandColor FromHtml(string htmlColor)
         {
+            if (!htmlColor.StartsWith("#"))
+                htmlColor = "#" + htmlColor;
+
             var color = ColorTranslator.FromHtml(htmlColor);
             return new CommandColor(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
         }
