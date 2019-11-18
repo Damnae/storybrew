@@ -70,6 +70,7 @@ namespace StorybrewCommon.Subtitles
                     textGraphics.DrawImage(blurredBitmap.Bitmap, 0, 0);
             }
         }
+
         public bool Matches(TinyToken cachedEffectRoot)
             => cachedEffectRoot.Value<string>("Type") == GetType().FullName &&
                 cachedEffectRoot.Value<int>("Radius") == Radius &&

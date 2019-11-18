@@ -95,6 +95,7 @@
     <Compile Include="Subtitles\FontGenerator.cs" />
     <Compile Include="Subtitles\FontOutline.cs" />
     <Compile Include="Subtitles\FontGlow.cs" />
+    <Compile Include="Subtitles\FontGradient.cs" />
     <Compile Include="Subtitles\FontShadow.cs" />
     <Compile Include="Subtitles\Parsers\AssParser.cs" />
     <Compile Include="Subtitles\Parsers\SbvParser.cs" />
