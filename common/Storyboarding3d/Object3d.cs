@@ -7,6 +7,7 @@ using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StorybrewCommon.Storyboarding3d
 {
@@ -18,9 +19,11 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
         public StoryboardLayer Layer;
 
+        public bool DrawBelowParent = false;
+
         public bool InheritsColor = true;
         public bool InheritsOpacity = true;
-        public bool InheritsLayer = true;
+        public bool ChildrenInheritLayer = true;
 
         public virtual IEnumerable<CommandGenerator> CommandGenerators { get { yield break; } }
 
@@ -34,12 +37,18 @@ namespace StorybrewCommon.Storyboarding3d
             return Matrix4.Identity;
         }
 
-        public void GenerateTreeSprite(StoryboardLayer defaultLayer)
+        public void GenerateTreeSprite(StoryboardLayer parentLayer)
         {
-            var layer = Layer ?? defaultLayer;
+            var layer = Layer ?? parentLayer;
+            var childrenLayer = ChildrenInheritLayer ? layer : parentLayer;
+
+            foreach (var child in children.Where(c => c.DrawBelowParent))
+                child.GenerateTreeSprite(childrenLayer);
+
             GenerateSprite(layer);
-            foreach (var child in children)
-                child.GenerateTreeSprite(InheritsLayer ? layer : defaultLayer);
+
+            foreach (var child in children.Where(c => !c.DrawBelowParent))
+                child.GenerateTreeSprite(childrenLayer);
         }
         public void GenerateTreeStates(double time, Camera camera, Object3dState parent3dState = null)
             => GenerateTreeStates(time, camera.StateAt(time), parent3dState);

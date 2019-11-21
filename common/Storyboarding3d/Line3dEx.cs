@@ -11,11 +11,11 @@ namespace StorybrewCommon.Storyboarding3d
 {
     public class Line3dEx : Node3d, HasOsbSprites
     {
-        public OsbSprite spriteBody;
-        public OsbSprite spriteTopEdge;
-        public OsbSprite spriteBottomEdge;
-        public OsbSprite spriteStartCap;
-        public OsbSprite spriteEndCapEnd;
+        private OsbSprite spriteBody;
+        private OsbSprite spriteTopEdge;
+        private OsbSprite spriteBottomEdge;
+        private OsbSprite spriteStartCap;
+        private OsbSprite spriteEndCapEnd;
         public IEnumerable<OsbSprite> Sprites
         {
             get

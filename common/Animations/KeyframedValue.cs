@@ -52,6 +52,9 @@ namespace StorybrewCommon.Animations
 
         public KeyframedValue<TValue> Until(double time)
         {
+            if (keyframes.Count == 0)
+                return null;
+
             var index = indexAt(time, false);
             return Add(time, keyframes[index == keyframes.Count ? keyframes.Count - 1 : index].Value);
         }
