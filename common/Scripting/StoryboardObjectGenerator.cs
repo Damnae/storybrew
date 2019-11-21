@@ -209,8 +209,9 @@ namespace StorybrewCommon.Scripting
                 var path = Path.Combine(cachePath, HashHelper.GetMd5(fontGenerator.Directory) + ".yaml");
                 if (File.Exists(path))
                 {
-                    var cachedFontRoot = TinyToken.Read(path);
-                    fontGenerator.HandleCache(cachedFontRoot);
+                    var cachedFontRoot = Util.Misc.WithRetries(() => TinyToken.Read(path), canThrow: false);
+                    if (cachedFontRoot != null)
+                        fontGenerator.HandleCache(cachedFontRoot);
                 }
             }
 
@@ -228,7 +229,14 @@ namespace StorybrewCommon.Scripting
                 var path = Path.Combine(cachePath, HashHelper.GetMd5(fontGenerator.Directory) + ".yaml");
 
                 var fontRoot = fontGenerator.ToTinyObject();
-                fontRoot.Write(path);
+                try
+                {
+                    fontRoot.Write(path);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"Failed to save font cache for {path} ({e.GetType().FullName})");
+                }
             }
         }
 
