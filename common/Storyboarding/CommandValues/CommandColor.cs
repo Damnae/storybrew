@@ -2,6 +2,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding.CommandValues
 {
@@ -20,6 +21,11 @@ namespace StorybrewCommon.Storyboarding.CommandValues
 
         public CommandColor(double r, double g, double b)
         {
+            if (double.IsNaN(r) || double.IsInfinity(r) ||
+                double.IsNaN(g) || double.IsInfinity(g) ||
+                double.IsNaN(b) || double.IsInfinity(b))
+                throw new InvalidDataException($"Invalid command color {r},{g},{b}");
+
             this.r = r;
             this.g = g;
             this.b = b;

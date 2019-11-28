@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding.CommandValues
 {
@@ -9,6 +10,9 @@ namespace StorybrewCommon.Storyboarding.CommandValues
 
         public CommandDecimal(double value)
         {
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                throw new InvalidDataException($"Invalid command decimal {value}");
+
             this.value = value;
         }
 
