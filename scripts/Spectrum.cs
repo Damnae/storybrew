@@ -3,6 +3,7 @@ using StorybrewCommon.Animations;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using System;
+using System.Linq;
 
 namespace StorybrewScripts
 {
@@ -55,17 +56,23 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
-            var endTime = Math.Min(EndTime, (int)AudioDuration);
-            var startTime = Math.Min(StartTime, endTime);
+            if (StartTime == EndTime)
+            {
+                StartTime = (int)Beatmap.HitObjects.First().StartTime;
+                EndTime = (int)Beatmap.HitObjects.Last().EndTime;
+            }
+            EndTime = Math.Min(EndTime, (int)AudioDuration);
+            StartTime = Math.Min(StartTime, EndTime);
+
             var bitmap = GetMapsetBitmap(SpritePath);
 
             var heightKeyframes = new KeyframedValue<float>[BarCount];
             for (var i = 0; i < BarCount; i++)
                 heightKeyframes[i] = new KeyframedValue<float>(null);
 
-            var fftTimeStep = Beatmap.GetTimingPointAt(startTime).BeatDuration / BeatDivisor;
+            var fftTimeStep = Beatmap.GetTimingPointAt(StartTime).BeatDuration / BeatDivisor;
             var fftOffset = fftTimeStep * 0.2;
-            for (var time = (double)startTime; time < endTime; time += fftTimeStep)
+            for (var time = (double)StartTime; time < EndTime; time += fftTimeStep)
             {
                 var fft = GetFft(time + fftOffset, BarCount, null, FftEasing);
                 for (var i = 0; i < BarCount; i++)
@@ -85,8 +92,8 @@ namespace StorybrewScripts
                 keyframes.Simplify1dKeyframes(Tolerance, h => h);
 
                 var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(Position.X + i * barWidth, Position.Y));
-                bar.ColorHsb(startTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
-                bar.Additive(startTime, endTime);
+                bar.ColorHsb(StartTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
+                bar.Additive(StartTime, EndTime);
 
                 var scaleX = Scale.X * barWidth / bitmap.Width;
                 scaleX = (float)Math.Floor(scaleX * 10) / 10.0f;
@@ -103,7 +110,7 @@ namespace StorybrewScripts
                     MinimalHeight,
                     s => (float)Math.Round(s, CommandDecimals)
                 );
-                if (!hasScale) bar.ScaleVec(startTime, scaleX, MinimalHeight);
+                if (!hasScale) bar.ScaleVec(StartTime, scaleX, MinimalHeight);
             }
         }
     }

@@ -90,6 +90,9 @@ namespace StorybrewCommon.Animations
             TValue defaultValue = default(TValue), Func<TValue, TValue> edit = null,
             double? explicitStartTime = null, double? explicitEndTime = null, bool loopable = false)
         {
+            if (keyframes.Count == 0)
+                return;
+
             var startTime = explicitStartTime ?? keyframes[0].Time;
             var endTime = explicitEndTime ?? keyframes[keyframes.Count - 1].Time;
 
