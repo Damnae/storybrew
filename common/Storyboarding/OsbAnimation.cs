@@ -33,6 +33,6 @@ namespace StorybrewCommon.Storyboarding
         }
 
         protected override void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
-            => writer.WriteLine($"Animation,{layer},{Origin.ToString()},\"{TexturePath.Trim()}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)},{FrameCount},{FrameDelay},{LoopType}");
+            => writer.WriteLine($"Animation,{layer},{Origin.ToString()},\"{TexturePath.Trim()}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)},{FrameCount},{FrameDelay.ToString(exportSettings.NumberFormat)},{LoopType}");
     }
 }
