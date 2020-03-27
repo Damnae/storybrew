@@ -53,7 +53,7 @@ namespace StorybrewEditor
             if (args.Length != 0 && handleArguments(args))
                 return;
 
-            setupLogging();
+            setupLogging(checkFrozen : false);
             startEditor();
         }
 
@@ -382,12 +382,13 @@ namespace StorybrewEditor
         private static object errorHandlerLock = new object();
         private static volatile bool insideErrorHandler;
 
-        private static void setupLogging(string logsPath = null, string commonLogFilename = null)
+        private static void setupLogging(string logsPath = null, string commonLogFilename = null, bool checkFrozen = false)
         {
             logsPath = logsPath ?? DefaultLogPath;
             var tracePath = Path.Combine(logsPath, commonLogFilename ?? "trace.log");
             var exceptionPath = Path.Combine(logsPath, commonLogFilename ?? "exception.log");
             var crashPath = Path.Combine(logsPath, commonLogFilename ?? "crash.log");
+            var freezePath = Path.Combine(logsPath, commonLogFilename ?? "freeze.log");
 
             if (!Directory.Exists(logsPath))
                 Directory.CreateDirectory(logsPath);
@@ -402,6 +403,9 @@ namespace StorybrewEditor
 
             AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(e.Exception, exceptionPath, null, false);
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError((Exception)e.ExceptionObject, crashPath, "crash", true);
+
+            if (checkFrozen)
+                setupFreezeCheck(e => logError(e, freezePath, null, false));
         }
 
         private static void logError(Exception e, string filename, string reportType, bool show)
@@ -459,6 +463,60 @@ namespace StorybrewEditor
                 (response, exception) =>
                 {
                 });
+        }
+
+        private static void setupFreezeCheck(Action<Exception> action)
+        {
+            var mainThread = Thread.CurrentThread;
+
+            var thread = new Thread(() =>
+            {
+                var answered = false;
+                var frozen = 0;
+
+                while (!schedulingEnabled)
+                    Thread.Sleep(1000);
+
+                while (true)
+                {
+                    answered = false;
+                    Schedule(() => answered = true);
+
+                    Thread.Sleep(1000);
+
+                    if (!answered)
+                        frozen++;
+
+                    if (frozen >= 3)
+                    {
+                        frozen = 0;
+
+                        mainThread.Suspend();
+                        StackTrace trace = null;
+                        try
+                        {
+                            trace = new StackTrace(mainThread, true);
+                            action(new Exception(trace.ToString()));
+                        }
+                        catch (ThreadStateException e)
+                        {
+                            action(e);
+                        }
+
+                        try
+                        {
+                            mainThread.Resume();
+                        }
+                        catch (ThreadStateException e)
+                        {
+                            action(e);
+                        }
+                    }
+                }
+            })
+            { Name = "Freeze Checker", IsBackground = true, };
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         #endregion
