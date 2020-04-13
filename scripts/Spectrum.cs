@@ -1,4 +1,5 @@
-﻿using OpenTK;
+using OpenTK;
+using OpenTK.Graphics;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
@@ -53,6 +54,12 @@ namespace StorybrewScripts
 
         [Configurable]
         public OsbEasing FftEasing = OsbEasing.InExpo;
+        
+        [Configurable]
+        public bool RainbowColor = false;
+
+        [Configurable]
+        public Color4 SpectrumColor = Color4.White;
 
         public override void Generate()
         {
@@ -92,7 +99,8 @@ namespace StorybrewScripts
                 keyframes.Simplify1dKeyframes(Tolerance, h => h);
 
                 var bar = layer.CreateSprite(SpritePath, SpriteOrigin, new Vector2(Position.X + i * barWidth, Position.Y));
-                bar.ColorHsb(StartTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
+                if(RainbowColor) bar.ColorHsb(StartTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
+                else bar.Color(StartTime, SpectrumColor);                 
                 bar.Additive(StartTime, EndTime);
 
                 var scaleX = Scale.X * barWidth / bitmap.Width;
