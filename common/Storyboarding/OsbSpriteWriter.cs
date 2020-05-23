@@ -125,10 +125,20 @@ namespace StorybrewCommon.Storyboarding
         {
             HashSet<int> fragmentationTimes = new HashSet<int>();
             var nonFragmentableCommands = OsbSprite.Commands.Where(c => !c.IsFragmentable()).ToList();
+            HashSet<int> nonFragmentableTimes = new HashSet<int>();
 
-            fragmentationTimes.UnionWith(Enumerable.Range((int)OsbSprite.Commands.Min(c => c.StartTime), (int)OsbSprite.Commands.Max(c => c.EndTime)));
-            //Performance seems not so fresh here (e.g. when using an Easing for the spectrum commands)
-            nonFragmentableCommands.ForEach(c => fragmentationTimes.RemoveWhere(t => t > c.StartTime && t < c.EndTime));
+            int startTime = (int)OsbSprite.Commands.Min(c => c.StartTime);
+            int endTime = (int)OsbSprite.Commands.Max(c => c.EndTime);
+
+            fragmentationTimes.UnionWith(Enumerable.Range(startTime, endTime - startTime));
+            
+            nonFragmentableCommands.ForEach(c =>
+            {
+                var range = Enumerable.Range((int)c.StartTime + 1, (int)(c.EndTime - c.StartTime - 1));
+                nonFragmentableTimes.UnionWith(range);
+            });
+                
+            fragmentationTimes.RemoveWhere(t => nonFragmentableTimes.Contains(t));
 
             return fragmentationTimes;
         }

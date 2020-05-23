@@ -73,11 +73,15 @@ namespace StorybrewCommon.Storyboarding
             HashSet<int> fragmentationTimes = base.GetFragmentationTimes();
 
             int tMax = fragmentationTimes.Max();
+            HashSet<int> nonFragmentableTimes = new HashSet<int>();
 
             for (double d = OsbAnimation.StartTime; d < OsbAnimation.AnimationEndtime(); d += OsbAnimation.LoopDuration())
             {
-                fragmentationTimes.RemoveWhere(t => t > d && t < d + OsbAnimation.LoopDuration() && t < tMax);
+                var range = Enumerable.Range((int)d + 1, (int)(OsbAnimation.LoopDuration() - 1));
+                nonFragmentableTimes.UnionWith(range);
             }
+
+            fragmentationTimes.RemoveWhere(t => nonFragmentableTimes.Contains(t) && t < tMax);
 
             return fragmentationTimes;
         }
