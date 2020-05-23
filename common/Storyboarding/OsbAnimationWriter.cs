@@ -40,7 +40,17 @@ namespace StorybrewCommon.Storyboarding
             if (OsbAnimation.LoopType == OsbLoopType.LoopOnce && segment.Min(c => c.StartTime) >= OsbAnimation.AnimationEndtime())
             {
                 //this shouldn't loop again so we need a sprite instead
-                return base.CreateSprite(segment);
+                var sprite = new OsbSprite()
+                {
+                    InitialPosition = OsbAnimation.InitialPosition,
+                    Origin = OsbAnimation.Origin,
+                    TexturePath = GetLastFramePath(),
+                };
+
+                foreach (var command in segment)
+                    sprite.AddCommand(command);
+
+                return sprite;
             }
             else
             {
@@ -61,11 +71,24 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
+        private string GetLastFramePath()
+        {
+            var dir = Path.GetDirectoryName(OsbAnimation.TexturePath);
+            var file = string.Concat(Path.GetFileNameWithoutExtension(OsbAnimation.TexturePath), OsbAnimation.FrameCount - 1, Path.GetExtension(OsbAnimation.TexturePath));
+            return Path.Combine(dir, file);
+        }
+
         protected override void WriteHeader(OsbSprite sprite)
         {
-            var animation = (OsbAnimation)sprite;
-            double frameDelay = animation.FrameDelay;
-            TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{OsbSprite.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
+            if (sprite is OsbAnimation animation)
+            {
+                double frameDelay = animation.FrameDelay;
+                TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{OsbSprite.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
+            }
+            else
+            {
+                base.WriteHeader(sprite);
+            }           
         }
 
         protected override HashSet<int> GetFragmentationTimes()
