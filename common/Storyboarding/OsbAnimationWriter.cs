@@ -37,7 +37,7 @@ namespace StorybrewCommon.Storyboarding
 
         protected override OsbSprite CreateSprite(List<ICommand> segment)
         {
-            if (OsbAnimation.LoopType == OsbLoopType.LoopOnce && segment.Min(c => c.StartTime) >= OsbAnimation.AnimationEndtime())
+            if (OsbAnimation.LoopType == OsbLoopType.LoopOnce && segment.Min(c => c.StartTime) >= OsbAnimation.AnimationEndTime)
             {
                 //this shouldn't loop again so we need a sprite instead
                 var sprite = new OsbSprite()
@@ -98,31 +98,15 @@ namespace StorybrewCommon.Storyboarding
             int tMax = fragmentationTimes.Max();
             HashSet<int> nonFragmentableTimes = new HashSet<int>();
 
-            for (double d = OsbAnimation.StartTime; d < OsbAnimation.AnimationEndtime(); d += OsbAnimation.LoopDuration())
+            for (double d = OsbAnimation.StartTime; d < OsbAnimation.AnimationEndTime; d += OsbAnimation.LoopDuration)
             {
-                var range = Enumerable.Range((int)d + 1, (int)(OsbAnimation.LoopDuration() - 1));
+                var range = Enumerable.Range((int)d + 1, (int)(OsbAnimation.LoopDuration - 1));
                 nonFragmentableTimes.UnionWith(range);
             }
 
             fragmentationTimes.RemoveWhere(t => nonFragmentableTimes.Contains(t) && t < tMax);
 
             return fragmentationTimes;
-        }
-    }
-
-    static class OsbAnimationExtensions
-    {
-        public static double AnimationEndtime(this OsbAnimation osbAnimation)
-        {
-            if (osbAnimation.LoopType == OsbLoopType.LoopOnce)
-                return osbAnimation.StartTime + osbAnimation.LoopDuration();
-            else
-                return osbAnimation.EndTime;
-        }
-
-        public static double LoopDuration(this OsbAnimation osbAnimation)
-        {
-            return osbAnimation.FrameCount * osbAnimation.FrameDelay;
         }
     }
 }

@@ -8,6 +8,8 @@ namespace StorybrewCommon.Storyboarding
         public int FrameCount;
         public double FrameDelay;
         public OsbLoopType LoopType;
+        public double LoopDuration => FrameCount * FrameDelay;
+        public double AnimationEndTime => (LoopType == OsbLoopType.LoopOnce) ? StartTime + LoopDuration : EndTime;
 
         public override string GetTexturePathAt(double time)
         {
