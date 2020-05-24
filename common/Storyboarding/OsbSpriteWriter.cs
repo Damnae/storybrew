@@ -118,7 +118,7 @@ namespace StorybrewCommon.Storyboarding
         protected virtual HashSet<int> GetFragmentationTimes()
         {
             var fragmentationTimes = new HashSet<int>();
-            var nonFragmentableCommands = osbSprite.Commands.Where(c => !c.IsFragmentable());
+            var nonFragmentableCommands = osbSprite.Commands.Where(c => c is IFragmentableCommand fragmentableCommand && !fragmentableCommand.IsFragmentable);
 
             fragmentationTimes.UnionWith(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime)));
             
@@ -163,24 +163,11 @@ namespace StorybrewCommon.Storyboarding
                 var sTime = Math.Max(startTime, (int)Math.Round(cmd.StartTime));
                 var eTime = Math.Min(endTime, (int)Math.Round(cmd.EndTime));
                 ICommand command;
-                if (sTime == (int)Math.Round(cmd.StartTime) && eTime == (int)Math.Round(cmd.EndTime))
-                {
-                    command = cmd;
-                }
+                
+                if (cmd is IFragmentableCommand fragmentableCommand && (sTime != (int)Math.Round(cmd.StartTime) || eTime != (int)Math.Round(cmd.EndTime)))
+                    command = fragmentableCommand.GetFragment(sTime, eTime);
                 else
-                {
-                    var type = cmd.GetType();
-                    var easingProp = type.GetProperty("Easing");
-                    var valueAtMethod = type.GetMethod("ValueAtTime");
-                    var startValue = valueAtMethod.Invoke(cmd, new object[] { sTime });
-                    var endValue = valueAtMethod.Invoke(cmd, new object[] { eTime });
-                    var easing = easingProp.GetValue(cmd);
-
-                    if (!(cmd is ParameterCommand))
-                        command = (ICommand)Activator.CreateInstance(type, new object[] { easing, sTime, eTime, startValue, endValue });
-                    else
-                        command = (ICommand)Activator.CreateInstance(type, new object[] { easing, sTime, eTime, startValue });
-                }
+                    command = cmd;
 
                 segment.Add(command);
             }
@@ -242,23 +229,6 @@ namespace StorybrewCommon.Storyboarding
                 var value = fadeTimeline.ValueAtTime(startTime);
                 segment.Add(new FadeCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-        } 
-    }
-
-    static class OsbSpriteExtensions
-    {
-        public static bool IsFragmentable(this ICommand command)
-        {
-            if (command is ParameterCommand)
-                return true;
-
-            if (command.StartTime == command.EndTime)
-                return true;
-
-            var type = command.GetType();
-            var easingProp = type.GetProperty("Easing");
-            var easing = easingProp.GetValue(command);
-            return (OsbEasing)easing == OsbEasing.None;
         }
     }
 }
