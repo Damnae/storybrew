@@ -33,22 +33,5 @@ namespace StorybrewCommon.Storyboarding
             }
             return Math.Max(0, (int)frame);
         }
-
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
-        {
-            if (CommandCount == 0)
-                return;
-
-            var osbSpriteWriter = new OsbAnimationWriter(this, MoveTimeline,
-                                                               MoveXTimeline,
-                                                               MoveYTimeline,
-                                                               ScaleTimeline,
-                                                               ScaleVecTimeline,
-                                                               RotateTimeline,
-                                                               FadeTimeline,
-                                                               ColorTimeline,
-                                                               writer, exportSettings, layer);
-            osbSpriteWriter.WriteOsb();
-        }
     }
 }

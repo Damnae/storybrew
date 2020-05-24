@@ -13,15 +13,15 @@ namespace StorybrewCommon.Storyboarding
     public class OsbSpriteWriter
 
     {
-        private OsbSprite osbSprite;
-        private AnimatedValue<CommandPosition> moveTimeline;
-        private AnimatedValue<CommandDecimal> moveXTimeline;
-        private AnimatedValue<CommandDecimal> moveYTimeline;
-        private AnimatedValue<CommandDecimal> scaleTimeline;
-        private AnimatedValue<CommandScale> scaleVecTimeline;
-        private AnimatedValue<CommandDecimal> rotateTimeline;
-        private AnimatedValue<CommandDecimal> fadeTimeline;
-        private AnimatedValue<CommandColor> colorTimeline;
+        private readonly OsbSprite osbSprite;
+        private readonly AnimatedValue<CommandPosition> moveTimeline;
+        private readonly AnimatedValue<CommandDecimal> moveXTimeline;
+        private readonly AnimatedValue<CommandDecimal> moveYTimeline;
+        private readonly AnimatedValue<CommandDecimal> scaleTimeline;
+        private readonly AnimatedValue<CommandScale> scaleVecTimeline;
+        private readonly AnimatedValue<CommandDecimal> rotateTimeline;
+        private readonly AnimatedValue<CommandDecimal> fadeTimeline;
+        private readonly AnimatedValue<CommandColor> colorTimeline;
         protected readonly TextWriter TextWriter;
         protected readonly ExportSettings ExportSettings;
         protected readonly OsbLayer OsbLayer;
