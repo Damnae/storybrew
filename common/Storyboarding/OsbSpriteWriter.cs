@@ -10,7 +10,8 @@ using StorybrewCommon.Storyboarding.Display;
 
 namespace StorybrewCommon.Storyboarding
 {
-    class OsbSpriteWriter
+    public class OsbSpriteWriter
+
     {
         protected OsbSprite OsbSprite;
         AnimatedValue<CommandPosition> moveTimeline;
