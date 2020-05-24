@@ -41,9 +41,9 @@ namespace StorybrewCommon.Storyboarding
             {
                 if (initialPosition == value) return;
                 initialPosition = value;
-                moveTimeline.DefaultValue = initialPosition;
-                moveXTimeline.DefaultValue = initialPosition.X;
-                moveYTimeline.DefaultValue = initialPosition.Y;
+                MoveTimeline.DefaultValue = initialPosition;
+                MoveXTimeline.DefaultValue = initialPosition.X;
+                MoveYTimeline.DefaultValue = initialPosition.Y;
             }
         }
 
@@ -200,40 +200,40 @@ namespace StorybrewCommon.Storyboarding
 
         private List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>> displayValueBuilders = new List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>>();
 
-        protected AnimatedValue<CommandPosition> moveTimeline = new AnimatedValue<CommandPosition>();
-        protected AnimatedValue<CommandDecimal> moveXTimeline = new AnimatedValue<CommandDecimal>();
-        protected AnimatedValue<CommandDecimal> moveYTimeline = new AnimatedValue<CommandDecimal>();
-        protected AnimatedValue<CommandDecimal> scaleTimeline = new AnimatedValue<CommandDecimal>(1);
-        protected AnimatedValue<CommandScale> scaleVecTimeline = new AnimatedValue<CommandScale>(Vector2.One);
-        protected AnimatedValue<CommandDecimal> rotateTimeline = new AnimatedValue<CommandDecimal>();
-        protected AnimatedValue<CommandDecimal> fadeTimeline = new AnimatedValue<CommandDecimal>(1);
-        protected AnimatedValue<CommandColor> colorTimeline = new AnimatedValue<CommandColor>(CommandColor.FromRgb(255, 255, 255));
-        protected AnimatedValue<CommandParameter> additiveTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
-        protected AnimatedValue<CommandParameter> flipHTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
-        protected AnimatedValue<CommandParameter> flipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        protected readonly AnimatedValue<CommandPosition> MoveTimeline = new AnimatedValue<CommandPosition>();
+        protected readonly AnimatedValue<CommandDecimal> MoveXTimeline = new AnimatedValue<CommandDecimal>();
+        protected readonly AnimatedValue<CommandDecimal> MoveYTimeline = new AnimatedValue<CommandDecimal>();
+        protected readonly AnimatedValue<CommandDecimal> ScaleTimeline = new AnimatedValue<CommandDecimal>(1);
+        protected readonly AnimatedValue<CommandScale> ScaleVecTimeline = new AnimatedValue<CommandScale>(Vector2.One);
+        protected readonly AnimatedValue<CommandDecimal> RotateTimeline = new AnimatedValue<CommandDecimal>();
+        protected readonly AnimatedValue<CommandDecimal> FadeTimeline = new AnimatedValue<CommandDecimal>(1);
+        protected readonly AnimatedValue<CommandColor> ColorTimeline = new AnimatedValue<CommandColor>(CommandColor.FromRgb(255, 255, 255));
+        protected readonly AnimatedValue<CommandParameter> AdditiveTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        protected readonly AnimatedValue<CommandParameter> FlipHTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        protected readonly AnimatedValue<CommandParameter> FlipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
 
-        public CommandPosition PositionAt(double time) => moveTimeline.HasCommands ? moveTimeline.ValueAtTime(time) : new CommandPosition(moveXTimeline.ValueAtTime(time), moveYTimeline.ValueAtTime(time));
-        public CommandScale ScaleAt(double time) => scaleVecTimeline.HasCommands ? scaleVecTimeline.ValueAtTime(time) : new CommandScale(scaleTimeline.ValueAtTime(time));
-        public CommandDecimal RotationAt(double time) => rotateTimeline.ValueAtTime(time);
-        public CommandDecimal OpacityAt(double time) => fadeTimeline.ValueAtTime(time);
-        public CommandColor ColorAt(double time) => colorTimeline.ValueAtTime(time);
-        public CommandParameter AdditiveAt(double time) => additiveTimeline.ValueAtTime(time);
-        public CommandParameter FlipHAt(double time) => flipHTimeline.ValueAtTime(time);
-        public CommandParameter FlipVAt(double time) => flipVTimeline.ValueAtTime(time);
+        public CommandPosition PositionAt(double time) => MoveTimeline.HasCommands ? MoveTimeline.ValueAtTime(time) : new CommandPosition(MoveXTimeline.ValueAtTime(time), MoveYTimeline.ValueAtTime(time));
+        public CommandScale ScaleAt(double time) => ScaleVecTimeline.HasCommands ? ScaleVecTimeline.ValueAtTime(time) : new CommandScale(ScaleTimeline.ValueAtTime(time));
+        public CommandDecimal RotationAt(double time) => RotateTimeline.ValueAtTime(time);
+        public CommandDecimal OpacityAt(double time) => FadeTimeline.ValueAtTime(time);
+        public CommandColor ColorAt(double time) => ColorTimeline.ValueAtTime(time);
+        public CommandParameter AdditiveAt(double time) => AdditiveTimeline.ValueAtTime(time);
+        public CommandParameter FlipHAt(double time) => FlipHTimeline.ValueAtTime(time);
+        public CommandParameter FlipVAt(double time) => FlipVTimeline.ValueAtTime(time);
 
         private void initializeDisplayValueBuilders()
         {
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveCommand, new AnimatedValueBuilder<CommandPosition>(moveTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveXCommand, new AnimatedValueBuilder<CommandDecimal>(moveXTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveYCommand, new AnimatedValueBuilder<CommandDecimal>(moveYTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ScaleCommand, new AnimatedValueBuilder<CommandDecimal>(scaleTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is VScaleCommand, new AnimatedValueBuilder<CommandScale>(scaleVecTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is RotateCommand, new AnimatedValueBuilder<CommandDecimal>(rotateTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is FadeCommand, new AnimatedValueBuilder<CommandDecimal>(fadeTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ColorCommand, new AnimatedValueBuilder<CommandColor>(colorTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.AdditiveBlending, new AnimatedValueBuilder<CommandParameter>(additiveTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipHorizontal, new AnimatedValueBuilder<CommandParameter>(flipHTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipVertical, new AnimatedValueBuilder<CommandParameter>(flipVTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveCommand, new AnimatedValueBuilder<CommandPosition>(MoveTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveXCommand, new AnimatedValueBuilder<CommandDecimal>(MoveXTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveYCommand, new AnimatedValueBuilder<CommandDecimal>(MoveYTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ScaleCommand, new AnimatedValueBuilder<CommandDecimal>(ScaleTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is VScaleCommand, new AnimatedValueBuilder<CommandScale>(ScaleVecTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is RotateCommand, new AnimatedValueBuilder<CommandDecimal>(RotateTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is FadeCommand, new AnimatedValueBuilder<CommandDecimal>(FadeTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ColorCommand, new AnimatedValueBuilder<CommandColor>(ColorTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.AdditiveBlending, new AnimatedValueBuilder<CommandParameter>(AdditiveTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipHorizontal, new AnimatedValueBuilder<CommandParameter>(FlipHTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipVertical, new AnimatedValueBuilder<CommandParameter>(FlipVTimeline)));
         }
 
         private void addDisplayCommand(ICommand command)
@@ -271,15 +271,15 @@ namespace StorybrewCommon.Storyboarding
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
-            OsbSpriteWriter osbSpriteWriter = new OsbSpriteWriter(this, moveTimeline,
-                                                                        moveXTimeline,
-                                                                        moveYTimeline,
-                                                                        scaleTimeline,
-                                                                        scaleVecTimeline,
-                                                                        rotateTimeline,
-                                                                        fadeTimeline,
-                                                                        colorTimeline,
-                                                                        writer, exportSettings, layer);
+            var osbSpriteWriter = new OsbSpriteWriter(this, MoveTimeline,
+                                                            MoveXTimeline,
+                                                            MoveYTimeline,
+                                                            ScaleTimeline,
+                                                            ScaleVecTimeline,
+                                                            RotateTimeline,
+                                                            FadeTimeline,
+                                                            ColorTimeline,
+                                                            writer, exportSettings, layer);
             osbSpriteWriter.WriteOsb();
         }
     }

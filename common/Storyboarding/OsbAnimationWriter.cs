@@ -13,7 +13,7 @@ namespace StorybrewCommon.Storyboarding
     public class OsbAnimationWriter : OsbSpriteWriter
 
     {
-        private OsbAnimation OsbAnimation;
+        private readonly OsbAnimation osbAnimation;
         public OsbAnimationWriter(OsbAnimation osbAnimation, AnimatedValue<CommandPosition> moveTimeline,
                                                              AnimatedValue<CommandDecimal> moveXTimeline,
                                                              AnimatedValue<CommandDecimal> moveYTimeline,
@@ -33,19 +33,19 @@ namespace StorybrewCommon.Storyboarding
                                                              colorTimeline,
                                                              writer, exportSettings, layer)
         {
-            OsbAnimation = osbAnimation;
+            this.osbAnimation = osbAnimation;
         }
 
         protected override OsbSprite CreateSprite(List<ICommand> segment)
         {
-            if (OsbAnimation.LoopType == OsbLoopType.LoopOnce && segment.Min(c => c.StartTime) >= OsbAnimation.AnimationEndTime)
+            if (osbAnimation.LoopType == OsbLoopType.LoopOnce && segment.Min(c => c.StartTime) >= osbAnimation.AnimationEndTime)
             {
                 //this shouldn't loop again so we need a sprite instead
                 var sprite = new OsbSprite()
                 {
-                    InitialPosition = OsbAnimation.InitialPosition,
-                    Origin = OsbAnimation.Origin,
-                    TexturePath = GetLastFramePath(),
+                    InitialPosition = osbAnimation.InitialPosition,
+                    Origin = osbAnimation.Origin,
+                    TexturePath = getLastFramePath(),
                 };
 
                 foreach (var command in segment)
@@ -57,12 +57,12 @@ namespace StorybrewCommon.Storyboarding
             {
                 var animation = new OsbAnimation()
                 {
-                    TexturePath = OsbAnimation.TexturePath,
-                    InitialPosition = OsbAnimation.InitialPosition,
-                    Origin = OsbAnimation.Origin,
-                    FrameCount = OsbAnimation.FrameCount,
-                    FrameDelay = OsbAnimation.FrameDelay,
-                    LoopType = OsbAnimation.LoopType,
+                    TexturePath = osbAnimation.TexturePath,
+                    InitialPosition = osbAnimation.InitialPosition,
+                    Origin = osbAnimation.Origin,
+                    FrameCount = osbAnimation.FrameCount,
+                    FrameDelay = osbAnimation.FrameDelay,
+                    LoopType = osbAnimation.LoopType,
                 };
 
                 foreach (var command in segment)
@@ -72,10 +72,10 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
-        private string GetLastFramePath()
+        private string getLastFramePath()
         {
-            var dir = Path.GetDirectoryName(OsbAnimation.TexturePath);
-            var file = string.Concat(Path.GetFileNameWithoutExtension(OsbAnimation.TexturePath), OsbAnimation.FrameCount - 1, Path.GetExtension(OsbAnimation.TexturePath));
+            var dir = Path.GetDirectoryName(osbAnimation.TexturePath);
+            var file = string.Concat(Path.GetFileNameWithoutExtension(osbAnimation.TexturePath), osbAnimation.FrameCount - 1, Path.GetExtension(osbAnimation.TexturePath));
             return Path.Combine(dir, file);
         }
 
@@ -83,8 +83,8 @@ namespace StorybrewCommon.Storyboarding
         {
             if (sprite is OsbAnimation animation)
             {
-                double frameDelay = animation.FrameDelay;
-                TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{OsbSprite.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
+                var frameDelay = animation.FrameDelay;
+                TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{animation.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
             }
             else
             {
@@ -94,14 +94,14 @@ namespace StorybrewCommon.Storyboarding
 
         protected override HashSet<int> GetFragmentationTimes()
         {
-            HashSet<int> fragmentationTimes = base.GetFragmentationTimes();
+            var fragmentationTimes = base.GetFragmentationTimes();
 
-            int tMax = fragmentationTimes.Max();
-            HashSet<int> nonFragmentableTimes = new HashSet<int>();
+            var tMax = fragmentationTimes.Max();
+            var nonFragmentableTimes = new HashSet<int>();
 
-            for (double d = OsbAnimation.StartTime; d < OsbAnimation.AnimationEndTime; d += OsbAnimation.LoopDuration)
+            for (double d = osbAnimation.StartTime; d < osbAnimation.AnimationEndTime; d += osbAnimation.LoopDuration)
             {
-                var range = Enumerable.Range((int)d + 1, (int)(OsbAnimation.LoopDuration - 1));
+                var range = Enumerable.Range((int)d + 1, (int)(osbAnimation.LoopDuration - 1));
                 nonFragmentableTimes.UnionWith(range);
             }
 

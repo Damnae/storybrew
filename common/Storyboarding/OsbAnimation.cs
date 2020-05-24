@@ -36,15 +36,15 @@ namespace StorybrewCommon.Storyboarding
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
-            OsbAnimationWriter osbSpriteWriter = new OsbAnimationWriter(this, moveTimeline,
-                                                                        moveXTimeline,
-                                                                        moveYTimeline,
-                                                                        scaleTimeline,
-                                                                        scaleVecTimeline,
-                                                                        rotateTimeline,
-                                                                        fadeTimeline,
-                                                                        colorTimeline,
-                                                                        writer, exportSettings, layer);
+            var osbSpriteWriter = new OsbAnimationWriter(this, MoveTimeline,
+                                                               MoveXTimeline,
+                                                               MoveYTimeline,
+                                                               ScaleTimeline,
+                                                               ScaleVecTimeline,
+                                                               RotateTimeline,
+                                                               FadeTimeline,
+                                                               ColorTimeline,
+                                                               writer, exportSettings, layer);
             osbSpriteWriter.WriteOsb();
         }
     }
