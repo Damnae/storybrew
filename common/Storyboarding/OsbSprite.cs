@@ -15,7 +15,7 @@ namespace StorybrewCommon.Storyboarding
         private List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
 
-        public int MaxCommandCount = 300;
+        public int MaxCommandCount = 0;
 
         private string texturePath = "";
         public string TexturePath
@@ -307,6 +307,9 @@ namespace StorybrewCommon.Storyboarding
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
+            if (CommandCount == 0)
+                return;
+
             var osbSpriteWriter = new OsbSpriteWriter(this, MoveTimeline,
                                                             MoveXTimeline,
                                                             MoveYTimeline,

@@ -36,6 +36,9 @@ namespace StorybrewCommon.Storyboarding
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
+            if (CommandCount == 0)
+                return;
+
             var osbSpriteWriter = new OsbAnimationWriter(this, MoveTimeline,
                                                                MoveXTimeline,
                                                                MoveYTimeline,

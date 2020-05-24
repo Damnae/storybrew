@@ -52,10 +52,7 @@ namespace StorybrewCommon.Storyboarding
 
         public void WriteOsb()
         {
-            if (osbSprite.CommandCount == 0)
-                return;
-
-            if (osbSprite.CommandCount > osbSprite.MaxCommandCount && IsFragmentable())
+            if (osbSprite.MaxCommandCount > 0 && osbSprite.CommandCount > osbSprite.MaxCommandCount && IsFragmentable())
             {
                 var fragmentationTimes = GetFragmentationTimes();
                 var commands = osbSprite.Commands.ToList();

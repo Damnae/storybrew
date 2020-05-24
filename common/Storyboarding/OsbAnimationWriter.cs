@@ -86,10 +86,7 @@ namespace StorybrewCommon.Storyboarding
                 var frameDelay = animation.FrameDelay;
                 TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{animation.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
             }
-            else
-            {
-                base.WriteHeader(sprite);
-            }           
+            else base.WriteHeader(sprite);          
         }
 
         protected override HashSet<int> GetFragmentationTimes()
