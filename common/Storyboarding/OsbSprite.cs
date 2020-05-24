@@ -196,6 +196,42 @@ namespace StorybrewCommon.Storyboarding
             clearStartEndTimes();
         }
 
+        public void AddCommand(ICommand command)
+        {
+            if (command is ColorCommand colorCommand)
+                Color(colorCommand.Easing, colorCommand.StartTime, colorCommand.EndTime, colorCommand.StartValue, colorCommand.EndValue);
+            else if (command is FadeCommand fadeCommand)
+                Fade(fadeCommand.Easing, fadeCommand.StartTime, fadeCommand.EndTime, fadeCommand.StartValue, fadeCommand.EndValue);
+            else if (command is ScaleCommand scaleCommand)
+                Scale(scaleCommand.Easing, scaleCommand.StartTime, scaleCommand.EndTime, scaleCommand.StartValue, scaleCommand.EndValue);
+            else if (command is VScaleCommand vScaleCommand)
+                ScaleVec(vScaleCommand.Easing, vScaleCommand.StartTime, vScaleCommand.EndTime, vScaleCommand.StartValue, vScaleCommand.EndValue);
+            else if (command is ParameterCommand parameterCommand)
+                Parameter(parameterCommand.Easing, parameterCommand.StartTime, parameterCommand.EndTime, parameterCommand.StartValue);
+            else if (command is MoveCommand moveCommand)
+                Move(moveCommand.Easing, moveCommand.StartTime, moveCommand.EndTime, moveCommand.StartValue, moveCommand.EndValue);
+            else if (command is MoveXCommand moveXCommand)
+                MoveX(moveXCommand.Easing, moveXCommand.StartTime, moveXCommand.EndTime, moveXCommand.StartValue, moveXCommand.EndValue);
+            else if (command is MoveYCommand moveYCommand)
+                MoveY(moveYCommand.Easing, moveYCommand.StartTime, moveYCommand.EndTime, moveYCommand.StartValue, moveYCommand.EndValue);
+            else if (command is RotateCommand rotateCommand)
+                Rotate(rotateCommand.Easing, rotateCommand.StartTime, rotateCommand.EndTime, rotateCommand.StartValue, rotateCommand.EndValue);
+            else if (command is LoopCommand loopCommand)
+            {
+                StartLoopGroup(loopCommand.StartTime, loopCommand.LoopCount);
+                foreach (var cmd in loopCommand.Commands)
+                    AddCommand(cmd);
+                EndGroup();
+            }
+            else if (command is TriggerCommand triggerCommand)
+            {
+                StartTriggerGroup(triggerCommand.TriggerName, triggerCommand.StartTime, triggerCommand.EndTime, triggerCommand.Group);
+                foreach (var cmd in triggerCommand.Commands)
+                    AddCommand(cmd);
+                EndGroup();
+            }
+        }
+
         #region Display 
 
         private List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>> displayValueBuilders = new List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>>();

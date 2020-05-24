@@ -250,42 +250,6 @@ namespace StorybrewCommon.Storyboarding
 
     static class OsbSpriteExtensions
     {
-        public static void AddCommand(this OsbSprite sprite, ICommand command)
-        {
-            if (command is ColorCommand colorCommand)
-                sprite.Color(colorCommand.Easing, colorCommand.StartTime, colorCommand.EndTime, colorCommand.StartValue, colorCommand.EndValue);
-            else if (command is FadeCommand fadeCommand)
-                sprite.Fade(fadeCommand.Easing, fadeCommand.StartTime, fadeCommand.EndTime, fadeCommand.StartValue, fadeCommand.EndValue);
-            else if (command is ScaleCommand scaleCommand)
-                sprite.Scale(scaleCommand.Easing, scaleCommand.StartTime, scaleCommand.EndTime, scaleCommand.StartValue, scaleCommand.EndValue);
-            else if (command is VScaleCommand vScaleCommand)
-                sprite.ScaleVec(vScaleCommand.Easing, vScaleCommand.StartTime, vScaleCommand.EndTime, vScaleCommand.StartValue, vScaleCommand.EndValue);
-            else if (command is ParameterCommand parameterCommand)
-                sprite.Parameter(parameterCommand.Easing, parameterCommand.StartTime, parameterCommand.EndTime, parameterCommand.StartValue);
-            else if (command is MoveCommand moveCommand)
-                sprite.Move(moveCommand.Easing, moveCommand.StartTime, moveCommand.EndTime, moveCommand.StartValue, moveCommand.EndValue);
-            else if (command is MoveXCommand moveXCommand)
-                sprite.MoveX(moveXCommand.Easing, moveXCommand.StartTime, moveXCommand.EndTime, moveXCommand.StartValue, moveXCommand.EndValue);
-            else if (command is MoveYCommand moveYCommand)
-                sprite.MoveY(moveYCommand.Easing, moveYCommand.StartTime, moveYCommand.EndTime, moveYCommand.StartValue, moveYCommand.EndValue);
-            else if (command is RotateCommand rotateCommand)
-                sprite.Rotate(rotateCommand.Easing, rotateCommand.StartTime, rotateCommand.EndTime, rotateCommand.StartValue, rotateCommand.EndValue);
-            else if (command is LoopCommand loopCommand)
-            {
-                sprite.StartLoopGroup(loopCommand.StartTime, loopCommand.LoopCount);
-                foreach (var cmd in loopCommand.Commands)
-                    AddCommand(sprite, cmd);
-                sprite.EndGroup();
-            }
-            else if (command is TriggerCommand triggerCommand)
-            {
-                sprite.StartTriggerGroup(triggerCommand.TriggerName, triggerCommand.StartTime, triggerCommand.EndTime, triggerCommand.Group);
-                foreach (var cmd in triggerCommand.Commands)
-                    AddCommand(sprite, cmd);
-                sprite.EndGroup();
-            }
-        }
-
         public static bool IsFragmentable(this ICommand command)
         {
             if (command is ParameterCommand)
