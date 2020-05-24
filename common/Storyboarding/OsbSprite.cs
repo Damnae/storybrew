@@ -246,7 +246,7 @@ namespace StorybrewCommon.Storyboarding
         private AnimatedValue<CommandColor> colorTimeline = new AnimatedValue<CommandColor>(CommandColor.FromRgb(255, 255, 255));
         private AnimatedValue<CommandParameter> additiveTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
         private AnimatedValue<CommandParameter> flipHTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
-        private AnimatedValue<CommandParameter> FlipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        private AnimatedValue<CommandParameter> flipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
 
         public CommandPosition PositionAt(double time) => moveTimeline.HasCommands ? moveTimeline.ValueAtTime(time) : new CommandPosition(moveXTimeline.ValueAtTime(time), moveYTimeline.ValueAtTime(time));
         public CommandScale ScaleAt(double time) => scaleVecTimeline.HasCommands ? scaleVecTimeline.ValueAtTime(time) : new CommandScale(scaleTimeline.ValueAtTime(time));
@@ -255,7 +255,7 @@ namespace StorybrewCommon.Storyboarding
         public CommandColor ColorAt(double time) => colorTimeline.ValueAtTime(time);
         public CommandParameter AdditiveAt(double time) => additiveTimeline.ValueAtTime(time);
         public CommandParameter FlipHAt(double time) => flipHTimeline.ValueAtTime(time);
-        public CommandParameter FlipVAt(double time) => FlipVTimeline.ValueAtTime(time);
+        public CommandParameter FlipVAt(double time) => flipVTimeline.ValueAtTime(time);
 
         private void initializeDisplayValueBuilders()
         {
@@ -269,7 +269,7 @@ namespace StorybrewCommon.Storyboarding
             displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ColorCommand, new AnimatedValueBuilder<CommandColor>(colorTimeline)));
             displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.AdditiveBlending, new AnimatedValueBuilder<CommandParameter>(additiveTimeline)));
             displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipHorizontal, new AnimatedValueBuilder<CommandParameter>(flipHTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipVertical, new AnimatedValueBuilder<CommandParameter>(FlipVTimeline)));
+            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipVertical, new AnimatedValueBuilder<CommandParameter>(flipVTimeline)));
         }
 
         private void addDisplayCommand(ICommand command)
