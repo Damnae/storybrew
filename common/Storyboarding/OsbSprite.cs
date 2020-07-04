@@ -50,6 +50,10 @@ namespace StorybrewCommon.Storyboarding
         public IEnumerable<ICommand> Commands => commands;
         public int CommandCount => commands.Count;
 
+        public bool HasIncompatibleCommands =>
+            (moveTimeline.HasCommands && (moveXTimeline.HasCommands || moveYTimeline.HasCommands)) ||
+            (scaleTimeline.HasCommands && scaleVecTimeline.HasCommands);
+
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
         {
