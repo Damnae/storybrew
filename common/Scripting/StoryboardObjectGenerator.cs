@@ -51,6 +51,9 @@ namespace StorybrewCommon.Scripting
         public void Log(string message)
             => context.AppendLog(message);
 
+        public void Log(object message)
+            => Log(message.ToString());
+
         public void Assert(bool condition, string message = null, [CallerLineNumber] int line = -1)
         {
             if (!condition)
