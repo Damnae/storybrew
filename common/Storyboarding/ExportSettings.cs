@@ -12,5 +12,10 @@ namespace StorybrewCommon.Storyboarding
         public bool UseFloatForMove = true;
 
         public readonly NumberFormatInfo NumberFormat = new CultureInfo(@"en-US", false).NumberFormat;
+
+        /// <summary>
+        /// Enables optimisation for OsbSprites that have a MaxCommandCount > 0
+        /// </summary>
+        public bool OptimiseSprites = true;
     }
 }

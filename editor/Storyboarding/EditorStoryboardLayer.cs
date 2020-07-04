@@ -186,6 +186,8 @@ namespace StorybrewEditor.Storyboarding
             estimatedSize = 0;
 
             var exportSettings = new ExportSettings();
+            //reduce update time for a minor inaccuracy in estimatedSize
+            exportSettings.OptimiseSprites = false;
             using (var stream = new ByteCounterStream())
             {
                 using (var writer = new StreamWriter(stream, Encoding.UTF8))

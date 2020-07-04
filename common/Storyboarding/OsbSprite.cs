@@ -15,6 +15,8 @@ namespace StorybrewCommon.Storyboarding
         private List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
 
+        public int MaxCommandCount = 0;
+
         private string texturePath = "";
         public string TexturePath
         {
@@ -194,6 +196,44 @@ namespace StorybrewCommon.Storyboarding
             clearStartEndTimes();
         }
 
+        public void AddCommand(ICommand command)
+        {
+            if (command is ColorCommand colorCommand)
+                Color(colorCommand.Easing, colorCommand.StartTime, colorCommand.EndTime, colorCommand.StartValue, colorCommand.EndValue);
+            else if (command is FadeCommand fadeCommand)
+                Fade(fadeCommand.Easing, fadeCommand.StartTime, fadeCommand.EndTime, fadeCommand.StartValue, fadeCommand.EndValue);
+            else if (command is ScaleCommand scaleCommand)
+                Scale(scaleCommand.Easing, scaleCommand.StartTime, scaleCommand.EndTime, scaleCommand.StartValue, scaleCommand.EndValue);
+            else if (command is VScaleCommand vScaleCommand)
+                ScaleVec(vScaleCommand.Easing, vScaleCommand.StartTime, vScaleCommand.EndTime, vScaleCommand.StartValue, vScaleCommand.EndValue);
+            else if (command is ParameterCommand parameterCommand)
+                Parameter(parameterCommand.Easing, parameterCommand.StartTime, parameterCommand.EndTime, parameterCommand.StartValue);
+            else if (command is MoveCommand moveCommand)
+                Move(moveCommand.Easing, moveCommand.StartTime, moveCommand.EndTime, moveCommand.StartValue, moveCommand.EndValue);
+            else if (command is MoveXCommand moveXCommand)
+                MoveX(moveXCommand.Easing, moveXCommand.StartTime, moveXCommand.EndTime, moveXCommand.StartValue, moveXCommand.EndValue);
+            else if (command is MoveYCommand moveYCommand)
+                MoveY(moveYCommand.Easing, moveYCommand.StartTime, moveYCommand.EndTime, moveYCommand.StartValue, moveYCommand.EndValue);
+            else if (command is RotateCommand rotateCommand)
+                Rotate(rotateCommand.Easing, rotateCommand.StartTime, rotateCommand.EndTime, rotateCommand.StartValue, rotateCommand.EndValue);
+            else if (command is LoopCommand loopCommand)
+            {
+                StartLoopGroup(loopCommand.StartTime, loopCommand.LoopCount);
+                foreach (var cmd in loopCommand.Commands)
+                    AddCommand(cmd);
+                EndGroup();
+            }
+            else if (command is TriggerCommand triggerCommand)
+            {
+                StartTriggerGroup(triggerCommand.TriggerName, triggerCommand.StartTime, triggerCommand.EndTime, triggerCommand.Group);
+                foreach (var cmd in triggerCommand.Commands)
+                    AddCommand(cmd);
+                EndGroup();
+            }
+            else
+                throw new NotSupportedException($"Failed to add command: No support for adding command of type {command.GetType().FullName}");
+        }
+
         #region Display 
 
         private List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>> displayValueBuilders = new List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>>();
@@ -264,28 +304,24 @@ namespace StorybrewCommon.Storyboarding
         public bool IsActive(double time)
             => CommandsStartTime <= time && time <= CommandsEndTime;
 
-        protected virtual void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
-        {
-            writer.Write($"Sprite,{layer},{Origin.ToString()},\"{TexturePath.Trim()}\"");
-            if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
-                writer.Write($",{InitialPosition.X.ToString(exportSettings.NumberFormat)}");
-            else writer.Write($",0");
-            if (!moveTimeline.HasCommands && !moveYTimeline.HasCommands)
-                writer.WriteLine($",{InitialPosition.Y.ToString(exportSettings.NumberFormat)}");
-            else writer.WriteLine($",0");
-        }
-
         public override double StartTime => CommandsStartTime;
         public override double EndTime => CommandsEndTime;
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
-            if (commands.Count == 0)
+            if (CommandCount == 0)
                 return;
 
-            WriteHeader(writer, exportSettings, layer);
-            foreach (var command in commands)
-                command.WriteOsb(writer, exportSettings, 1);
+            var osbSpriteWriter = OsbWriterFactory.CreateWriter(this, moveTimeline,
+                                                                      moveXTimeline,
+                                                                      moveYTimeline,
+                                                                      scaleTimeline,
+                                                                      scaleVecTimeline,
+                                                                      rotateTimeline,
+                                                                      fadeTimeline,
+                                                                      colorTimeline,
+                                                                      writer, exportSettings, layer);
+            osbSpriteWriter.WriteOsb();
         }
     }
 

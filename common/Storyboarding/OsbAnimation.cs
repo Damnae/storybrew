@@ -8,6 +8,8 @@ namespace StorybrewCommon.Storyboarding
         public int FrameCount;
         public double FrameDelay;
         public OsbLoopType LoopType;
+        public double LoopDuration => FrameCount * FrameDelay;
+        public double AnimationEndTime => (LoopType == OsbLoopType.LoopOnce) ? StartTime + LoopDuration : EndTime;
 
         public override string GetTexturePathAt(double time)
         {
@@ -31,8 +33,5 @@ namespace StorybrewCommon.Storyboarding
             }
             return Math.Max(0, (int)frame);
         }
-
-        protected override void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
-            => writer.WriteLine($"Animation,{layer},{Origin.ToString()},\"{TexturePath.Trim()}\",{InitialPosition.X.ToString(exportSettings.NumberFormat)},{InitialPosition.Y.ToString(exportSettings.NumberFormat)},{FrameCount},{FrameDelay.ToString(exportSettings.NumberFormat)},{LoopType}");
     }
 }
