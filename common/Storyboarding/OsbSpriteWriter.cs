@@ -1,17 +1,14 @@
-﻿using System;
+﻿using StorybrewCommon.Storyboarding.Commands;
+using StorybrewCommon.Storyboarding.CommandValues;
+using StorybrewCommon.Storyboarding.Display;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StorybrewCommon.Storyboarding.Commands;
-using StorybrewCommon.Storyboarding.CommandValues;
-using StorybrewCommon.Storyboarding.Display;
 
 namespace StorybrewCommon.Storyboarding
 {
     public class OsbSpriteWriter
-
     {
         private readonly OsbSprite osbSprite;
         private readonly AnimatedValue<CommandPosition> moveTimeline;
@@ -33,7 +30,7 @@ namespace StorybrewCommon.Storyboarding
                                                     AnimatedValue<CommandScale> scaleVecTimeline,
                                                     AnimatedValue<CommandDecimal> rotateTimeline,
                                                     AnimatedValue<CommandDecimal> fadeTimeline,
-                                                    AnimatedValue<CommandColor> colorTimeline, 
+                                                    AnimatedValue<CommandColor> colorTimeline,
                                                     TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             this.osbSprite = osbSprite;
@@ -54,14 +51,13 @@ namespace StorybrewCommon.Storyboarding
         {
             if (ExportSettings.OptimiseSprites && osbSprite.MaxCommandCount > 0 && osbSprite.CommandCount > osbSprite.MaxCommandCount && IsFragmentable())
             {
-                var commands = osbSprite.Commands.Select(c => (IFragmentableCommand)c)
-                                                 .ToList();
+                var commands = osbSprite.Commands.Select(c => (IFragmentableCommand)c).ToList();
                 var fragmentationTimes = GetFragmentationTimes(commands);
 
                 while (commands.Count > 0)
                 {
                     var segment = getNextSegment(fragmentationTimes, commands);
-                    var sprite = CreateSprite(segment);                       
+                    var sprite = CreateSprite(segment);
                     writeOsbSprite(sprite);
                 }
             }
@@ -103,7 +99,7 @@ namespace StorybrewCommon.Storyboarding
 
         protected virtual bool IsFragmentable()
         {
-            //if there are commands with non-deterministic results (aka triggercommands) the sprite can't reliably be split
+            // if there are commands with non-deterministic results (aka triggercommands) the sprite can't reliably be split
             if (osbSprite.Commands.Any(c => !(c is IFragmentableCommand)))
                 return false;
 
@@ -119,10 +115,7 @@ namespace StorybrewCommon.Storyboarding
 
         protected virtual HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragmentableCommands)
         {
-            var fragmentationTimes = new HashSet<int>();
-
-            //+1 cause from 5 to 10 you have 5 elements from 5 -> 5, 6, 7, 8, 9 but the last one (10) would be missing
-            fragmentationTimes.UnionWith(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime) + 1));
+            var fragmentationTimes = new HashSet<int>(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime) + 1));
 
             foreach (var command in fragmentableCommands)
                 fragmentationTimes.ExceptWith(command.GetNonFragmentableTimes());
@@ -135,18 +128,17 @@ namespace StorybrewCommon.Storyboarding
             List<IFragmentableCommand> segment = new List<IFragmentableCommand>();
 
             var startTime = fragmentationTimes.Min();
-            int endTime = getSegmentEndTime(fragmentationTimes, commands);
+            var endTime = getSegmentEndTime(fragmentationTimes, commands);
 
             foreach (var cmd in commands.Where(c => c.StartTime < endTime))
             {
                 var sTime = Math.Max(startTime, (int)Math.Round(cmd.StartTime));
                 var eTime = Math.Min(endTime, (int)Math.Round(cmd.EndTime));
+
                 IFragmentableCommand command;
-                
                 if (sTime != (int)Math.Round(cmd.StartTime) || eTime != (int)Math.Round(cmd.EndTime))
                     command = cmd.GetFragment(sTime, eTime);
-                else
-                    command = cmd;
+                else command = cmd;
 
                 segment.Add(command);
             }
@@ -184,8 +176,7 @@ namespace StorybrewCommon.Storyboarding
                         if (endTime == startTime) // segment can't be <= MaxCommandCount, so we use the smallest available
                             endTime = fragmentationTimes.First(t => t > startTime);
                     }
-                    else
-                        endTime = fragmentationTimes.First(t => t > startTime);
+                    else endTime = fragmentationTimes.First(t => t > startTime);
                 }
             }
 

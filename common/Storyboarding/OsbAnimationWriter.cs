@@ -1,17 +1,13 @@
-﻿using System;
+﻿using StorybrewCommon.Storyboarding.Commands;
+using StorybrewCommon.Storyboarding.CommandValues;
+using StorybrewCommon.Storyboarding.Display;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StorybrewCommon.Storyboarding.Commands;
-using StorybrewCommon.Storyboarding.CommandValues;
-using StorybrewCommon.Storyboarding.Display;
 
 namespace StorybrewCommon.Storyboarding
 {
     public class OsbAnimationWriter : OsbSpriteWriter
-
     {
         private readonly OsbAnimation osbAnimation;
         public OsbAnimationWriter(OsbAnimation osbAnimation, AnimatedValue<CommandPosition> moveTimeline,
@@ -72,13 +68,6 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
-        private string getLastFramePath()
-        {
-            var dir = Path.GetDirectoryName(osbAnimation.TexturePath);
-            var file = string.Concat(Path.GetFileNameWithoutExtension(osbAnimation.TexturePath), osbAnimation.FrameCount - 1, Path.GetExtension(osbAnimation.TexturePath));
-            return Path.Combine(dir, file);
-        }
-
         protected override void WriteHeader(OsbSprite sprite)
         {
             if (sprite is OsbAnimation animation)
@@ -86,7 +75,7 @@ namespace StorybrewCommon.Storyboarding
                 var frameDelay = animation.FrameDelay;
                 TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{animation.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
             }
-            else base.WriteHeader(sprite);          
+            else base.WriteHeader(sprite);
         }
 
         protected override HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragmentableCommands)
@@ -105,6 +94,13 @@ namespace StorybrewCommon.Storyboarding
             fragmentationTimes.RemoveWhere(t => nonFragmentableTimes.Contains(t) && t < tMax);
 
             return fragmentationTimes;
+        }
+
+        private string getLastFramePath()
+        {
+            var directory = Path.GetDirectoryName(osbAnimation.TexturePath);
+            var file = string.Concat(Path.GetFileNameWithoutExtension(osbAnimation.TexturePath), osbAnimation.FrameCount - 1, Path.GetExtension(osbAnimation.TexturePath));
+            return Path.Combine(directory, file);
         }
     }
 }
