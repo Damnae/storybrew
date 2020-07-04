@@ -121,7 +121,8 @@ namespace StorybrewCommon.Storyboarding
         {
             var fragmentationTimes = new HashSet<int>();
 
-            fragmentationTimes.UnionWith(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime)));
+            //+1 cause from 5 to 10 you have 5 elements from 5 -> 5, 6, 7, 8, 9 but the last one (10) would be missing
+            fragmentationTimes.UnionWith(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime) + 1));
 
             foreach (var command in fragmentableCommands)
                 fragmentationTimes.ExceptWith(command.GetNonFragmentableTimes());
