@@ -1,6 +1,8 @@
 ﻿using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding.CommandValues;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
@@ -77,5 +79,14 @@ namespace StorybrewCommon.Storyboarding.Commands
         public bool IsFragmentable => (StartTime == EndTime) ? true : Easing == OsbEasing.None;
 
         public abstract IFragmentableCommand GetFragment(double startTime, double endTime);
+
+        public IEnumerable<int> GetNonFragmentableTimes() 
+        {
+            var nonFragmentableTimes = new HashSet<int>();
+            if (!IsFragmentable)
+                nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + 1, (int)(EndTime - StartTime - 1)));
+
+            return nonFragmentableTimes;
+        }
     }
 }

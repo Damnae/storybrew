@@ -186,6 +186,8 @@ namespace StorybrewEditor.Storyboarding
             estimatedSize = 0;
 
             var exportSettings = new ExportSettings();
+            //removes overhead of optimising the osb in the export, potentially results in estimatedSize being slightly lower than the actual size
+            exportSettings.WriteToFile = false;
             using (var stream = new ByteCounterStream())
             {
                 using (var writer = new StreamWriter(stream, Encoding.UTF8))

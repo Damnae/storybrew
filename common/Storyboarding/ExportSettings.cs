@@ -12,5 +12,7 @@ namespace StorybrewCommon.Storyboarding
         public bool UseFloatForMove = true;
 
         public readonly NumberFormatInfo NumberFormat = new CultureInfo(@"en-US", false).NumberFormat;
+
+        public bool WriteToFile = true;
     }
 }

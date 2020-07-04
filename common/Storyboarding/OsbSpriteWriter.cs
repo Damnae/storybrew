@@ -52,10 +52,11 @@ namespace StorybrewCommon.Storyboarding
 
         public void WriteOsb()
         {
-            if (osbSprite.MaxCommandCount > 0 && osbSprite.CommandCount > osbSprite.MaxCommandCount && IsFragmentable())
+            if (ExportSettings.WriteToFile && osbSprite.MaxCommandCount > 0 && osbSprite.CommandCount > osbSprite.MaxCommandCount && IsFragmentable())
             {
-                var fragmentationTimes = GetFragmentationTimes();
-                var commands = osbSprite.Commands.ToList();
+                var commands = osbSprite.Commands.Select(c => (IFragmentableCommand)c)
+                                                 .ToList();
+                var fragmentationTimes = GetFragmentationTimes(commands);
 
                 while (commands.Count > 0)
                 {
@@ -67,7 +68,7 @@ namespace StorybrewCommon.Storyboarding
             else writeOsbSprite(osbSprite);
         }
 
-        protected virtual OsbSprite CreateSprite(List<ICommand> segment)
+        protected virtual OsbSprite CreateSprite(List<IFragmentableCommand> segment)
         {
             var sprite = new OsbSprite()
             {
@@ -102,7 +103,8 @@ namespace StorybrewCommon.Storyboarding
 
         protected virtual bool IsFragmentable()
         {
-            if (osbSprite.CommandCount < osbSprite.MaxCommandCount)
+            //if there are commands with non-deterministic results (aka triggercommands) the sprite can't reliably be split
+            if (osbSprite.Commands.Any(c => !(c is IFragmentableCommand)))
                 return false;
 
             return !(moveTimeline.HasOverlap ||
@@ -115,25 +117,21 @@ namespace StorybrewCommon.Storyboarding
                      colorTimeline.HasOverlap);
         }
 
-        protected virtual HashSet<int> GetFragmentationTimes()
+        protected virtual HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragmentableCommands)
         {
             var fragmentationTimes = new HashSet<int>();
-            var nonFragmentableCommands = osbSprite.Commands.Where(c => c is IFragmentableCommand fragmentableCommand && !fragmentableCommand.IsFragmentable);
 
             fragmentationTimes.UnionWith(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime)));
-            
-            foreach (var command in nonFragmentableCommands)
-            {
-                var range = Enumerable.Range((int)command.StartTime + 1, (int)(command.EndTime - command.StartTime - 1));
-                fragmentationTimes.ExceptWith(range);
-            }
+
+            foreach (var command in fragmentableCommands)
+                fragmentationTimes.ExceptWith(command.GetNonFragmentableTimes());
 
             return fragmentationTimes;
         }
 
-        private List<ICommand> getNextSegment(HashSet<int> fragmentationTimes, List<ICommand> commands)
+        private List<IFragmentableCommand> getNextSegment(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
         {
-            List<ICommand> segment = new List<ICommand>();
+            List<IFragmentableCommand> segment = new List<IFragmentableCommand>();
 
             var startTime = fragmentationTimes.Min();
             int endTime;
@@ -162,10 +160,10 @@ namespace StorybrewCommon.Storyboarding
             {
                 var sTime = Math.Max(startTime, (int)Math.Round(cmd.StartTime));
                 var eTime = Math.Min(endTime, (int)Math.Round(cmd.EndTime));
-                ICommand command;
+                IFragmentableCommand command;
                 
-                if (cmd is IFragmentableCommand fragmentableCommand && (sTime != (int)Math.Round(cmd.StartTime) || eTime != (int)Math.Round(cmd.EndTime)))
-                    command = fragmentableCommand.GetFragment(sTime, eTime);
+                if (sTime != (int)Math.Round(cmd.StartTime) || eTime != (int)Math.Round(cmd.EndTime))
+                    command = cmd.GetFragment(sTime, eTime);
                 else
                     command = cmd;
 
@@ -180,7 +178,7 @@ namespace StorybrewCommon.Storyboarding
             return segment;
         }
 
-        private void addStaticCommands(List<ICommand> segment, int startTime)
+        private void addStaticCommands(List<IFragmentableCommand> segment, int startTime)
         {
             if (moveTimeline.HasCommands && !segment.Any(c => c is MoveCommand && c.StartTime == startTime))
             {

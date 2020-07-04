@@ -5,15 +5,13 @@ using System.Runtime.Remoting.Messaging;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public abstract class CommandGroup : MarshalByRefObject, ICommand, IFragmentableCommand
+    public abstract class CommandGroup : MarshalByRefObject, ICommand
     {
         private bool ended;
 
         public double StartTime { get; set; }
         public virtual double EndTime { get; set; }
         public virtual bool Active => true;
-        public bool IsFragmentable => false;
-        public IFragmentableCommand GetFragment(double startTime, double endTime) => this;
 
         private List<ICommand> commands = new List<ICommand>();
         public IEnumerable<ICommand> Commands => commands;

@@ -36,7 +36,7 @@ namespace StorybrewCommon.Storyboarding
             this.osbAnimation = osbAnimation;
         }
 
-        protected override OsbSprite CreateSprite(List<ICommand> segment)
+        protected override OsbSprite CreateSprite(List<IFragmentableCommand> segment)
         {
             if (osbAnimation.LoopType == OsbLoopType.LoopOnce && segment.Min(c => c.StartTime) >= osbAnimation.AnimationEndTime)
             {
@@ -89,9 +89,9 @@ namespace StorybrewCommon.Storyboarding
             else base.WriteHeader(sprite);          
         }
 
-        protected override HashSet<int> GetFragmentationTimes()
+        protected override HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragmentableCommands)
         {
-            var fragmentationTimes = base.GetFragmentationTimes();
+            var fragmentationTimes = base.GetFragmentationTimes(fragmentableCommands);
 
             var tMax = fragmentationTimes.Max();
             var nonFragmentableTimes = new HashSet<int>();
