@@ -13,6 +13,9 @@ namespace StorybrewCommon.Storyboarding
 
         public readonly NumberFormatInfo NumberFormat = new CultureInfo(@"en-US", false).NumberFormat;
 
-        public bool WriteToFile = true;
+        /// <summary>
+        /// Enables optimisation for OsbSprites that have a MaxCommandCount > 0
+        /// </summary>
+        public bool OptimiseSprites = true;
     }
 }

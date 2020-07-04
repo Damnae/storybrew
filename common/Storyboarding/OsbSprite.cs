@@ -230,6 +230,8 @@ namespace StorybrewCommon.Storyboarding
                     AddCommand(cmd);
                 EndGroup();
             }
+            else
+                throw new NotSupportedException($"Failed to add command: No support for adding command of type {command.GetType().FullName}");
         }
 
         #region Display 
