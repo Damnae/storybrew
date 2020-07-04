@@ -143,16 +143,21 @@ namespace StorybrewCommon.Storyboarding
                 maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
 
             if (commands.Count < maxCommandCount)
-                endTime = fragmentationTimes.Max() + 1;
+                endTime = fragmentationTimes.Max();
             else
             {
-                var cEndTime = (int)commands.OrderBy(c => c.StartTime).ElementAt(maxCommandCount - 1).StartTime;
-                if (fragmentationTimes.Contains(cEndTime))
-                    endTime = cEndTime;
+                var lastCommand = commands.OrderBy(c => c.StartTime).ElementAt(maxCommandCount - 1);
+                if (fragmentationTimes.Contains((int)lastCommand.StartTime) && lastCommand.StartTime > startTime)
+                    endTime = (int)lastCommand.StartTime;
                 else
                 {
-                    endTime = fragmentationTimes.Where(t => t < cEndTime).Max();
-                    if (endTime == startTime) // segment can't be <= MaxCommandCount, so we use the smallest available
+                    if (fragmentationTimes.Any(t => t < (int)lastCommand.StartTime))
+                    {
+                        endTime = fragmentationTimes.Where(t => t < (int)lastCommand.StartTime).Max();
+                        if (endTime == startTime) // segment can't be <= MaxCommandCount, so we use the smallest available
+                            endTime = fragmentationTimes.First(t => t > startTime);
+                    }
+                    else
                         endTime = fragmentationTimes.First(t => t > startTime);
                 }
             }
