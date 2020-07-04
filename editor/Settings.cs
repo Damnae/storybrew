@@ -37,24 +37,32 @@ namespace StorybrewEditor
             Trace.WriteLine($"Loading settings from '{path}'");
 
             var type = GetType();
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                reader.ParseKeyValueSection((key, value) =>
-                {
-                    var field = type.GetField(key);
-                    if (field == null || !field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
-                        return;
+            try
+            {
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+                    reader.ParseKeyValueSection((key, value) =>
+                    {
+                        var field = type.GetField(key);
+                        if (field == null || !field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
+                            return;
 
-                    try
-                    {
-                        var setting = (Setting)field.GetValue(this);
-                        setting.Set(value);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.WriteLine($"Failed to load setting {key} with value {value}: {e}");
-                    }
-                });
+                        try
+                        {
+                            var setting = (Setting)field.GetValue(this);
+                            setting.Set(value);
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.WriteLine($"Failed to load setting {key} with value {value}: {e}");
+                        }
+                    });
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Failed to load settings: {e}");
+                Save();
+            }
         }
 
         public void Save()
