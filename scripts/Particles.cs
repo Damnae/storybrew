@@ -106,7 +106,7 @@ namespace StorybrewScripts
                 if (Color.R < 1 || Color.G < 1 || Color.B < 1)
                     sprite.Color(startTime, Color);
 
-                if (Color.A < 1)
+                if (Color.A < 1 && FadeInDuration == 0 && FadeOutDuration == 0)
                     sprite.Fade(startTime, Color.A);
 
                 if (StartScale == EndScale && StartScale != 1)
