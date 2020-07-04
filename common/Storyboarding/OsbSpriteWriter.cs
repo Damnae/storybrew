@@ -135,32 +135,7 @@ namespace StorybrewCommon.Storyboarding
             List<IFragmentableCommand> segment = new List<IFragmentableCommand>();
 
             var startTime = fragmentationTimes.Min();
-            int endTime;
-            var maxCommandCount = osbSprite.MaxCommandCount;
-
-            //split the last 2 segments evenly so we don't have weird 5 command leftovers
-            if (commands.Count < osbSprite.MaxCommandCount * 2 && commands.Count > osbSprite.MaxCommandCount)
-                maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
-
-            if (commands.Count < maxCommandCount)
-                endTime = fragmentationTimes.Max();
-            else
-            {
-                var lastCommand = commands.OrderBy(c => c.StartTime).ElementAt(maxCommandCount - 1);
-                if (fragmentationTimes.Contains((int)lastCommand.StartTime) && lastCommand.StartTime > startTime)
-                    endTime = (int)lastCommand.StartTime;
-                else
-                {
-                    if (fragmentationTimes.Any(t => t < (int)lastCommand.StartTime))
-                    {
-                        endTime = fragmentationTimes.Where(t => t < (int)lastCommand.StartTime).Max();
-                        if (endTime == startTime) // segment can't be <= MaxCommandCount, so we use the smallest available
-                            endTime = fragmentationTimes.First(t => t > startTime);
-                    }
-                    else
-                        endTime = fragmentationTimes.First(t => t > startTime);
-                }
-            }
+            int endTime = getSegmentEndTime(fragmentationTimes, commands);
 
             foreach (var cmd in commands.Where(c => c.StartTime < endTime))
             {
@@ -182,6 +157,39 @@ namespace StorybrewCommon.Storyboarding
             commands.RemoveAll(c => c.EndTime <= endTime);
 
             return segment;
+        }
+
+        private int getSegmentEndTime(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
+        {
+            var startTime = fragmentationTimes.Min();
+            int endTime;
+            var maxCommandCount = osbSprite.MaxCommandCount;
+
+            //split the last 2 segments evenly so we don't have weird 5 command leftovers
+            if (commands.Count < osbSprite.MaxCommandCount * 2 && commands.Count > osbSprite.MaxCommandCount)
+                maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
+
+            if (commands.Count < maxCommandCount)
+                endTime = fragmentationTimes.Max() + 1;
+            else
+            {
+                var lastCommand = commands.OrderBy(c => c.StartTime).ElementAt(maxCommandCount - 1);
+                if (fragmentationTimes.Contains((int)lastCommand.StartTime) && lastCommand.StartTime > startTime)
+                    endTime = (int)lastCommand.StartTime;
+                else
+                {
+                    if (fragmentationTimes.Any(t => t < (int)lastCommand.StartTime))
+                    {
+                        endTime = fragmentationTimes.Where(t => t < (int)lastCommand.StartTime).Max();
+                        if (endTime == startTime) // segment can't be <= MaxCommandCount, so we use the smallest available
+                            endTime = fragmentationTimes.First(t => t > startTime);
+                    }
+                    else
+                        endTime = fragmentationTimes.First(t => t > startTime);
+                }
+            }
+
+            return endTime;
         }
 
         private void addStaticCommands(List<IFragmentableCommand> segment, int startTime)
