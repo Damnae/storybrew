@@ -47,7 +47,9 @@ namespace StorybrewEditor.Storyboarding
             var position = sprite.PositionAt(time);
             var rotation = sprite.RotationAt(time);
             var color = sprite.ColorAt(time);
-            var finalColor = ((Color4)color).WithOpacity(opacity * fade);
+            var finalColor = ((Color4)color)
+                .LerpColor(Color4.Black, project.DimFactor)
+                .WithOpacity(opacity * fade);
             var additive = sprite.AdditiveAt(time);
 
             Vector2 origin;

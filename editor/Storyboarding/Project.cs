@@ -153,6 +153,7 @@ namespace StorybrewEditor.Storyboarding
         public static readonly OsbLayer[] OsbLayers = (OsbLayer[])Enum.GetValues(typeof(OsbLayer));
 
         public double DisplayTime;
+        public float DimFactor;
 
         private TextureContainer textureContainer;
         public TextureContainer TextureContainer => textureContainer;

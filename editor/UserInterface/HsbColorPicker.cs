@@ -72,7 +72,7 @@ namespace StorybrewEditor.UserInterface
                 FitChildren = true,
                 Children = new Widget[]
                 {
-                    new Label(Manager)
+                    new Label(manager)
                     {
                         StyleName = "small",
                         Text = "Hue"
@@ -84,7 +84,7 @@ namespace StorybrewEditor.UserInterface
                         MaxValue = 1,
                         Value = 0,
                     },
-                    new Label(Manager)
+                    new Label(manager)
                     {
                         StyleName = "small",
                         Text = "Saturation"
@@ -96,7 +96,7 @@ namespace StorybrewEditor.UserInterface
                         MaxValue = 1,
                         Value = 0.7f,
                     },
-                    new Label(Manager)
+                    new Label(manager)
                     {
                         StyleName = "small",
                         Text = "Brightness"
@@ -108,7 +108,7 @@ namespace StorybrewEditor.UserInterface
                         MaxValue = 1,
                         Value = 1,
                     },
-                    new Label(Manager)
+                    new Label(manager)
                     {
                         StyleName = "small",
                         Text = "Alpha"
