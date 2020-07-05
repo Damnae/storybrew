@@ -97,6 +97,7 @@ namespace StorybrewScripts
                 var defaultPosition = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * Radius;
 
                 var bar = layer.CreateSprite(SpritePath, SpriteOrigin);
+                bar.CommandSplitThreshold = 300;
                 bar.ColorHsb(StartTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
                 if (SpriteScale.X == SpriteScale.Y)
                     bar.Scale(StartTime, barScale * SpriteScale.X);

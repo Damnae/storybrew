@@ -15,7 +15,11 @@ namespace StorybrewCommon.Storyboarding
         private List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
 
-        public int MaxCommandCount = 0;
+        /// <summary>
+        /// If this sprite contains more than CommandSplitThreshold commands, they will be split between multiple sprites.
+        /// Does not apply when the sprite has triggers.
+        /// </summary>
+        public int CommandSplitThreshold = 0;
 
         private string texturePath = "";
         public string TexturePath

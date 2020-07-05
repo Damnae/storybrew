@@ -76,11 +76,11 @@ namespace StorybrewCommon.Storyboarding.Commands
         public override string ToString()
             => ToOsbString(ExportSettings.Default);
 
-        public bool IsFragmentable => (StartTime == EndTime) ? true : Easing == OsbEasing.None;
+        public bool IsFragmentable => StartTime == EndTime || Easing == OsbEasing.None;
 
         public abstract IFragmentableCommand GetFragment(double startTime, double endTime);
 
-        public IEnumerable<int> GetNonFragmentableTimes() 
+        public IEnumerable<int> GetNonFragmentableTimes()
         {
             var nonFragmentableTimes = new HashSet<int>();
             if (!IsFragmentable)

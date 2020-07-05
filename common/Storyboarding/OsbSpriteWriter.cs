@@ -49,7 +49,7 @@ namespace StorybrewCommon.Storyboarding
 
         public void WriteOsb()
         {
-            if (ExportSettings.OptimiseSprites && osbSprite.MaxCommandCount > 0 && osbSprite.CommandCount > osbSprite.MaxCommandCount && IsFragmentable())
+            if (ExportSettings.OptimiseSprites && osbSprite.CommandSplitThreshold > 0 && osbSprite.CommandCount > osbSprite.CommandSplitThreshold && IsFragmentable())
             {
                 var commands = osbSprite.Commands.Select(c => (IFragmentableCommand)c).ToList();
                 var fragmentationTimes = GetFragmentationTimes(commands);
@@ -155,10 +155,10 @@ namespace StorybrewCommon.Storyboarding
         {
             var startTime = fragmentationTimes.Min();
             int endTime;
-            var maxCommandCount = osbSprite.MaxCommandCount;
+            var maxCommandCount = osbSprite.CommandSplitThreshold;
 
             //split the last 2 segments evenly so we don't have weird 5 command leftovers
-            if (commands.Count < osbSprite.MaxCommandCount * 2 && commands.Count > osbSprite.MaxCommandCount)
+            if (commands.Count < osbSprite.CommandSplitThreshold * 2 && commands.Count > osbSprite.CommandSplitThreshold)
                 maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
 
             if (commands.Count < maxCommandCount)
