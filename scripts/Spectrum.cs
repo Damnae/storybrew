@@ -19,10 +19,10 @@ namespace StorybrewScripts
         public int EndTime = 10000;
 
         [Configurable]
-        public Vector2 Position = new Vector2(-107, 240);
+        public Vector2 Position = new Vector2(0, 400);
 
         [Configurable]
-        public float Width = 844;
+        public float Width = 640;
 
         [Configurable]
         public int BeatDivisor = 16;
@@ -34,10 +34,10 @@ namespace StorybrewScripts
         public string SpritePath = "sb/bar.png";
 
         [Configurable]
-        public OsbOrigin SpriteOrigin = OsbOrigin.CentreLeft;
+        public OsbOrigin SpriteOrigin = OsbOrigin.BottomLeft;
 
         [Configurable]
-        public Vector2 Scale = new Vector2(1, 200);
+        public Vector2 Scale = new Vector2(1, 100);
 
         [Configurable]
         public int LogScale = 600;
