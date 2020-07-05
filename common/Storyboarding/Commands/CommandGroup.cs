@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
@@ -11,6 +12,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public double StartTime { get; set; }
         public virtual double EndTime { get; set; }
         public virtual bool Active => true;
+        public int Cost => commands.Sum(c => c.Cost);
 
         private List<ICommand> commands = new List<ICommand>();
         public IEnumerable<ICommand> Commands => commands;

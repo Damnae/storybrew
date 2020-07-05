@@ -5,9 +5,9 @@ namespace StorybrewCommon.Util
 {
     public class OrientedBoundingBox
     {
-        private Vector2[] corners = new Vector2[4];
-        private Vector2[] axis = new Vector2[2];
-        private double[] origins = new double[2];
+        private readonly Vector2[] corners = new Vector2[4];
+        private readonly Vector2[] axis = new Vector2[2];
+        private readonly double[] origins = new double[2];
 
         public OrientedBoundingBox(Vector2 position, Vector2 origin, double width, double height, double angle)
         {

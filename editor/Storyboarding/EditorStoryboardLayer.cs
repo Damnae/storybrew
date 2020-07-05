@@ -87,6 +87,15 @@ namespace StorybrewEditor.Storyboarding
         private List<DisplayableObject> displayableObjects = new List<DisplayableObject>();
         private List<EventObject> eventObjects = new List<EventObject>();
 
+        public int GetActiveSpriteCount(double time)
+            => Visible ? storyboardObjects
+                .Count(o => Math.Floor(o.StartTime) < time && time < Math.Ceiling(o.EndTime)) : 0;
+
+        public int GetCommandCost(double time)
+            => Visible ? storyboardObjects
+                .Where(o => Math.Floor(o.StartTime) < time && time < Math.Ceiling(o.EndTime))
+                .Sum(o => o.CommandCost) : 0;
+
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
         {
             var storyboardObject = new EditorOsbSprite()
@@ -121,7 +130,7 @@ namespace StorybrewEditor.Storyboarding
 
         public override OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre)
             => CreateAnimation(path, frameCount, frameDelay, loopType, origin, OsbSprite.DefaultPosition);
-        
+
         public override OsbSample CreateSample(string path, double time, double volume)
         {
             var storyboardObject = new EditorOsbSample()
@@ -185,9 +194,10 @@ namespace StorybrewEditor.Storyboarding
         {
             estimatedSize = 0;
 
-            var exportSettings = new ExportSettings();
-            //reduce update time for a minor inaccuracy in estimatedSize
-            exportSettings.OptimiseSprites = false;
+            var exportSettings = new ExportSettings
+            {
+                OptimiseSprites = false, // reduce update time for a minor inaccuracy in estimatedSize
+            };
             using (var stream = new ByteCounterStream())
             {
                 using (var writer = new StreamWriter(stream, Encoding.UTF8))

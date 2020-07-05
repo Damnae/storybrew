@@ -4,6 +4,7 @@ using BrewLib.Util;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -172,6 +173,12 @@ namespace StorybrewEditor.Storyboarding
             foreach (var layer in Layers)
                 layer.TriggerEvents(startTime, endTime);
         }
+
+        public int GetActiveSpriteCount(double time)
+            => layers.Sum(l => l.GetActiveSpriteCount(time));
+
+        public int GetCommandCost(double time)
+            => layers.Sum(l => l.GetCommandCost(time));
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
         {

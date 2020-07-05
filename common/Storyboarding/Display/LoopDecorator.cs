@@ -20,6 +20,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
         public bool Active => true;
+        public int Cost => throw new InvalidOperationException();
 
         public double RepeatDuration => repeatDuration < 0 ? command.EndTime : repeatDuration;
 

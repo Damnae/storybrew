@@ -10,6 +10,7 @@ namespace StorybrewCommon.Storyboarding.Display
     {
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
         public bool Active => true;
+        public int Cost => throw new InvalidOperationException();
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {

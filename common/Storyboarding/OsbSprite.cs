@@ -5,6 +5,7 @@ using StorybrewCommon.Storyboarding.Display;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewCommon.Storyboarding
 {
@@ -53,6 +54,8 @@ namespace StorybrewCommon.Storyboarding
 
         public IEnumerable<ICommand> Commands => commands;
         public int CommandCount => commands.Count;
+
+        public override int CommandCost => commands.Sum(c => c.Cost);
 
         public bool HasIncompatibleCommands =>
             (moveTimeline.HasCommands && (moveXTimeline.HasCommands || moveYTimeline.HasCommands)) ||
@@ -238,8 +241,7 @@ namespace StorybrewCommon.Storyboarding
                     AddCommand(cmd);
                 EndGroup();
             }
-            else
-                throw new NotSupportedException($"Failed to add command: No support for adding command of type {command.GetType().FullName}");
+            else throw new NotSupportedException($"Failed to add command: No support for adding command of type {command.GetType().FullName}");
         }
 
         #region Display 

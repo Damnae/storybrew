@@ -31,6 +31,8 @@ namespace StorybrewEditor.ScreenLayers
         private Label statusIcon;
         private Label statusMessage;
 
+        private Label profilingLabel;
+
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
         private Button timeButton;
@@ -279,6 +281,15 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
+            WidgetManager.Root.Add(profilingLabel = new Label(WidgetManager)
+            {
+                StyleName = "tooltip",
+                AnchorTarget = timeline,
+                AnchorFrom = BoxAlignment.BottomLeft,
+                AnchorTo = BoxAlignment.TopLeft,
+                Offset = new Vector2(0, -8),
+            });
+
             WidgetManager.Root.Add(previewContainer = new DrawableContainer(WidgetManager)
             {
                 StyleName = "storyboardPreview",
@@ -365,7 +376,7 @@ namespace StorybrewEditor.ScreenLayers
                 if (e == MouseButton.Right)
                     exportProjectAll();
                 else exportProject();
-           };
+            };
 
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
@@ -512,9 +523,21 @@ namespace StorybrewEditor.ScreenLayers
 
             timeline.SetValueSilent(time);
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
+            {
                 timeButton.Text = Manager.GetContext<Editor>().InputManager.Alt ?
                     $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
                     $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
+
+                var activeSpriteCount = project.LayerManager.GetActiveSpriteCount(time * 1000);
+                var commandCount = project.LayerManager.GetCommandCost(time * 1000);
+                var warnings = "";
+                if (activeSpriteCount >= 1000) warnings += $"⚠ {activeSpriteCount} Sprites\n";
+                if (commandCount >= 10000) warnings += $"⚠ {commandCount} Commands\n";
+                warnings = warnings.TrimEnd('\n');
+                profilingLabel.Text = warnings;
+                profilingLabel.Displayed = warnings.Length > 0;
+                profilingLabel.Pack(width: 180);
+            }
 
             if (audio.Playing && mainStoryboardDrawable.Time < time)
                 project.TriggerEvents(mainStoryboardDrawable.Time, time);

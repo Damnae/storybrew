@@ -19,6 +19,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue EndValue => command.EndValue;
         public double Duration => EndTime - StartTime;
         public bool Active => triggered;
+        public int Cost => throw new InvalidOperationException();
 
         public event EventHandler OnStateChanged;
 
