@@ -333,6 +333,23 @@ namespace StorybrewCommon.Storyboarding
                                                                       writer, exportSettings, layer);
             osbSpriteWriter.WriteOsb();
         }
+
+        public static Vector2 GetOriginVector(OsbOrigin origin, float width, float height)
+        {
+            switch (origin)
+            {
+                case OsbOrigin.TopLeft: return Vector2.Zero;
+                case OsbOrigin.TopCentre: return new Vector2(width * 0.5f, 0);
+                case OsbOrigin.TopRight: return new Vector2(width, 0);
+                case OsbOrigin.CentreLeft: return new Vector2(0, height * 0.5f);
+                case OsbOrigin.Centre: return new Vector2(width * 0.5f, height * 0.5f);
+                case OsbOrigin.CentreRight: return new Vector2(width, height * 0.5f);
+                case OsbOrigin.BottomLeft: return new Vector2(0, height);
+                case OsbOrigin.BottomCentre: return new Vector2(width * 0.5f, height);
+                case OsbOrigin.BottomRight: return new Vector2(width, height);
+            }
+            throw new NotSupportedException(origin.ToString());
+        }
     }
 
     public enum OsbLayer

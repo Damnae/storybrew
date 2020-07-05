@@ -1,10 +1,11 @@
-﻿using OpenTK;
+using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Storyboarding.Util;
+using StorybrewCommon.Util;
 using System;
+using System.Drawing;
 using System.Linq;
 
 namespace StorybrewScripts
@@ -21,61 +22,46 @@ namespace StorybrewScripts
         public int EndTime;
 
         [Configurable]
-        public double ParticleDuration = 2000;
+        public int ParticleCount = 32;
 
         [Configurable]
-        public double ParticleAmount = 16;
+        public Vector2 Scale = new Vector2(1, 1);
 
         [Configurable]
-        public Vector2 StartPosition = new Vector2(-107, 0);
-
-        [Configurable]
-        public Vector2 EndPosition = new Vector2(747, 480);
-
-        [Configurable]
-        public bool RandomX = true;
-
-        [Configurable]
-        public bool RandomY;
-
-        [Configurable]
-        public OsbEasing Easing;
-
-        [Configurable]
-        public bool RandomEasing;
-
-        [Configurable]
-        public int FadeInDuration = 200;
-
-        [Configurable]
-        public int FadeOutDuration = 200;
-
-        [Configurable]
-        public Color4 Color = new Color4(1, 1, 1, 0.6f);
-
-        [Configurable]
-        public double StartScale = 0.1;
-
-        [Configurable]
-        public double EndScale = 1.0;
-
-        [Configurable]
-        public bool RandomScale;
-
-        [Configurable]
-        public double StartRotation;
-
-        [Configurable]
-        public double EndRotation;
-
-        [Configurable]
-        public bool RandomRotation;
+        public float Rotation = 0;
 
         [Configurable]
         public OsbOrigin Origin = OsbOrigin.Centre;
 
         [Configurable]
-        public bool Additive = true;
+        public Color4 Color = Color4.White;
+
+        [Configurable]
+        public float ColorVariance = 0.6f;
+
+        [Configurable]
+        public bool Additive = false;
+
+        [Configurable]
+        public Vector2 SpawnOrigin = new Vector2(420, 0);
+
+        [Configurable]
+        public float SpawnSpread = 360;
+
+        [Configurable]
+        public float Angle = 110;
+
+        [Configurable]
+        public float AngleSpread = 60;
+
+        [Configurable]
+        public float Speed = 480;
+
+        [Configurable]
+        public float Lifetime = 1000;
+
+        [Configurable]
+        public OsbEasing Easing = OsbEasing.None;
 
         public override void Generate()
         {
@@ -87,83 +73,88 @@ namespace StorybrewScripts
             EndTime = Math.Min(EndTime, (int)AudioDuration);
             StartTime = Math.Min(StartTime, EndTime);
 
-            var particleDuration = ParticleDuration > 0 ? ParticleDuration :
-                Beatmap.GetTimingPointAt(StartTime).BeatDuration * 4;
+            var bitmap = GetMapsetBitmap(Path);
 
-            // This is an example of using a sprite pool.
-            // Sprites using the same layer, path and origin can be reused as if they were multiple sprites.
+            var duration = (double)(EndTime - StartTime);
+            var loopCount = (int)Math.Floor(duration / Lifetime);
 
             var layer = GetLayer("");
-            using (var pool = new OsbSpritePool(layer, Path, Origin, (sprite, startTime, endTime) =>
+            for (var i = 0; i < ParticleCount; i++)
             {
-                // This action runs for every sprite created from the pool, after all of them are created (AFTER the for loop below).
+                var spawnAngle = Random(Math.PI * 2);
+                var spawnDistance = (float)(SpawnSpread * Math.Sqrt(Random(1f)));
 
-                // It is intended to set states common to every sprite:
-                // In this example, this handles cases where all sprites will have the same color / opacity / scale / rotation / additive mode.
+                var moveAngle = MathHelper.DegreesToRadians(Angle + Random(-AngleSpread, AngleSpread) * 0.5f);
+                var moveDistance = Speed * Lifetime * 0.001f;
 
-                // Note that the pool is in a using block, this is necessary to run this action.
+                var spriteRotation = moveAngle + MathHelper.DegreesToRadians(Rotation);
 
-                if (Color.R < 1 || Color.G < 1 || Color.B < 1)
-                    sprite.Color(startTime, Color);
+                var startPosition = SpawnOrigin + new Vector2((float)Math.Cos(spawnAngle), (float)Math.Sin(spawnAngle)) * spawnDistance;
+                var endPosition = startPosition + new Vector2((float)Math.Cos(moveAngle), (float)Math.Sin(moveAngle)) * moveDistance;
 
-                if (Color.A < 1 && FadeInDuration == 0 && FadeOutDuration == 0)
-                    sprite.Fade(startTime, Color.A);
+                var loopDuration = duration / loopCount;
+                var startTime = StartTime + (i * loopDuration) / ParticleCount;
+                var endTime = startTime + loopDuration * (loopCount - 1);
 
-                if (StartScale == EndScale && StartScale != 1)
-                    sprite.Scale(startTime, StartScale);
+                if (!isVisible(bitmap, startPosition, endPosition, (float)spriteRotation, (float)loopDuration))
+                    continue;
 
-                if (StartRotation == EndRotation && StartRotation != 0)
-                    sprite.Rotate(startTime, MathHelper.DegreesToRadians(StartRotation));
-
-                if (Additive)
-                    sprite.Additive(startTime, endTime);
-            }))
-            {
-                var timeStep = particleDuration / ParticleAmount;
-                for (var startTime = (double)StartTime; startTime <= EndTime - particleDuration; startTime += timeStep)
+                var color = Color;
+                if (ColorVariance != 0)
                 {
-                    var endTime = startTime + particleDuration;
+                    ColorVariance = MathHelper.Clamp(ColorVariance, 0, 1);
 
-                    // This is where sprites are created from the pool.
-                    // Commands here are specific to each sprite.
+                    var hsba = Color4.ToHsv(color);
+                    var sMin = Math.Max(0, hsba.Y - ColorVariance * 0.5f);
+                    var sMax = sMin + ColorVariance * 0.5f;
+                    var vMin = Math.Max(0, hsba.Z - ColorVariance * 0.5f);
+                    var vMax = vMin + ColorVariance * 0.5f;
 
-                    // Note that you must know for how long you are going to use the sprite:
-                    // startTime being the start time of the earliest command, endTime the end time of the last command.
-
-                    // Sprites must also be created in order (startTime keeps increasing in each loop iteration),
-                    // or sprites won't be properly reused.
-                    var sprite = pool.Get(startTime, endTime);
-
-                    var easing = RandomEasing ? (OsbEasing)Random(1, 3) : Easing;
-
-                    var startX = RandomX ? Random(StartPosition.X, EndPosition.X) : StartPosition.X;
-                    var startY = RandomY ? Random(StartPosition.Y, EndPosition.Y) : StartPosition.Y;
-                    var endX = RandomX ? startX : EndPosition.X;
-                    var endY = RandomY ? startY : EndPosition.Y;
-                    sprite.Move(easing, startTime, endTime, startX, startY, endX, endY);
-
-                    if (FadeInDuration > 0 || FadeOutDuration > 0)
-                    {
-                        var fadeInTime = startTime + FadeInDuration;
-                        var fadeOutTime = endTime - FadeOutDuration;
-                        if (fadeOutTime < fadeInTime)
-                            fadeInTime = fadeOutTime = (fadeInTime + fadeOutTime) / 2;
-
-                        sprite.Fade(easing, startTime, Math.Max(startTime, fadeInTime), 0, Color.A);
-                        sprite.Fade(easing, Math.Min(fadeOutTime, endTime), endTime, Color.A, 0);
-                    }
-
-                    if (StartScale != EndScale)
-                        if (RandomScale)
-                            sprite.Scale(easing, startTime, endTime, Random(StartScale, EndScale), Random(StartScale, EndScale));
-                        else sprite.Scale(easing, startTime, endTime, StartScale, EndScale);
-
-                    if (StartRotation != EndRotation)
-                        if (RandomRotation)
-                            sprite.Rotate(easing, startTime, endTime, MathHelper.DegreesToRadians(Random(StartRotation, EndRotation)), MathHelper.DegreesToRadians(Random(StartRotation, EndRotation)));
-                        else sprite.Rotate(easing, startTime, endTime, MathHelper.DegreesToRadians(StartRotation), MathHelper.DegreesToRadians(EndRotation));
+                    color = Color4.FromHsv(new Vector4(
+                        hsba.X,
+                        (float)Random(sMin, sMax),
+                        (float)Random(vMin, vMax),
+                        hsba.W));
                 }
+
+                var particle = layer.CreateSprite(Path, Origin);
+                if (spriteRotation != 0)
+                    particle.Rotate(startTime, spriteRotation);
+                if (color.R != 1 || color.G != 1 || color.B != 1)
+                    particle.Color(startTime, color);
+                if (Scale.X != 1 || Scale.Y != 1)
+                {
+                    if (Scale.X != Scale.Y)
+                        particle.ScaleVec(startTime, Scale.X, Scale.Y);
+                    else particle.Scale(startTime, Scale.X);
+                }
+                if (Additive)
+                    particle.Additive(startTime, startTime);
+
+                particle.StartLoopGroup(startTime, loopCount);
+                particle.Fade(OsbEasing.Out, 0, loopDuration * 0.2, 0, color.A);
+                particle.Fade(OsbEasing.In, loopDuration * 0.8, loopDuration, color.A, 0);
+                particle.Move(Easing, 0, loopDuration, startPosition, endPosition);
+                particle.EndGroup();
             }
+        }
+
+        private bool isVisible(Bitmap bitmap, Vector2 startPosition, Vector2 endPosition, float rotation, float duration)
+        {
+            var screenBB = OsuHitObject.WidescreenStoryboardBounds;
+            var spriteSize = new Vector2(bitmap.Width * Scale.X, bitmap.Height * Scale.Y);
+            var originVector = OsbSprite.GetOriginVector(Origin, spriteSize.X, spriteSize.Y);
+
+            for (var t = 0; t < duration; t += 200)
+            {
+                var position = Vector2.Lerp(startPosition, endPosition, (float)(t / duration));
+                var spriteBB = new OrientedBoundingBox(position, originVector,
+                    spriteSize.X, spriteSize.Y, rotation);
+
+                if (spriteBB.Intersects(screenBB))
+                    return true;
+            }
+            return false;
         }
     }
 }
