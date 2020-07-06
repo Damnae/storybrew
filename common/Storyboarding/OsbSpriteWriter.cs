@@ -125,7 +125,7 @@ namespace StorybrewCommon.Storyboarding
 
         private List<IFragmentableCommand> getNextSegment(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
         {
-            List<IFragmentableCommand> segment = new List<IFragmentableCommand>();
+            var segment = new List<IFragmentableCommand>();
 
             var startTime = fragmentationTimes.Min();
             var endTime = getSegmentEndTime(fragmentationTimes, commands);

@@ -71,7 +71,10 @@ namespace StorybrewCommon.Storyboarding
             scaleVecTimeline.HasOverlap ||
             rotateTimeline.HasOverlap ||
             fadeTimeline.HasOverlap ||
-            colorTimeline.HasOverlap;
+            colorTimeline.HasOverlap ||
+            additiveTimeline.HasOverlap ||
+            flipHTimeline.HasOverlap ||
+            flipVTimeline.HasOverlap;
 
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
