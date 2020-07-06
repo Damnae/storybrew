@@ -7,6 +7,6 @@
         public int EffectiveCommandCount;
         public bool IncompatibleCommands;
         public bool OverlappedCommands;
-        public float DrawLoad;
+        public float ScreenFill;
     }
 }

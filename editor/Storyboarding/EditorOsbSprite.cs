@@ -70,10 +70,7 @@ namespace StorybrewEditor.Storyboarding
                 if (InScreenBounds(position, size, rotation, origin * scale))
                 {
                     frameStats.EffectiveCommandCount += sprite.CommandCost;
-
-                    var oneScreen = OsuHitObject.StoryboardSize.X * OsuHitObject.StoryboardSize.Y;
-                    var oneWidescreen = OsuHitObject.WidescreenStoryboardSize.X * OsuHitObject.WidescreenStoryboardSize.Y;
-                    frameStats.DrawLoad += Math.Min(size.X * size.Y, oneWidescreen) / oneScreen;
+                    frameStats.ScreenFill += Math.Min(OsuHitObject.WidescreenStoryboardArea, size.X * size.Y) / OsuHitObject.WidescreenStoryboardArea;
                 }
             }
 

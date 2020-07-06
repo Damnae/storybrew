@@ -571,8 +571,8 @@ namespace StorybrewEditor.ScreenLayers
             if (project.FrameStats.IncompatibleCommands)
                 warnings += $"⚠ Incompatible Commands\n";
 
-            if (project.FrameStats.DrawLoad > 5)
-                warnings += $"⚠ {project.FrameStats.DrawLoad:0}x Draw Load\n";
+            if (project.FrameStats.ScreenFill > 5)
+                warnings += $"⚠ {project.FrameStats.ScreenFill:0}x Screen Fill\n";
 
             return warnings.TrimEnd('\n');
         }
