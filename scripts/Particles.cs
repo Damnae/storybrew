@@ -94,23 +94,23 @@ namespace StorybrewScripts
 
                 var loopDuration = duration / loopCount;
                 var startTime = StartTime + (i * loopDuration) / ParticleCount;
-                var endTime = startTime + loopDuration * (loopCount - 1);
+                var endTime = startTime + loopDuration * loopCount;
 
                 if (!isVisible(bitmap, startPosition, endPosition, (float)spriteRotation, (float)loopDuration))
                     continue;
 
                 var color = Color;
-                if (ColorVariance != 0)
+                if (ColorVariance > 0)
                 {
                     ColorVariance = MathHelper.Clamp(ColorVariance, 0, 1);
 
-                    var hsba = Color4.ToHsv(color);
+                    var hsba = Color4.ToHsl(color);
                     var sMin = Math.Max(0, hsba.Y - ColorVariance * 0.5f);
-                    var sMax = sMin + ColorVariance * 0.5f;
+                    var sMax = Math.Min(sMin + ColorVariance, 1);
                     var vMin = Math.Max(0, hsba.Z - ColorVariance * 0.5f);
-                    var vMax = vMin + ColorVariance * 0.5f;
+                    var vMax = Math.Min(vMin + ColorVariance, 1);
 
-                    color = Color4.FromHsv(new Vector4(
+                    color = Color4.FromHsl(new Vector4(
                         hsba.X,
                         (float)Random(sMin, sMax),
                         (float)Random(vMin, vMax),
@@ -129,7 +129,7 @@ namespace StorybrewScripts
                     else particle.Scale(startTime, Scale.X);
                 }
                 if (Additive)
-                    particle.Additive(startTime, startTime);
+                    particle.Additive(startTime, endTime);
 
                 particle.StartLoopGroup(startTime, loopCount);
                 particle.Fade(OsbEasing.Out, 0, loopDuration * 0.2, 0, color.A);
