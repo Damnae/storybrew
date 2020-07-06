@@ -52,20 +52,7 @@ namespace StorybrewEditor.Storyboarding
                 .WithOpacity(opacity * fade);
             var additive = sprite.AdditiveAt(time);
 
-            Vector2 origin;
-            switch (sprite.Origin)
-            {
-                default:
-                case OsbOrigin.TopLeft: origin = new Vector2(0, 0); break;
-                case OsbOrigin.TopCentre: origin = new Vector2(texture.Width * 0.5f, 0); break;
-                case OsbOrigin.TopRight: origin = new Vector2(texture.Width, 0); break;
-                case OsbOrigin.CentreLeft: origin = new Vector2(0, texture.Height * 0.5f); break;
-                case OsbOrigin.Centre: origin = new Vector2(texture.Width * 0.5f, texture.Height * 0.5f); break;
-                case OsbOrigin.CentreRight: origin = new Vector2(texture.Width, texture.Height * 0.5f); break;
-                case OsbOrigin.BottomLeft: origin = new Vector2(0, texture.Height); break;
-                case OsbOrigin.BottomCentre: origin = new Vector2(texture.Width * 0.5f, texture.Height); break;
-                case OsbOrigin.BottomRight: origin = new Vector2(texture.Width, texture.Height); break;
-            }
+            var origin = GetOriginVector(sprite.Origin, texture.Width, texture.Height);
 
             var boundsScaling = bounds.Height / 480;
             DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, additive ? AdditiveStates : AlphaBlendStates)
