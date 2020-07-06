@@ -7,6 +7,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Util;
 using System;
 using System.IO;
 
@@ -67,10 +68,19 @@ namespace StorybrewEditor.Storyboarding
             if (frameStats != null)
             {
                 var size = texture.Size * scale;
-                if (InScreenBounds(position, size, rotation, origin * scale))
+
+                var spriteObb = new OrientedBoundingBox(position, origin * scale, size.X, size.Y, rotation);
+                if (spriteObb.Intersects(OsuHitObject.WidescreenStoryboardBounds))
                 {
                     frameStats.EffectiveCommandCount += sprite.CommandCost;
-                    frameStats.ScreenFill += Math.Min(OsuHitObject.WidescreenStoryboardArea, size.X * size.Y) / OsuHitObject.WidescreenStoryboardArea;
+
+                    // Approximate how much of the sprite is on screen
+                    var spriteAabb = spriteObb.GetAABB();
+                    var intersection = spriteAabb.IntersectWith(OsuHitObject.WidescreenStoryboardBounds);
+                    var aabbIntersectionFactor = (intersection.Width * intersection.Height) / (spriteAabb.Width * spriteAabb.Height);
+
+                    var intersectionArea = size.X * size.Y * aabbIntersectionFactor;
+                    frameStats.ScreenFill += Math.Min(OsuHitObject.WidescreenStoryboardArea, intersectionArea) / OsuHitObject.WidescreenStoryboardArea;
                 }
             }
 

@@ -31,6 +31,19 @@ namespace StorybrewCommon.Util
             }
         }
 
+        public Box2 GetAABB()
+        {
+            float minX = float.MaxValue, maxX = float.MinValue, minY = float.MaxValue, maxY = float.MinValue;
+            foreach (var corner in corners)
+            {
+                minX = Math.Min(minX, corner.X);
+                maxX = Math.Max(maxX, corner.X);
+                minY = Math.Min(minY, corner.Y);
+                maxY = Math.Max(maxY, corner.Y);
+            }
+            return new Box2(minX, minY, maxX, maxY);
+        }
+
         public bool Intersects(OrientedBoundingBox other)
             => intersects1Way(other) && other.intersects1Way(this);
 
