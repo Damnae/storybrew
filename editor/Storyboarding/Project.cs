@@ -161,15 +161,20 @@ namespace StorybrewEditor.Storyboarding
         private AudioSampleContainer audioContainer;
         public AudioSampleContainer AudioContainer => audioContainer;
 
+        public FrameStats FrameStats { get; private set; } = new FrameStats();
+
         public void TriggerEvents(double startTime, double endTime)
         {
             layerManager.TriggerEvents(startTime, endTime);
         }
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, bool updateFrameStats)
         {
             effectUpdateQueue.Enabled = true;
-            layerManager.Draw(drawContext, camera, bounds, opacity);
+
+            var newFrameStats = updateFrameStats ? new FrameStats() : null;
+            layerManager.Draw(drawContext, camera, bounds, opacity, newFrameStats);
+            FrameStats = newFrameStats ?? FrameStats;
         }
 
         private void reloadTextures()

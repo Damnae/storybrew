@@ -7,7 +7,7 @@ namespace StorybrewEditor.Storyboarding
 {
     public class EditorOsbAnimation : OsbAnimation, DisplayableObject
     {
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project)
-            => EditorOsbSprite.Draw(drawContext, camera, bounds, opacity, project, this);
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
+            => EditorOsbSprite.Draw(drawContext, camera, bounds, opacity, project, frameStats, this);
     }
 }

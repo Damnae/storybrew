@@ -5,7 +5,9 @@ using BrewLib.Graphics.Textures;
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
+using System;
 using System.IO;
 
 namespace StorybrewEditor.Storyboarding
@@ -15,13 +17,21 @@ namespace StorybrewEditor.Storyboarding
         public readonly static RenderStates AlphaBlendStates = new RenderStates();
         public readonly static RenderStates AdditiveStates = new RenderStates() { BlendingFactor = new BlendingFactorState(BlendingMode.Additive), };
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project)
-            => Draw(drawContext, camera, bounds, opacity, project, this);
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
+            => Draw(drawContext, camera, bounds, opacity, project, frameStats, this);
 
-        public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, OsbSprite sprite)
+        public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats, OsbSprite sprite)
         {
             var time = project.DisplayTime * 1000;
             if (sprite.TexturePath == null || !sprite.IsActive(time)) return;
+
+            if (frameStats != null)
+            {
+                frameStats.SpriteCount++;
+                frameStats.CommandCount += sprite.CommandCost;
+                frameStats.IncompatibleCommands |= sprite.HasIncompatibleCommands;
+                frameStats.OverlappedCommands |= sprite.HasOverlappedCommands;
+            }
 
             var fade = sprite.OpacityAt(time);
             if (fade < 0.00001f) return;
@@ -53,6 +63,19 @@ namespace StorybrewEditor.Storyboarding
             var additive = sprite.AdditiveAt(time);
 
             var origin = GetOriginVector(sprite.Origin, texture.Width, texture.Height);
+
+            if (frameStats != null)
+            {
+                var size = texture.Size * scale;
+                if (InScreenBounds(position, size, rotation, origin * scale))
+                {
+                    frameStats.EffectiveCommandCount += sprite.CommandCost;
+
+                    var oneScreen = OsuHitObject.StoryboardSize.X * OsuHitObject.StoryboardSize.Y;
+                    var oneWidescreen = OsuHitObject.WidescreenStoryboardSize.X * OsuHitObject.WidescreenStoryboardSize.Y;
+                    frameStats.DrawLoad += Math.Min(size.X * size.Y, oneWidescreen) / oneScreen;
+                }
+            }
 
             var boundsScaling = bounds.Height / 480;
             DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, additive ? AdditiveStates : AlphaBlendStates)

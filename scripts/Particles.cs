@@ -141,17 +141,13 @@ namespace StorybrewScripts
 
         private bool isVisible(Bitmap bitmap, Vector2 startPosition, Vector2 endPosition, float rotation, float duration)
         {
-            var screenBB = OsuHitObject.WidescreenStoryboardBounds;
             var spriteSize = new Vector2(bitmap.Width * Scale.X, bitmap.Height * Scale.Y);
             var originVector = OsbSprite.GetOriginVector(Origin, spriteSize.X, spriteSize.Y);
 
             for (var t = 0; t < duration; t += 200)
             {
-                var position = Vector2.Lerp(startPosition, endPosition, (float)(t / duration));
-                var spriteBB = new OrientedBoundingBox(position, originVector,
-                    spriteSize.X, spriteSize.Y, rotation);
-
-                if (spriteBB.Intersects(screenBB))
+                var position = Vector2.Lerp(startPosition, endPosition, t / duration);
+                if (OsbSprite.InScreenBounds(position, spriteSize, rotation, originVector))
                     return true;
             }
             return false;

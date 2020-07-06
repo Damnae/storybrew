@@ -6,6 +6,6 @@ namespace StorybrewEditor.Storyboarding
 {
     public interface DisplayableObject
     {
-        void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project);
+        void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats);
     }
 }

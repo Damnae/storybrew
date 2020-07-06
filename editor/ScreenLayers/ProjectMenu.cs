@@ -31,7 +31,7 @@ namespace StorybrewEditor.ScreenLayers
         private Label statusIcon;
         private Label statusMessage;
 
-        private Label profilingLabel;
+        private Label warningsLabel;
 
         private LinearLayout bottomLeftLayout;
         private LinearLayout bottomRightLayout;
@@ -75,7 +75,10 @@ namespace StorybrewEditor.ScreenLayers
 
             WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager)
             {
-                Drawable = mainStoryboardDrawable = new StoryboardDrawable(project),
+                Drawable = mainStoryboardDrawable = new StoryboardDrawable(project)
+                {
+                    UpdateFrameStats = true,
+                },
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = BoxAlignment.Centre,
                 AnchorTo = BoxAlignment.Centre,
@@ -281,7 +284,7 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            WidgetManager.Root.Add(profilingLabel = new Label(WidgetManager)
+            WidgetManager.Root.Add(warningsLabel = new Label(WidgetManager)
             {
                 StyleName = "tooltip",
                 AnchorTarget = timeline,
@@ -528,15 +531,10 @@ namespace StorybrewEditor.ScreenLayers
                     $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
                     $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
 
-                var activeSpriteCount = project.LayerManager.GetActiveSpriteCount(time * 1000);
-                var commandCount = project.LayerManager.GetCommandCost(time * 1000);
-                var warnings = "";
-                if (activeSpriteCount >= 1000) warnings += $"⚠ {activeSpriteCount} Sprites\n";
-                if (commandCount >= 10000) warnings += $"⚠ {commandCount} Commands\n";
-                warnings = warnings.TrimEnd('\n');
-                profilingLabel.Text = warnings;
-                profilingLabel.Displayed = warnings.Length > 0;
-                profilingLabel.Pack(width: 180);
+                warningsLabel.Text = buildWarningMessage();
+                warningsLabel.Displayed = warningsLabel.Text.Length > 0;
+                warningsLabel.Pack(width: 600);
+                warningsLabel.Pack();
             }
 
             if (audio.Playing && mainStoryboardDrawable.Time < time)
@@ -546,6 +544,37 @@ namespace StorybrewEditor.ScreenLayers
             mainStoryboardDrawable.Clip = !Manager.GetContext<Editor>().InputManager.Alt;
             if (previewContainer.Visible)
                 previewDrawable.Time = timeline.GetValueForPosition(Manager.GetContext<Editor>().InputManager.MousePosition);
+        }
+
+        private string buildWarningMessage()
+        {
+            var warnings = "";
+
+            var activeSpriteCount = project.FrameStats.SpriteCount;
+            if (activeSpriteCount >= 1500)
+                warnings += $"⚠ {activeSpriteCount:n0} Sprites\n";
+
+            var commandCount = project.FrameStats.CommandCount;
+            if (commandCount >= 15000)
+                warnings += $"⚠ {commandCount:n0} Commands\n";
+
+            var effectiveCommandCount = project.FrameStats.EffectiveCommandCount;
+            var unusedCommandCount = commandCount - effectiveCommandCount;
+            var unusedCommandFactor = (float)unusedCommandCount / commandCount;
+            if ((unusedCommandCount >= 5000 && unusedCommandFactor > .5f) ||
+                (unusedCommandCount >= 10000 && unusedCommandFactor > .2f) ||
+                unusedCommandCount >= 20000)
+                warnings += $"⚠ {unusedCommandCount:n0} ({unusedCommandFactor:0%}) Commands on Hidden Sprites\n";
+
+            if (project.FrameStats.OverlappedCommands)
+                warnings += $"⚠ Overlapped Commands\n";
+            if (project.FrameStats.IncompatibleCommands)
+                warnings += $"⚠ Incompatible Commands\n";
+
+            if (project.FrameStats.DrawLoad > 5)
+                warnings += $"⚠ {project.FrameStats.DrawLoad:0}x Draw Load\n";
+
+            return warnings.TrimEnd('\n');
         }
 
         public override void Resize(int width, int height)

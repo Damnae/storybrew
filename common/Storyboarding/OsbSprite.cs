@@ -1,7 +1,9 @@
 ﻿using OpenTK;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
+using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,11 +57,21 @@ namespace StorybrewCommon.Storyboarding
         public IEnumerable<ICommand> Commands => commands;
         public int CommandCount => commands.Count;
 
-        public override int CommandCost => commands.Sum(c => c.Cost);
+        public int CommandCost => commands.Sum(c => c.Cost);
 
         public bool HasIncompatibleCommands =>
             (moveTimeline.HasCommands && (moveXTimeline.HasCommands || moveYTimeline.HasCommands)) ||
             (scaleTimeline.HasCommands && scaleVecTimeline.HasCommands);
+
+        public bool HasOverlappedCommands =>
+            moveTimeline.HasOverlap ||
+            moveXTimeline.HasOverlap ||
+            moveYTimeline.HasOverlap ||
+            scaleTimeline.HasOverlap ||
+            scaleVecTimeline.HasOverlap ||
+            rotateTimeline.HasOverlap ||
+            fadeTimeline.HasOverlap ||
+            colorTimeline.HasOverlap;
 
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
@@ -333,6 +345,10 @@ namespace StorybrewCommon.Storyboarding
                                                                       writer, exportSettings, layer);
             osbSpriteWriter.WriteOsb();
         }
+
+        public static bool InScreenBounds(Vector2 position, Vector2 size, float rotation, Vector2 origin)
+            => new OrientedBoundingBox(position, origin, size.X, size.Y, rotation)
+                .Intersects(OsuHitObject.WidescreenStoryboardBounds);
 
         public static Vector2 GetOriginVector(OsbOrigin origin, float width, float height)
         {

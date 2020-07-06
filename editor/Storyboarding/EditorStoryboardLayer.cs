@@ -89,12 +89,13 @@ namespace StorybrewEditor.Storyboarding
 
         public int GetActiveSpriteCount(double time)
             => Visible ? storyboardObjects
-                .Count(o => Math.Floor(o.StartTime) < time && time < Math.Ceiling(o.EndTime)) : 0;
+                .Count(o => (o as OsbSprite)?.IsActive(time) ?? false) : 0;
 
         public int GetCommandCost(double time)
             => Visible ? storyboardObjects
-                .Where(o => Math.Floor(o.StartTime) < time && time < Math.Ceiling(o.EndTime))
-                .Sum(o => o.CommandCost) : 0;
+                .Select(o => o as OsbSprite)
+                .Where(s => s?.IsActive(time) ?? false)
+                .Sum(s => s.CommandCost) : 0;
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
         {
@@ -152,7 +153,7 @@ namespace StorybrewEditor.Storyboarding
                     eventObject.TriggerEvent(effect.Project, toTime);
         }
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, FrameStats frameStats)
         {
             if (!Visible) return;
 
@@ -160,7 +161,7 @@ namespace StorybrewEditor.Storyboarding
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
             foreach (var displayableObject in displayableObjects)
-                displayableObject.Draw(drawContext, camera, bounds, opacity, effect.Project);
+                displayableObject.Draw(drawContext, camera, bounds, opacity, effect.Project, frameStats);
         }
 
         public void CopySettings(EditorStoryboardLayer other, bool copyGuid = false)

@@ -13,28 +13,29 @@ namespace StorybrewEditor.UserInterface.Drawables
         public Vector2 MinSize => Vector2.Zero;
         public Vector2 PreferredSize => new Vector2(854, 480);
 
-        private Project storyboard;
+        private Project project;
         private RenderStates linesRenderStates = new RenderStates();
 
         public double Time;
         public bool Clip = true;
+        public bool UpdateFrameStats;
 
-        public StoryboardDrawable(Project storyboard)
+        public StoryboardDrawable(Project project)
         {
-            this.storyboard = storyboard;
+            this.project = project;
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity = 1)
         {
-            storyboard.DisplayTime = Time;
+            project.DisplayTime = Time;
             if (Clip)
             {
                 using (DrawState.Clip(bounds, camera))
-                    storyboard.Draw(drawContext, camera, bounds, opacity);
+                    project.Draw(drawContext, camera, bounds, opacity, UpdateFrameStats);
             }
             else
             {
-                storyboard.Draw(drawContext, camera, bounds, opacity);
+                project.Draw(drawContext, camera, bounds, opacity, UpdateFrameStats);
                 DrawState.Prepare(drawContext.Get<LineRenderer>(), camera, linesRenderStates)
                     .DrawSquare(new Vector3(bounds.Left, bounds.Top, 0), new Vector3(bounds.Right, bounds.Bottom, 0), Color4.Black);
             }

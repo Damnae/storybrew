@@ -180,10 +180,10 @@ namespace StorybrewEditor.Storyboarding
         public int GetCommandCost(double time)
             => layers.Sum(l => l.GetCommandCost(time));
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity)
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, FrameStats frameStats)
         {
             foreach (var layer in Layers)
-                layer.Draw(drawContext, camera, bounds, opacity);
+                layer.Draw(drawContext, camera, bounds, opacity, frameStats);
         }
 
         private void layer_OnChanged(object sender, ChangedEventArgs e)

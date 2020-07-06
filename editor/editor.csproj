@@ -98,6 +98,7 @@
     <Compile Include="Storyboarding\EditorOsbSample.cs" />
     <Compile Include="Storyboarding\EventObject.cs" />
     <Compile Include="ScreenLayers\ReferencedAssemblyConfig.cs" />
+    <Compile Include="Storyboarding\FrameStats.cs" />
     <Compile Include="UserInterface\Components\SettingsMenu.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />
