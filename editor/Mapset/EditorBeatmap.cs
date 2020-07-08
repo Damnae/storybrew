@@ -156,7 +156,8 @@ namespace StorybrewEditor.Mapset
                 {
                     case "Bookmarks":
                         foreach (var bookmark in value.Split(','))
-                            beatmap.bookmarks.Add(int.Parse(bookmark));
+                            if (value.Length > 0)
+                                beatmap.bookmarks.Add(int.Parse(bookmark));
                         break;
                 }
             });
