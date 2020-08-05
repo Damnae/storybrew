@@ -45,7 +45,7 @@ namespace StorybrewCommon.Storyboarding.Display
                 findCommandIndex(command.StartTime, out int index);
                 while (index < commands.Count)
                 {
-                    if (commands[index].StartTime <= command.StartTime)
+                    if (commands[index].CompareTo(command) < 0)
                         index++;
                     else break;
                 }

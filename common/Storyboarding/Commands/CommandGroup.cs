@@ -67,6 +67,9 @@ namespace StorybrewCommon.Storyboarding.Commands
             ended = true;
         }
 
+        public int CompareTo(ICommand other)
+            => CommandComparer.CompareCommands(this, other);
+
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             if (commands.Count <= 0)

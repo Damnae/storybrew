@@ -56,6 +56,9 @@ namespace StorybrewCommon.Storyboarding.Display
             return command.ValueAtTime(repeatTime);
         }
 
+        public int CompareTo(ICommand other)
+            => CommandComparer.CompareCommands(this, other);
+
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             throw new InvalidOperationException();

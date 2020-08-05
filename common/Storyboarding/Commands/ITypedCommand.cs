@@ -1,4 +1,3 @@
-
 namespace StorybrewCommon.Storyboarding.Commands
 {
     public interface ITypedCommand<TValue> : ICommand

@@ -48,6 +48,22 @@ namespace StorybrewCommon.Storyboarding.Commands
         public abstract TValue ValueAtProgress(double progress);
         public abstract TValue Midpoint(Command<TValue> endCommand, double progress);
 
+        public bool IsFragmentable => StartTime == EndTime || Easing == OsbEasing.None;
+
+        public abstract IFragmentableCommand GetFragment(double startTime, double endTime);
+
+        public IEnumerable<int> GetNonFragmentableTimes()
+        {
+            var nonFragmentableTimes = new HashSet<int>();
+            if (!IsFragmentable)
+                nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + 1, (int)(EndTime - StartTime - 1)));
+
+            return nonFragmentableTimes;
+        }
+
+        public int CompareTo(ICommand other)
+            => CommandComparer.CompareCommands(this, other);
+
         public virtual string ToOsbString(ExportSettings exportSettings)
         {
             var startTimeString = ((int)StartTime).ToString(exportSettings.NumberFormat);
@@ -76,18 +92,5 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public override string ToString()
             => ToOsbString(ExportSettings.Default);
-
-        public bool IsFragmentable => StartTime == EndTime || Easing == OsbEasing.None;
-
-        public abstract IFragmentableCommand GetFragment(double startTime, double endTime);
-
-        public IEnumerable<int> GetNonFragmentableTimes()
-        {
-            var nonFragmentableTimes = new HashSet<int>();
-            if (!IsFragmentable)
-                nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + 1, (int)(EndTime - StartTime - 1)));
-
-            return nonFragmentableTimes;
-        }
     }
 }

@@ -1,9 +1,9 @@
-
+using System;
 using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public interface ICommand
+    public interface ICommand : IComparable<ICommand>
     {
         double StartTime { get; }
         double EndTime { get; }

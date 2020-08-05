@@ -12,6 +12,9 @@ namespace StorybrewCommon.Storyboarding.Display
         public bool Active => true;
         public int Cost => throw new InvalidOperationException();
 
+        public int CompareTo(ICommand other)
+            => CommandComparer.CompareCommands(this, other);
+
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             throw new InvalidOperationException();
