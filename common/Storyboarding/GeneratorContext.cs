@@ -7,6 +7,7 @@ namespace StorybrewCommon.Storyboarding
     public abstract class GeneratorContext : MarshalByRefObject
     {
         public abstract string ProjectPath { get; }
+        public abstract string ProjectAssetPath { get; }
         public abstract string MapsetPath { get; }
 
         public abstract void AddDependency(string path);

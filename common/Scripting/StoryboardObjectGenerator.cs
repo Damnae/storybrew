@@ -69,23 +69,31 @@ namespace StorybrewCommon.Scripting
         /// Do not call Dispose, it will be disposed automatically when the script ends.
         /// </summary>
         public Bitmap GetProjectBitmap(string path, bool watch = true)
-            => getBitmap(Path.Combine(context.ProjectPath, path), watch);
+            => getBitmap(Path.Combine(context.ProjectPath, path), null, watch);
 
         /// <summary>
         /// Returns a Bitmap from the mapset's directory.
         /// Do not call Dispose, it will be disposed automatically when the script ends.
         /// </summary>
         public Bitmap GetMapsetBitmap(string path, bool watch = true)
-            => getBitmap(Path.Combine(context.MapsetPath, path), watch);
+            => getBitmap(Path.Combine(context.MapsetPath, path), Path.Combine(context.ProjectAssetPath, path), watch);
 
-        private Bitmap getBitmap(string path, bool watch)
+        private Bitmap getBitmap(string path, string alternatePath, bool watch)
         {
             path = Path.GetFullPath(path);
 
             if (!bitmaps.TryGetValue(path, out Bitmap bitmap))
             {
                 if (watch) context.AddDependency(path);
-                bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
+                
+                if (alternatePath != null && !File.Exists(path))
+                {
+                    alternatePath = Path.GetFullPath(alternatePath);
+                    if (watch) context.AddDependency(alternatePath);
+
+                    bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(alternatePath)));
+                }
+                else bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
             }
             return bitmap;
         }

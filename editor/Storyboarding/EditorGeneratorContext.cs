@@ -12,13 +12,16 @@ namespace StorybrewEditor.Storyboarding
 {
     public class EditorGeneratorContext : GeneratorContext
     {
-        private Effect effect;
-        private MultiFileWatcher watcher;
+        private readonly Effect effect;
+        private readonly MultiFileWatcher watcher;
 
-        private string projectPath;
+        private readonly string projectPath;
         public override string ProjectPath => projectPath;
 
-        private string mapsetPath;
+        private readonly string projectAssetPath;
+        public override string ProjectAssetPath => projectAssetPath;
+
+        private readonly string mapsetPath;
         public override string MapsetPath
         {
             get
@@ -30,37 +33,37 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        private EditorBeatmap beatmap;
+        private readonly EditorBeatmap beatmap;
         public override Beatmap Beatmap
         {
             get
             {
-                beatmapDependent = true;
+                BeatmapDependent = true;
                 return beatmap;
             }
         }
 
-        private IEnumerable<EditorBeatmap> beatmaps;
+        private readonly IEnumerable<EditorBeatmap> beatmaps;
         public override IEnumerable<Beatmap> Beatmaps
         {
             get
             {
-                beatmapDependent = true;
+                BeatmapDependent = true;
                 return beatmaps;
             }
         }
 
-        private bool beatmapDependent;
-        public bool BeatmapDependent => beatmapDependent;
+        public bool BeatmapDependent { get; private set; }
 
-        private StringBuilder log = new StringBuilder();
+        private readonly StringBuilder log = new StringBuilder();
         public string Log => log.ToString();
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
-        public EditorGeneratorContext(Effect effect, string projectPath, string mapsetPath, EditorBeatmap beatmap, IEnumerable<EditorBeatmap> beatmaps, MultiFileWatcher watcher)
+        public EditorGeneratorContext(Effect effect, string projectPath, string projectAssetPath, string mapsetPath, EditorBeatmap beatmap, IEnumerable<EditorBeatmap> beatmaps, MultiFileWatcher watcher)
         {
             this.projectPath = projectPath;
+            this.projectAssetPath = projectAssetPath;
             this.mapsetPath = mapsetPath;
             this.effect = effect;
             this.beatmap = beatmap;

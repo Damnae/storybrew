@@ -42,11 +42,16 @@ namespace StorybrewEditor.Storyboarding
             if (sprite.FlipHAt(time)) scale.X = -scale.X;
             if (sprite.FlipVAt(time)) scale.Y = -scale.Y;
 
-            var fullPath = Path.Combine(project.MapsetPath, sprite.GetTexturePathAt(time));
             Texture2dRegion texture = null;
+            var fullPath = Path.Combine(project.MapsetPath, sprite.GetTexturePathAt(time));
             try
             {
                 texture = project.TextureContainer.Get(fullPath);
+                if (texture == null)
+                {
+                    fullPath = Path.Combine(project.ProjectAssetFolderPath, sprite.GetTexturePathAt(time));
+                    texture = project.TextureContainer.Get(fullPath);
+                }
             }
             catch (IOException)
             {

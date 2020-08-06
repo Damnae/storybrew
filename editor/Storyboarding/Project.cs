@@ -36,17 +36,13 @@ namespace StorybrewEditor.Storyboarding
 
         private ScriptManager<StoryboardObjectGenerator> scriptManager;
 
-        private string projectPath;
+        private readonly string projectPath;
         public string ProjectFolderPath => Path.GetDirectoryName(projectPath);
+        public string ProjectAssetFolderPath => Path.Combine(ProjectFolderPath, "assetlibrary");
 
-        private string scriptsSourcePath;
-        public string ScriptsPath => scriptsSourcePath;
-
-        private string commonScriptsSourcePath;
-        public string CommonScriptsPath => commonScriptsSourcePath;
-
-        private string scriptsLibraryPath;
-        public string ScriptsLibraryPath => scriptsLibraryPath;
+        public string ScriptsPath { get; }
+        public string CommonScriptsPath { get; }
+        public string ScriptsLibraryPath { get; }
 
         public string AudioPath
         {
@@ -55,7 +51,7 @@ namespace StorybrewEditor.Storyboarding
                 if (!Directory.Exists(MapsetPath))
                     return null;
 
-                foreach (var beatmap in mapsetManager.Beatmaps)
+                foreach (var beatmap in MapsetManager.Beatmaps)
                 {
                     if (beatmap.AudioFilename == null)
                         continue;
@@ -98,8 +94,7 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        private LayerManager layerManager = new LayerManager();
-        public LayerManager LayerManager => layerManager;
+        public LayerManager LayerManager { get; } = new LayerManager();
 
         public Project(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
         {
@@ -108,22 +103,22 @@ namespace StorybrewEditor.Storyboarding
             reloadTextures();
             reloadAudio();
 
-            scriptsSourcePath = Path.GetDirectoryName(projectPath);
+            ScriptsPath = Path.GetDirectoryName(projectPath);
             if (withCommonScripts)
             {
-                commonScriptsSourcePath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
-                if (!Directory.Exists(commonScriptsSourcePath))
+                CommonScriptsPath = Path.GetFullPath(Path.Combine("..", "..", "..", "scripts"));
+                if (!Directory.Exists(CommonScriptsPath))
                 {
-                    commonScriptsSourcePath = Path.GetFullPath("scripts");
-                    if (!Directory.Exists(commonScriptsSourcePath))
-                        Directory.CreateDirectory(commonScriptsSourcePath);
+                    CommonScriptsPath = Path.GetFullPath("scripts");
+                    if (!Directory.Exists(CommonScriptsPath))
+                        Directory.CreateDirectory(CommonScriptsPath);
                 }
             }
-            scriptsLibraryPath = Path.Combine(scriptsSourcePath, "scriptslibrary");
-            if (!Directory.Exists(scriptsLibraryPath))
-                Directory.CreateDirectory(scriptsLibraryPath);
+            ScriptsLibraryPath = Path.Combine(ScriptsPath, "scriptslibrary");
+            if (!Directory.Exists(ScriptsLibraryPath))
+                Directory.CreateDirectory(ScriptsLibraryPath);
 
-            Trace.WriteLine($"Scripts path - project:{scriptsSourcePath}, common:{commonScriptsSourcePath}, library:{scriptsLibraryPath}");
+            Trace.WriteLine($"Scripts path - project:{ScriptsPath}, common:{CommonScriptsPath}, library:{ScriptsLibraryPath}");
 
             var compiledScriptsPath = Path.GetFullPath("cache/scripts");
             if (!Directory.Exists(compiledScriptsPath))
@@ -134,11 +129,13 @@ namespace StorybrewEditor.Storyboarding
                 cleanupFolder(compiledScriptsPath, "*.pdb");
             }
 
-            scriptManager = new ScriptManager<StoryboardObjectGenerator>(resourceContainer, "StorybrewScripts", scriptsSourcePath, commonScriptsSourcePath, scriptsLibraryPath, compiledScriptsPath, ReferencedAssemblies);
+            initializeAssetWatcher();
+
+            scriptManager = new ScriptManager<StoryboardObjectGenerator>(resourceContainer, "StorybrewScripts", ScriptsPath, CommonScriptsPath, ScriptsLibraryPath, compiledScriptsPath, ReferencedAssemblies);
             effectUpdateQueue.OnActionFailed += (effect, e) => Trace.WriteLine($"Action failed for '{effect}': {e.Message}");
 
-            layerManager.OnLayersChanged +=
-                (sender, e) => changed = true;
+            LayerManager.OnLayersChanged +=
+                (sender, e) => Changed = true;
 
             OnMainBeatmapChanged += (sender, e) =>
             {
@@ -155,17 +152,14 @@ namespace StorybrewEditor.Storyboarding
         public double DisplayTime;
         public float DimFactor;
 
-        private TextureContainer textureContainer;
-        public TextureContainer TextureContainer => textureContainer;
-
-        private AudioSampleContainer audioContainer;
-        public AudioSampleContainer AudioContainer => audioContainer;
+        public TextureContainer TextureContainer { get; private set; }
+        public AudioSampleContainer AudioContainer { get; private set; }
 
         public FrameStats FrameStats { get; private set; } = new FrameStats();
 
         public void TriggerEvents(double startTime, double endTime)
         {
-            layerManager.TriggerEvents(startTime, endTime);
+            LayerManager.TriggerEvents(startTime, endTime);
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, bool updateFrameStats)
@@ -173,32 +167,31 @@ namespace StorybrewEditor.Storyboarding
             effectUpdateQueue.Enabled = true;
 
             var newFrameStats = updateFrameStats ? new FrameStats() : null;
-            layerManager.Draw(drawContext, camera, bounds, opacity, newFrameStats);
+            LayerManager.Draw(drawContext, camera, bounds, opacity, newFrameStats);
             FrameStats = newFrameStats ?? FrameStats;
         }
 
         private void reloadTextures()
         {
-            textureContainer?.Dispose();
-            textureContainer = new TextureContainerSeparate(null, TextureOptions.Default);
+            TextureContainer?.Dispose();
+            TextureContainer = new TextureContainerSeparate(null, TextureOptions.Default);
         }
 
         private void reloadAudio()
         {
-            audioContainer?.Dispose();
-            audioContainer = new AudioSampleContainer(Program.AudioManager, null);
+            AudioContainer?.Dispose();
+            AudioContainer = new AudioSampleContainer(Program.AudioManager, null);
         }
 
         #endregion
 
         #region Effects
 
-        private List<Effect> effects = new List<Effect>();
+        private readonly List<Effect> effects = new List<Effect>();
         public IEnumerable<Effect> Effects => effects;
         public event EventHandler OnEffectsChanged;
 
-        private EffectStatus effectsStatus = EffectStatus.Initializing;
-        public EffectStatus EffectsStatus => effectsStatus;
+        public EffectStatus EffectsStatus { get; private set; } = EffectStatus.Initializing;
         public event EventHandler OnEffectsStatusChanged;
 
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
@@ -223,7 +216,7 @@ namespace StorybrewEditor.Storyboarding
             var effect = new ScriptedEffect(this, scriptManager.Get(effectName));
 
             effects.Add(effect);
-            changed = true;
+            Changed = true;
 
             effect.OnChanged += effect_OnChanged;
             refreshEffectsStatus();
@@ -239,7 +232,7 @@ namespace StorybrewEditor.Storyboarding
 
             effects.Remove(effect);
             effect.Dispose();
-            changed = true;
+            Changed = true;
 
             refreshEffectsStatus();
 
@@ -259,12 +252,12 @@ namespace StorybrewEditor.Storyboarding
         private void effect_OnChanged(object sender, EventArgs e)
         {
             refreshEffectsStatus();
-            changed = true;
+            Changed = true;
         }
 
         private void refreshEffectsStatus()
         {
-            var previousStatus = effectsStatus;
+            var previousStatus = EffectsStatus;
             var pendingTasks = effectUpdateQueue.TaskCount;
             var isUpdating = pendingTasks > 0;
             var hasError = false;
@@ -291,9 +284,9 @@ namespace StorybrewEditor.Storyboarding
                         break;
                 }
             }
-            effectsStatus = hasError ? EffectStatus.ExecutionFailed :
+            EffectsStatus = hasError ? EffectStatus.ExecutionFailed :
                 isUpdating ? EffectStatus.Updating : EffectStatus.Ready;
-            if (effectsStatus != previousStatus)
+            if (EffectsStatus != previousStatus)
                 OnEffectsStatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -309,7 +302,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mapsetPath == value) return;
                 mapsetPath = value;
-                changed = true;
+                Changed = true;
 
                 OnMapsetPathChanged?.Invoke(this, EventArgs.Empty);
                 refreshMapset();
@@ -318,8 +311,7 @@ namespace StorybrewEditor.Storyboarding
 
         public event EventHandler OnMapsetPathChanged;
 
-        private MapsetManager mapsetManager;
-        public MapsetManager MapsetManager => mapsetManager;
+        public MapsetManager MapsetManager { get; private set; }
 
         private EditorBeatmap mainBeatmap;
         public EditorBeatmap MainBeatmap
@@ -335,7 +327,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mainBeatmap == value) return;
                 mainBeatmap = value;
-                changed = true;
+                Changed = true;
 
                 OnMainBeatmapChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -346,7 +338,7 @@ namespace StorybrewEditor.Storyboarding
         public void SwitchMainBeatmap()
         {
             var takeNextBeatmap = false;
-            foreach (var beatmap in mapsetManager.Beatmaps)
+            foreach (var beatmap in MapsetManager.Beatmaps)
             {
                 if (takeNextBeatmap)
                 {
@@ -356,7 +348,7 @@ namespace StorybrewEditor.Storyboarding
                 else if (beatmap == mainBeatmap)
                     takeNextBeatmap = true;
             }
-            foreach (var beatmap in mapsetManager.Beatmaps)
+            foreach (var beatmap in MapsetManager.Beatmaps)
             {
                 MainBeatmap = beatmap;
                 return;
@@ -380,10 +372,10 @@ namespace StorybrewEditor.Storyboarding
             var previousBeatmapName = mainBeatmap?.Name;
 
             mainBeatmap = null;
-            mapsetManager?.Dispose();
+            MapsetManager?.Dispose();
 
-            mapsetManager = new MapsetManager(mapsetPath, mapsetManager != null);
-            mapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
+            MapsetManager = new MapsetManager(mapsetPath, MapsetManager != null);
+            MapsetManager.OnFileChanged += mapsetManager_OnFileChanged;
 
             if (previousBeatmapName != null)
                 SelectBeatmap(previousBeatmapId, previousBeatmapName);
@@ -398,6 +390,31 @@ namespace StorybrewEditor.Storyboarding
                 reloadAudio();
             else if (extension == ".osu")
                 refreshMapset();
+        }
+
+        #endregion
+
+        #region Asset library folder
+
+        private FileSystemWatcher assetWatcher;
+
+        private void initializeAssetWatcher()
+        {
+            var assetsFolderPath = Path.GetFullPath(ProjectAssetFolderPath);
+            if (!Directory.Exists(assetsFolderPath))
+                Directory.CreateDirectory(assetsFolderPath);
+
+            assetWatcher = new FileSystemWatcher()
+            {
+                Path = assetsFolderPath,
+                IncludeSubdirectories = true,
+            };
+            assetWatcher.Created += mapsetManager_OnFileChanged;
+            assetWatcher.Changed += mapsetManager_OnFileChanged;
+            assetWatcher.Renamed += mapsetManager_OnFileChanged;
+            assetWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (assets): {e.GetException()}");
+            assetWatcher.EnableRaisingEvents = true;
+            Trace.WriteLine($"Watching (assets): {assetsFolderPath}");
         }
 
         #endregion
@@ -436,8 +453,7 @@ namespace StorybrewEditor.Storyboarding
 
         public const int Version = 6;
 
-        private bool changed;
-        public bool Changed => changed;
+        public bool Changed { get; private set; }
 
         private bool ownsOsb;
         public bool OwnsOsb
@@ -447,7 +463,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (ownsOsb == value) return;
                 ownsOsb = value;
-                changed = true;
+                Changed = true;
             }
         }
 
@@ -512,8 +528,8 @@ namespace StorybrewEditor.Storyboarding
                     }
                 }
 
-                w.Write(layerManager.LayersCount);
-                foreach (var layer in layerManager.Layers)
+                w.Write(LayerManager.LayersCount);
+                foreach (var layer in LayerManager.Layers)
                 {
                     w.Write(layer.Guid.ToByteArray());
                     w.Write(layer.Identifier);
@@ -528,7 +544,7 @@ namespace StorybrewEditor.Storyboarding
                     w.Write(assembly);
 
                 stream.Commit();
-                changed = false;
+                Changed = false;
             }
         }
 
@@ -651,7 +667,7 @@ namespace StorybrewEditor.Storyboarding
                         { "BeatmapId", MainBeatmap.Id },
                         { "BeatmapName", MainBeatmap.Name },
                         { "Assemblies", importedAssemblies },
-                        { "Layers", layerManager.Layers.Select(l => l.Guid.ToString("N")) },
+                        { "Layers", LayerManager.Layers.Select(l => l.Guid.ToString("N")) },
                     };
 
                     var indexPath = directoryWriter.GetPath("index.yaml");
@@ -708,7 +724,7 @@ namespace StorybrewEditor.Storyboarding
                     var layersRoot = new TinyObject();
                     effectRoot.Add("Layers", layersRoot);
 
-                    foreach (var layer in layerManager.Layers.Where(l => l.Effect == effect))
+                    foreach (var layer in LayerManager.Layers.Where(l => l.Effect == effect))
                     {
                         var layerRoot = new TinyObject
                         {
@@ -725,7 +741,7 @@ namespace StorybrewEditor.Storyboarding
                 }
 
                 directoryWriter.Commit();
-                changed = false;
+                Changed = false;
             }
         }
 
@@ -878,7 +894,7 @@ namespace StorybrewEditor.Storyboarding
                     File.Copy(osbPath, $"{osbPath}.bak");
                 OwnsOsb = true;
 
-                localLayers = new List<EditorStoryboardLayer>(layerManager.FindLayers(l => l.Visible));
+                localLayers = new List<EditorStoryboardLayer>(LayerManager.FindLayers(l => l.Visible));
             });
 
             var exportSettings = new ExportSettings();
@@ -993,16 +1009,18 @@ namespace StorybrewEditor.Storyboarding
                     // Always dispose this first to ensure updates aren't happening while the project is being disposed
                     effectUpdateQueue.Dispose();
 
-                    mapsetManager?.Dispose();
+                    assetWatcher.Dispose();
+                    MapsetManager?.Dispose();
                     scriptManager.Dispose();
-                    textureContainer.Dispose();
-                    audioContainer.Dispose();
+                    TextureContainer.Dispose();
+                    AudioContainer.Dispose();
                 }
-                mapsetManager = null;
+                assetWatcher = null;
+                MapsetManager = null;
                 effectUpdateQueue = null;
                 scriptManager = null;
-                textureContainer = null;
-                audioContainer = null;
+                TextureContainer = null;
+                AudioContainer = null;
                 disposedValue = true;
             }
         }

@@ -13,11 +13,16 @@ namespace StorybrewEditor.Storyboarding
             if (EventTime + 1 < currentTime)
                 return;
 
+            AudioSample sample;
             var fullPath = Path.Combine(project.MapsetPath, AudioPath);
-            AudioSample sample = null;
             try
             {
                 sample = project.AudioContainer.Get(fullPath);
+                if (sample == null)
+                {
+                    fullPath = Path.Combine(project.ProjectAssetFolderPath, AudioPath);
+                    sample = project.AudioContainer.Get(fullPath);
+                }
             }
             catch (IOException)
             {
