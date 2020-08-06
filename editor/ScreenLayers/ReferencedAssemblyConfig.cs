@@ -20,8 +20,8 @@ namespace StorybrewEditor.ScreenLayers
 
         public override bool IsPopup => true;
 
-        private Project project;
-        private List<string> selectedAssemblies;
+        private readonly Project project;
+        private readonly List<string> selectedAssemblies;
 
         public ReferencedAssemblyConfig(Project project)
         {

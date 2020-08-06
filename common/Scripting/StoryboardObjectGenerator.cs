@@ -20,8 +20,7 @@ namespace StorybrewCommon.Scripting
 {
     public abstract class StoryboardObjectGenerator : Script
     {
-        private static StoryboardObjectGenerator current;
-        public static StoryboardObjectGenerator Current => current;
+        public static StoryboardObjectGenerator Current { get; private set; }
 
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
@@ -62,7 +61,7 @@ namespace StorybrewCommon.Scripting
 
         #region File loading
 
-        private Dictionary<string, Bitmap> bitmaps = new Dictionary<string, Bitmap>();
+        private readonly Dictionary<string, Bitmap> bitmaps = new Dictionary<string, Bitmap>();
 
         /// <summary>
         /// Returns a Bitmap from the project's directory.
@@ -179,12 +178,12 @@ namespace StorybrewCommon.Scripting
 
         #region Subtitles
 
-        private SrtParser srtParser = new SrtParser();
-        private AssParser assParser = new AssParser();
-        private SbvParser sbvParser = new SbvParser();
+        private readonly SrtParser srtParser = new SrtParser();
+        private readonly AssParser assParser = new AssParser();
+        private readonly SbvParser sbvParser = new SbvParser();
 
-        private HashSet<string> fontDirectories = new HashSet<string>();
-        private List<FontGenerator> fontGenerators = new List<FontGenerator>();
+        private readonly HashSet<string> fontDirectories = new HashSet<string>();
+        private readonly List<FontGenerator> fontGenerators = new List<FontGenerator>();
 
         private string fontCacheDirectory => Path.Combine(context.ProjectPath, ".cache", "font");
 
@@ -364,14 +363,14 @@ namespace StorybrewCommon.Scripting
 
         public void Generate(GeneratorContext context)
         {
-            if (current != null) throw new InvalidOperationException("A script is already running in this domain");
+            if (Current != null) throw new InvalidOperationException("A script is already running in this domain");
             try
             {
                 this.context = context;
 
                 random = new Random(RandomSeed);
 
-                current = this;
+                Current = this;
                 Generate();
 
                 saveFontCache();
@@ -379,7 +378,7 @@ namespace StorybrewCommon.Scripting
             finally
             {
                 this.context = null;
-                current = null;
+                Current = null;
 
                 foreach (var bitmap in bitmaps.Values)
                     bitmap.Dispose();

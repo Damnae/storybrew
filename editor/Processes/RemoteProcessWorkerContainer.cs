@@ -14,8 +14,7 @@ namespace StorybrewEditor.Processes
         private IChannel channel;
         private Process process;
 
-        private RemoteProcessWorker worker;
-        public RemoteProcessWorker Worker => worker;
+        public RemoteProcessWorker Worker { get; private set; }
 
         public RemoteProcessWorkerContainer()
         {
@@ -34,7 +33,7 @@ namespace StorybrewEditor.Processes
             ChannelServices.RegisterChannel(channel, false);
 
             startProcess(identifier);
-            worker = retrieveWorker(workerUrl);
+            Worker = retrieveWorker(workerUrl);
         }
 
         private void startProcess(string identifier)
@@ -82,7 +81,7 @@ namespace StorybrewEditor.Processes
                 {
                     try
                     {
-                        worker.Dispose();
+                        Worker.Dispose();
                     }
                     catch (Exception e)
                     {
@@ -92,7 +91,7 @@ namespace StorybrewEditor.Processes
                         process.Kill();
                     ChannelServices.UnregisterChannel(channel);
                 }
-                worker = null;
+                Worker = null;
                 process = null;
                 channel = null;
                 disposedValue = true;

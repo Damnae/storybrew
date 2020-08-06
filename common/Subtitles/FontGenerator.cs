@@ -76,7 +76,7 @@ namespace StorybrewCommon.Subtitles
         private readonly string projectDirectory;
         private readonly string mapsetDirectory;
 
-        private Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
+        private readonly Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
 
         internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string mapsetDirectory)
         {

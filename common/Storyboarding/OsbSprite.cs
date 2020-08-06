@@ -15,7 +15,7 @@ namespace StorybrewCommon.Storyboarding
     {
         public static readonly Vector2 DefaultPosition = new Vector2(320, 240);
 
-        private List<ICommand> commands = new List<ICommand>();
+        private readonly List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
 
         /// <summary>
@@ -261,19 +261,19 @@ namespace StorybrewCommon.Storyboarding
 
         #region Display 
 
-        private List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>> displayValueBuilders = new List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>>();
+        private readonly List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>> displayValueBuilders = new List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>>();
 
-        private AnimatedValue<CommandPosition> moveTimeline = new AnimatedValue<CommandPosition>();
-        private AnimatedValue<CommandDecimal> moveXTimeline = new AnimatedValue<CommandDecimal>();
-        private AnimatedValue<CommandDecimal> moveYTimeline = new AnimatedValue<CommandDecimal>();
-        private AnimatedValue<CommandDecimal> scaleTimeline = new AnimatedValue<CommandDecimal>(1);
-        private AnimatedValue<CommandScale> scaleVecTimeline = new AnimatedValue<CommandScale>(Vector2.One);
-        private AnimatedValue<CommandDecimal> rotateTimeline = new AnimatedValue<CommandDecimal>();
-        private AnimatedValue<CommandDecimal> fadeTimeline = new AnimatedValue<CommandDecimal>(1);
-        private AnimatedValue<CommandColor> colorTimeline = new AnimatedValue<CommandColor>(CommandColor.FromRgb(255, 255, 255));
-        private AnimatedValue<CommandParameter> additiveTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
-        private AnimatedValue<CommandParameter> flipHTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
-        private AnimatedValue<CommandParameter> flipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        private readonly AnimatedValue<CommandPosition> moveTimeline = new AnimatedValue<CommandPosition>();
+        private readonly AnimatedValue<CommandDecimal> moveXTimeline = new AnimatedValue<CommandDecimal>();
+        private readonly AnimatedValue<CommandDecimal> moveYTimeline = new AnimatedValue<CommandDecimal>();
+        private readonly AnimatedValue<CommandDecimal> scaleTimeline = new AnimatedValue<CommandDecimal>(1);
+        private readonly AnimatedValue<CommandScale> scaleVecTimeline = new AnimatedValue<CommandScale>(Vector2.One);
+        private readonly AnimatedValue<CommandDecimal> rotateTimeline = new AnimatedValue<CommandDecimal>();
+        private readonly AnimatedValue<CommandDecimal> fadeTimeline = new AnimatedValue<CommandDecimal>(1);
+        private readonly AnimatedValue<CommandColor> colorTimeline = new AnimatedValue<CommandColor>(CommandColor.FromRgb(255, 255, 255));
+        private readonly AnimatedValue<CommandParameter> additiveTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        private readonly AnimatedValue<CommandParameter> flipHTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
+        private readonly AnimatedValue<CommandParameter> flipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None, true);
 
         public CommandPosition PositionAt(double time) => moveTimeline.HasCommands ? moveTimeline.ValueAtTime(time) : new CommandPosition(moveXTimeline.ValueAtTime(time), moveYTimeline.ValueAtTime(time));
         public CommandScale ScaleAt(double time) => scaleVecTimeline.HasCommands ? scaleVecTimeline.ValueAtTime(time) : new CommandScale(scaleTimeline.ValueAtTime(time));

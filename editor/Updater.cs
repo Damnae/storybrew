@@ -9,14 +9,14 @@ namespace StorybrewEditor
 {
     public static class Updater
     {
-        private static string[] ignoredPaths = { ".vscode/", "cache/", "logs/", "settings.cfg" };
-        private static string[] readOnlyPaths = { "scripts/" };
+        private static readonly string[] ignoredPaths = { ".vscode/", "cache/", "logs/", "settings.cfg" };
+        private static readonly string[] readOnlyPaths = { "scripts/" };
 
         public const string UpdateArchivePath = "cache/net/update";
         public const string UpdateFolderPath = "cache/update";
         public const string FirstRunPath = "firstrun";
 
-        private static Version readOnlyVersion = new Version(1, 8);
+        private static readonly Version readOnlyVersion = new Version(1, 8);
 
         public static void OpenLastestReleasePage()
             => Process.Start($"https://github.com/{Program.Repository}/releases/latest");

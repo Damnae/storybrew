@@ -9,11 +9,11 @@ namespace StorybrewCommon.Mapset
     [Serializable]
     public class OsuSlider : OsuHitObject
     {
-        private List<OsuSliderNode> nodes;
+        private readonly List<OsuSliderNode> nodes;
         public IEnumerable<OsuSliderNode> Nodes => nodes;
         public int NodeCount => nodes.Count;
 
-        private List<OsuSliderControlPoint> controlPoints;
+        private readonly List<OsuSliderControlPoint> controlPoints;
         public IEnumerable<OsuSliderControlPoint> ControlPoints => controlPoints;
         public int ControlPointCount => controlPoints.Count;
 

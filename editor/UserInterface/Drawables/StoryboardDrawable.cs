@@ -13,8 +13,8 @@ namespace StorybrewEditor.UserInterface.Drawables
         public Vector2 MinSize => Vector2.Zero;
         public Vector2 PreferredSize => new Vector2(854, 480);
 
-        private Project project;
-        private RenderStates linesRenderStates = new RenderStates();
+        private readonly Project project;
+        private readonly RenderStates linesRenderStates = new RenderStates();
 
         public double Time;
         public bool Clip = true;

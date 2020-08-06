@@ -11,7 +11,7 @@ namespace StorybrewEditor.ScreenLayers
 {
     public class UpdateMenu : UiScreenLayer
     {
-        private string downloadUrl;
+        private readonly string downloadUrl;
 
         private LinearLayout mainLayout;
         private Label actionLabel;

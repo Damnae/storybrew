@@ -10,11 +10,11 @@ namespace StorybrewEditor.UserInterface
 {
     public class PathSelector : Widget
     {
-        private PathSelectorMode mode;
+        private readonly PathSelectorMode mode;
 
-        private LinearLayout layout;
-        private Textbox textbox;
-        private Button button;
+        private readonly LinearLayout layout;
+        private readonly Textbox textbox;
+        private readonly Button button;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;

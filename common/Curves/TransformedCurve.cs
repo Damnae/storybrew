@@ -6,10 +6,10 @@ namespace StorybrewCommon.Curves
     [Serializable]
     public class TransformedCurve : Curve
     {
-        private Curve curve;
+        private readonly Curve curve;
         private Vector2 offset;
-        private float scale;
-        private bool reversed;
+        private readonly float scale;
+        private readonly bool reversed;
 
         public TransformedCurve(Curve curve, Vector2 offset, float scale, bool reversed = false)
         {

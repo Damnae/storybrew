@@ -4,9 +4,9 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbAnimationPool : OsbSpritePool
     {
-        private int frameCount;
-        private double frameDelay;
-        private OsbLoopType loopType;
+        private readonly int frameCount;
+        private readonly double frameDelay;
+        private readonly OsbLoopType loopType;
 
         public OsbAnimationPool(StoryboardLayer layer, string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite = null)
             : base(layer, path, origin, finalizeSprite)

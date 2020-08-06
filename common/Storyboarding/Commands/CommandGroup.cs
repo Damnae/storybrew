@@ -14,7 +14,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public virtual bool Active => true;
         public int Cost => commands.Sum(c => c.Cost);
 
-        private List<ICommand> commands = new List<ICommand>();
+        private readonly List<ICommand> commands = new List<ICommand>();
         public IEnumerable<ICommand> Commands => commands;
 
         public double CommandsStartTime

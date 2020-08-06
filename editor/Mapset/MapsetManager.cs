@@ -8,10 +8,10 @@ namespace StorybrewEditor.Mapset
 {
     public class MapsetManager : IDisposable
     {
-        private string path;
-        private bool logLoadingExceptions;
+        private readonly string path;
+        private readonly bool logLoadingExceptions;
 
-        private List<EditorBeatmap> beatmaps = new List<EditorBeatmap>();
+        private readonly List<EditorBeatmap> beatmaps = new List<EditorBeatmap>();
         public IEnumerable<EditorBeatmap> Beatmaps => beatmaps;
         public int BeatmapCount => beatmaps.Count;
 
@@ -52,7 +52,7 @@ namespace StorybrewEditor.Mapset
         #region Events
 
         private FileSystemWatcher fileWatcher;
-        private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
+        private readonly ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
 
         public event FileSystemEventHandler OnFileChanged;
 

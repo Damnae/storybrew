@@ -8,8 +8,8 @@ namespace StorybrewCommon.Animations
     public class KeyframedValue<TValue> : MarshalByRefObject, IEnumerable<Keyframe<TValue>>
     {
         private List<Keyframe<TValue>> keyframes = new List<Keyframe<TValue>>();
-        private Func<TValue, TValue, double, TValue> interpolate;
-        private TValue defaultValue;
+        private readonly Func<TValue, TValue, double, TValue> interpolate;
+        private readonly TValue defaultValue;
 
         public double StartTime => keyframes.Count == 0 ? 0 : keyframes[0].Time;
         public double EndTime => keyframes.Count == 0 ? 0 : keyframes[keyframes.Count - 1].Time;

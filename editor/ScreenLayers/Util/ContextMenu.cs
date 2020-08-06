@@ -8,9 +8,9 @@ namespace StorybrewEditor.ScreenLayers
 {
     public class ContextMenu<T> : UiScreenLayer
     {
-        private string title;
-        private Action<T> callback;
-        private List<Option> options = new List<Option>();
+        private readonly string title;
+        private readonly Action<T> callback;
+        private readonly List<Option> options = new List<Option>();
 
         private LinearLayout mainLayout;
         private LinearLayout optionsLayout;

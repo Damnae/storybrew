@@ -10,9 +10,9 @@ namespace StorybrewCommon.Storyboarding.Display
         where TValue : CommandValue
     {
         public TValue DefaultValue;
-        private bool strict;
+        private readonly bool strict;
 
-        private List<ITypedCommand<TValue>> commands = new List<ITypedCommand<TValue>>();
+        private readonly List<ITypedCommand<TValue>> commands = new List<ITypedCommand<TValue>>();
         public IEnumerable<ITypedCommand<TValue>> Commands => commands;
         public bool HasCommands => commands.Count > 0;
 

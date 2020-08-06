@@ -7,7 +7,7 @@ namespace StorybrewCommon.Storyboarding
 {
     public class EffectConfig : MarshalByRefObject
     {
-        private Dictionary<string, ConfigField> fields = new Dictionary<string, ConfigField>();
+        private readonly Dictionary<string, ConfigField> fields = new Dictionary<string, ConfigField>();
 
         public int FieldCount => fields.Count;
         public IEnumerable<ConfigField> Fields => fields.Values;

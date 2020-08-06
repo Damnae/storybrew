@@ -14,12 +14,12 @@ namespace StorybrewEditor.UserInterface
     public class HsbColorPicker : Widget, Field
     {
         private Sprite previewSprite;
-        private LinearLayout layout;
-        private Slider hueSlider;
-        private Slider saturationSlider;
-        private Slider brightnessSlider;
-        private Slider alphaSlider;
-        private Textbox htmlTextbox;
+        private readonly LinearLayout layout;
+        private readonly Slider hueSlider;
+        private readonly Slider saturationSlider;
+        private readonly Slider brightnessSlider;
+        private readonly Slider alphaSlider;
+        private readonly Textbox htmlTextbox;
 
         public override Vector2 MinSize => new Vector2(layout.MinSize.X, layout.MinSize.Y + previewHeight);
         public override Vector2 MaxSize => Vector2.Zero;

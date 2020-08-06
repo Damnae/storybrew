@@ -10,7 +10,7 @@ namespace StorybrewEditor.UserInterface
 {
     public class Selectbox : Widget, Field
     {
-        private Button button;
+        private readonly Button button;
 
         public override Vector2 MinSize => button.MinSize;
         public override Vector2 MaxSize => button.MaxSize;

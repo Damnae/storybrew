@@ -17,9 +17,9 @@ namespace StorybrewEditor.UserInterface.Components
     {
         private const string effectConfigFormat = "storybrewEffectConfig";
 
-        private Label titleLabel;
-        private LinearLayout layout;
-        private LinearLayout configFieldsLayout;
+        private readonly Label titleLabel;
+        private readonly LinearLayout layout;
+        private readonly LinearLayout configFieldsLayout;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;

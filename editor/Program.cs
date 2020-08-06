@@ -29,11 +29,8 @@ namespace StorybrewEditor
         public static string FullName => $"{Name} {Version} ({Repository})";
         public static string DiscordUrl = $"https://discord.gg/0qfFOucX93QDNVN7";
 
-        private static AudioManager audioManager;
-        private static Settings settings;
-
-        public static AudioManager AudioManager => audioManager;
-        public static Settings Settings => settings;
+        public static AudioManager AudioManager { get; private set; }
+        public static Settings Settings { get; private set; }
 
         private static int mainThreadId;
         public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == mainThreadId;
@@ -82,20 +79,19 @@ namespace StorybrewEditor
 
         #region Editor
 
-        private static string stats;
-        public static string Stats => stats;
+        public static string Stats { get; private set; }
 
         private static void startEditor()
         {
             enableScheduling();
 
-            settings = new Settings();
+            Settings = new Settings();
             Updater.NotifyEditorRun();
 
             var displayDevice = findDisplayDevice();
 
             using (var window = createWindow(displayDevice))
-            using (audioManager = createAudioManager(window))
+            using (AudioManager = createAudioManager(window))
             using (var editor = new Editor(window))
             {
                 Trace.WriteLine($"{getOSVersion()} / {window.WindowInfo}");
@@ -111,7 +107,7 @@ namespace StorybrewEditor
                 editor.Initialize();
                 runMainLoop(window, editor, 1.0 / Settings.UpdateRate, 1.0 / (Settings.FrameRate > 0 ? Settings.FrameRate : displayDevice.RefreshRate));
 
-                settings.Save();
+                Settings.Save();
             }
         }
 
@@ -215,7 +211,7 @@ namespace StorybrewEditor
                 var currentTime = watch.Elapsed.TotalSeconds;
                 var fixedUpdates = 0;
 
-                audioManager.Update();
+                AudioManager.Update();
                 window.ProcessEvents();
 
                 while (currentTime - fixedRateTime >= fixedRateUpdateDuration && fixedUpdates < 2)
@@ -261,7 +257,7 @@ namespace StorybrewEditor
 
                 if (lastStatTime + 1 < currentTime)
                 {
-                    stats = $"fps:{1 / averageFrameTime:0}/{1 / averageActiveTime:0} (act:{averageActiveTime * 1000:0} avg:{averageFrameTime * 1000:0} hi:{longestFrameTime * 1000:0})";
+                    Stats = $"fps:{1 / averageFrameTime:0}/{1 / averageActiveTime:0} (act:{averageActiveTime * 1000:0} avg:{averageFrameTime * 1000:0} hi:{longestFrameTime * 1000:0})";
                     if (false) Debug.Print($"TexBinds - {DrawState.TextureBinds}, {editor.GetStats()}");
 
                     longestFrameTime = 0;
@@ -274,14 +270,13 @@ namespace StorybrewEditor
 
         #region Scheduling
 
-        private static bool schedulingEnabled;
-        public static bool SchedulingEnabled => schedulingEnabled;
+        public static bool SchedulingEnabled { get; private set; }
 
         private static readonly Queue<Action> scheduledActions = new Queue<Action>();
 
         public static void enableScheduling()
         {
-            schedulingEnabled = true;
+            SchedulingEnabled = true;
         }
 
         /// <summary>
@@ -290,7 +285,7 @@ namespace StorybrewEditor
         /// </summary>
         public static void Schedule(Action action)
         {
-            if (schedulingEnabled)
+            if (SchedulingEnabled)
                 lock (scheduledActions)
                     scheduledActions.Enqueue(action);
             else throw new InvalidOperationException("Scheduling isn't enabled");
@@ -379,7 +374,7 @@ namespace StorybrewEditor
         public const string DefaultLogPath = "logs";
 
         private static TraceLogger logger;
-        private static object errorHandlerLock = new object();
+        private static readonly object errorHandlerLock = new object();
         private static volatile bool insideErrorHandler;
 
         private static void setupLogging(string logsPath = null, string commonLogFilename = null, bool checkFrozen = false)
@@ -474,7 +469,7 @@ namespace StorybrewEditor
                 var answered = false;
                 var frozen = 0;
 
-                while (!schedulingEnabled)
+                while (!SchedulingEnabled)
                     Thread.Sleep(1000);
 
                 while (true)

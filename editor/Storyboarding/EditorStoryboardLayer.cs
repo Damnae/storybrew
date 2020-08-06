@@ -27,8 +27,7 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        private Effect effect;
-        public Effect Effect => effect;
+        public Effect Effect { get; }
 
         private bool visible = true;
         public bool Visible
@@ -71,8 +70,7 @@ namespace StorybrewEditor.Storyboarding
 
         public bool Highlight;
 
-        private int estimatedSize;
-        public int EstimatedSize => estimatedSize;
+        public int EstimatedSize { get; private set; }
 
         public event ChangedHandler OnChanged;
         protected void RaiseChanged(string propertyName)
@@ -80,12 +78,12 @@ namespace StorybrewEditor.Storyboarding
 
         public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
         {
-            this.effect = effect;
+            this.Effect = effect;
         }
 
-        private List<StoryboardObject> storyboardObjects = new List<StoryboardObject>();
-        private List<DisplayableObject> displayableObjects = new List<DisplayableObject>();
-        private List<EventObject> eventObjects = new List<EventObject>();
+        private readonly List<StoryboardObject> storyboardObjects = new List<StoryboardObject>();
+        private readonly List<DisplayableObject> displayableObjects = new List<DisplayableObject>();
+        private readonly List<EventObject> eventObjects = new List<EventObject>();
 
         public int GetActiveSpriteCount(double time)
             => Visible ? storyboardObjects
@@ -150,18 +148,18 @@ namespace StorybrewEditor.Storyboarding
             if (!Visible) return;
             foreach (var eventObject in eventObjects)
                 if (fromTime <= eventObject.EventTime && eventObject.EventTime < toTime)
-                    eventObject.TriggerEvent(effect.Project, toTime);
+                    eventObject.TriggerEvent(Effect.Project, toTime);
         }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, FrameStats frameStats)
         {
             if (!Visible) return;
 
-            if (Highlight || effect.Highlight)
+            if (Highlight || Effect.Highlight)
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
             foreach (var displayableObject in displayableObjects)
-                displayableObject.Draw(drawContext, camera, bounds, opacity, effect.Project, frameStats);
+                displayableObject.Draw(drawContext, camera, bounds, opacity, Effect.Project, frameStats);
         }
 
         public void CopySettings(EditorStoryboardLayer other, bool copyGuid = false)
@@ -193,7 +191,7 @@ namespace StorybrewEditor.Storyboarding
 
         private void calculateSize()
         {
-            estimatedSize = 0;
+            EstimatedSize = 0;
 
             var exportSettings = new ExportSettings
             {
@@ -205,7 +203,7 @@ namespace StorybrewEditor.Storyboarding
                     foreach (var sbo in storyboardObjects)
                         sbo.WriteOsb(writer, exportSettings, osbLayer);
 
-                estimatedSize = (int)stream.Length;
+                EstimatedSize = (int)stream.Length;
             }
         }
 

@@ -17,12 +17,11 @@ namespace StorybrewEditor.Scripting
     public class ScriptManager<TScript> : IDisposable
         where TScript : Script
     {
-        private ResourceContainer resourceContainer;
-        private string scriptsNamespace;
-        private string scriptsSourcePath;
-        private string commonScriptsPath;
-        private string scriptsLibraryPath;
-        private string compiledScriptsPath;
+        private readonly ResourceContainer resourceContainer;
+        private readonly string scriptsNamespace;
+        private readonly string commonScriptsPath;
+        private readonly string scriptsLibraryPath;
+        private readonly string compiledScriptsPath;
 
         private List<string> referencedAssemblies = new List<string>();
         public IEnumerable<string> ReferencedAssemblies
@@ -38,17 +37,17 @@ namespace StorybrewEditor.Scripting
         }
 
         private FileSystemWatcher scriptWatcher;
-        private FileSystemWatcher libraryWatcher;
+        private readonly FileSystemWatcher libraryWatcher;
         private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
         private Dictionary<string, ScriptContainer<TScript>> scriptContainers = new Dictionary<string, ScriptContainer<TScript>>();
 
-        public string ScriptsPath => scriptsSourcePath;
+        public string ScriptsPath { get; }
 
         public ScriptManager(ResourceContainer resourceContainer, string scriptsNamespace, string scriptsSourcePath, string commonScriptsPath, string scriptsLibraryPath, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
         {
             this.resourceContainer = resourceContainer;
             this.scriptsNamespace = scriptsNamespace;
-            this.scriptsSourcePath = scriptsSourcePath;
+            this.ScriptsPath = scriptsSourcePath;
             this.commonScriptsPath = commonScriptsPath;
             this.scriptsLibraryPath = scriptsLibraryPath;
             this.compiledScriptsPath = compiledScriptsPath;
@@ -92,7 +91,7 @@ namespace StorybrewEditor.Scripting
                 return scriptContainer;
 
             var scriptTypeName = $"{scriptsNamespace}.{scriptName}";
-            var sourcePath = Path.Combine(scriptsSourcePath, $"{scriptName}.cs");
+            var sourcePath = Path.Combine(ScriptsPath, $"{scriptName}.cs");
 
             if (commonScriptsPath != null && !File.Exists(sourcePath))
             {
@@ -113,7 +112,7 @@ namespace StorybrewEditor.Scripting
         public IEnumerable<string> GetScriptNames()
         {
             var projectScriptNames = new List<string>();
-            foreach (var scriptPath in Directory.GetFiles(scriptsSourcePath, "*.cs", SearchOption.TopDirectoryOnly))
+            foreach (var scriptPath in Directory.GetFiles(ScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
             {
                 var name = Path.GetFileNameWithoutExtension(scriptPath);
                 projectScriptNames.Add(name);
@@ -176,10 +175,10 @@ namespace StorybrewEditor.Scripting
         {
             Trace.WriteLine($"Updating solution files");
 
-            var slnPath = Path.Combine(scriptsSourcePath, "storyboard.sln");
+            var slnPath = Path.Combine(ScriptsPath, "storyboard.sln");
             File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative));
 
-            var csProjPath = Path.Combine(scriptsSourcePath, "scripts.csproj");
+            var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
             try
             {
@@ -189,9 +188,9 @@ namespace StorybrewEditor.Scripting
                 var xmlns = document.DocumentElement.GetAttribute("xmlns");
                 var compileGroup = document.CreateElement("ItemGroup", xmlns);
                 document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.EnumerateFiles(scriptsSourcePath, "*.cs", SearchOption.AllDirectories))
+                foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
                 {
-                    var relativePath = PathHelper.GetRelativePath(scriptsSourcePath, path);
+                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
 
                     var compileNode = document.CreateElement("Compile", xmlns);
                     compileNode.SetAttribute("Include", relativePath);
@@ -203,7 +202,7 @@ namespace StorybrewEditor.Scripting
                 var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultAssemblies.Contains(e));
                 foreach (var path in importedAssemblies)
                 {
-                    var relativePath = PathHelper.GetRelativePath(scriptsSourcePath, path);
+                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
 
                     var compileNode = document.CreateElement("Reference", xmlns);
                     compileNode.SetAttribute("Include", AssemblyName.GetAssemblyName(path).Name);

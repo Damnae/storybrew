@@ -9,8 +9,8 @@ namespace StorybrewEditor.ScreenLayers.Util
 {
     public class LoadingScreen : UiScreenLayer
     {
-        private string title;
-        private Action action;
+        private readonly string title;
+        private readonly Action action;
 
         private LinearLayout mainLayout;
 

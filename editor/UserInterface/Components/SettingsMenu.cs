@@ -9,7 +9,7 @@ namespace StorybrewEditor.UserInterface.Components
 {
     public class SettingsMenu : Widget
     {
-        private LinearLayout layout;
+        private readonly LinearLayout layout;
         private Project project;
 
         public override Vector2 MinSize => layout.MinSize;

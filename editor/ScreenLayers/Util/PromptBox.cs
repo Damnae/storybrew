@@ -6,10 +6,10 @@ namespace StorybrewEditor.ScreenLayers.Util
 {
     public class PromptBox : UiScreenLayer
     {
-        private string title;
-        private string description;
-        private string initialText;
-        private Action<string> action;
+        private readonly string title;
+        private readonly string description;
+        private readonly string initialText;
+        private readonly Action<string> action;
 
         private LinearLayout mainLayout;
         private Textbox textbox;

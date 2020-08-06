@@ -12,8 +12,8 @@ namespace StorybrewEditor
 {
     public class Builder
     {
-        private static string mainExecutablePath = "StorybrewEditor.exe";
-        private static string[] ignoredPaths = { };
+        private static readonly string mainExecutablePath = "StorybrewEditor.exe";
+        private static readonly string[] ignoredPaths = { };
 
         public static void Build()
         {
@@ -127,7 +127,7 @@ namespace StorybrewEditor
                 entryName += "_";
 
             Trace.WriteLine($"  Adding {path} -> {entryName}");
-            var entry = archive.CreateEntryFromFile(path, entryName, CompressionLevel.Optimal);
+            archive.CreateEntryFromFile(path, entryName, CompressionLevel.Optimal);
 
             var pathExtension = Path.GetExtension(path);
             if (pathExtension == ".exe" || pathExtension == ".dll")

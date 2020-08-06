@@ -23,15 +23,13 @@ namespace StorybrewEditor
 {
     public class Editor : IDisposable
     {
-        private GameWindow window;
-        public GameWindow Window => window;
+        public GameWindow Window { get; }
         public readonly FormsWindow FormsWindow;
 
-        private Clock clock = new Clock();
+        private readonly Clock clock = new Clock();
         public TimeSource TimeSource => clock;
 
-        private bool isFixedRateUpdate;
-        public bool IsFixedRateUpdate => isFixedRateUpdate;
+        public bool IsFixedRateUpdate { get; private set; }
 
         private DrawContext drawContext;
 
@@ -42,7 +40,7 @@ namespace StorybrewEditor
 
         public Editor(GameWindow window)
         {
-            this.window = window;
+            this.Window = window;
             FormsWindow = new FormsWindow(window.GetWindowHandle());
         }
 
@@ -50,7 +48,7 @@ namespace StorybrewEditor
         {
             ResourceContainer = new AssemblyResourceContainer(Assembly.GetEntryAssembly(), $"{nameof(StorybrewEditor)}.Resources", "resources");
 
-            DrawState.Initialize(ResourceContainer, window.Width, window.Height);
+            DrawState.Initialize(ResourceContainer, Window.Width, Window.Height);
             drawContext = new DrawContext();
             drawContext.Register(this, false);
             drawContext.Register<TextureContainer>(new TextureContainerAtlas(ResourceContainer), true);
@@ -80,16 +78,16 @@ namespace StorybrewEditor
             }
 
             var inputDispatcher = new InputDispatcher();
-            InputManager = new InputManager(window, inputDispatcher);
+            InputManager = new InputManager(Window, inputDispatcher);
 
-            ScreenLayerManager = new ScreenLayerManager(window, clock, this);
+            ScreenLayerManager = new ScreenLayerManager(Window, clock, this);
             inputDispatcher.Add(createOverlay(ScreenLayerManager));
             inputDispatcher.Add(ScreenLayerManager.InputHandler);
 
             Restart(initialLayer);
 
-            window.Resize += window_Resize;
-            window.Closing += window_Closing;
+            Window.Resize += window_Resize;
+            Window.Closing += window_Closing;
 
             resizeToWindow();
         }
@@ -207,8 +205,8 @@ namespace StorybrewEditor
 
         public void Dispose()
         {
-            window.Resize -= window_Resize;
-            window.Closing -= window_Closing;
+            Window.Resize -= window_Resize;
+            Window.Closing -= window_Closing;
 
             ScreenLayerManager.Dispose();
             overlay.Dispose();
@@ -224,7 +222,7 @@ namespace StorybrewEditor
 
         public void Update(double time, bool isFixedRateUpdate)
         {
-            this.isFixedRateUpdate = isFixedRateUpdate;
+            this.IsFixedRateUpdate = isFixedRateUpdate;
             clock.Current = time;
 
             updateOverlay();
@@ -257,8 +255,8 @@ namespace StorybrewEditor
 
         private void resizeToWindow()
         {
-            var width = window.Width;
-            var height = window.Height;
+            var width = Window.Width;
+            var height = Window.Height;
             if (width == 0 || height == 0) return;
 
             DrawState.Viewport = new Rectangle(0, 0, width, height);
@@ -271,12 +269,11 @@ namespace StorybrewEditor
 
     public class FormsWindow : System.Windows.Forms.IWin32Window
     {
-        private IntPtr handle;
-        public IntPtr Handle => handle;
+        public IntPtr Handle { get; }
 
         public FormsWindow(IntPtr handle)
         {
-            this.handle = handle;
+            this.Handle = handle;
         }
     }
 }

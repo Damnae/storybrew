@@ -17,10 +17,10 @@ namespace StorybrewEditor.UserInterface.Components
 {
     public class EffectList : Widget
     {
-        private LinearLayout layout;
-        private LinearLayout effectsLayout;
+        private readonly LinearLayout layout;
+        private readonly LinearLayout effectsLayout;
         private Project project;
-        private EffectConfigUi effectConfigUi;
+        private readonly EffectConfigUi effectConfigUi;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;

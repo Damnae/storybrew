@@ -211,7 +211,7 @@ namespace StorybrewEditor.Storyboarding
 
         public Effect AddEffect(string effectName)
         {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+            if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
             var effect = new ScriptedEffect(this, scriptManager.Get(effectName));
 
@@ -228,7 +228,7 @@ namespace StorybrewEditor.Storyboarding
 
         public void Remove(Effect effect)
         {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+            if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
             effects.Remove(effect);
             effect.Dispose();
@@ -421,7 +421,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Assemblies
 
-        private static List<string> defaultAssemblies = new List<string>()
+        private static readonly List<string> defaultAssemblies = new List<string>()
         {
             "System.dll",
             "System.Core.dll",
@@ -437,7 +437,7 @@ namespace StorybrewEditor.Storyboarding
             get { return importedAssemblies; }
             set
             {
-                if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+                if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
                 importedAssemblies = new List<string>(value);
                 scriptManager.ReferencedAssemblies = ReferencedAssemblies;
@@ -489,7 +489,7 @@ namespace StorybrewEditor.Storyboarding
 
         private void saveBinary(string path)
         {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+            if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
             using (var stream = new SafeWriteStream(path))
             using (var w = new BinaryWriter(stream, Encoding.UTF8))
@@ -643,7 +643,7 @@ namespace StorybrewEditor.Storyboarding
 
         private void saveText(string path)
         {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+            if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
             // Create the opener file
             if (!File.Exists(path))
@@ -881,7 +881,7 @@ namespace StorybrewEditor.Storyboarding
         /// </summary>
         public void ExportToOsb(bool exportOsb = true)
         {
-            if (disposedValue) throw new ObjectDisposedException(nameof(Project));
+            if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
             string osuPath = null, osbPath = null;
             List<EditorStoryboardLayer> localLayers = null;
@@ -997,12 +997,11 @@ namespace StorybrewEditor.Storyboarding
 
         #region IDisposable Support
 
-        public bool IsDisposed => disposedValue;
-        private bool disposedValue = false;
+        public bool IsDisposed { get; private set; } = false;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!IsDisposed)
             {
                 if (disposing)
                 {
@@ -1021,7 +1020,7 @@ namespace StorybrewEditor.Storyboarding
                 scriptManager = null;
                 TextureContainer = null;
                 AudioContainer = null;
-                disposedValue = true;
+                IsDisposed = true;
             }
         }
 

@@ -9,7 +9,7 @@ namespace StorybrewEditor.Util
     {
         private Dictionary<string, FileSystemWatcher> folderWatchers = new Dictionary<string, FileSystemWatcher>();
         private HashSet<string> watchedFilenames = new HashSet<string>();
-        private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
+        private readonly ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
 
         public IEnumerable<string> WatchedFilenames => watchedFilenames;
 

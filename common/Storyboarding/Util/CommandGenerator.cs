@@ -14,7 +14,7 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class CommandGenerator
     {
-        private List<State> states = new List<State>();
+        private readonly List<State> states = new List<State>();
 
         private readonly KeyframedValue<Vector2> positions = new KeyframedValue<Vector2>(InterpolatingFunctions.Vector2);
         private readonly KeyframedValue<Vector2> scales = new KeyframedValue<Vector2>(InterpolatingFunctions.Vector2);

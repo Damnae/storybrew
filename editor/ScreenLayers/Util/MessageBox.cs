@@ -6,13 +6,13 @@ namespace StorybrewEditor.ScreenLayers.Util
 {
     public class MessageBox : UiScreenLayer
     {
-        private string message;
+        private readonly string message;
         private LinearLayout mainLayout;
         private LinearLayout buttonsLayout;
 
-        private Action yesAction;
-        private Action noAction;
-        private bool cancelable;
+        private readonly Action yesAction;
+        private readonly Action noAction;
+        private readonly bool cancelable;
 
         public override bool IsPopup => true;
 

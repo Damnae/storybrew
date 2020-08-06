@@ -5,9 +5,9 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbSpritePools : IDisposable
     {
-        private StoryboardLayer layer;
-        private Dictionary<string, OsbSpritePool> pools = new Dictionary<string, OsbSpritePool>();
-        private Dictionary<string, OsbAnimationPool> animationPools = new Dictionary<string, OsbAnimationPool>();
+        private readonly StoryboardLayer layer;
+        private readonly Dictionary<string, OsbSpritePool> pools = new Dictionary<string, OsbSpritePool>();
+        private readonly Dictionary<string, OsbAnimationPool> animationPools = new Dictionary<string, OsbAnimationPool>();
 
         private int maxPoolDuration = 60000;
         public int MaxPoolDuration

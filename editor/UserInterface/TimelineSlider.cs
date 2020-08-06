@@ -28,18 +28,17 @@ namespace StorybrewEditor.UserInterface
         private static readonly Color4 highlightColor = new Color4(255, 0, 0, 80);
 
         private Sprite line;
-        private Label beatmapLabel;
+        private readonly Label beatmapLabel;
 
-        private Project project;
+        private readonly Project project;
         private float timeSpan;
 
         public int SnapDivisor = 4;
         public bool ShowHitObjects;
 
         private float dragStart;
-        private float repeatStart;
         private float repeatEnd;
-        public float RepeatStart => repeatStart;
+        public float RepeatStart { get; private set; }
         public float RepeatEnd => repeatEnd;
 
         private double highlightStart;
@@ -101,11 +100,11 @@ namespace StorybrewEditor.UserInterface
             var valueLength = MaxValue - MinValue;
 
             // Repeat
-            if (repeatStart != repeatEnd)
+            if (RepeatStart != repeatEnd)
             {
                 line.Color = repeatColor;
 
-                var left = timeToXTop(repeatStart);
+                var left = timeToXTop(RepeatStart);
                 var right = timeToXTop(repeatEnd);
                 if (right < left + pixelSize)
                     right = left + pixelSize;
@@ -214,9 +213,9 @@ namespace StorybrewEditor.UserInterface
                 var x = timeToXTop(Value);
                 var lineSize = new Vector2(pixelSize, bounds.Height * 0.4f);
 
-                if (repeatStart != repeatEnd)
+                if (RepeatStart != repeatEnd)
                 {
-                    drawLine(drawContext, new Vector2(timeToXTop(repeatStart) - pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(timeToXTop(RepeatStart) - pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
                     drawLine(drawContext, new Vector2(x, offset.Y), lineSize * 0.6f, Color4.White, actualOpacity);
                     drawLine(drawContext, new Vector2(timeToXTop(repeatEnd) + pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
                 }
@@ -269,7 +268,7 @@ namespace StorybrewEditor.UserInterface
             if (button != MouseButton.Right) return;
 
             dragStart = Value;
-            repeatStart = dragStart;
+            RepeatStart = dragStart;
             repeatEnd = dragStart;
         }
 
@@ -280,12 +279,12 @@ namespace StorybrewEditor.UserInterface
             var value = Value;
             if (value < dragStart)
             {
-                repeatStart = value;
+                RepeatStart = value;
                 repeatEnd = dragStart;
             }
             else
             {
-                repeatStart = dragStart;
+                RepeatStart = dragStart;
                 repeatEnd = value;
             }
         }

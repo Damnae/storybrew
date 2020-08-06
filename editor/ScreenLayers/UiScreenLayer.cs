@@ -10,8 +10,8 @@ namespace StorybrewEditor.ScreenLayers
     public class UiScreenLayer : ScreenLayer
     {
         private CameraOrtho uiCamera;
-        private WidgetManager widgetManager;
-        protected WidgetManager WidgetManager => widgetManager;
+
+        protected WidgetManager WidgetManager { get; private set; }
 
         private float opacity = 0;
 
@@ -20,7 +20,7 @@ namespace StorybrewEditor.ScreenLayers
             base.Load();
 
             var editor = Manager.GetContext<Editor>();
-            AddInputHandler(widgetManager = new WidgetManager(Manager, editor.InputManager, editor.Skin)
+            AddInputHandler(WidgetManager = new WidgetManager(Manager, editor.InputManager, editor.Skin)
             {
                 Camera = uiCamera = new CameraOrtho(),
             });
@@ -30,7 +30,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             uiCamera.VirtualHeight = (int)(height * Math.Max(1024f / width, 768f / height));
             uiCamera.VirtualWidth = width * uiCamera.VirtualHeight / height;
-            widgetManager.Size = new Vector2(uiCamera.VirtualWidth, uiCamera.VirtualHeight);
+            WidgetManager.Size = new Vector2(uiCamera.VirtualWidth, uiCamera.VirtualHeight);
             base.Resize(width, height);
         }
 
@@ -44,13 +44,13 @@ namespace StorybrewEditor.ScreenLayers
                 if (Math.Abs(opacity - targetOpacity) <= 0.07f) opacity = targetOpacity;
                 else opacity = MathHelper.Clamp(opacity + (opacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
             }
-            widgetManager.Opacity = opacity * (float)TransitionProgress;
+            WidgetManager.Opacity = opacity * (float)TransitionProgress;
         }
 
         public override void Draw(DrawContext drawContext, double tween)
         {
             base.Draw(drawContext, tween);
-            widgetManager.Draw(drawContext);
+            WidgetManager.Draw(drawContext);
         }
 
         protected void MakeTabs(Button[] buttons, Widget[] widgets)
@@ -81,10 +81,10 @@ namespace StorybrewEditor.ScreenLayers
             {
                 if (disposing)
                 {
-                    widgetManager.Dispose();
+                    WidgetManager.Dispose();
                     uiCamera.Dispose();
                 }
-                widgetManager = null;
+                WidgetManager = null;
                 uiCamera = null;
                 disposedValue = true;
             }

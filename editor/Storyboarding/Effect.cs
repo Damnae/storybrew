@@ -5,8 +5,7 @@ namespace StorybrewEditor.Storyboarding
 {
     public abstract class Effect : IDisposable
     {
-        private Project project;
-        public Project Project => project;
+        public Project Project { get; }
 
         public Guid Guid { get; set; } = Guid.NewGuid();
 
@@ -36,7 +35,7 @@ namespace StorybrewEditor.Storyboarding
 
         public Effect(Project project)
         {
-            this.project = project;
+            this.Project = project;
         }
 
         /// <summary>
@@ -55,18 +54,17 @@ namespace StorybrewEditor.Storyboarding
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
-        public bool IsDisposed => disposedValue;
+        public bool IsDisposed { get; private set; } = false;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!IsDisposed)
             {
                 if (disposing)
                 {
                 }
                 OnChanged = null;
-                disposedValue = true;
+                IsDisposed = true;
             }
         }
 

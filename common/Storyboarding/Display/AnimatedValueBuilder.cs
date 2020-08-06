@@ -7,7 +7,7 @@ namespace StorybrewCommon.Storyboarding.Display
     public class AnimatedValueBuilder<TValue> : IAnimatedValueBuilder
         where TValue : CommandValue
     {
-        private AnimatedValue<TValue> value;
+        private readonly AnimatedValue<TValue> value;
         private CompositeCommand<TValue> composite;
         private Func<ITypedCommand<TValue>, ITypedCommand<TValue>> decorate;
 

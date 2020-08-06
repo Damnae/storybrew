@@ -5,12 +5,11 @@ namespace StorybrewCommon.Storyboarding
 {
     public abstract class StoryboardLayer : MarshalByRefObject
     {
-        private string identifier;
-        public string Identifier => identifier;
+        public string Identifier { get; }
 
         public StoryboardLayer(string identifier)
         {
-            this.identifier = identifier;
+            this.Identifier = identifier;
         }
 
         public abstract OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition);

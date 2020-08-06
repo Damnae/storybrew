@@ -5,16 +5,16 @@ namespace StorybrewCommon.Util
 {
     public sealed class Pool<T> where T : class
     {
-        private Func<T> allocator;
-        private Action<T> disposer;
-        private Queue<T> queue;
+        private readonly Func<T> allocator;
+        private readonly Action<T> disposer;
+        private readonly Queue<T> queue;
 
         public readonly int PoolCapacity;
 
 #if DEBUG
         private int virtualCapacity;
-        private int optimalCapacity;
-        public int OptimalCapacity => optimalCapacity;
+
+        public int OptimalCapacity { get; private set; }
 #endif
 
         public Pool(Func<T> allocator, Action<T> disposer = null, int poolCapacity = 256)
@@ -54,7 +54,7 @@ namespace StorybrewCommon.Util
         {
 #if DEBUG
             ++virtualCapacity;
-            optimalCapacity = Math.Max(virtualCapacity, optimalCapacity);
+            OptimalCapacity = Math.Max(virtualCapacity, OptimalCapacity);
 #endif
             if (queue.Count > PoolCapacity)
                 return;

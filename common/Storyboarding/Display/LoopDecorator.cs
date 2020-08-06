@@ -8,14 +8,13 @@ namespace StorybrewCommon.Storyboarding.Display
     public class LoopDecorator<TValue> : ITypedCommand<TValue>
         where TValue : CommandValue
     {
-        private ITypedCommand<TValue> command;
-        private double startTime;
-        private double repeatDuration;
-        private int repeats;
+        private readonly ITypedCommand<TValue> command;
+        private readonly double repeatDuration;
+        private readonly int repeats;
 
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
-        public double StartTime => startTime;
-        public double EndTime => startTime + RepeatDuration * repeats;
+        public double StartTime { get; }
+        public double EndTime => StartTime + RepeatDuration * repeats;
         public double Duration => EndTime - StartTime;
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
@@ -27,7 +26,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public LoopDecorator(ITypedCommand<TValue> command, double startTime, double repeatDuration, int repeats)
         {
             this.command = command;
-            this.startTime = startTime;
+            this.StartTime = startTime;
             this.repeatDuration = repeatDuration;
             this.repeats = repeats;
         }

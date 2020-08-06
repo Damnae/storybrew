@@ -10,8 +10,8 @@ namespace StorybrewEditor.UserInterface.Components
 {
     public class LayerList : Widget
     {
-        private LinearLayout layout;
-        private LinearLayout layersLayout;
+        private readonly LinearLayout layout;
+        private readonly LinearLayout layersLayout;
         private LayerManager layerManager;
 
         public override Vector2 MinSize => layout.MinSize;

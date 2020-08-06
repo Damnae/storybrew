@@ -7,9 +7,9 @@ namespace StorybrewEditor.UserInterface
 {
     public class Vector2Picker : Widget, Field
     {
-        private LinearLayout layout;
-        private Textbox xTextbox;
-        private Textbox yTextbox;
+        private readonly LinearLayout layout;
+        private readonly Textbox xTextbox;
+        private readonly Textbox yTextbox;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => Vector2.Zero;

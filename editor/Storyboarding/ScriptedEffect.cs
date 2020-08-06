@@ -12,10 +12,10 @@ namespace StorybrewEditor.Storyboarding
 {
     public class ScriptedEffect : Effect
     {
-        private ScriptContainer<StoryboardObjectGenerator> scriptContainer;
+        private readonly ScriptContainer<StoryboardObjectGenerator> scriptContainer;
         private List<EditorStoryboardLayer> layers;
         private EditorStoryboardLayer placeHolderLayer;
-        private Stopwatch statusStopwatch = new Stopwatch();
+        private readonly Stopwatch statusStopwatch = new Stopwatch();
         private string configScriptIdentifier;
         private MultiFileWatcher dependencyWatcher;
 
@@ -56,8 +56,10 @@ namespace StorybrewEditor.Storyboarding
             this.scriptContainer = scriptContainer;
             name = project.GetUniqueEffectName(BaseName);
 
-            layers = new List<EditorStoryboardLayer>();
-            layers.Add(placeHolderLayer = new EditorStoryboardLayer(string.Empty, this));
+            layers = new List<EditorStoryboardLayer>
+            {
+                (placeHolderLayer = new EditorStoryboardLayer(string.Empty, this))
+            };
             refreshLayerNames();
 
             Project.LayerManager.Add(placeHolderLayer);
@@ -141,7 +143,7 @@ namespace StorybrewEditor.Storyboarding
             }
             catch (ScriptLoadingException e)
             {
-                Debug.Print($"Script load failed for {BaseName}\n{e.ToString()}");
+                Debug.Print($"Script load failed for {BaseName}\n{e}");
                 changeStatus(EffectStatus.LoadingFailed, e.InnerException != null ? $"{e.Message}: {e.InnerException.Message}" : e.Message, context.Log);
                 return;
             }
@@ -251,9 +253,9 @@ namespace StorybrewEditor.Storyboarding
         private string getExecutionFailedMessage(Exception e)
         {
             if (e is FileNotFoundException)
-                return $"File not found while {status}. Make sure this path is correct:\n{(e as FileNotFoundException).FileName}\n\nDetails:\n{e.ToString()}";
+                return $"File not found while {status}. Make sure this path is correct:\n{(e as FileNotFoundException).FileName}\n\nDetails:\n{e}";
 
-            return $"Unexpected error during {status}:\n{e.ToString()}";
+            return $"Unexpected error during {status}:\n{e}";
         }
 
         #region IDisposable Support

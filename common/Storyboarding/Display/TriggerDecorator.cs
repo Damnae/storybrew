@@ -8,9 +8,8 @@ namespace StorybrewCommon.Storyboarding.Display
     public class TriggerDecorator<TValue> : ITypedCommand<TValue>
         where TValue : CommandValue
     {
-        private ITypedCommand<TValue> command;
+        private readonly ITypedCommand<TValue> command;
         private double triggerTime;
-        private bool triggered;
 
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
         public double StartTime => triggerTime + command.StartTime;
@@ -18,7 +17,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue StartValue => command.StartValue;
         public TValue EndValue => command.EndValue;
         public double Duration => EndTime - StartTime;
-        public bool Active => triggered;
+        public bool Active { get; private set; }
         public int Cost => throw new InvalidOperationException();
 
         public event EventHandler OnStateChanged;
@@ -30,24 +29,24 @@ namespace StorybrewCommon.Storyboarding.Display
 
         public void Trigger(double time)
         {
-            if (triggered) return;
+            if (Active) return;
 
-            triggered = true;
+            Active = true;
             triggerTime = time;
             OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void UnTrigger()
         {
-            if (!triggered) return;
+            if (!Active) return;
 
-            triggered = false;
+            Active = false;
             OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public TValue ValueAtTime(double time)
         {
-            if (!triggered) throw new InvalidOperationException("Not triggered");
+            if (!Active) throw new InvalidOperationException("Not triggered");
 
             var commandTime = time - triggerTime;
             if (commandTime < command.StartTime) return command.StartValue;
@@ -63,7 +62,7 @@ namespace StorybrewCommon.Storyboarding.Display
             throw new InvalidOperationException();
         }
 
-        public override string ToString() => $"triggerable ({StartTime}s - {EndTime}s active:{triggered})";
+        public override string ToString() => $"triggerable ({StartTime}s - {EndTime}s active:{Active})";
 
     }
 }

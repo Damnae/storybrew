@@ -7,7 +7,7 @@ namespace StorybrewCommon.Curves
     [Serializable]
     public class CompositeCurve : Curve
     {
-        private List<Curve> curves;
+        private readonly List<Curve> curves;
 
         public Vector2 StartPosition => curves[0].StartPosition;
         public Vector2 EndPosition => curves[curves.Count - 1].EndPosition;

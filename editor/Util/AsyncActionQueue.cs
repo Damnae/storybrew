@@ -144,8 +144,8 @@ namespace StorybrewEditor.Util
 
         private class ActionRunner
         {
-            private ActionQueueContext context;
-            private string threadName;
+            private readonly ActionQueueContext context;
+            private readonly string threadName;
 
             private Thread thread;
 

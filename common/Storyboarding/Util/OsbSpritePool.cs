@@ -5,12 +5,12 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbSpritePool : IDisposable
     {
-        private StoryboardLayer layer;
-        private string path;
-        private OsbOrigin origin;
-        private Action<OsbSprite, double, double> finalizeSprite;
+        private readonly StoryboardLayer layer;
+        private readonly string path;
+        private readonly OsbOrigin origin;
+        private readonly Action<OsbSprite, double, double> finalizeSprite;
 
-        private List<PooledSprite> pooledSprites = new List<PooledSprite>();
+        private readonly List<PooledSprite> pooledSprites = new List<PooledSprite>();
 
         public int MaxPoolDuration = 60000;
 

@@ -13,7 +13,7 @@ namespace StorybrewCommon.Storyboarding3d
 {
     public class Object3d
     {
-        private List<Object3d> children = new List<Object3d>();
+        private readonly List<Object3d> children = new List<Object3d>();
 
         public readonly KeyframedValue<CommandColor> Coloring = new KeyframedValue<CommandColor>(InterpolatingFunctions.CommandColor, CommandColor.White);
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);

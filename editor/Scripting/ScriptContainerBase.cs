@@ -12,10 +12,9 @@ namespace StorybrewEditor.Scripting
         private static int nextId;
         public readonly int Id = nextId++;
 
-        private ScriptManager<TScript> manager;
+        private readonly ScriptManager<TScript> manager;
 
-        private string compiledScriptsPath;
-        public string CompiledScriptsPath => compiledScriptsPath;
+        public string CompiledScriptsPath { get; }
 
         private ScriptProvider<TScript> scriptProvider;
 
@@ -26,30 +25,27 @@ namespace StorybrewEditor.Scripting
         {
             get
             {
-                var name = scriptTypeName;
+                var name = ScriptTypeName;
                 if (name.Contains("."))
                     name = name.Substring(name.LastIndexOf('.') + 1);
                 return name;
             }
         }
 
-        private string scriptTypeName;
-        public string ScriptTypeName => scriptTypeName;
+        public string ScriptTypeName { get; }
 
-        private string mainSourcePath;
-        public string MainSourcePath => mainSourcePath;
+        public string MainSourcePath { get; }
 
-        private string libraryFolder;
-        public string LibraryFolder => libraryFolder;
+        public string LibraryFolder { get; }
 
         public string[] SourcePaths
         {
             get
             {
-                if (libraryFolder == null || !Directory.Exists(libraryFolder))
+                if (LibraryFolder == null || !Directory.Exists(LibraryFolder))
                     return new[] { MainSourcePath };
 
-                return Directory.GetFiles(libraryFolder, "*.cs", SearchOption.AllDirectories)
+                return Directory.GetFiles(LibraryFolder, "*.cs", SearchOption.AllDirectories)
                     .Concat(new[] { MainSourcePath }).ToArray();
             }
         }
@@ -79,10 +75,10 @@ namespace StorybrewEditor.Scripting
         public ScriptContainerBase(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
         {
             this.manager = manager;
-            this.scriptTypeName = scriptTypeName;
-            this.mainSourcePath = mainSourcePath;
-            this.libraryFolder = libraryFolder;
-            this.compiledScriptsPath = compiledScriptsPath;
+            this.ScriptTypeName = scriptTypeName;
+            this.MainSourcePath = mainSourcePath;
+            this.LibraryFolder = libraryFolder;
+            this.CompiledScriptsPath = compiledScriptsPath;
 
             ReferencedAssemblies = referencedAssemblies;
         }

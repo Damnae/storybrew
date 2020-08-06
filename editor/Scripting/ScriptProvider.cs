@@ -7,7 +7,7 @@ namespace StorybrewEditor.Scripting
     public class ScriptProvider<TScript> : MarshalByRefObject
         where TScript : Script
     {
-        private string identifier = Guid.NewGuid().ToString();
+        private readonly string identifier = Guid.NewGuid().ToString();
         private Type type;
 
         public void Initialize(string assemblyPath, string typeName)

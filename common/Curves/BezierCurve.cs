@@ -7,8 +7,8 @@ namespace StorybrewCommon.Curves
     [Serializable]
     public class BezierCurve : BaseCurve
     {
-        private List<Vector2> points;
-        private int precision;
+        private readonly List<Vector2> points;
+        private readonly int precision;
 
         public override Vector2 StartPosition => points[0];
         public override Vector2 EndPosition => points[points.Count - 1];
