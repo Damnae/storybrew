@@ -1,3 +1,6 @@
 [submodule "tiny"]
 	path = tiny
 	url = git@github.com:Damnae/tiny.git
+[submodule "brewlib"]
+	path = brewlib
+	url = git@github.com:Damnae/brewlib.git

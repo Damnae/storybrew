@@ -52,7 +52,7 @@ namespace StorybrewEditor
             drawContext = new DrawContext();
             drawContext.Register(this, false);
             drawContext.Register<TextureContainer>(new TextureContainerAtlas(ResourceContainer), true);
-            drawContext.Register<SpriteRenderer>(new SpriteRendererBuffered(), true);
+            drawContext.Register<QuadRenderer>(new QuadRendererBuffered(), true);
             drawContext.Register<LineRenderer>(new LineRendererBuffered(), true);
 
             try
@@ -226,7 +226,7 @@ namespace StorybrewEditor
             clock.Current = time;
 
             updateOverlay();
-            ScreenLayerManager.Update();
+            ScreenLayerManager.Update(IsFixedRateUpdate);
         }
 
         public void Draw(double tween)
@@ -241,10 +241,10 @@ namespace StorybrewEditor
 
         public string GetStats()
         {
-            var spriteRenderer = drawContext.Get<SpriteRenderer>();
+            var spriteRenderer = drawContext.Get<QuadRenderer>();
 
             return string.Format("Sprite - t:{0}k f:{1:0.0}k b:{2} w:{3} lb:{4}",
-                spriteRenderer.RenderedSpriteCount / 1000, spriteRenderer.FlushedBufferCount / 1000f, spriteRenderer.DiscardedBufferCount, spriteRenderer.BufferWaitCount, spriteRenderer.LargestBatch);
+                spriteRenderer.RenderedQuadCount / 1000, spriteRenderer.FlushedBufferCount / 1000f, spriteRenderer.DiscardedBufferCount, spriteRenderer.BufferWaitCount, spriteRenderer.LargestBatch);
         }
 
         private void window_Resize(object sender, EventArgs e)

@@ -90,7 +90,7 @@ namespace StorybrewEditor.Storyboarding
             }
 
             var boundsScaling = bounds.Height / 480;
-            DrawState.Prepare(drawContext.Get<SpriteRenderer>(), camera, additive ? AdditiveStates : AlphaBlendStates)
+            DrawState.Prepare(drawContext.Get<QuadRenderer>(), camera, additive ? AdditiveStates : AlphaBlendStates)
                 .Draw(texture, bounds.Left + bounds.Width * 0.5f + (position.X - 320) * boundsScaling, bounds.Top + position.Y * boundsScaling,
                     origin.X, origin.Y, scale.X * boundsScaling, scale.Y * boundsScaling, rotation, finalColor);
         }
