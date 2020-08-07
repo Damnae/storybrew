@@ -90,7 +90,14 @@ namespace StorybrewCommon.Scripting
                     alternatePath = Path.GetFullPath(alternatePath);
                     if (watch) context.AddDependency(alternatePath);
 
-                    bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(alternatePath)));
+                    try
+                    {
+                        bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(alternatePath)));
+                    }
+                    catch (FileNotFoundException e)
+                    {
+                        throw new FileNotFoundException(path, e);
+                    }
                 }
                 else bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
             }
