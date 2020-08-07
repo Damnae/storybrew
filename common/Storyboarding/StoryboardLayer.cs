@@ -9,7 +9,7 @@ namespace StorybrewCommon.Storyboarding
 
         public StoryboardLayer(string identifier)
         {
-            this.Identifier = identifier;
+            Identifier = identifier;
         }
 
         public abstract OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition);

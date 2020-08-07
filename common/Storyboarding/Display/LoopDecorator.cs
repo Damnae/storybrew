@@ -26,7 +26,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public LoopDecorator(ITypedCommand<TValue> command, double startTime, double repeatDuration, int repeats)
         {
             this.command = command;
-            this.StartTime = startTime;
+            StartTime = startTime;
             this.repeatDuration = repeatDuration;
             this.repeats = repeats;
         }

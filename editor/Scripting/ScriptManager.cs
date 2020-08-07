@@ -47,7 +47,7 @@ namespace StorybrewEditor.Scripting
         {
             this.resourceContainer = resourceContainer;
             this.scriptsNamespace = scriptsNamespace;
-            this.ScriptsPath = scriptsSourcePath;
+            ScriptsPath = scriptsSourcePath;
             this.commonScriptsPath = commonScriptsPath;
             this.scriptsLibraryPath = scriptsLibraryPath;
             this.compiledScriptsPath = compiledScriptsPath;

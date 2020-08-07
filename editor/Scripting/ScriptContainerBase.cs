@@ -75,10 +75,10 @@ namespace StorybrewEditor.Scripting
         public ScriptContainerBase(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
         {
             this.manager = manager;
-            this.ScriptTypeName = scriptTypeName;
-            this.MainSourcePath = mainSourcePath;
-            this.LibraryFolder = libraryFolder;
-            this.CompiledScriptsPath = compiledScriptsPath;
+            ScriptTypeName = scriptTypeName;
+            MainSourcePath = mainSourcePath;
+            LibraryFolder = libraryFolder;
+            CompiledScriptsPath = compiledScriptsPath;
 
             ReferencedAssemblies = referencedAssemblies;
         }

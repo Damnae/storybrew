@@ -35,7 +35,7 @@ namespace StorybrewEditor.Storyboarding
 
         public Effect(Project project)
         {
-            this.Project = project;
+            Project = project;
         }
 
         /// <summary>

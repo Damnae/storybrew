@@ -40,7 +40,7 @@ namespace StorybrewEditor
 
         public Editor(GameWindow window)
         {
-            this.Window = window;
+            Window = window;
             FormsWindow = new FormsWindow(window.GetWindowHandle());
         }
 
@@ -222,7 +222,7 @@ namespace StorybrewEditor
 
         public void Update(double time, bool isFixedRateUpdate)
         {
-            this.IsFixedRateUpdate = isFixedRateUpdate;
+            IsFixedRateUpdate = isFixedRateUpdate;
             clock.Current = time;
 
             updateOverlay();
@@ -273,7 +273,7 @@ namespace StorybrewEditor
 
         public FormsWindow(IntPtr handle)
         {
-            this.Handle = handle;
+            Handle = handle;
         }
     }
 }

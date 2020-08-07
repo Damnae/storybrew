@@ -78,7 +78,7 @@ namespace StorybrewEditor.Storyboarding
 
         public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
         {
-            this.Effect = effect;
+            Effect = effect;
         }
 
         private readonly List<StoryboardObject> storyboardObjects = new List<StoryboardObject>();
