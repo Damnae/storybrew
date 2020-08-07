@@ -2,6 +2,7 @@
 using BrewLib.Graphics.Cameras;
 using BrewLib.Util;
 using OpenTK;
+using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -166,6 +167,28 @@ namespace StorybrewEditor.Storyboarding
             else throw new InvalidOperationException($"Cannot move layer '{layer.Name}'");
             OnLayersChanged?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        public void MoveToOsbLayer(EditorStoryboardLayer layer, OsbLayer osbLayer)
+        {
+            var firstLayer = layers.FirstOrDefault(l => l.OsbLayer == osbLayer);
+            if (firstLayer != null)
+                MoveToLayer(layer, firstLayer);
+            else layer.OsbLayer = osbLayer;
+        }
+
+        public void MoveToLayer(EditorStoryboardLayer layerToMove, EditorStoryboardLayer toLayer)
+        {
+            layerToMove.OsbLayer = toLayer.OsbLayer;
+
+            var fromIndex = layers.IndexOf(layerToMove);
+            var toIndex = layers.IndexOf(toLayer);
+            if (fromIndex != -1 && toIndex != -1)
+            {
+                layers.Move(fromIndex, toIndex);
+                sortLayer(layerToMove);
+            }
+            else throw new InvalidOperationException($"Cannot move layer '{layerToMove.Name}' to the position of '{layerToMove.Name}'");
         }
 
         public void TriggerEvents(double startTime, double endTime)

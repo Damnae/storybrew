@@ -13,6 +13,7 @@ namespace StorybrewEditor.UserInterface.Components
         private readonly LinearLayout layout;
         private readonly LinearLayout layersLayout;
         private LayerManager layerManager;
+        private DragDropBehavior dragDropBehavior;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
@@ -54,8 +55,10 @@ namespace StorybrewEditor.UserInterface.Components
             if (disposing)
             {
                 layerManager.OnLayersChanged -= layerManager_OnLayersChanged;
+                dragDropBehavior?.Dispose();
             }
             layerManager = null;
+            dragDropBehavior = null;
             base.Dispose(disposing);
         }
 
@@ -70,14 +73,21 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void refreshLayers()
         {
+            dragDropBehavior?.Dispose();
+            dragDropBehavior = new DragDropBehavior();
+
             layersLayout.ClearWidgets();
             foreach (var osbLayer in Project.OsbLayers)
             {
-                layersLayout.Add(new Label(Manager)
+                Label osbLayerLabel;
+                layersLayout.Add(osbLayerLabel = new Label(Manager)
                 {
                     StyleName = "listHeader",
                     Text = osbLayer.ToString(),
                 });
+
+                var ol = osbLayer;
+                dragDropBehavior.AddDropTarget(osbLayerLabel, data => layerManager.MoveToOsbLayer(data as EditorStoryboardLayer, ol));
 
                 buildLayers(osbLayer, true);
                 buildLayers(osbLayer, false);
@@ -95,7 +105,7 @@ namespace StorybrewEditor.UserInterface.Components
 
                 Widget layerRoot;
                 Label nameLabel, detailsLabel;
-                Button moveUpButton, moveDownButton, moveToTopButton, moveToBottomButton, diffSpecificButton, osbLayerButton, showHideButton;
+                Button diffSpecificButton, osbLayerButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
                 {
                     AnchorFrom = BoxAlignment.Centre,
@@ -144,62 +154,6 @@ namespace StorybrewEditor.UserInterface.Components
                             AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
-                        new LinearLayout(Manager)
-                        {
-                            StyleName = "condensed",
-                            CanGrow = false,
-                            Children = new Widget[]
-                            {
-                                moveUpButton = new Button(Manager)
-                                {
-                                    StyleName = "icon",
-                                    Icon = IconFont.AngleUp,
-                                    Tooltip = "Up",
-                                    AnchorFrom = BoxAlignment.Centre,
-                                    AnchorTo = BoxAlignment.Centre,
-                                    CanGrow = false,
-                                    Disabled = index == 0,
-                                },
-                                moveDownButton = new Button(Manager)
-                                {
-                                    StyleName = "icon",
-                                    Icon = IconFont.AngleDown,
-                                    Tooltip = "Down",
-                                    AnchorFrom = BoxAlignment.Centre,
-                                    AnchorTo = BoxAlignment.Centre,
-                                    CanGrow = false,
-                                    Disabled = index == layers.Count - 1,
-                                },
-                            },
-                        },
-                        new LinearLayout(Manager)
-                        {
-                            StyleName = "condensed",
-                            CanGrow = false,
-                            Children = new Widget[]
-                            {
-                                moveToTopButton = new Button(Manager)
-                                {
-                                    StyleName = "icon",
-                                    Icon = IconFont.AngleDoubleUp,
-                                    Tooltip = "Move to top",
-                                    AnchorFrom = BoxAlignment.Centre,
-                                    AnchorTo = BoxAlignment.Centre,
-                                    CanGrow = false,
-                                    Disabled = index == 0,
-                                },
-                                moveToBottomButton = new Button(Manager)
-                                {
-                                    StyleName = "icon",
-                                    Icon = IconFont.AngleDoubleDown,
-                                    Tooltip = "Move to bottom",
-                                    AnchorFrom = BoxAlignment.Centre,
-                                    AnchorTo = BoxAlignment.Centre,
-                                    CanGrow = false,
-                                    Disabled = index == layers.Count - 1,
-                                },
-                            },
-                        },
                         showHideButton = new Button(Manager)
                         {
                             StyleName = "icon",
@@ -215,6 +169,9 @@ namespace StorybrewEditor.UserInterface.Components
                 });
 
                 var la = layer;
+
+                dragDropBehavior.AddDraggable(layerRoot, () => la);
+                dragDropBehavior.AddDropTarget(layerRoot, data => layerManager.MoveToLayer(data as EditorStoryboardLayer, la));
 
                 ChangedHandler changedHandler;
                 EventHandler effectChangedHandler;
@@ -244,10 +201,6 @@ namespace StorybrewEditor.UserInterface.Components
                     effect.OnChanged -= effectChangedHandler;
                 };
 
-                moveUpButton.OnClick += (sender, e) => layerManager.MoveUp(la);
-                moveDownButton.OnClick += (sender, e) => layerManager.MoveDown(la);
-                moveToTopButton.OnClick += (sender, e) => layerManager.MoveToTop(la);
-                moveToBottomButton.OnClick += (sender, e) => layerManager.MoveToBottom(la);
                 diffSpecificButton.OnClick += (sender, e) => la.DiffSpecific = !la.DiffSpecific;
                 osbLayerButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer => la.OsbLayer = selectedOsbLayer, Project.OsbLayers);
                 showHideButton.OnValueChanged += (sender, e) => la.Visible = showHideButton.Checked;
