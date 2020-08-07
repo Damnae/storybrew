@@ -409,13 +409,21 @@ namespace StorybrewEditor.Storyboarding
                 Path = assetsFolderPath,
                 IncludeSubdirectories = true,
             };
-            assetWatcher.Created += mapsetManager_OnFileChanged;
-            assetWatcher.Changed += mapsetManager_OnFileChanged;
-            assetWatcher.Renamed += mapsetManager_OnFileChanged;
+            assetWatcher.Created += assetWatcher_OnFileChanged;
+            assetWatcher.Changed += assetWatcher_OnFileChanged;
+            assetWatcher.Renamed += assetWatcher_OnFileChanged;
             assetWatcher.Error += (sender, e) => Trace.WriteLine($"Watcher error (assets): {e.GetException()}");
             assetWatcher.EnableRaisingEvents = true;
             Trace.WriteLine($"Watching (assets): {assetsFolderPath}");
         }
+
+        private void assetWatcher_OnFileChanged(object sender, FileSystemEventArgs e)
+            => Program.Schedule(() =>
+            {
+                if (IsDisposed) return;
+
+                mapsetManager_OnFileChanged(sender, e);
+            });
 
         #endregion
 
