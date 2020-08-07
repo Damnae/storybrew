@@ -80,6 +80,7 @@ namespace StorybrewEditor
         {
             var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
             if (fromVersion < new Version(1, 53)) settings.UseRoslyn.Set(true);
+            if (fromVersion < new Version(1, 70)) settings.Volume.Set(Math.Pow(settings.Volume, 1 / 4f));
             settings.Save();
 
             if (fromVersion < new Version(1, 57))
