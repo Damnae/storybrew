@@ -422,7 +422,11 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (IsDisposed) return;
 
-                mapsetManager_OnFileChanged(sender, e);
+                var extension = Path.GetExtension(e.Name);
+                if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+                    reloadTextures();
+                else if (extension == ".wav" || extension == ".mp3" || extension == ".ogg")
+                    reloadAudio();
             });
 
         #endregion
