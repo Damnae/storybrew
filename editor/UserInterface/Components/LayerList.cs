@@ -5,6 +5,7 @@ using StorybrewCommon.Storyboarding;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System;
+using System.Linq;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -13,7 +14,6 @@ namespace StorybrewEditor.UserInterface.Components
         private readonly LinearLayout layout;
         private readonly LinearLayout layersLayout;
         private LayerManager layerManager;
-        private DragDropBehavior dragDropBehavior;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
@@ -55,10 +55,8 @@ namespace StorybrewEditor.UserInterface.Components
             if (disposing)
             {
                 layerManager.OnLayersChanged -= layerManager_OnLayersChanged;
-                dragDropBehavior?.Dispose();
             }
             layerManager = null;
-            dragDropBehavior = null;
             base.Dispose(disposing);
         }
 
@@ -73,9 +71,6 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void refreshLayers()
         {
-            dragDropBehavior?.Dispose();
-            dragDropBehavior = new DragDropBehavior();
-
             layersLayout.ClearWidgets();
             foreach (var osbLayer in Project.OsbLayers)
             {
@@ -87,7 +82,17 @@ namespace StorybrewEditor.UserInterface.Components
                 });
 
                 var ol = osbLayer;
-                dragDropBehavior.AddDropTarget(osbLayerLabel, data => layerManager.MoveToOsbLayer(data as EditorStoryboardLayer, ol));
+                osbLayerLabel.HandleDrop = data =>
+                {
+                    if (data is EditorStoryboardLayer droppedLayer)
+                    {
+                        var dndLayer = layerManager.Layers.FirstOrDefault(l => l.Guid == droppedLayer.Guid);
+                        if (dndLayer != null)
+                            layerManager.MoveToOsbLayer(dndLayer, ol);
+                        return true;
+                    }
+                    return false;
+                };
 
                 buildLayers(osbLayer, true);
                 buildLayers(osbLayer, false);
@@ -170,8 +175,21 @@ namespace StorybrewEditor.UserInterface.Components
 
                 var la = layer;
 
-                dragDropBehavior.AddDraggable(layerRoot, () => la);
-                dragDropBehavior.AddDropTarget(layerRoot, data => layerManager.MoveToLayer(data as EditorStoryboardLayer, la));
+                layerRoot.GetDragData = () => la;
+                layerRoot.HandleDrop = data =>
+                {
+                    if (data is EditorStoryboardLayer droppedLayer)
+                    {
+                        if (droppedLayer.Guid != la.Guid)
+                        {
+                            var dndLayer = layerManager.Layers.FirstOrDefault(l => l.Guid == droppedLayer.Guid);
+                            if (dndLayer != null)
+                                layerManager.MoveToLayer(dndLayer, la);
+                        }
+                        return true;
+                    }
+                    return false;
+                };
 
                 ChangedHandler changedHandler;
                 EventHandler effectChangedHandler;
