@@ -202,15 +202,19 @@ namespace StorybrewEditor.UserInterface.Components
                     detailsLabel.Text = getEffectDetails(ef);
                     updateStatusButton(statusButton, ef);
                 };
-                effectRoot.OnHovered += (sender, e) =>
+                effectRoot.OnHovered += (evt, e) =>
                 {
                     ef.Highlight = e.Hovered;
                     OnEffectPreselect?.Invoke(e.Hovered ? ef : null);
                 };
-                effectRoot.OnClickDown += (sender, e) =>
+                effectRoot.OnClickDown += (evt, e) =>
                 {
-                    OnEffectSelected?.Invoke(ef);
                     return true;
+                };
+                effectRoot.OnClickUp += (evt, e) =>
+                {
+                    if (evt.RelatedTarget == this || evt.RelatedTarget.HasAncestor(this))
+                        OnEffectSelected?.Invoke(ef);
                 };
                 effectRoot.OnDisposed += (sender, e) =>
                 {

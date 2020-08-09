@@ -202,15 +202,19 @@ namespace StorybrewEditor.UserInterface.Components
                     showHideButton.Checked = la.Visible;
                 };
                 effect.OnChanged += effectChangedHandler = (sender, e) => detailsLabel.Text = getLayerDetails(la, effect);
-                layerRoot.OnHovered += (sender, e) =>
+                layerRoot.OnHovered += (evt, e) =>
                 {
                     la.Highlight = e.Hovered;
                     OnLayerPreselect?.Invoke(e.Hovered ? la : null);
                 };
-                layerRoot.OnClickDown += (sender, e) =>
+                layerRoot.OnClickDown += (evt, e) =>
                 {
-                    OnLayerSelected?.Invoke(la);
                     return true;
+                };
+                layerRoot.OnClickUp += (evt, e) =>
+                {
+                    if (evt.RelatedTarget == this || evt.RelatedTarget.HasAncestor(this))
+                        OnLayerSelected?.Invoke(la);
                 };
                 layerRoot.OnDisposed += (sender, e) =>
                 {
