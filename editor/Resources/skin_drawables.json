@@ -29,6 +29,14 @@
 			Color: "@colorTooltip",
 			Outset: [2, 4],
 		},
+		"dragCursor":
+		{
+			_type: "NinePatch",
+			Texture: "ui-line.png",
+			Borders: [1, 2, 2, 1],
+			Color: [ 0.3, 0.3, 0.3 ],
+			Outset: [2],
+		},
 
 		"button":
 		{

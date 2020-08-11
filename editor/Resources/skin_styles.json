@@ -42,6 +42,7 @@
 			"icon":
 			{
 				FontName: "@iconFont",
+				TextAlignment: "Centre",
 			},
 			"light":
 			{

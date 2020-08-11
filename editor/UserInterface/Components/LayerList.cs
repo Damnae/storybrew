@@ -2,7 +2,6 @@
 using BrewLib.Util;
 using OpenTK;
 using StorybrewCommon.Storyboarding;
-using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System;
 using System.Linq;
@@ -110,7 +109,7 @@ namespace StorybrewEditor.UserInterface.Components
 
                 Widget layerRoot;
                 Label nameLabel, detailsLabel;
-                Button diffSpecificButton, osbLayerButton, showHideButton;
+                Button diffSpecificButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
                 {
                     AnchorFrom = BoxAlignment.Centre,
@@ -120,6 +119,15 @@ namespace StorybrewEditor.UserInterface.Components
                     Fill = true,
                     Children = new Widget[]
                     {
+                        new Label(Manager)
+                        {
+                            StyleName = "icon",
+                            Icon = IconFont.Reorder,
+                            Tooltip = "Drag to reorder",
+                            AnchorFrom = BoxAlignment.Centre,
+                            AnchorTo = BoxAlignment.Centre,
+                            CanGrow = false,
+                        },
                         new LinearLayout(Manager)
                         {
                             StyleName = "condensed",
@@ -146,15 +154,6 @@ namespace StorybrewEditor.UserInterface.Components
                             StyleName = "icon",
                             Icon = layer.DiffSpecific ? IconFont.FileO : IconFont.FilesO,
                             Tooltip = layer.DiffSpecific ? "Diff. specific\n(exports to .osu)" : "All diffs\n(exports to .osb)",
-                            AnchorFrom = BoxAlignment.Centre,
-                            AnchorTo = BoxAlignment.Centre,
-                            CanGrow = false,
-                        },
-                        osbLayerButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            Icon = IconFont.ThLarge,
-                            Tooltip = "Osb Layer",
                             AnchorFrom = BoxAlignment.Centre,
                             AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
@@ -224,7 +223,6 @@ namespace StorybrewEditor.UserInterface.Components
                 };
 
                 diffSpecificButton.OnClick += (sender, e) => la.DiffSpecific = !la.DiffSpecific;
-                osbLayerButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Choose an osb layer", selectedOsbLayer => la.OsbLayer = selectedOsbLayer, Project.OsbLayers);
                 showHideButton.OnValueChanged += (sender, e) => la.Visible = showHideButton.Checked;
                 index++;
             }
