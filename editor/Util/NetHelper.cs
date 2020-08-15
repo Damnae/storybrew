@@ -29,15 +29,18 @@ namespace StorybrewEditor.Util
                     Debug.Print($"Requesting {url}");
                     webClient.Headers.Add("user-agent", Program.Name);
                     webClient.DownloadStringCompleted += (sender, e) =>
-                        Program.Schedule(() =>
+                    {
+                        if (e.Error == null)
                         {
-                            if (e.Error == null)
+                            var result = e.Result;
+                            Program.Schedule(() =>
                             {
-                                File.WriteAllText(cachePath, e.Result);
-                                action(e.Result, null);
-                            }
-                            else action(null, e.Error);
-                        });
+                                File.WriteAllText(cachePath, result);
+                                action(result, null);
+                            });
+                        }
+                        else Program.Schedule(() => action(null, e.Error));
+                    };
                     webClient.DownloadStringAsync(new Uri(url));
                 }
             }
@@ -56,15 +59,14 @@ namespace StorybrewEditor.Util
                     Debug.Print($"Post {url}");
                     webClient.Headers.Add("user-agent", Program.Name);
                     webClient.UploadValuesCompleted += (sender, e) =>
-                        Program.Schedule(() =>
+                    {
+                        if (e.Error == null)
                         {
-                            if (e.Error == null)
-                            {
-                                var response = Encoding.UTF8.GetString(e.Result);
-                                action(response, null);
-                            }
-                            else action(null, e.Error);
-                        });
+                            var response = Encoding.UTF8.GetString(e.Result);
+                            Program.Schedule(() => action(response, null));
+                        }
+                        else Program.Schedule(() => action(null, e.Error));
+                    };
                     webClient.UploadValuesAsync(new Uri(url), "POST", data);
                 }
             }

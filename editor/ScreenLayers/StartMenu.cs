@@ -98,8 +98,10 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     updateButton = new Button(WidgetManager)
                     {
+                        Text = "Checking for updates",
                         AnchorFrom = BoxAlignment.Centre,
-                        Displayed = false,
+                        StyleName = "small",
+                        Disabled = true,
                     },
                     versionLabel = new Label(WidgetManager)
                     {
@@ -125,7 +127,7 @@ namespace StorybrewEditor.ScreenLayers
             bottomLayout.Pack(600);
             bottomRightLayout.Pack((1024 - bottomLayout.Width) / 2);
         }
-        
+
         private void checkLatestVersion()
         {
             NetHelper.Request($"https://api.github.com/repos/{Program.Repository}/releases?per_page=10&page=1", "cache/net/releases", 15 * 60,
@@ -201,9 +203,14 @@ namespace StorybrewEditor.ScreenLayers
                                     Manager.Add(new UpdateMenu(downloadUrl));
                                 else Updater.OpenLastestReleasePage();
                             };
-                            updateButton.Displayed = true;
+                            updateButton.StyleName = "";
+                            updateButton.Disabled = false;
                         }
-                        else versionLabel.Tooltip = $"Recent changes:\n\n{description.TrimEnd('\n')}";
+                        else
+                        {
+                            versionLabel.Tooltip = $"Recent changes:\n\n{description.TrimEnd('\n')}";
+                            updateButton.Displayed = false;
+                        }
                         bottomLayout.Pack(600);
                     }
                     catch (Exception e)
@@ -219,10 +226,9 @@ namespace StorybrewEditor.ScreenLayers
 
             versionLabel.Text = $"Could not retrieve latest release information:\n{exception.Message}\n\n{versionLabel.Text}";
 
-            updateButton.StyleName = "small";
             updateButton.Text = "See latest release";
             updateButton.OnClick += (sender, e) => Updater.OpenLastestReleasePage();
-            updateButton.Displayed = true;
+            updateButton.Disabled = false;
             bottomLayout.Pack(600);
         }
     }
