@@ -71,7 +71,7 @@ namespace StorybrewEditor.Storyboarding
         {
             get
             {
-                if (!Directory.Exists(MapsetPath))
+                if (!MapsetPathIsValid)
                     return Path.Combine(ProjectFolderPath, "storyboard.osb");
 
                 // Find the correct osb filename from .osu files
@@ -164,7 +164,7 @@ namespace StorybrewEditor.Storyboarding
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, bool updateFrameStats)
         {
-            effectUpdateQueue.Enabled = true;
+            effectUpdateQueue.Enabled = allowEffectUpdates && MapsetPathIsValid;
 
             var newFrameStats = updateFrameStats ? new FrameStats() : null;
             LayerManager.Draw(drawContext, camera, bounds, opacity, newFrameStats);
@@ -194,6 +194,8 @@ namespace StorybrewEditor.Storyboarding
         public EffectStatus EffectsStatus { get; private set; } = EffectStatus.Initializing;
         public event EventHandler OnEffectsStatusChanged;
 
+        private bool allowEffectUpdates = true;
+
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
         public void QueueEffectUpdate(Effect effect)
         {
@@ -201,7 +203,11 @@ namespace StorybrewEditor.Storyboarding
             refreshEffectsStatus();
         }
         public void CancelEffectUpdates(bool stopThreads) => effectUpdateQueue.CancelQueuedActions(stopThreads);
-        public void StopEffectUpdates() => effectUpdateQueue.Enabled = false;
+        public void StopEffectUpdates()
+        {
+            allowEffectUpdates = false;
+            effectUpdateQueue.Enabled = false;
+        }
 
         public IEnumerable<string> GetEffectNames()
             => scriptManager.GetScriptNames();
@@ -294,6 +300,8 @@ namespace StorybrewEditor.Storyboarding
 
         #region Mapset
 
+        public bool MapsetPathIsValid { get; private set; }
+
         private string mapsetPath;
         public string MapsetPath
         {
@@ -302,6 +310,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 if (mapsetPath == value) return;
                 mapsetPath = value;
+                MapsetPathIsValid = Directory.Exists(mapsetPath);
                 Changed = true;
 
                 OnMapsetPathChanged?.Invoke(this, EventArgs.Empty);
@@ -463,7 +472,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Save / Load / Export
 
-        public const int Version = 6;
+        public const int Version = 7;
 
         public bool Changed { get; private set; }
 
@@ -675,7 +684,6 @@ namespace StorybrewEditor.Storyboarding
                     var indexRoot = new TinyObject
                     {
                         { "FormatVersion", Version },
-                        { "MapsetPath", PathHelper.WithStandardSeparators(MapsetPath) },
                         { "BeatmapId", MainBeatmap.Id },
                         { "BeatmapName", MainBeatmap.Name },
                         { "Assemblies", importedAssemblies },
@@ -692,6 +700,7 @@ namespace StorybrewEditor.Storyboarding
                     {
                         { "FormatVersion", Version },
                         { "Editor", Program.FullName },
+                        { "MapsetPath", PathHelper.WithStandardSeparators(MapsetPath) },
                         { "OwnsOsb", OwnsOsb },
                     };
 
@@ -770,9 +779,10 @@ namespace StorybrewEditor.Storyboarding
                     throw new InvalidOperationException("This project was saved with a more recent version, you need to update to open it");
 
                 var userPath = directoryReader.GetPath("user.yaml");
+                var userRoot = (TinyToken)null;
                 if (File.Exists(userPath))
                 {
-                    var userRoot = TinyToken.Read(userPath);
+                    userRoot = TinyToken.Read(userPath);
 
                     var userVersion = userRoot.Value<int>("FormatVersion");
                     if (userVersion > Version)
@@ -784,7 +794,7 @@ namespace StorybrewEditor.Storyboarding
                     OwnsOsb = userRoot.Value<bool>("OwnsOsb");
                 }
 
-                MapsetPath = indexRoot.Value<string>("MapsetPath");
+                MapsetPath = userRoot?.Value<string>("MapsetPath") ?? indexRoot.Value<string>("MapsetPath") ?? "nul";
                 SelectBeatmap(indexRoot.Value<long>("BeatmapId"), indexRoot.Value<string>("BeatmapName"));
                 ImportedAssemblies = indexRoot.Values<string>("Assemblies");
 
@@ -984,11 +994,6 @@ namespace StorybrewEditor.Storyboarding
                     stream.Commit();
                 }
             }
-        }
-
-        private void checkMapsetPath()
-        {
-            if (!Directory.Exists(MapsetPath)) throw new InvalidOperationException($"Mapset directory doesn't exist.\n{MapsetPath}");
         }
 
         private static void cleanupFolder(string path, string searchPattern)

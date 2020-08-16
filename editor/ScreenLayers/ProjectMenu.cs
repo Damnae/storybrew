@@ -384,7 +384,7 @@ namespace StorybrewEditor.ScreenLayers
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
 
-            if (!Directory.Exists(project.MapsetPath))
+            if (!project.MapsetPathIsValid)
                 Manager.ShowMessage($"The mapset folder cannot be found.\n{project.MapsetPath}\n\nPlease select a new one.", () => changeMapsetFolder(), true);
         }
 
@@ -513,6 +513,7 @@ namespace StorybrewEditor.ScreenLayers
             changeMapButton.Disabled = project.MapsetManager.BeatmapCount < 2;
             playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
             saveButton.Disabled = !project.Changed;
+            exportButton.Disabled = !project.MapsetPathIsValid;
             audio.Volume = WidgetManager.Root.Opacity;
 
             var time = (float)audio.Time;
