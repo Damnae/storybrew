@@ -492,81 +492,22 @@ namespace StorybrewEditor.Storyboarding
 
         public void Save()
         {
-            var binaryProjectPath = projectPath.Replace(DefaultTextFilename, DefaultBinaryFilename);
-            if (File.Exists(binaryProjectPath))
-                saveBinary(binaryProjectPath);
-
             saveText(projectPath.Replace(DefaultBinaryFilename, DefaultTextFilename));
         }
 
         public static Project Load(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
         {
+            // Binary format isn't saved anymore and may be obsolete:
+            // Load from the text format if possible even if the binary format has been selected.
+            var textFormatPath = projectPath.Replace(DefaultBinaryFilename, DefaultTextFilename);
+            if (projectPath.EndsWith(BinaryExtension) && File.Exists(textFormatPath))
+                projectPath = textFormatPath;
+
             var project = new Project(projectPath, withCommonScripts, resourceContainer);
             if (projectPath.EndsWith(BinaryExtension))
                 project.loadBinary(projectPath);
-            else project.loadText(projectPath.Replace(DefaultBinaryFilename, DefaultTextFilename));
+            else project.loadText(textFormatPath);
             return project;
-        }
-
-        private void saveBinary(string path)
-        {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
-
-            using (var stream = new SafeWriteStream(path))
-            using (var w = new BinaryWriter(stream, Encoding.UTF8))
-            {
-                w.Write(Version);
-                w.Write(Program.FullName);
-
-                w.Write(MapsetPath);
-                w.Write(MainBeatmap.Id);
-                w.Write(MainBeatmap.Name);
-
-                w.Write(OwnsOsb);
-
-                w.Write(effects.Count);
-                foreach (var effect in effects)
-                {
-                    w.Write(effect.Guid.ToByteArray());
-                    w.Write(effect.BaseName);
-                    w.Write(effect.Name);
-
-                    var config = effect.Config;
-                    w.Write(config.FieldCount);
-                    foreach (var field in config.SortedFields)
-                    {
-                        w.Write(field.Name);
-                        w.Write(field.DisplayName);
-                        ObjectSerializer.Write(w, field.Value);
-
-                        w.Write(field.AllowedValues?.Length ?? 0);
-                        if (field.AllowedValues != null)
-                            foreach (var allowedValue in field.AllowedValues)
-                            {
-                                w.Write(allowedValue.Name);
-                                ObjectSerializer.Write(w, allowedValue.Value);
-                            }
-                    }
-                }
-
-                w.Write(LayerManager.LayersCount);
-                foreach (var layer in LayerManager.Layers)
-                {
-                    w.Write(layer.Guid.ToByteArray());
-                    w.Write(layer.Identifier);
-                    w.Write(effects.IndexOf(layer.Effect));
-                    w.Write(layer.DiffSpecific);
-                    w.Write((int)layer.OsbLayer);
-                    w.Write(layer.Visible);
-                }
-
-                w.Write(importedAssemblies.Count);
-                foreach (var assembly in importedAssemblies)
-                    w.Write(assembly);
-
-                stream.Commit();
-                Changed = false;
-            }
         }
 
         private void loadBinary(string path)
