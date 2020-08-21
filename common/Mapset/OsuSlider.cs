@@ -100,16 +100,22 @@ namespace StorybrewCommon.Mapset
             switch (CurveType)
             {
                 case SliderCurveType.Catmull:
-                    if (controlPoints.Count == 1) goto case SliderCurveType.Linear;
+                    if (controlPoints.Count == 1)
+                        goto case SliderCurveType.Linear;
                     curve = generateCatmullCurve();
                     break;
                 case SliderCurveType.Bezier:
-                    if (controlPoints.Count == 1) goto case SliderCurveType.Linear;
+                    if (controlPoints.Count == 1)
+                        goto case SliderCurveType.Linear;
                     curve = generateBezierCurve();
                     break;
                 case SliderCurveType.Perfect:
-                    if (controlPoints.Count < 2) goto case SliderCurveType.Linear;
-                    if (controlPoints.Count > 2) goto case SliderCurveType.Bezier;
+                    if (controlPoints.Count > 2)
+                        goto case SliderCurveType.Bezier;
+                    if (controlPoints.Count < 2 ||
+                        PlayfieldPosition == controlPoints[0].PlayfieldPosition ||
+                        controlPoints[0].PlayfieldPosition == controlPoints[1].PlayfieldPosition)
+                        goto case SliderCurveType.Linear;
                     curve = generateCircleCurve();
                     break;
                 case SliderCurveType.Linear:
