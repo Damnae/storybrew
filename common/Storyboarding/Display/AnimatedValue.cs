@@ -50,16 +50,9 @@ namespace StorybrewCommon.Storyboarding.Display
                     else break;
                 }
 
-                if (index > 0 && command.StartTime < commands[index - 1].EndTime)
-                {
-                    HasOverlap = true;
-                    //Debug.Print($"'{command}' overlaps existing previous command '{commands[index - 1]}'");
-                }
-                else if (index < commands.Count && commands[index].StartTime < command.EndTime)
-                {
-                    HasOverlap = true;
-                    //Debug.Print($"'{command}' overlaps existing next command '{commands[index]}'");
-                }
+                HasOverlap =
+                    (index > 0 && (int)Math.Round(command.StartTime) < (int)Math.Round(commands[index - 1].EndTime)) ||
+                    (index < commands.Count && (int)Math.Round(commands[index].StartTime) < (int)Math.Round(command.EndTime));
 
                 commands.Insert(index, command);
             }
