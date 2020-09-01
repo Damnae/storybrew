@@ -5,6 +5,7 @@ using StorybrewEditor.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -108,8 +109,9 @@ namespace StorybrewEditor.ScreenLayers
 
             screenLayerManager.OpenFilePicker("", "", Project.ProjectsFolder, Project.FileFilter, (projectPath) =>
             {
-                if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath))
-                    screenLayerManager.ShowMessage("Projects must be placed in a folder inside the 'projects' folder.");
+                if (!PathHelper.FolderContainsPath(Project.ProjectsFolder, projectPath) || 
+                PathHelper.GetRelativePath(Project.ProjectsFolder, projectPath).Count(c => c == '/') != 1)
+                    screenLayerManager.ShowMessage("Projects must be placed in a folder directly inside the 'projects' folder.");
                 else
                     screenLayerManager.AsyncLoading("Loading project", () =>
                     {
