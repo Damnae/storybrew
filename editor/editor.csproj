@@ -104,6 +104,7 @@
     <Compile Include="UserInterface\Selectbox.cs" />
     <Compile Include="UserInterface\Skinning\Styles\ColorPickerStyle.cs" />
     <Compile Include="UserInterface\Skinning\Styles\SelectboxStyle.cs" />
+    <Compile Include="UserInterface\Vector3Picker.cs" />
     <Compile Include="UserInterface\Vector2Picker.cs" />
     <Compile Include="Util\ThrottledActionScheduler.cs" />
     <Compile Include="Util\MultiFileWatcher.cs" />
