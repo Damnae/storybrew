@@ -48,6 +48,35 @@ namespace StorybrewCommon.Util
                 return vector.X.ToString(CultureInfo.InvariantCulture) + "," +
                     vector.Y.ToString(CultureInfo.InvariantCulture);
             }),
+            new SimpleObjectSerializer<Vector3>(r =>
+            {
+                var x = r.ReadSingle();
+                var y = r.ReadSingle();
+                var z = r.ReadSingle();
+                return new Vector3(x, y, z);
+            },
+            (w, v) =>
+            {
+                var vector = (Vector3) v;
+                w.Write(vector.X);
+                w.Write(vector.Y);
+                w.Write(vector.Z);
+            },
+            v =>
+            {
+                var split = v.Split(',');
+                return new Vector3(
+                    float.Parse(split[0], CultureInfo.InvariantCulture),
+                    float.Parse(split[1], CultureInfo.InvariantCulture),
+                    float.Parse(split[2], CultureInfo.InvariantCulture));
+            },
+            v =>
+            {
+                var vector = (Vector3)v;
+                return vector.X.ToString(CultureInfo.InvariantCulture) + "," +
+                    vector.Y.ToString(CultureInfo.InvariantCulture) + "," +
+                    vector.Z.ToString(CultureInfo.InvariantCulture);
+            }),
             new SimpleObjectSerializer<Color4>(r =>
             {
                 var red = r.ReadByte();
