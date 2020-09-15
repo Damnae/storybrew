@@ -206,14 +206,18 @@ namespace StorybrewEditor.UserInterface.Components
                     la.Highlight = e.Hovered;
                     OnLayerPreselect?.Invoke(e.Hovered ? la : null);
                 };
+                var handledClick = false;
                 layerRoot.OnClickDown += (evt, e) =>
                 {
+                    handledClick = true;
                     return true;
                 };
                 layerRoot.OnClickUp += (evt, e) =>
                 {
-                    if (evt.RelatedTarget == this || evt.RelatedTarget.HasAncestor(this))
+                    if (handledClick && (evt.RelatedTarget == layerRoot || evt.RelatedTarget.HasAncestor(layerRoot)))
                         OnLayerSelected?.Invoke(la);
+
+                    handledClick = false;
                 };
                 layerRoot.OnDisposed += (sender, e) =>
                 {

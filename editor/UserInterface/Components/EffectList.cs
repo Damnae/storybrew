@@ -207,14 +207,18 @@ namespace StorybrewEditor.UserInterface.Components
                     ef.Highlight = e.Hovered;
                     OnEffectPreselect?.Invoke(e.Hovered ? ef : null);
                 };
+                var handledClick = false;
                 effectRoot.OnClickDown += (evt, e) =>
                 {
+                    handledClick = true;
                     return true;
                 };
                 effectRoot.OnClickUp += (evt, e) =>
                 {
-                    if (evt.RelatedTarget == this || evt.RelatedTarget.HasAncestor(this))
+                    if (handledClick && (evt.RelatedTarget == effectRoot || evt.RelatedTarget.HasAncestor(effectRoot)))
                         OnEffectSelected?.Invoke(ef);
+
+                    handledClick = false;
                 };
                 effectRoot.OnDisposed += (sender, e) =>
                 {
