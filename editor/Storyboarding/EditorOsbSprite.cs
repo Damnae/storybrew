@@ -13,13 +13,19 @@ using System.IO;
 
 namespace StorybrewEditor.Storyboarding
 {
-    public class EditorOsbSprite : OsbSprite, DisplayableObject
+    public class EditorOsbSprite : OsbSprite, DisplayableObject, HasPostProcess
     {
         public readonly static RenderStates AlphaBlendStates = new RenderStates();
         public readonly static RenderStates AdditiveStates = new RenderStates() { BlendingFactor = new BlendingFactorState(BlendingMode.Additive), };
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
             => Draw(drawContext, camera, bounds, opacity, project, frameStats, this);
+
+        public void PostProcess()
+        {
+            if (InGroup)
+                EndGroup();
+        }
 
         public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats, OsbSprite sprite)
         {

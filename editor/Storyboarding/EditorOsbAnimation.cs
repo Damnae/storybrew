@@ -5,9 +5,15 @@ using BrewLib.Graphics.Cameras;
 
 namespace StorybrewEditor.Storyboarding
 {
-    public class EditorOsbAnimation : OsbAnimation, DisplayableObject
+    public class EditorOsbAnimation : OsbAnimation, DisplayableObject, HasPostProcess
     {
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
             => EditorOsbSprite.Draw(drawContext, camera, bounds, opacity, project, frameStats, this);
+
+        public void PostProcess()
+        {
+            if (InGroup) 
+                EndGroup();
+        }
     }
 }

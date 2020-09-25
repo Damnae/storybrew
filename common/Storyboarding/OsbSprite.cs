@@ -17,6 +17,7 @@ namespace StorybrewCommon.Storyboarding
 
         private readonly List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
+        public bool InGroup => currentCommandGroup != null;
 
         /// <summary>
         /// If this sprite contains more than CommandSplitThreshold commands, they will be split between multiple sprites.

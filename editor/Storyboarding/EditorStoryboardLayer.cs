@@ -173,6 +173,9 @@ namespace StorybrewEditor.Storyboarding
 
         public void PostProcess()
         {
+            foreach (var storyboardObject in storyboardObjects)
+                (storyboardObject as HasPostProcess)?.PostProcess();
+
             calculateSize();
         }
 
