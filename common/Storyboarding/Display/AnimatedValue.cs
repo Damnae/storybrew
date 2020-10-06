@@ -10,7 +10,6 @@ namespace StorybrewCommon.Storyboarding.Display
         where TValue : CommandValue
     {
         public TValue DefaultValue;
-        private readonly bool strict;
 
         private readonly List<ITypedCommand<TValue>> commands = new List<ITypedCommand<TValue>>();
         public IEnumerable<ITypedCommand<TValue>> Commands => commands;
@@ -28,10 +27,9 @@ namespace StorybrewCommon.Storyboarding.Display
         {
         }
 
-        public AnimatedValue(TValue defaultValue, bool strict = false)
+        public AnimatedValue(TValue defaultValue)
         {
             DefaultValue = defaultValue;
-            this.strict = strict;
         }
 
         public void Add(ITypedCommand<TValue> command)
@@ -73,7 +71,6 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue ValueAtTime(double time)
         {
             if (commands.Count == 0) return DefaultValue;
-            if (!strict && time >= EndTime) return EndValue;
 
             if (!findCommandIndex(time, out int index) && index > 0)
                 index--;
@@ -87,9 +84,6 @@ namespace StorybrewCommon.Storyboarding.Display
                     }
 
             var command = commands[index];
-            if (strict && (time < command.StartTime || time > command.EndTime && command.Duration != 0))
-                return DefaultValue;
-
             return command.ValueAtTime(time);
         }
 

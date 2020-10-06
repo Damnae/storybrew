@@ -16,6 +16,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public double Duration => EndTime - StartTime;
         public TValue StartValue { get; set; }
         public TValue EndValue { get; set; }
+        public virtual bool ExportEndValue => true;
         public bool Active => true;
         public int Cost => 1;
 
@@ -69,7 +70,7 @@ namespace StorybrewCommon.Storyboarding.Commands
             var startTimeString = ((int)StartTime).ToString(exportSettings.NumberFormat);
             var endTimeString = ((int)EndTime).ToString(exportSettings.NumberFormat);
             var startValueString = StartValue.ToOsbString(exportSettings);
-            var endValueString = EndValue.ToOsbString(exportSettings);
+            var endValueString = (ExportEndValue ? EndValue : StartValue).ToOsbString(exportSettings);
 
             if (startTimeString == endTimeString)
                 endTimeString = string.Empty;
