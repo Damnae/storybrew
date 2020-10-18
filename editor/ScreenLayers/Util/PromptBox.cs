@@ -13,7 +13,6 @@ namespace StorybrewEditor.ScreenLayers.Util
 
         private LinearLayout mainLayout;
         private Textbox textbox;
-        private LinearLayout buttonsLayout;
         private Button okButton;
         private Button cancelButton;
 
@@ -53,7 +52,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                         AnchorFrom = BoxAlignment.Centre,
                         Value = initialText,
                     },
-                    buttonsLayout = new LinearLayout(WidgetManager)
+                    new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
                         AnchorFrom = BoxAlignment.Centre,

@@ -1,5 +1,6 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
+using OpenTK.Input;
 using System;
 
 namespace StorybrewEditor.ScreenLayers.Util
@@ -92,6 +93,24 @@ namespace StorybrewEditor.ScreenLayers.Util
                 cancelButton.OnClick += (sender, e) => Exit();
                 buttonsLayout.Add(cancelButton);
             }
+        }
+
+        public override bool OnKeyDown(KeyboardKeyEventArgs e)
+        {
+            if (!e.IsRepeat)
+            {
+                switch (e.Key)
+                {
+                    case Key.C:
+                        if (e.Control)
+                        {
+                            ClipboardHelper.SetText(message);
+                            return true;
+                        }
+                        break;
+                }
+            }
+            return base.OnKeyDown(e);
         }
 
         public override void Resize(int width, int height)
