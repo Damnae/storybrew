@@ -21,7 +21,9 @@ namespace StorybrewCommon.Mapset
                 var specialValues = special.Split(':');
                 var objectSampleSet = (SampleSet)int.Parse(specialValues[0]);
                 var objectAdditionsSampleSet = (SampleSet)int.Parse(specialValues[1]);
-                var objectCustomSampleSet = int.Parse(specialValues[2]);
+                var objectCustomSampleSet = 0;
+                if (specialValues.Length > 2)
+                    objectCustomSampleSet = int.Parse(specialValues[2]);
                 var objectVolume = 0.0f;
                 if (specialValues.Length > 3)
                     objectVolume = int.Parse(specialValues[3]);
