@@ -137,6 +137,8 @@ namespace StorybrewCommon.Scripting
         public int Random(int maxValue) => random.Next(maxValue);
         public double Random(double minValue, double maxValue) => minValue + random.NextDouble() * (maxValue - minValue);
         public double Random(double maxValue) => random.NextDouble() * maxValue;
+        public float Random(float minValue, float maxValue) => minValue + (float)random.NextDouble() * (maxValue - minValue);
+        public float Random(float maxValue) => (float)random.NextDouble() * maxValue;
 
         #endregion
 
