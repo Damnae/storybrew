@@ -113,8 +113,7 @@ namespace StorybrewCommon.Mapset
                     if (controlPoints.Count > 2)
                         goto case SliderCurveType.Bezier;
                     if (controlPoints.Count < 2 ||
-                        PlayfieldPosition == controlPoints[0].PlayfieldPosition ||
-                        controlPoints[0].PlayfieldPosition == controlPoints[1].PlayfieldPosition)
+                        !CircleCurve.IsValid(PlayfieldPosition, controlPoints[0].PlayfieldPosition, controlPoints[1].PlayfieldPosition))
                         goto case SliderCurveType.Linear;
                     curve = generateCircleCurve();
                     break;
