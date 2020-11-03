@@ -37,6 +37,7 @@ namespace StorybrewCommon.Scripting
             => context.Beatmaps.FirstOrDefault(b => b.Name == name);
 
         public string ProjectPath => context.ProjectPath;
+        public string AssetPath => context.ProjectAssetPath;
         public string MapsetPath => context.MapsetPath;
 
         public StoryboardObjectGenerator()
