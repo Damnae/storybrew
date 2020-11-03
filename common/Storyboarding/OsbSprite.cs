@@ -177,8 +177,11 @@ namespace StorybrewCommon.Storyboarding
 
         public void Parameter(OsbEasing easing, double startTime, double endTime, CommandParameter parameter) => addCommand(new ParameterCommand(easing, startTime, endTime, parameter));
         public void FlipH(double startTime, double endTime) => Parameter(OsbEasing.None, startTime, endTime, CommandParameter.FlipHorizontal);
+        public void FlipH(double time) => FlipH(time, time);
         public void FlipV(double startTime, double endTime) => Parameter(OsbEasing.None, startTime, endTime, CommandParameter.FlipVertical);
+        public void FlipV(double time) => FlipV(time, time);
         public void Additive(double startTime, double endTime) => Parameter(OsbEasing.None, startTime, endTime, CommandParameter.AdditiveBlending);
+        public void Additive(double time) => Additive(time, time);
 
         public LoopCommand StartLoopGroup(double startTime, int loopCount)
         {
