@@ -26,8 +26,8 @@ namespace StorybrewEditor
         public GameWindow Window { get; }
         public readonly FormsWindow FormsWindow;
 
-        private readonly Clock clock = new Clock();
-        public TimeSource TimeSource => clock;
+        private readonly FrameClock clock = new FrameClock();
+        public FrameTimeSource TimeSource => clock;
 
         public bool IsFixedRateUpdate { get; private set; }
 
@@ -223,7 +223,7 @@ namespace StorybrewEditor
         public void Update(double time, bool isFixedRateUpdate)
         {
             IsFixedRateUpdate = isFixedRateUpdate;
-            clock.Current = time;
+            clock.AdvanceFrameTo(time);
 
             updateOverlay();
             ScreenLayerManager.Update(IsFixedRateUpdate);
