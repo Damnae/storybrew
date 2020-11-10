@@ -60,6 +60,7 @@ namespace StorybrewEditor.ScreenLayers
 
         private AudioStream audio;
         private TimeSourceExtender timeSource;
+        private double? pendingSeek;
 
         private int snapDivisor = 4;
         private Vector2 storyboardPosition;
@@ -314,7 +315,7 @@ namespace StorybrewEditor.ScreenLayers
             });
 
             resizeTimeline();
-            timeline.OnValueChanged += (sender, e) => timeSource.Seek(timeline.Value);
+            timeline.OnValueChanged += (sender, e) => pendingSeek = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
             changeMapButton.OnClick += (sender, e) =>
@@ -510,12 +511,23 @@ namespace StorybrewEditor.ScreenLayers
             });
         }
 
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (pendingSeek.HasValue)
+            {
+                timeSource.Seek(pendingSeek.Value);
+                pendingSeek = null;
+            }
+        }
+
         public override void Update(bool isTop, bool isCovered)
         {
             base.Update(isTop, isCovered);
 
             timeSource.Update();
-            var time = (float)timeSource.Current;
+            var time = (float)(pendingSeek ?? timeSource.Current);
 
             changeMapButton.Disabled = project.MapsetManager.BeatmapCount < 2;
             playPauseButton.Icon = timeSource.Playing ? IconFont.Pause : IconFont.Play;
@@ -527,7 +539,7 @@ namespace StorybrewEditor.ScreenLayers
                 timeline.RepeatStart != timeline.RepeatEnd &&
                 (time < timeline.RepeatStart - 0.005 || timeline.RepeatEnd < time))
             {
-                timeSource.Seek(time = timeline.RepeatStart);
+                pendingSeek = time = timeline.RepeatStart;
             }
 
             timeline.SetValueSilent(time);
@@ -658,7 +670,7 @@ namespace StorybrewEditor.ScreenLayers
 
             if (previousAudio != null)
             {
-                timeSource.Seek(previousTimeSource.Current);
+                pendingSeek = previousTimeSource.Current;
                 timeSource.TimeFactor = previousTimeSource.TimeFactor;
                 timeSource.Playing = previousTimeSource.Playing;
                 previousAudio.Dispose();
