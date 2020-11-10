@@ -89,7 +89,6 @@
     <Compile Include="Editor.cs" />
     <Compile Include="Processes\RemoteProcessWorkerContainer.cs" />
     <Compile Include="Processes\RemoteProcessWorker.cs" />
-    <Compile Include="ScreenLayers\Test\LineBreakTest.cs" />
     <Compile Include="Scripting\ScriptContainer.cs" />
     <Compile Include="Scripting\ScriptContainerBase.cs" />
     <Compile Include="Scripting\ScriptContainerProcess.cs" />
@@ -111,7 +110,6 @@
     <Compile Include="Util\MultiFileWatcher.cs" />
     <None Include="OpenTK.dll.config" />
     <EmbeddedResource Include="Resources\scripttemplate.csx" />
-    <Compile Include="ScreenLayers\Test\FlowLayoutTest.cs" />
     <Compile Include="ScreenLayers\UpdateMenu.cs" />
     <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
     <Compile Include="Settings.cs" />
