@@ -535,11 +535,15 @@ namespace StorybrewEditor.ScreenLayers
             exportButton.Disabled = !project.MapsetPathIsValid;
             audio.Volume = WidgetManager.Root.Opacity;
 
-            if (timeSource.Playing &&
-                timeline.RepeatStart != timeline.RepeatEnd &&
-                (time < timeline.RepeatStart - 0.005 || timeline.RepeatEnd < time))
+            if (timeSource.Playing)
             {
-                pendingSeek = time = timeline.RepeatStart;
+                if (timeline.RepeatStart != timeline.RepeatEnd && (time < timeline.RepeatStart - 0.005 || timeline.RepeatEnd < time))
+                    pendingSeek = time = timeline.RepeatStart;
+                else if (timeSource.Current > timeline.MaxValue)
+                {
+                    timeSource.Playing = false;
+                    pendingSeek = timeline.MaxValue;
+                }
             }
 
             timeline.SetValueSilent(time);
