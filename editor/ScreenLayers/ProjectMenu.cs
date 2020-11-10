@@ -1,4 +1,5 @@
 ﻿using BrewLib.Audio;
+using BrewLib.Time;
 using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
@@ -58,7 +59,7 @@ namespace StorybrewEditor.ScreenLayers
         private EffectConfigUi effectConfigUi;
 
         private AudioStream audio;
-        private AudioChannelTimeSource timeSource;
+        private TimeSourceExtender timeSource;
 
         private int snapDivisor = 4;
         private Vector2 storyboardPosition;
@@ -308,10 +309,11 @@ namespace StorybrewEditor.ScreenLayers
 
             timeButton.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", value =>
             {
-                if (float.TryParse(value, out float time)) timeline.Value = time / 1000;
+                if (float.TryParse(value, out float time))
+                    timeline.Value = time / 1000;
             });
 
-            timeline.MaxValue = (float)audio.Duration;
+            resizeTimeline();
             timeline.OnValueChanged += (sender, e) => timeSource.Seek(timeline.Value);
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
@@ -338,7 +340,7 @@ namespace StorybrewEditor.ScreenLayers
             {
                 if (e == MouseButton.Left)
                 {
-                    var speed = audio.TimeFactor;
+                    var speed = timeSource.TimeFactor;
                     if (speed > 1) speed = 2;
                     speed *= 0.5;
                     if (speed < 0.2) speed = 1;
@@ -383,6 +385,7 @@ namespace StorybrewEditor.ScreenLayers
             };
 
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
+            project.OnEffectsContentChanged += project_OnEffectsContentChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
 
             if (!project.MapsetPathIsValid)
@@ -511,13 +514,14 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Update(isTop, isCovered);
 
+            timeSource.Update();
+            var time = (float)timeSource.Current;
+
             changeMapButton.Disabled = project.MapsetManager.BeatmapCount < 2;
             playPauseButton.Icon = timeSource.Playing ? IconFont.Pause : IconFont.Play;
             saveButton.Disabled = !project.Changed;
             exportButton.Disabled = !project.MapsetPathIsValid;
             audio.Volume = WidgetManager.Root.Opacity;
-
-            var time = (float)timeSource.Current;
 
             if (timeSource.Playing &&
                 timeline.RepeatStart != timeline.RepeatEnd &&
@@ -531,7 +535,7 @@ namespace StorybrewEditor.ScreenLayers
             {
                 timeButton.Text = Manager.GetContext<Editor>().InputManager.Alt ?
                     $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
-                    $"{(int)time / 60:00}:{(int)time % 60:00}:{(int)(time * 1000) % 1000:000}";
+                    $"{(time < 0 ? "-" : "")}{(int)Math.Abs(time / 60):00}:{(int)Math.Abs(time % 60):00}:{(int)Math.Abs(time * 1000) % 1000:000}";
 
                 warningsLabel.Text = buildWarningMessage();
                 warningsLabel.Displayed = warningsLabel.Text.Length > 0;
@@ -606,6 +610,12 @@ namespace StorybrewEditor.ScreenLayers
             mainStoryboardContainer.Size = fitButton.Checked ? new Vector2(parentSize.X, (parentSize.X * 9) / 16) : parentSize;
         }
 
+        private void resizeTimeline()
+        {
+            timeline.MinValue = (float)Math.Min(0, project.StartTime * 0.001);
+            timeline.MaxValue = (float)Math.Max(audio.Duration, project.EndTime * 0.001);
+        }
+
         public override void Close()
         {
             withSavePrompt(() =>
@@ -635,17 +645,17 @@ namespace StorybrewEditor.ScreenLayers
         private void refreshAudio()
         {
             audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
-            timeSource = new AudioChannelTimeSource(audio);
+            timeSource = new TimeSourceExtender(new AudioChannelTimeSource(audio));
         }
 
         private void project_OnMapsetPathChanged(object sender, EventArgs e)
         {
             var previousAudio = audio;
             var previousTimeSource = timeSource;
-            
-            refreshAudio();
 
-            timeline.MaxValue = (float)audio.Duration;
+            refreshAudio();
+            resizeTimeline();
+
             if (previousAudio != null)
             {
                 timeSource.Seek(previousTimeSource.Current);
@@ -653,6 +663,11 @@ namespace StorybrewEditor.ScreenLayers
                 timeSource.Playing = previousTimeSource.Playing;
                 previousAudio.Dispose();
             }
+        }
+
+        private void project_OnEffectsContentChanged(object sender, EventArgs e)
+        {
+            resizeTimeline();
         }
 
         private void project_OnEffectsStatusChanged(object sender, EventArgs e)
@@ -687,6 +702,7 @@ namespace StorybrewEditor.ScreenLayers
             {
                 if (disposing)
                 {
+                    project.OnEffectsContentChanged -= project_OnEffectsContentChanged;
                     project.OnEffectsStatusChanged -= project_OnEffectsStatusChanged;
                     project.Dispose();
                     audio.Dispose();

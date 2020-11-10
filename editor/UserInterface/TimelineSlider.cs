@@ -37,9 +37,9 @@ namespace StorybrewEditor.UserInterface
         public bool ShowHitObjects;
 
         private float dragStart;
-        private float repeatEnd;
+
         public float RepeatStart { get; private set; }
-        public float RepeatEnd => repeatEnd;
+        public float RepeatEnd { get; private set; }
 
         private double highlightStart;
         private double highlightEnd;
@@ -92,7 +92,7 @@ namespace StorybrewEditor.UserInterface
 
             var currentTimingPoint = project.MainBeatmap.GetTimingPointAt((int)(Value * 1000));
             var targetTimeSpan = (SnapDivisor >= 2 ? SnapDivisor >= 8 ? 1 : 2 : 4) * (170 / (float)currentTimingPoint.Bpm);
-            timeSpan = timeSpan + (targetTimeSpan - timeSpan) * 0.01f;
+            timeSpan += (targetTimeSpan - timeSpan) * 0.01f;
 
             var leftTime = (int)((Value - timeSpan) * 1000);
             var rightTime = (int)((Value + timeSpan) * 1000);
@@ -100,12 +100,12 @@ namespace StorybrewEditor.UserInterface
             var valueLength = MaxValue - MinValue;
 
             // Repeat
-            if (RepeatStart != repeatEnd)
+            if (RepeatStart != RepeatEnd)
             {
                 line.Color = repeatColor;
 
                 var left = timeToXTop(RepeatStart);
-                var right = timeToXTop(repeatEnd);
+                var right = timeToXTop(RepeatEnd);
                 if (right < left + pixelSize)
                     right = left + pixelSize;
 
@@ -213,11 +213,11 @@ namespace StorybrewEditor.UserInterface
                 var x = timeToXTop(Value);
                 var lineSize = new Vector2(pixelSize, bounds.Height * 0.4f);
 
-                if (RepeatStart != repeatEnd)
+                if (RepeatStart != RepeatEnd)
                 {
                     drawLine(drawContext, new Vector2(timeToXTop(RepeatStart) - pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
                     drawLine(drawContext, new Vector2(x, offset.Y), lineSize * 0.6f, Color4.White, actualOpacity);
-                    drawLine(drawContext, new Vector2(timeToXTop(repeatEnd) + pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
+                    drawLine(drawContext, new Vector2(timeToXTop(RepeatEnd) + pixelSize, offset.Y), lineSize, Color4.White, actualOpacity);
                 }
                 else
                 {
@@ -237,7 +237,7 @@ namespace StorybrewEditor.UserInterface
 
         private float timeToXTop(double time)
         {
-            var progress = time / (MaxValue - MinValue);
+            var progress = (time - MinValue) / (MaxValue - MinValue);
             return (float)Manager.SnapToPixel(AbsolutePosition.X + progress * Width);
         }
 
@@ -269,7 +269,7 @@ namespace StorybrewEditor.UserInterface
 
             dragStart = Value;
             RepeatStart = dragStart;
-            repeatEnd = dragStart;
+            RepeatEnd = dragStart;
         }
 
         protected override void DragUpdate(MouseButton button)
@@ -280,12 +280,12 @@ namespace StorybrewEditor.UserInterface
             if (value < dragStart)
             {
                 RepeatStart = value;
-                repeatEnd = dragStart;
+                RepeatEnd = dragStart;
             }
             else
             {
                 RepeatStart = dragStart;
-                repeatEnd = value;
+                RepeatEnd = value;
             }
         }
 

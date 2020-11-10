@@ -194,6 +194,10 @@ namespace StorybrewEditor.Storyboarding
         public EffectStatus EffectsStatus { get; private set; } = EffectStatus.Initializing;
         public event EventHandler OnEffectsStatusChanged;
 
+        public double StartTime => effects.Min(e => e.StartTime);
+        public double EndTime => effects.Max(e => e.EndTime);
+        public event EventHandler OnEffectsContentChanged;
+
         private bool allowEffectUpdates = true;
 
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
@@ -257,8 +261,10 @@ namespace StorybrewEditor.Storyboarding
 
         private void effect_OnChanged(object sender, EventArgs e)
         {
-            refreshEffectsStatus();
             Changed = true;
+
+            refreshEffectsStatus();
+            OnEffectsContentChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void refreshEffectsStatus()
