@@ -58,6 +58,7 @@ namespace StorybrewEditor.ScreenLayers
         private EffectConfigUi effectConfigUi;
 
         private AudioStream audio;
+        private AudioChannelTimeSource timeSource;
 
         private int snapDivisor = 4;
         private Vector2 storyboardPosition;
@@ -71,7 +72,7 @@ namespace StorybrewEditor.ScreenLayers
         {
             base.Load();
 
-            audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
+            refreshAudio();
 
             WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager)
             {
@@ -113,7 +114,7 @@ namespace StorybrewEditor.ScreenLayers
                     audioTimeFactorButton = new Button(WidgetManager)
                     {
                         StyleName = "small",
-                        Text = $"{audio.TimeFactor:P0}",
+                        Text = $"{timeSource.TimeFactor:P0}",
                         Tooltip = "Audio speed",
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
@@ -311,7 +312,7 @@ namespace StorybrewEditor.ScreenLayers
             });
 
             timeline.MaxValue = (float)audio.Duration;
-            timeline.OnValueChanged += (sender, e) => audio.Time = timeline.Value;
+            timeline.OnValueChanged += (sender, e) => timeSource.Seek(timeline.Value);
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
             changeMapButton.OnClick += (sender, e) =>
@@ -321,7 +322,7 @@ namespace StorybrewEditor.ScreenLayers
                 else project.SwitchMainBeatmap();
             };
             Program.Settings.FitStoryboard.Bind(fitButton, () => resizeStoryboard());
-            playPauseButton.OnClick += (sender, e) => audio.Playing = !audio.Playing;
+            playPauseButton.OnClick += (sender, e) => timeSource.Playing = !timeSource.Playing;
 
             divisorButton.OnClick += (sender, e) =>
             {
@@ -341,20 +342,20 @@ namespace StorybrewEditor.ScreenLayers
                     if (speed > 1) speed = 2;
                     speed *= 0.5;
                     if (speed < 0.2) speed = 1;
-                    audio.TimeFactor = speed;
+                    timeSource.TimeFactor = speed;
                 }
                 else if (e == MouseButton.Right)
                 {
-                    var speed = audio.TimeFactor;
+                    var speed = timeSource.TimeFactor;
                     if (speed < 1) speed = 1;
                     speed += speed >= 2 ? 1 : 0.5;
                     if (speed > 8) speed = 1;
-                    audio.TimeFactor = speed;
+                    timeSource.TimeFactor = speed;
                 }
                 else if (e == MouseButton.Middle)
-                    audio.TimeFactor = audio.TimeFactor == 8 ? 1 : 8;
+                    timeSource.TimeFactor = timeSource.TimeFactor == 8 ? 1 : 8;
 
-                audioTimeFactorButton.Text = $"{audio.TimeFactor:P0}";
+                audioTimeFactorButton.Text = $"{timeSource.TimeFactor:P0}";
             };
 
             MakeTabs(
@@ -431,8 +432,8 @@ namespace StorybrewEditor.ScreenLayers
                         if (e.Control)
                         {
                             if (e.Shift)
-                                ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(audio.Time * 1000)).ToString(Program.Settings.TimeCopyFormat));
-                            else ClipboardHelper.SetText(((int)(audio.Time * 1000)).ToString());
+                                ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(timeSource.Current * 1000)).ToString(Program.Settings.TimeCopyFormat));
+                            else ClipboardHelper.SetText(((int)(timeSource.Current * 1000)).ToString());
                             return true;
                         }
                         break;
@@ -511,18 +512,18 @@ namespace StorybrewEditor.ScreenLayers
             base.Update(isTop, isCovered);
 
             changeMapButton.Disabled = project.MapsetManager.BeatmapCount < 2;
-            playPauseButton.Icon = audio.Playing ? IconFont.Pause : IconFont.Play;
+            playPauseButton.Icon = timeSource.Playing ? IconFont.Pause : IconFont.Play;
             saveButton.Disabled = !project.Changed;
             exportButton.Disabled = !project.MapsetPathIsValid;
             audio.Volume = WidgetManager.Root.Opacity;
 
-            var time = (float)audio.Time;
+            var time = (float)timeSource.Current;
 
-            if (audio.Playing &&
+            if (timeSource.Playing &&
                 timeline.RepeatStart != timeline.RepeatEnd &&
                 (time < timeline.RepeatStart - 0.005 || timeline.RepeatEnd < time))
             {
-                audio.Time = time = timeline.RepeatStart;
+                timeSource.Seek(time = timeline.RepeatStart);
             }
 
             timeline.SetValueSilent(time);
@@ -538,7 +539,7 @@ namespace StorybrewEditor.ScreenLayers
                 warningsLabel.Pack();
             }
 
-            if (audio.Playing && mainStoryboardDrawable.Time < time)
+            if (timeSource.Playing && mainStoryboardDrawable.Time < time)
                 project.TriggerEvents(mainStoryboardDrawable.Time, time);
 
             mainStoryboardDrawable.Time = time;
@@ -631,18 +632,25 @@ namespace StorybrewEditor.ScreenLayers
             else action();
         }
 
+        private void refreshAudio()
+        {
+            audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
+            timeSource = new AudioChannelTimeSource(audio);
+        }
+
         private void project_OnMapsetPathChanged(object sender, EventArgs e)
         {
             var previousAudio = audio;
+            var previousTimeSource = timeSource;
+            
+            refreshAudio();
 
-            audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
             timeline.MaxValue = (float)audio.Duration;
-
             if (previousAudio != null)
             {
-                audio.Time = previousAudio.Time;
-                audio.TimeFactor = previousAudio.TimeFactor;
-                audio.Playing = previousAudio.Playing;
+                timeSource.Seek(previousTimeSource.Current);
+                timeSource.TimeFactor = previousTimeSource.TimeFactor;
+                timeSource.Playing = previousTimeSource.Playing;
                 previousAudio.Dispose();
             }
         }
@@ -685,6 +693,7 @@ namespace StorybrewEditor.ScreenLayers
                 }
                 project = null;
                 audio = null;
+                timeSource = null;
                 disposedValue = true;
             }
         }
