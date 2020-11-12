@@ -194,8 +194,8 @@ namespace StorybrewEditor.Storyboarding
         public EffectStatus EffectsStatus { get; private set; } = EffectStatus.Initializing;
         public event EventHandler OnEffectsStatusChanged;
 
-        public double StartTime => effects.Min(e => e.StartTime);
-        public double EndTime => effects.Max(e => e.EndTime);
+        public double StartTime => effects.Count > 0 ? effects.Min(e => e.StartTime) : 0;
+        public double EndTime => effects.Count > 0 ? effects.Max(e => e.EndTime) : 0;
         public event EventHandler OnEffectsContentChanged;
 
         private bool allowEffectUpdates = true;
