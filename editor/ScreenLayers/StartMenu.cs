@@ -1,11 +1,12 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
-using Newtonsoft.Json.Linq;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using Tiny;
+using Tiny.Formats.Json;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -146,8 +147,8 @@ namespace StorybrewEditor.ScreenLayers
                         var description = "";
                         var downloadUrl = (string)null;
 
-                        var releases = JArray.Parse(response);
-                        foreach (var release in releases.Children<JObject>())
+                        var releases = TinyToken.ReadString<JsonFormat>(response);
+                        foreach (var release in releases.Values<TinyObject>())
                         {
                             var isDraft = release.Value<bool>("draft");
                             var isPrerelease = release.Value<bool>("prerelease");
@@ -161,8 +162,7 @@ namespace StorybrewEditor.ScreenLayers
                                 hasLatest = true;
                                 latestVersion = version;
 
-                                var assets = release.GetValue("assets");
-                                foreach (var asset in assets)
+                                foreach (var asset in release.Values<TinyObject>("assets"))
                                 {
                                     var downloadName = asset.Value<string>("name");
                                     if (downloadName.EndsWith(".zip"))
@@ -176,8 +176,8 @@ namespace StorybrewEditor.ScreenLayers
                             if (Program.Version < version || Program.Version >= latestVersion)
                             {
                                 var publishedAt = release.Value<string>("published_at");
-                                var publishDate = DateTime.ParseExact(publishedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-                                var authorName = release.GetValue("author").Value<string>("login");
+                                var publishDate = DateTime.ParseExact(publishedAt, @"yyyy-MM-dd\THH:mm:ss\Z", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                                var authorName = release.Value<string>("author", "login");
 
                                 var body = release.Value<string>("body");
                                 if (body.Contains("---")) body = body.Substring(0, body.IndexOf("---"));
