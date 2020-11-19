@@ -79,7 +79,7 @@ namespace StorybrewEditor.UserInterface.Components
                 },
             });
 
-            addEffectButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Select an effect", (effectName) => project.AddEffect(effectName), project.GetEffectNames());
+            addEffectButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Select an effect", (effectName) => project.AddScriptedEffect(effectName), project.GetEffectNames());
             newScriptButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Script name", name => createScript(name));
 
             project.OnEffectsChanged += project_OnEffectsChanged;
@@ -296,7 +296,7 @@ namespace StorybrewEditor.UserInterface.Components
             }
 
             File.WriteAllText(path, script);
-            openEffectEditor(project.AddEffect(name));
+            openEffectEditor(project.AddScriptedEffect(name));
         }
 
         private void openEffectEditor(Effect effect)

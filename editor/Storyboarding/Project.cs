@@ -219,11 +219,14 @@ namespace StorybrewEditor.Storyboarding
         public Effect GetEffectByName(string name)
             => effects.Find(e => e.Name == name);
 
-        public Effect AddEffect(string effectName)
+        public Effect AddScriptedEffect(string scriptName)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
-            var effect = new ScriptedEffect(this, scriptManager.Get(effectName));
+            var effect = new ScriptedEffect(this, scriptManager.Get(scriptName))
+            {
+                Name = GetUniqueEffectName(scriptName),
+            };
 
             effects.Add(effect);
             Changed = true;
@@ -545,7 +548,7 @@ namespace StorybrewEditor.Storyboarding
                     var baseName = r.ReadString();
                     var name = r.ReadString();
 
-                    var effect = AddEffect(baseName);
+                    var effect = AddScriptedEffect(baseName);
                     effect.Guid = guid;
                     effect.Name = name;
 
@@ -759,7 +762,7 @@ namespace StorybrewEditor.Storyboarding
                     if (effectVersion > Version)
                         throw new InvalidOperationException("This project contains an effect that was saved with a more recent version, you need to update to open it");
 
-                    var effect = AddEffect(effectRoot.Value<string>("Script"));
+                    var effect = AddScriptedEffect(effectRoot.Value<string>("Script"));
                     effect.Guid = Guid.Parse(guidMatch.Groups[1].Value);
                     effect.Name = effectRoot.Value<string>("Name");
 

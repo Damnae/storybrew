@@ -2,10 +2,8 @@
 using StorybrewEditor.Scripting;
 using StorybrewEditor.Util;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Remoting;
 
 namespace StorybrewEditor.Storyboarding
@@ -13,27 +11,13 @@ namespace StorybrewEditor.Storyboarding
     public class ScriptedEffect : Effect
     {
         private readonly ScriptContainer<StoryboardObjectGenerator> scriptContainer;
-        private List<EditorStoryboardLayer> layers;
-        private EditorStoryboardLayer placeHolderLayer;
+
         private readonly Stopwatch statusStopwatch = new Stopwatch();
         private string configScriptIdentifier;
         private MultiFileWatcher dependencyWatcher;
 
-        private string name;
-        public override string Name
-        {
-            get { return name; }
-            set
-            {
-                if (name == value) return;
-                name = value;
-                RaiseChanged();
-                refreshLayerNames();
-            }
-        }
-
-        public override string BaseName => scriptContainer.Name;
-        public override string Path => scriptContainer.MainSourcePath;
+        public override string BaseName => scriptContainer?.Name;
+        public override string Path => scriptContainer?.MainSourcePath;
 
         private EffectStatus status = EffectStatus.Initializing;
         public override EffectStatus Status => status;
@@ -43,42 +27,12 @@ namespace StorybrewEditor.Storyboarding
         private bool beatmapDependant = true;
         public override bool BeatmapDependant => beatmapDependant;
 
-        public override double StartTime => layers.Select(l => l.StartTime).DefaultIfEmpty().Min();
-        public override double EndTime => layers.Select(l => l.EndTime).DefaultIfEmpty().Max();
-        
-        private int estimatedSize;
-        public override int EstimatedSize => estimatedSize;
-
         public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
         {
             statusStopwatch.Start();
 
             this.scriptContainer = scriptContainer;
-            name = project.GetUniqueEffectName(BaseName);
-
-            layers = new List<EditorStoryboardLayer>
-            {
-                (placeHolderLayer = new EditorStoryboardLayer(string.Empty, this))
-            };
-            refreshLayerNames();
-
-            Project.LayerManager.Add(placeHolderLayer);
-
             scriptContainer.OnScriptChanged += scriptContainer_OnScriptChanged;
-        }
-
-        public override void AddPlaceholder(EditorStoryboardLayer layer)
-        {
-            if (placeHolderLayer != null)
-            {
-                layers.Remove(placeHolderLayer);
-                Project.LayerManager.Remove(placeHolderLayer);
-                placeHolderLayer = null;
-            }
-            layers.Add(layer);
-            refreshLayerNames();
-
-            Project.LayerManager.Add(layer);
         }
 
         /// <summary>
@@ -121,7 +75,7 @@ namespace StorybrewEditor.Storyboarding
                 script.Generate(context);
                 foreach (var layer in context.EditorLayers)
                     layer.PostProcess();
-                
+
                 success = true;
             }
             catch (RemotingException e)
@@ -183,40 +137,12 @@ namespace StorybrewEditor.Storyboarding
                 if (Project.IsDisposed)
                     return;
 
-                if (placeHolderLayer != null)
-                {
-                    Project.LayerManager.Replace(placeHolderLayer, context.EditorLayers);
-                    placeHolderLayer = null;
-                }
-                else Project.LayerManager.Replace(layers, context.EditorLayers);
-                layers = context.EditorLayers;
-                refreshLayerNames();
-                refreshEstimatedSize();
+                UpdateLayers(context.EditorLayers);
             });
-        }
-
-        public override void Refresh()
-        {
-            if (Project.IsDisposed) return;
-            Project.QueueEffectUpdate(this);
         }
 
         private void scriptContainer_OnScriptChanged(object sender, EventArgs e)
             => Refresh();
-
-        private void refreshLayerNames()
-        {
-            foreach (var layer in layers)
-                layer.Name = string.IsNullOrWhiteSpace(layer.Identifier) ? $"{name}" : $"{name} ({layer.Identifier})";
-        }
-
-        private void refreshEstimatedSize()
-        {
-            estimatedSize = 0;
-            foreach (var layer in layers)
-                estimatedSize += layer.EstimatedSize;
-            RaiseChanged();
-        }
 
         private void changeStatus(EffectStatus status, string message = null, string log = null)
         {
@@ -269,11 +195,8 @@ namespace StorybrewEditor.Storyboarding
                 {
                     dependencyWatcher?.Dispose();
                     scriptContainer.OnScriptChanged -= scriptContainer_OnScriptChanged;
-                    foreach (var layer in layers)
-                        Project.LayerManager.Remove(layer);
                 }
                 dependencyWatcher = null;
-                layers = null;
                 disposedValue = true;
             }
 
