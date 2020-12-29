@@ -711,7 +711,7 @@ namespace StorybrewEditor.Storyboarding
                     effectRoot.Write(effectPath);
                 }
 
-                directoryWriter.Commit();
+                directoryWriter.Commit(checkPaths: true);
                 Changed = false;
             }
         }

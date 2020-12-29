@@ -479,7 +479,7 @@ namespace StorybrewEditor.ScreenLayers
         }
 
         private void saveProject()
-            => Manager.AsyncLoading("Saving", () => project.Save());
+            => Manager.AsyncLoading("Saving", () => Program.RunMainThread(() => project.Save()));
 
         private void exportProject()
             => Manager.AsyncLoading("Exporting", () => project.ExportToOsb());
