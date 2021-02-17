@@ -77,6 +77,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tiny, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Damnae.Tiny.1.0.0\lib\net452\Tiny.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Builder.cs" />
@@ -168,10 +171,6 @@
     <ProjectReference Include="..\common\common.csproj">
       <Project>{f0edccec-4b64-4ce8-801f-1377e3384dc4}</Project>
       <Name>common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\tiny\tiny.csproj">
-      <Project>{520e33d3-e022-4581-acd8-bed838bc817e}</Project>
-      <Name>tiny</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
