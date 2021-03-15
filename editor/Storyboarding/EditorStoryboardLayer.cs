@@ -202,7 +202,7 @@ namespace StorybrewEditor.Storyboarding
             };
             using (var stream = new ByteCounterStream())
             {
-                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                using (var writer = new StreamWriter(stream, Project.Encoding))
                     foreach (var sbo in storyboardObjects)
                         sbo.WriteOsb(writer, exportSettings, osbLayer);
 

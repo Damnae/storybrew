@@ -25,6 +25,8 @@ namespace StorybrewEditor.Storyboarding
 {
     public class Project : IDisposable
     {
+        public static readonly Encoding Encoding = new UTF8Encoding();
+
         public const string BinaryExtension = ".sbp";
         public const string TextExtension = ".yaml";
         public const string DefaultBinaryFilename = "project" + BinaryExtension;
@@ -876,9 +878,9 @@ namespace StorybrewEditor.Storyboarding
             {
                 Debug.Print($"Exporting diff specific events to {osuPath}");
                 using (var stream = new SafeWriteStream(osuPath))
-                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                using (var writer = new StreamWriter(stream, Encoding))
                 using (var fileStream = new FileStream(osuPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                using (var reader = new StreamReader(fileStream, Encoding.UTF8))
+                using (var reader = new StreamReader(fileStream, Encoding))
                 {
                     string line;
                     var inEvents = false;
@@ -926,7 +928,7 @@ namespace StorybrewEditor.Storyboarding
             {
                 Debug.Print($"Exporting osb to {osbPath}");
                 using (var stream = new SafeWriteStream(osbPath))
-                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                using (var writer = new StreamWriter(stream, Encoding))
                 {
                     writer.WriteLine("[Events]");
                     writer.WriteLine("//Background and Video events");

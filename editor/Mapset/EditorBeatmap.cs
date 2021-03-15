@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Util;
+using StorybrewEditor.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -115,7 +116,7 @@ namespace StorybrewEditor.Mapset
             {
                 var beatmap = new EditorBeatmap(path);
                 using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+                using (var reader = new StreamReader(stream, Project.Encoding))
                     reader.ParseSections(sectionName =>
                     {
                         switch (sectionName)

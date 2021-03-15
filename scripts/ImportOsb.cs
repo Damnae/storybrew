@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace StorybrewScripts
 {
@@ -19,7 +20,7 @@ namespace StorybrewScripts
         public override void Generate()
         {
             using (var stream = OpenProjectFile(Path))
-            using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+            using (var reader = new StreamReader(stream, new UTF8Encoding()))
                 reader.ParseSections(sectionName =>
                 {
                     switch (sectionName)
