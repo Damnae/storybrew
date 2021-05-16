@@ -48,7 +48,7 @@ namespace StorybrewCommon.Storyboarding.Display
                     else break;
                 }
 
-                HasOverlap =
+                HasOverlap |=
                     (index > 0 && (int)Math.Round(command.StartTime) < (int)Math.Round(commands[index - 1].EndTime)) ||
                     (index < commands.Count && (int)Math.Round(commands[index].StartTime) < (int)Math.Round(command.EndTime));
 
