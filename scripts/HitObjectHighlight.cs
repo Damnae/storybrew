@@ -16,7 +16,7 @@ namespace StorybrewScripts
         public int BeatDivisor = 8;
 
         [Configurable]
-        public int FadeTime = 200;
+        public int FadeDuration = 200;
 
         [Configurable]
         public string SpritePath = "sb/glow.png";
@@ -34,9 +34,9 @@ namespace StorybrewScripts
                     continue;
 
                 var hSprite = hitobjectLayer.CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position);
-                hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeTime, SpriteScale, SpriteScale * 0.2);
-                hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeTime, 1, 0);
-                hSprite.Additive(hitobject.StartTime, hitobject.EndTime + FadeTime);
+                hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeDuration, SpriteScale, SpriteScale * 0.2);
+                hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeDuration, 1, 0);
+                hSprite.Additive(hitobject.StartTime, hitobject.EndTime + FadeDuration);
                 hSprite.Color(hitobject.StartTime, hitobject.Color);
 
                 if (hitobject is OsuSlider)
