@@ -76,7 +76,7 @@ namespace StorybrewScripts
             var bitmap = GetMapsetBitmap(Path);
 
             var duration = (double)(EndTime - StartTime);
-            var loopCount = (int)Math.Floor(duration / Lifetime);
+            var loopCount = Math.Max(1, (int)Math.Floor(duration / Lifetime));
 
             var layer = GetLayer("");
             for (var i = 0; i < ParticleCount; i++)
