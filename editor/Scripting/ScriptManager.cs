@@ -176,7 +176,9 @@ namespace StorybrewEditor.Scripting
             Trace.WriteLine($"Updating solution files");
 
             var slnPath = Path.Combine(ScriptsPath, "storyboard.sln");
-            File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative));
+            var templateSlnBytes = resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative);
+            if (!File.Exists(slnPath) || !File.ReadAllBytes(slnPath).SequenceEqual(templateSlnBytes))
+                File.WriteAllBytes(slnPath, templateSlnBytes);
 
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
