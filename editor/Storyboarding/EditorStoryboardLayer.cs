@@ -143,6 +143,15 @@ namespace StorybrewEditor.Storyboarding
             return storyboardObject;
         }
 
+        public override void Discard(StoryboardObject storyboardObject)
+        {
+            storyboardObjects.Remove(storyboardObject);
+            if (storyboardObject is DisplayableObject displayableObject)
+                displayableObjects.Remove(displayableObject);
+            if (storyboardObject is EventObject eventObject)
+                eventObjects.Remove(eventObject);
+        }
+
         public void TriggerEvents(double fromTime, double toTime)
         {
             if (!Visible) return;
