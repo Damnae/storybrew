@@ -1,0 +1,19 @@
+<Project>
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <HintPath>../../PresentationCore.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <HintPath>../../PresentationFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xaml">
+      <HintPath>../../System.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <HintPath>../../WindowsBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Coosu.Storyboard.Storybrew">
+      <HintPath>../../Coosu.Storyboard.Storybrew.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

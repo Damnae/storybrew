@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "editor": {
+      "commandName": "Project",
+      "workingDirectory": "E:\\Games\\storybrew\\"
+    }
+  }
+}

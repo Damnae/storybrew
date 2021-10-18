@@ -6,10 +6,11 @@
     <Configurations>Output</Configurations>
     <RootNamespace>storyboard</RootNamespace>
     <AssemblyName>storyboard</AssemblyName>
+    <Platforms>x86</Platforms>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Output|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Output|x86' ">
     <Optimize>true</Optimize>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <BaseOutputPath>..\..\cache\bin</BaseOutputPath>

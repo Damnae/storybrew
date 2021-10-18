@@ -841,9 +841,19 @@ namespace StorybrewEditor.Storyboarding
                 throw new InvalidOperationException($"A project already exists at '{projectFolderPath}'");
 
             Directory.CreateDirectory(projectFolderPath);
-            var project = new Project(Path.Combine(projectFolderPath, DefaultTextFilename), withCommonScripts, resourceContainer)
+            var current = Environment.CurrentDirectory;
+            var project = new Project(Path.Combine(projectFolderPath, DefaultTextFilename), withCommonScripts,
+                resourceContainer)
             {
                 MapsetPath = mapsetPath,
+                ImportedAssemblies = new[]
+                {
+                    current + "\\Coosu.Storyboard.Storybrew.dll",
+                    current + "\\PresentationCore.dll",
+                    current + "\\PresentationFramework.dll",
+                    current + "\\System.Xaml.dll",
+                    current + "\\WindowsBase.dll",
+                }
             };
             project.Save();
 

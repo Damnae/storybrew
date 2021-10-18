@@ -1,4 +1,6 @@
-﻿using OpenTK;
+﻿using Coosu.Storyboard;
+using Coosu.Storyboard.Easing;
+using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;

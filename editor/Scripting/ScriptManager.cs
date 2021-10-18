@@ -180,6 +180,11 @@ namespace StorybrewEditor.Scripting
             if (!File.Exists(slnPath) || !File.ReadAllBytes(slnPath).SequenceEqual(templateSlnBytes))
                 File.WriteAllBytes(slnPath, templateSlnBytes);
 
+            var msbuildPath = Path.Combine(ScriptsPath, "Directory.Build.targets");
+            var templateMsbuildBytes = resourceContainer.GetBytes("project/Directory.Build.targets", ResourceSource.Embedded | ResourceSource.Relative);
+            if (!File.Exists(msbuildPath) || !File.ReadAllBytes(msbuildPath).SequenceEqual(templateMsbuildBytes))
+                File.WriteAllBytes(msbuildPath, templateMsbuildBytes);
+
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
             try
@@ -190,14 +195,14 @@ namespace StorybrewEditor.Scripting
                 var xmlns = document.DocumentElement.GetAttribute("xmlns");
                 var compileGroup = document.CreateElement("ItemGroup", xmlns);
                 document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
-                {
-                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
+                //foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
+                //{
+                //    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
 
-                    var compileNode = document.CreateElement("Compile", xmlns);
-                    compileNode.SetAttribute("Include", relativePath);
-                    compileGroup.AppendChild(compileNode);
-                }
+                //    var compileNode = document.CreateElement("Compile", xmlns);
+                //    compileNode.SetAttribute("Include", relativePath);
+                //    compileGroup.AppendChild(compileNode);
+                //}
 
                 var referencedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
                 document.DocumentElement.AppendChild(referencedAssembliesGroup);
