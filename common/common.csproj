@@ -12,6 +12,7 @@
     <Product>storybrew common</Product>
     <Description>Copyright © Damnae 2016</Description>
     <Version>1.0.7909.25927</Version>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   
   <ItemGroup>

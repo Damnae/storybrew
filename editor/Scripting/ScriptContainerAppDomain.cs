@@ -52,14 +52,14 @@ namespace StorybrewEditor.Scripting
                 }
                 catch
                 {
-                    AppDomain.Unload(scriptDomain);
+                    //AppDomain.Unload(scriptDomain);
                     throw;
                 }
 
                 if (appDomain != null)
                 {
                     Debug.Print($"{nameof(Scripting)}: Unloading domain {appDomain.FriendlyName}");
-                    AppDomain.Unload(appDomain);
+                    //AppDomain.Unload(appDomain);
                 }
                 appDomain = scriptDomain;
 
@@ -85,7 +85,19 @@ namespace StorybrewEditor.Scripting
                 if (disposing)
                 {
                 }
-                if (appDomain != null) AppDomain.Unload(appDomain);
+
+                if (appDomain != null)
+                {
+                    try
+                    {
+                        AppDomain.Unload(appDomain);
+                    }
+                    catch (Exception e)
+                    {
+                        
+                    }
+                }
+
                 appDomain = null;
                 disposedValue = true;
             }

@@ -5,6 +5,8 @@
     <AssemblyName>StorybrewEditor</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net452</TargetFramework>
+    <Platforms>AnyCPU;x86</Platforms>
+   <Version>1.80.7960-modified.1</Version>
   </PropertyGroup>
 
   <PropertyGroup>

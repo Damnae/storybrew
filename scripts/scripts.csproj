@@ -11,6 +11,7 @@
     <Company>storybrew scripts</Company>
     <Product>storybrew scripts</Product>
     <Description>Copyright © Damnae 2016</Description>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
