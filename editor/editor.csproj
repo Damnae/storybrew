@@ -4,7 +4,7 @@
     <RootNamespace>StorybrewEditor</RootNamespace>
     <AssemblyName>StorybrewEditor</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <Platforms>AnyCPU;x86</Platforms>
    <Version>1.80.7960-modified.2</Version>
   </PropertyGroup>

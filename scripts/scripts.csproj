@@ -5,7 +5,7 @@
     <RootNamespace>StorybrewScripts</RootNamespace>
     <AssemblyName>StorybrewScripts</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <PackageId>storybrew scripts</PackageId>
     <Authors>storybrew scripts</Authors>
     <Company>storybrew scripts</Company>
