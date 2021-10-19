@@ -52,14 +52,14 @@ namespace StorybrewEditor.Scripting
                 }
                 catch
                 {
-                    //AppDomain.Unload(scriptDomain);
+                    AppDomain.Unload(scriptDomain);
                     throw;
                 }
 
                 if (appDomain != null)
                 {
                     Debug.Print($"{nameof(Scripting)}: Unloading domain {appDomain.FriendlyName}");
-                    //AppDomain.Unload(appDomain);
+                    AppDomain.Unload(appDomain);
                 }
                 appDomain = scriptDomain;
 

@@ -107,7 +107,7 @@ namespace StorybrewEditor.ScreenLayers
                     versionLabel = new Label(WidgetManager)
                     {
                         StyleName = "small",
-                        Text = Program.FullName,
+                        Text =$"{Program.Name} {ReflectionUtil.GetVersionInfo()} (Coosu integrated) \r\nCoosu/storybrew (forked from Damnae/storybrew)",
                         AnchorFrom = BoxAlignment.Centre,
                     },
                 },
