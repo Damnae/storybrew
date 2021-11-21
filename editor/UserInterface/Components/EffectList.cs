@@ -343,9 +343,8 @@ namespace StorybrewEditor.UserInterface.Components
                     paths.Add(Path.Combine(path, "code"));
                     paths.Add(Path.Combine(path, "code-insiders"));
                 }
-                else {
-                    Trace.WriteLine($"Invalid path in environment variables: {path}");
-                }
+                else Trace.WriteLine($"Invalid path in environment variables: {path}");
+
             var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
             if (Program.Settings.VerboseVsCode)
                 arguments += " --verbose";
