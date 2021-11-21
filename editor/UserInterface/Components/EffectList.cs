@@ -330,14 +330,17 @@ namespace StorybrewEditor.UserInterface.Components
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft VS Code", "bin", "code"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code", "bin", "code"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft VS Code Insiders", "bin", "code-insiders"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code Insiders", "bin", "code-insiders"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Microsoft VS Code Insiders", "bin", "code-insiders"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code Insiders", "bin", "code-insiders")
             };
             foreach (var path in Environment.GetEnvironmentVariable("path").Split(';'))
                 if (PathHelper.IsValidPath(path))
+                {
                     paths.Add(Path.Combine(path, "code"));
-                else Trace.WriteLine($"Invalid path in environment variables: {path}");
-
+                    paths.Add(Path.Combine(path, "code-insiders"));
+                }
+                else {
+                    Trace.WriteLine($"Invalid path in environment variables: {path}");
+                }
             var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
             if (Program.Settings.VerboseVsCode)
                 arguments += " --verbose";
