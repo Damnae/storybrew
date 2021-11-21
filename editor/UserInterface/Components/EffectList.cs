@@ -109,141 +109,146 @@ namespace StorybrewEditor.UserInterface.Components
         {
             effectsLayout.ClearWidgets();
             foreach (var effect in project.Effects.OrderBy(e => e.Name))
+                effectsLayout.Add(createEffectWidget(effect));
+        }
+
+        private Widget createEffectWidget(Effect effect)
+        {
+            Label nameLabel, detailsLabel;
+            Button renameButton, statusButton, configButton, editButton, removeButton;
+
+            var effectWidget = new LinearLayout(Manager)
             {
-                Widget effectRoot;
-                Label nameLabel, detailsLabel;
-                Button renameButton, statusButton, configButton, editButton, removeButton;
-                effectsLayout.Add(effectRoot = new LinearLayout(Manager)
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
+                Horizontal = true,
+                FitChildren = true,
+                Fill = true,
+                Children = new Widget[]
                 {
-                    AnchorFrom = BoxAlignment.Centre,
-                    AnchorTo = BoxAlignment.Centre,
-                    Horizontal = true,
-                    FitChildren = true,
-                    Fill = true,
-                    Children = new Widget[]
+                    renameButton = new Button(Manager)
                     {
-                        renameButton = new Button(Manager)
+                        StyleName = "icon",
+                        Icon = IconFont.Pencil,
+                        Tooltip = "Rename",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
+                    new LinearLayout(Manager)
+                    {
+                        StyleName = "condensed",
+                        Children = new Widget[]
                         {
-                            StyleName = "icon",
-                            Icon = IconFont.Pencil,
-                            Tooltip = "Rename",
-                            AnchorFrom = BoxAlignment.Centre,
-                            AnchorTo = BoxAlignment.Centre,
-                            CanGrow = false,
-                        },
-                        new LinearLayout(Manager)
-                        {
-                            StyleName = "condensed",
-                            Children = new Widget[]
+                            nameLabel = new Label(Manager)
                             {
-                                nameLabel = new Label(Manager)
-                                {
-                                    StyleName = "listItem",
-                                    Text = effect.Name,
-                                    AnchorFrom = BoxAlignment.Left,
-                                    AnchorTo = BoxAlignment.Left,
-                                },
-                                detailsLabel = new Label(Manager)
-                                {
-                                    StyleName = "listItemSecondary",
-                                    Text = getEffectDetails(effect),
-                                    AnchorFrom = BoxAlignment.Left,
-                                    AnchorTo = BoxAlignment.Left,
-                                },
+                                StyleName = "listItem",
+                                Text = effect.Name,
+                                AnchorFrom = BoxAlignment.Left,
+                                AnchorTo = BoxAlignment.Left,
+                            },
+                            detailsLabel = new Label(Manager)
+                            {
+                                StyleName = "listItemSecondary",
+                                Text = getEffectDetails(effect),
+                                AnchorFrom = BoxAlignment.Left,
+                                AnchorTo = BoxAlignment.Left,
                             },
                         },
-                        statusButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            AnchorFrom = BoxAlignment.Centre,
-                            AnchorTo = BoxAlignment.Centre,
-                            CanGrow = false,
-                            Displayed = false,
-                        },
-                        configButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            Icon = IconFont.Gear,
-                            Tooltip = "Configure",
-                            AnchorFrom = BoxAlignment.Centre,
-                            AnchorTo = BoxAlignment.Centre,
-                            CanGrow = false,
-                        },
-                        editButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            Icon = IconFont.PencilSquare,
-                            Tooltip = "Edit script",
-                            AnchorFrom = BoxAlignment.Centre,
-                            AnchorTo = BoxAlignment.Centre,
-                            CanGrow = false,
-                            Disabled = effect.Path == null,
-                        },
-                        removeButton = new Button(Manager)
-                        {
-                            StyleName = "icon",
-                            Icon = IconFont.Times,
-                            Tooltip = "Remove",
-                            AnchorFrom = BoxAlignment.Centre,
-                            AnchorTo = BoxAlignment.Centre,
-                            CanGrow = false,
-                        },
                     },
-                });
-
-                updateStatusButton(statusButton, effect);
-
-                var ef = effect;
-
-                EventHandler changedHandler;
-                effect.OnChanged += changedHandler = (sender, e) =>
-                {
-                    nameLabel.Text = ef.Name;
-                    detailsLabel.Text = getEffectDetails(ef);
-                    updateStatusButton(statusButton, ef);
-                };
-                effectRoot.OnHovered += (evt, e) =>
-                {
-                    ef.Highlight = e.Hovered;
-                    OnEffectPreselect?.Invoke(e.Hovered ? ef : null);
-                };
-                var handledClick = false;
-                effectRoot.OnClickDown += (evt, e) =>
-                {
-                    handledClick = true;
-                    return true;
-                };
-                effectRoot.OnClickUp += (evt, e) =>
-                {
-                    if (handledClick && (evt.RelatedTarget == effectRoot || evt.RelatedTarget.HasAncestor(effectRoot)))
-                        OnEffectSelected?.Invoke(ef);
-
-                    handledClick = false;
-                };
-                effectRoot.OnDisposed += (sender, e) =>
-                {
-                    ef.Highlight = false;
-                    ef.OnChanged -= changedHandler;
-                };
-
-                statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
-                renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", ef.Name, (newName) =>
-                {
-                    ef.Name = newName;
-                    refreshEffects();
-                });
-                editButton.OnClick += (sender, e) => openEffectEditor(ef);
-                configButton.OnClick += (sender, e) =>
-                {
-                    if (!effectConfigUi.Displayed || effectConfigUi.Effect != ef)
+                    statusButton = new Button(Manager)
                     {
-                        effectConfigUi.Effect = ef;
-                        effectConfigUi.Displayed = true;
-                    }
-                    else effectConfigUi.Displayed = false;
-                };
-                removeButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Remove {ef.Name}?", () => project.Remove(ef), true);
-            }
+                        StyleName = "icon",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                        Displayed = false,
+                    },
+                    configButton = new Button(Manager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Gear,
+                        Tooltip = "Configure",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
+                    editButton = new Button(Manager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.PencilSquare,
+                        Tooltip = "Edit script",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                        Disabled = effect.Path == null,
+                    },
+                    removeButton = new Button(Manager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Times,
+                        Tooltip = "Remove",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
+                },
+            };
+
+            updateStatusButton(statusButton, effect);
+
+            var ef = effect;
+
+            EventHandler changedHandler;
+            effect.OnChanged += changedHandler = (sender, e) =>
+            {
+                nameLabel.Text = ef.Name;
+                detailsLabel.Text = getEffectDetails(ef);
+                updateStatusButton(statusButton, ef);
+            };
+            effectWidget.OnHovered += (evt, e) =>
+            {
+                ef.Highlight = e.Hovered;
+                OnEffectPreselect?.Invoke(e.Hovered ? ef : null);
+            };
+            var handledClick = false;
+            effectWidget.OnClickDown += (evt, e) =>
+            {
+                handledClick = true;
+                return true;
+            };
+            effectWidget.OnClickUp += (evt, e) =>
+            {
+                if (handledClick && (evt.RelatedTarget == effectWidget || evt.RelatedTarget.HasAncestor(effectWidget)))
+                    OnEffectSelected?.Invoke(ef);
+
+                handledClick = false;
+            };
+            effectWidget.OnDisposed += (sender, e) =>
+            {
+                ef.Highlight = false;
+                ef.OnChanged -= changedHandler;
+            };
+
+            statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
+            renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", ef.Name, (newName) =>
+            {
+                ef.Name = newName;
+                refreshEffects();
+            });
+            editButton.OnClick += (sender, e) => openEffectEditor(ef);
+            configButton.OnClick += (sender, e) =>
+            {
+                if (!effectConfigUi.Displayed || effectConfigUi.Effect != ef)
+                {
+                    effectConfigUi.Effect = ef;
+                    effectConfigUi.Displayed = true;
+                }
+                else effectConfigUi.Displayed = false;
+            };
+            removeButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Remove {ef.Name}?", () => project.Remove(ef), true);
+
+            return effectWidget;
         }
 
         private static void updateStatusButton(Button button, Effect effect)
