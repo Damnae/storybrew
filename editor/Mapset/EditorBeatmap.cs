@@ -46,13 +46,15 @@ namespace StorybrewEditor.Mapset
         private readonly List<OsuHitObject> hitObjects = new List<OsuHitObject>();
         public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
 
-        private readonly List<Color4> comboColors = new List<Color4>()
+        private static readonly List<Color4> defaultComboColors = new List<Color4>()
         {
             new Color4(255, 192, 0, 255),
             new Color4(0, 202, 0, 255),
             new Color4(18, 124, 255, 255),
             new Color4(242, 24, 57, 255),
         };
+        
+        private readonly List<Color4> comboColors = new List<Color4>(defaultComboColors);
         public override IEnumerable<Color4> ComboColors => comboColors;
 
         public string backgroundPath;
@@ -205,6 +207,11 @@ namespace StorybrewEditor.Mapset
                 var rgb = value.Split(',');
                 beatmap.comboColors.Add(new Color4(byte.Parse(rgb[0]), byte.Parse(rgb[1]), byte.Parse(rgb[2]), 255));
             });
+
+            if (beatmap.comboColors.Count == 0)
+            {
+                beatmap.comboColors.AddRange(defaultComboColors);
+            }
         }
         private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader)
         {
