@@ -437,6 +437,8 @@ namespace StorybrewEditor.ScreenLayers
                         {
                             if (e.Shift)
                                 ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(timeSource.Current * 1000)).ToString(Program.Settings.TimeCopyFormat));
+                            else if (e.Alt)
+                                ClipboardHelper.SetText($"{storyboardPosition.X:000}, {storyboardPosition.Y:000}");
                             else ClipboardHelper.SetText(((int)(timeSource.Current * 1000)).ToString());
                             return true;
                         }
