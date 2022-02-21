@@ -131,7 +131,7 @@ namespace StorybrewEditor.Scripting
             var change = e.ChangeType.ToString().ToLowerInvariant();
             Trace.WriteLine($"Watched script file {change}: {e.FullPath}");
 
-            if (e.ChangeType != WatcherChangeTypes.Changed)
+            if (e.ChangeType != WatcherChangeTypes.Changed && e.ChangeType != WatcherChangeTypes.Renamed)
                 scheduleSolutionUpdate();
 
             if (e.ChangeType != WatcherChangeTypes.Deleted)
