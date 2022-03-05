@@ -184,6 +184,38 @@ namespace StorybrewCommon.Scripting
             return resultFft;
         }
 
+        /// <summary>
+        /// Returns the Fast Fourier Transform of the song at a certain time, with the specified amount of magnitudes.
+        /// Useful to make spectrum effets.
+        /// </summary>
+        public float[] GetFft(double time, int magnitudes, string path = null, OsbEasing easing = OsbEasing.None, int FrequencyCutOff = 20000, int SamplingRate = 44100)
+        {
+            var fft = GetFft(time, path);
+            if (magnitudes == fft.Length && easing == OsbEasing.None)
+                return fft;
+
+            var usedFftLength = GetLastBucketIndex(FrequencyCutOff, SamplingRate, fft.Length);
+            var resultFft = new float[magnitudes];
+            var baseIndex = 0;
+            for (var i = 0; i < magnitudes; i++)
+            {
+                var progress = EasingFunctions.Ease(easing, (double)i / magnitudes);
+                var index = Math.Min(Math.Max(baseIndex + 1, (int)(progress * usedFftLength)), usedFftLength - 1);
+
+                var value = 0f;
+                for (var v = baseIndex; v < index; v++)
+                    value = Math.Max(value, fft[index]);
+
+                resultFft[i] = value;
+                baseIndex = index;
+            }
+            return resultFft;
+        }
+
+        private int GetLastBucketIndex(int FrequencyCutOff, int SamplingRate, int fftLength)
+        {
+            return (int)Math.Floor(FrequencyCutOff / (SamplingRate / 2.0) * fftLength);
+        }
         #endregion
 
         #region Subtitles

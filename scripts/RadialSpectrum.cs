@@ -54,6 +54,12 @@ namespace StorybrewScripts
         [Configurable]
         public OsbEasing FftEasing = OsbEasing.InExpo;
 
+        [Configurable]
+        public int SamplingRate = 44100;
+
+        [Configurable]
+        public int FrequencyCutOff = 16000;
+
         public override void Generate()
         {
             if (StartTime == EndTime)
@@ -74,7 +80,7 @@ namespace StorybrewScripts
             var fftOffset = fftTimeStep * 0.2;
             for (var time = (double)StartTime; time < EndTime; time += fftTimeStep)
             {
-                var fft = GetFft(time + fftOffset, BarCount, null, FftEasing);
+                var fft = GetFft(time + fftOffset, BarCount, null, FftEasing, FrequencyCutOff, SamplingRate);
                 for (var i = 0; i < BarCount; i++)
                 {
                     var height = Radius + (float)Math.Log10(1 + fft[i] * LogScale) * Scale;
