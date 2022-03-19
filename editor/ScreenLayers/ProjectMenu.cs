@@ -437,6 +437,8 @@ namespace StorybrewEditor.ScreenLayers
                         {
                             if (e.Shift)
                                 ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(timeSource.Current * 1000)).ToString(Program.Settings.TimeCopyFormat));
+                            else if (e.Alt)
+                                ClipboardHelper.SetText($"{storyboardPosition.X:###}, {storyboardPosition.Y:###}");
                             else ClipboardHelper.SetText(((int)(timeSource.Current * 1000)).ToString());
                             return true;
                         }
@@ -550,7 +552,7 @@ namespace StorybrewEditor.ScreenLayers
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {
                 timeButton.Text = Manager.GetContext<Editor>().InputManager.Alt ?
-                    $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
+                    $"{storyboardPosition.X:###}, {storyboardPosition.Y:###}" :
                     $"{(time < 0 ? "-" : "")}{(int)Math.Abs(time / 60):00}:{(int)Math.Abs(time % 60):00}:{(int)Math.Abs(time * 1000) % 1000:000}";
 
                 warningsLabel.Text = buildWarningMessage();
