@@ -103,6 +103,9 @@ namespace StorybrewEditor.Storyboarding
         public override float[] GetFft(double time, string path = null)
             => getFftStream(path ?? effect.Project.AudioPath).GetFft(time * 0.001);
 
+        public override float GetFftFrequency(string path = null)
+            => getFftStream(path ?? effect.Project.AudioPath).Frequency;
+
         #endregion
 
         public void DisposeResources()

@@ -85,7 +85,7 @@ namespace StorybrewCommon.Scripting
             if (!bitmaps.TryGetValue(path, out Bitmap bitmap))
             {
                 if (watch) context.AddDependency(path);
-                
+
                 if (alternatePath != null && !File.Exists(path))
                 {
                     alternatePath = Path.GetFullPath(alternatePath);
@@ -161,13 +161,16 @@ namespace StorybrewCommon.Scripting
         /// Returns the Fast Fourier Transform of the song at a certain time, with the specified amount of magnitudes.
         /// Useful to make spectrum effets.
         /// </summary>
-        public float[] GetFft(double time, int magnitudes, string path = null, OsbEasing easing = OsbEasing.None, int FrequencyCutOff = 20000, int SamplingRate = 44100)
+        public float[] GetFft(double time, int magnitudes, string path = null, OsbEasing easing = OsbEasing.None, float frequencyCutOff = 0)
         {
             var fft = GetFft(time, path);
             if (magnitudes == fft.Length && easing == OsbEasing.None)
                 return fft;
 
-            var usedFftLength = GetLastBucketIndex(FrequencyCutOff, SamplingRate, fft.Length);
+            var usedFftLength = frequencyCutOff > 0 ?
+                (int)Math.Floor(frequencyCutOff / (context.GetFftFrequency(path) / 2.0) * fft.Length) :
+                fft.Length;
+
             var resultFft = new float[magnitudes];
             var baseIndex = 0;
             for (var i = 0; i < magnitudes; i++)
@@ -185,10 +188,6 @@ namespace StorybrewCommon.Scripting
             return resultFft;
         }
 
-        private int GetLastBucketIndex(int FrequencyCutOff, int SamplingRate, int fftLength)
-        {
-            return (int)Math.Floor(FrequencyCutOff / (SamplingRate / 2.0) * fftLength);
-        }
         #endregion
 
         #region Subtitles

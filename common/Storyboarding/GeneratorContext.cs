@@ -19,5 +19,6 @@ namespace StorybrewCommon.Storyboarding
 
         public abstract double AudioDuration { get; }
         public abstract float[] GetFft(double time, string path = null);
+        public abstract float GetFftFrequency(string path = null);
     }
 }

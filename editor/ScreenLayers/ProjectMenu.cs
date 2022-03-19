@@ -552,7 +552,7 @@ namespace StorybrewEditor.ScreenLayers
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {
                 timeButton.Text = Manager.GetContext<Editor>().InputManager.Alt ?
-                    $"{storyboardPosition.X:###}, {storyboardPosition.Y:###}" :
+                    $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
                     $"{(time < 0 ? "-" : "")}{(int)Math.Abs(time / 60):00}:{(int)Math.Abs(time % 60):00}:{(int)Math.Abs(time * 1000) % 1000:000}";
 
                 warningsLabel.Text = buildWarningMessage();
