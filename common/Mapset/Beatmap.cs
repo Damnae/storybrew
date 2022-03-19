@@ -56,5 +56,7 @@ namespace StorybrewCommon.Mapset
         /// Finds the timing point (red line) active at a specific time.
         /// </summary>
         public abstract ControlPoint GetTimingPointAt(int time);
+
+        public abstract string AudioFilename { get; }
     }
 }

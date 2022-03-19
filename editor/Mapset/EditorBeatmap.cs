@@ -14,7 +14,8 @@ namespace StorybrewEditor.Mapset
     {
         public readonly string Path;
 
-        public string AudioFilename { get; set; }
+        public override string AudioFilename => audioFilename;
+        private string audioFilename = "audio.mp3";
 
         private string name = string.Empty;
         public override string Name => name;
@@ -145,7 +146,7 @@ namespace StorybrewEditor.Mapset
             {
                 switch (key)
                 {
-                    case "AudioFilename": beatmap.AudioFilename = value; break;
+                    case "AudioFilename": beatmap.audioFilename = value; break;
                 }
             });
         }
