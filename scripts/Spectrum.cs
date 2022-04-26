@@ -59,7 +59,7 @@ namespace StorybrewScripts
 
         public override void Generate()
         {
-            if (StartTime == EndTime)
+            if (StartTime == EndTime && Beatmap.HitObjects.FirstOrDefault() != null)
             {
                 StartTime = (int)Beatmap.HitObjects.First().StartTime;
                 EndTime = (int)Beatmap.HitObjects.Last().EndTime;
