@@ -61,7 +61,7 @@ namespace StorybrewEditor.Util
 
                 var parentDirectory = Directory.GetParent(directoryPath);
                 while (parentDirectory != null && !parentDirectory.Exists)
-                    parentDirectory = parentDirectory.Parent;
+                    parentDirectory = Directory.GetParent(parentDirectory.FullName);
 
                 if (parentDirectory != null && parentDirectory != parentDirectory.Root)
                 {
