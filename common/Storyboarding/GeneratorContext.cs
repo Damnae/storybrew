@@ -18,7 +18,7 @@ namespace StorybrewCommon.Storyboarding
         public abstract StoryboardLayer GetLayer(string identifier);
 
         public abstract double AudioDuration { get; }
-        public abstract float[] GetFft(double time, string path = null);
+        public abstract float[] GetFft(double time, string path = null, bool splitChannels = false);
         public abstract float GetFftFrequency(string path = null);
     }
 }

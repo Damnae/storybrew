@@ -151,10 +151,10 @@ namespace StorybrewCommon.Scripting
         /// Returns the Fast Fourier Transform of the song at a certain time, with the default amount of magnitudes.
         /// Useful to make spectrum effets.
         /// </summary>
-        public float[] GetFft(double time, string path = null)
+        public float[] GetFft(double time, string path = null, bool splitChannels = false)
         {
             if (path != null) AddDependency(path);
-            return context.GetFft(time, path);
+            return context.GetFft(time, path, splitChannels);
         }
 
         /// <summary>
