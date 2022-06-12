@@ -178,6 +178,14 @@ namespace StorybrewEditor.Scripting
             var slnPath = Path.Combine(ScriptsPath, "storyboard.sln");
             File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative));
 
+            var vsCodePath = Path.Combine(ScriptsPath, ".vscode");
+            if (!Directory.Exists(vsCodePath))
+                Directory.CreateDirectory(vsCodePath);
+
+            var vsCodeSettingsPath = Path.Combine(vsCodePath, "settings.json");
+            if (!File.Exists(vsCodeSettingsPath))
+                File.WriteAllBytes(vsCodeSettingsPath, resourceContainer.GetBytes("project/vscode_settings.json", ResourceSource.Embedded | ResourceSource.Relative));
+
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
             try

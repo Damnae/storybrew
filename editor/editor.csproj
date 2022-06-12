@@ -148,6 +148,7 @@
     <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
     <Compile Include="Util\OsuHelper.cs" />
     <Compile Include="Util\NetHelper.cs" />
+    <EmbeddedResource Include="Resources\project\vscode_settings.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
