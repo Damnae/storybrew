@@ -74,17 +74,17 @@ namespace StorybrewCommon.Subtitles
         private readonly FontDescription description;
         private readonly FontEffect[] effects;
         private readonly string projectDirectory;
-        private readonly string mapsetDirectory;
+        private readonly string assetDirectory;
 
         private readonly Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
 
-        internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string mapsetDirectory)
+        internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string assetDirectory)
         {
             Directory = directory;
             this.description = description;
             this.effects = effects;
             this.projectDirectory = projectDirectory;
-            this.mapsetDirectory = mapsetDirectory;
+            this.assetDirectory = assetDirectory;
         }
 
         public FontTexture GetTexture(string text)
@@ -97,7 +97,7 @@ namespace StorybrewCommon.Subtitles
         private FontTexture generateTexture(string text)
         {
             var filename = text.Length == 1 ? $"{(int)text[0]:x4}.png" : $"_{textureCache.Count(l => l.Key.Length > 1):x3}.png";
-            var bitmapPath = Path.Combine(mapsetDirectory, Directory, filename);
+            var bitmapPath = Path.Combine(assetDirectory, Directory, filename);
 
             System.IO.Directory.CreateDirectory(Path.GetDirectoryName(bitmapPath));
 
@@ -215,7 +215,7 @@ namespace StorybrewCommon.Subtitles
                 var path = cacheEntry.Value<string>("Path");
                 var hash = cacheEntry.Value<string>("Hash");
 
-                var fullPath = Path.Combine(mapsetDirectory, path);
+                var fullPath = Path.Combine(assetDirectory, path);
                 if (!File.Exists(fullPath) || HashHelper.GetFileMd5(fullPath) != hash)
                     continue;
 
@@ -290,7 +290,7 @@ namespace StorybrewCommon.Subtitles
         {
             { "Text", letterEntry.Key },
             { "Path", PathHelper.WithStandardSeparators(letterEntry.Value.Path) },
-            { "Hash", HashHelper.GetFileMd5(Path.Combine(mapsetDirectory, letterEntry.Value.Path)) },
+            { "Hash", HashHelper.GetFileMd5(Path.Combine(assetDirectory, letterEntry.Value.Path)) },
             { "OffsetX", letterEntry.Value.OffsetX },
             { "OffsetY", letterEntry.Value.OffsetY },
             { "BaseWidth", letterEntry.Value.BaseWidth },

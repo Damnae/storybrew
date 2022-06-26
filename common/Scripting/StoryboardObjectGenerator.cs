@@ -217,14 +217,18 @@ namespace StorybrewCommon.Scripting
         }
 
         public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects)
-        {
-            var fontDirectory = Path.GetFullPath(Path.Combine(context.MapsetPath, directory));
+            => LoadFont(directory, false, description, effects);
 
+        public FontGenerator LoadFont(string directory, bool asAsset, FontDescription description, params FontEffect[] effects)
+        {
+            var assetDirectory = asAsset ? context.ProjectAssetPath : context.MapsetPath;
+            
+            var fontDirectory = Path.GetFullPath(Path.Combine(assetDirectory, directory));
             if (fontDirectories.Contains(fontDirectory))
                 throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
             fontDirectories.Add(fontDirectory);
 
-            var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, context.MapsetPath);
+            var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, assetDirectory);
             fontGenerators.Add(fontGenerator);
 
             var cachePath = fontCacheDirectory;
