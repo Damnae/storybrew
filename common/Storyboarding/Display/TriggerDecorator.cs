@@ -49,8 +49,11 @@ namespace StorybrewCommon.Storyboarding.Display
             if (!Active) throw new InvalidOperationException("Not triggered");
 
             var commandTime = time - triggerTime;
-            if (commandTime < command.StartTime) return command.StartValue;
-            if (command.EndTime < commandTime) return command.EndValue;
+            if (commandTime < command.StartTime) 
+                return command.ValueAtTime(command.StartTime);
+            if (command.EndTime < commandTime) 
+                return command.ValueAtTime(command.EndTime);
+
             return command.ValueAtTime(commandTime);
         }
 

@@ -33,8 +33,8 @@ namespace StorybrewCommon.Storyboarding.Display
 
         public TValue ValueAtTime(double time)
         {
-            if (time < StartTime) return command.StartValue;
-            if (EndTime < time) return command.EndValue;
+            if (time < StartTime) return command.ValueAtTime(command.EndTime);
+            if (EndTime < time) return command.ValueAtTime(command.EndTime);
 
             var repeatDuration = RepeatDuration;
             var repeatTime = time - StartTime;
@@ -47,11 +47,11 @@ namespace StorybrewCommon.Storyboarding.Display
 
             if (repeatTime < command.StartTime)
                 if (repeated && repeatTime < command.StartTime)
-                    return command.EndValue;
-                else return command.StartValue;
+                    return command.ValueAtTime(command.EndTime);
+                else return command.ValueAtTime(command.StartTime);
 
             if (command.EndTime < repeatTime)
-                return command.EndValue;
+                return command.ValueAtTime(command.EndTime);
             return command.ValueAtTime(repeatTime);
         }
 

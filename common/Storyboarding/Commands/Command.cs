@@ -38,8 +38,8 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public TValue ValueAtTime(double time)
         {
-            if (time <= StartTime) return StartValue;
-            if (EndTime <= time) return EndValue;
+            if (time <= StartTime) return ValueAtProgress(0);
+            if (EndTime <= time) return ValueAtProgress(1);
 
             var duration = EndTime - StartTime;
             var progress = Easing.Ease((time - StartTime) / duration);

@@ -1,4 +1,5 @@
 ﻿using StorybrewCommon.Storyboarding.CommandValues;
+using System;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
@@ -9,15 +10,17 @@ namespace StorybrewCommon.Storyboarding.Commands
         {
         }
 
+        // Scale commands cannot return a negative size
         public override CommandDecimal ValueAtProgress(double progress)
-            => StartValue + (EndValue - StartValue) * progress;
+            => Math.Max(0, StartValue + (EndValue - StartValue) * progress);
 
         public override CommandDecimal Midpoint(Command<CommandDecimal> endCommand, double progress)
             => StartValue + (endCommand.EndValue - StartValue) * progress;
 
         public override IFragmentableCommand GetFragment(double startTime, double endTime)
         {
-            if (IsFragmentable)
+            // Cannot fragment a command that has includes a negative size
+            if (IsFragmentable && StartValue >= 0 && EndValue >= 0)
             {
                 var startValue = ValueAtTime(startTime);
                 var endValue = ValueAtTime(endTime);
