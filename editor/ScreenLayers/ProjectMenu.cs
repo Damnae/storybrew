@@ -380,9 +380,12 @@ namespace StorybrewEditor.ScreenLayers
             saveButton.OnClick += (sender, e) => saveProject();
             exportButton.OnClick += (sender, e) =>
             {
-                if (e == MouseButton.Right)
-                    exportProjectAll();
-                else exportProject();
+                if (project.LayerManager.Layers.Count() == 0)
+                    Manager.ShowMessage("Effects is empty, can't export to osb.");
+                else
+                    if (e == MouseButton.Right)
+                        exportProjectAll();
+                    else exportProject();
             };
 
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
