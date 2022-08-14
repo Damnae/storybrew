@@ -495,7 +495,7 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     Program.RunMainThread(() => project.MainBeatmap = beatmap);
 
-                    while (project.EffectsStatus != EffectStatus.Ready)
+                    while (project.EffectsStatus != EffectStatus.Ready && project.Effects.Count() > 0)
                     {
                         switch (project.EffectsStatus)
                         {
