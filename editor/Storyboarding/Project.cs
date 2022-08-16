@@ -802,6 +802,9 @@ namespace StorybrewEditor.Storyboarding
                     }
                 }
 
+                if (effects.Count == 0)
+                    EffectsStatus = EffectStatus.Ready;
+
                 // Insert layers defined in the index
                 var layersOrder = indexRoot.Values<string>("Layers");
                 if (layersOrder != null)
