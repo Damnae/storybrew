@@ -380,9 +380,17 @@ namespace StorybrewEditor.ScreenLayers
             saveButton.OnClick += (sender, e) => saveProject();
             exportButton.OnClick += (sender, e) =>
             {
-                if (e == MouseButton.Right)
-                    exportProjectAll();
-                else exportProject();
+                //Scheme 1: Show a message box to block the operation
+                if (project.Effects.Count() <= 0)
+                {
+                    Manager.ShowMessage("Effects is empty, which requires no export.");
+                }
+                else
+                {
+                    if (e == MouseButton.Right)
+                        exportProjectAll();
+                    else exportProject();
+                }
             };
 
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
@@ -495,7 +503,7 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     Program.RunMainThread(() => project.MainBeatmap = beatmap);
 
-                    while (project.EffectsStatus != EffectStatus.Ready && project.Effects.Count() > 0)
+                    while (project.EffectsStatus != EffectStatus.Ready)// && project.Effects.Count() > 0) //Scheme 2: Only fix exportProjectAll()
                     {
                         switch (project.EffectsStatus)
                         {
