@@ -174,6 +174,11 @@ namespace StorybrewEditor.UserInterface.Components
         {
             if (field.AllowedValues != null)
             {
+                if (field.AllowedValues.Length < 1)
+                {
+                    return new EmptyWidget(Manager);
+                } 
+                
                 var widget = new Selectbox(Manager)
                 {
                     Value = field.Value,
