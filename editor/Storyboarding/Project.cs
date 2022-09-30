@@ -202,7 +202,7 @@ namespace StorybrewEditor.Storyboarding
 
         private bool allowEffectUpdates = true;
 
-        private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false);
+        private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false, Program.Settings.EffectThreads);
         public void QueueEffectUpdate(Effect effect)
         {
             effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());

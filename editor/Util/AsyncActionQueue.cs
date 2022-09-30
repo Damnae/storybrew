@@ -35,11 +35,14 @@ namespace StorybrewEditor.Util
             }
         }
 
-        public AsyncActionQueue(string threadName, bool allowDuplicates = false)
+        public AsyncActionQueue(string threadName, bool allowDuplicates = false, int runnerCount = 0)
         {
             this.allowDuplicates = allowDuplicates;
 
-            var runnerCount = Math.Max(1, Environment.ProcessorCount - 1);
+            if (runnerCount == 0)
+                runnerCount = Environment.ProcessorCount - 1;
+            runnerCount = Math.Max(1, runnerCount);
+
             for (var i = 0; i < runnerCount; i++)
                 actionRunners.Add(new ActionRunner(context, $"{threadName} #{i + 1}"));
         }
