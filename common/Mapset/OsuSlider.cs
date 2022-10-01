@@ -20,6 +20,14 @@ namespace StorybrewCommon.Mapset
         public override double EndTime => StartTime + TravelCount * TravelDuration;
 
         private Curve curve;
+        public Curve Curve
+        {
+            get
+            {
+                if (curve == null) generateCurve();
+                return curve;
+            }
+        }
 
         private Vector2 playfieldTipPosition;
         public Vector2 PlayfieldTipPosition
