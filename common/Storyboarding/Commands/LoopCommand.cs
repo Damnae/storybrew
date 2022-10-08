@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public class LoopCommand : CommandGroup, IFragmentableCommand
+    public class LoopCommand : CommandGroup, IFragmentableCommand, IOffsetable
     {
         public int LoopCount { get; set; }
         public override double EndTime
@@ -65,6 +65,11 @@ namespace StorybrewCommon.Storyboarding.Commands
                 nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + i * (int)CommandsDuration + 1, (int)CommandsDuration - 1));
 
             return nonFragmentableTimes;
+        }
+        
+        public void Offset(double offset)
+        {
+            StartTime += offset;
         }
     }
 }
