@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace StorybrewCommon.Storyboarding
 {
-    public class OsbSprite : StoryboardObject
+    public class OsbSprite : StoryboardObject, IOffsetable
     {
         public static readonly Vector2 DefaultPosition = new Vector2(320, 240);
 
@@ -205,6 +205,16 @@ namespace StorybrewCommon.Storyboarding
             currentCommandGroup = null;
 
             endDisplayComposites();
+        }
+
+        public void Offset(double offset)
+        {
+            commands.ForEach(command =>
+            {
+                if (command is IOffsetable c)
+                    c.Offset(offset);
+            });
+            clearStartEndTimes();
         }
 
         private void addCommand(ICommand command)
