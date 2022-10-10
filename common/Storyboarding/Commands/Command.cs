@@ -67,8 +67,8 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public virtual string ToOsbString(ExportSettings exportSettings)
         {
-            var startTimeString = ((int)StartTime).ToString(exportSettings.NumberFormat);
-            var endTimeString = ((int)EndTime).ToString(exportSettings.NumberFormat);
+            var startTimeString = (exportSettings.UseFloatForTime ? StartTime : (int)StartTime).ToString(exportSettings.NumberFormat);
+            var endTimeString = (exportSettings.UseFloatForTime ? EndTime : (int)EndTime).ToString(exportSettings.NumberFormat);
             var startValueString = StartValue.ToOsbString(exportSettings);
             var endValueString = (ExportEndValue ? EndValue : StartValue).ToOsbString(exportSettings);
 

@@ -96,6 +96,8 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
+        public readonly ExportSettings ExportSettings = new ExportSettings();
+
         public LayerManager LayerManager { get; } = new LayerManager();
 
         public Project(string projectPath, bool withCommonScripts, ResourceContainer resourceContainer)
@@ -653,6 +655,7 @@ namespace StorybrewEditor.Storyboarding
                         { "FormatVersion", Version },
                         { "Editor", Program.FullName },
                         { "MapsetPath", PathHelper.WithStandardSeparators(MapsetPath) },
+                        { "ExportTimeAsFloatingPoint", ExportSettings.UseFloatForTime },
                         { "OwnsOsb", OwnsOsb },
                     };
 
@@ -743,6 +746,7 @@ namespace StorybrewEditor.Storyboarding
                     var savedBy = userRoot.Value<string>("Editor");
                     Debug.Print($"Project saved by {savedBy}");
 
+                    ExportSettings.UseFloatForTime = userRoot.Value<bool>("ExportTimeAsFloatingPoint");
                     OwnsOsb = userRoot.Value<bool>("OwnsOsb");
                 }
 
@@ -874,7 +878,6 @@ namespace StorybrewEditor.Storyboarding
                 localLayers = new List<EditorStoryboardLayer>(LayerManager.FindLayers(l => l.Visible));
             });
 
-            var exportSettings = new ExportSettings();
             var usesOverlayLayer = localLayers.Any(l => l.OsbLayer == OsbLayer.Overlay);
 
             if (!string.IsNullOrEmpty(osuPath))
@@ -910,7 +913,7 @@ namespace StorybrewEditor.Storyboarding
                                         writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                                         foreach (var layer in localLayers)
                                             if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
-                                                layer.WriteOsbSprites(writer, exportSettings);
+                                                layer.WriteOsbSprites(writer, ExportSettings);
                                     }
                                     inStoryboard = true;
                                 }
@@ -943,7 +946,7 @@ namespace StorybrewEditor.Storyboarding
                         writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                         foreach (var layer in localLayers)
                             if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)
-                                layer.WriteOsbSprites(writer, exportSettings);
+                                layer.WriteOsbSprites(writer, ExportSettings);
                     }
                     writer.WriteLine("//Storyboard Sound Samples");
                     stream.Commit();

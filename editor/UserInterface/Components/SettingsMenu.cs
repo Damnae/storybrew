@@ -20,7 +20,7 @@ namespace StorybrewEditor.UserInterface.Components
         {
             this.project = project;
 
-            Button referencedAssemblyButton, helpButton;
+            Button referencedAssemblyButton, floatingPointTimeButton, helpButton;
             Label dimLabel;
             Slider dimSlider;
 
@@ -76,7 +76,16 @@ namespace StorybrewEditor.UserInterface.Components
                                         Step = .05f,
                                     },
                                 }
-                            }
+                            },
+                            floatingPointTimeButton = new Button(manager)
+                            {
+                                Text = "Export Time as Floating Point",
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
+                                Checkable = true,
+                                Checked = project.ExportSettings.UseFloatForTime,
+                                Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer",
+                            },
                         }
                     }
                 },
@@ -89,6 +98,7 @@ namespace StorybrewEditor.UserInterface.Components
                 project.DimFactor = dimSlider.Value;
                 dimLabel.Text = $"Dim ({project.DimFactor:p})";
             };
+            floatingPointTimeButton.OnValueChanged += (sender, e) => project.ExportSettings.UseFloatForTime = floatingPointTimeButton.Checked;
         }
 
         protected override void Dispose(bool disposing)
