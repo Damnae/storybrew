@@ -62,8 +62,11 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public double StartTime { get; private set; }
-        public double EndTime { get; private set; }
+        private double startTime;
+        public override double StartTime => startTime;
+
+        private double endTime;
+        public override double EndTime => endTime;
 
         public bool Highlight;
 
@@ -78,7 +81,7 @@ namespace StorybrewEditor.Storyboarding
         public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
         {
             Effect = effect;
-            segment = new EditorStoryboardSegment(effect);
+            segment = new EditorStoryboardSegment(effect, this);
         }
 
         public int GetActiveSpriteCount(double time)
@@ -121,26 +124,29 @@ namespace StorybrewEditor.Storyboarding
             if (!Visible)
                 return;
 
-            segment.Draw(drawContext, camera, bounds, opacity, frameStats, Highlight || Effect.Highlight);
+            segment.Draw(drawContext, camera, bounds, opacity, Effect.Project, frameStats);
         }
 
         public void PostProcess()
         {
             segment.PostProcess();
 
-            StartTime = segment.StartTime;
-            if (StartTime == double.MaxValue)
-                StartTime = 0;
+            startTime = segment.StartTime;
+            if (startTime == double.MaxValue)
+                startTime = 0;
 
-            EndTime = segment.EndTime;
-            if (EndTime == double.MinValue)
-                EndTime = 0;
+            endTime = segment.EndTime;
+            if (endTime == double.MinValue)
+                endTime = 0;
 
             EstimatedSize = segment.CalculateSize(osbLayer);
         }
 
-        public void WriteOsbSprites(TextWriter writer, ExportSettings exportSettings)
-            => segment.WriteOsbSprites(writer, exportSettings, osbLayer);
+        public void WriteOsb(TextWriter writer, ExportSettings exportSettings)
+            => WriteOsb(writer, exportSettings, osbLayer);
+
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer) 
+            => segment.WriteOsb(writer, exportSettings, osbLayer);
 
         public void CopySettings(EditorStoryboardLayer other, bool copyGuid = false)
         {

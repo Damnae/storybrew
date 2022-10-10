@@ -10,12 +10,16 @@ using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
-    public class EditorStoryboardSegment : StoryboardSegment
+    public class EditorStoryboardSegment : StoryboardSegment, DisplayableObject, HasPostProcess
     {
         public Effect Effect { get; }
+        public EditorStoryboardLayer Layer { get; }
 
-        public double StartTime { get; private set; }
-        public double EndTime { get; private set; }
+        private double startTime;
+        public override double StartTime => startTime;
+
+        private double endTime;
+        public override double EndTime => endTime;
 
         public bool Highlight;
 
@@ -28,21 +32,20 @@ namespace StorybrewEditor.Storyboarding
         private readonly List<EventObject> eventObjects = new List<EventObject>();
         private readonly List<EditorStoryboardSegment> segments = new List<EditorStoryboardSegment>();
 
-        public EditorStoryboardSegment(Effect effect)
+        public EditorStoryboardSegment(Effect effect, EditorStoryboardLayer layer)
         {
             Effect = effect;
+            Layer = layer;
         }
 
         public int GetActiveSpriteCount(double time)
-            => storyboardObjects.Count(o => (o as OsbSprite)?.IsActive(time) ?? false)
-                + segments.Sum(s => s.GetActiveSpriteCount(time));
+            => storyboardObjects.Count(o => (o as OsbSprite)?.IsActive(time) ?? false);
 
         public int GetCommandCost(double time)
             => storyboardObjects
                 .Select(o => o as OsbSprite)
                 .Where(s => s?.IsActive(time) ?? false)
-                .Sum(s => s.CommandCost)
-                + segments.Sum(s => s.GetCommandCost(time));
+                .Sum(s => s.CommandCost);
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
         {
@@ -94,7 +97,9 @@ namespace StorybrewEditor.Storyboarding
 
         public override StoryboardSegment CreateSegment()
         {
-            var segment = new EditorStoryboardSegment(Effect);
+            var segment = new EditorStoryboardSegment(Effect, Layer);
+            storyboardObjects.Add(segment);
+            displayableObjects.Add(segment);
             segments.Add(segment);
             return segment;
         }
@@ -116,15 +121,17 @@ namespace StorybrewEditor.Storyboarding
             segments.ForEach(s => s.TriggerEvents(fromTime, toTime));
         }
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, FrameStats frameStats, bool highlight)
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
         {
-            if (highlight)
+            var displayTime = project.DisplayTime * 1000;
+            if (displayTime < StartTime || EndTime < displayTime)
+                return;
+
+            if (Layer.Highlight || Effect.Highlight)
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
             foreach (var displayableObject in displayableObjects)
-                displayableObject.Draw(drawContext, camera, bounds, opacity, Effect.Project, frameStats);
-
-            segments.ForEach(s => s.Draw(drawContext, camera, bounds, opacity, frameStats, highlight));
+                displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
         }
 
         public void PostProcess()
@@ -132,18 +139,14 @@ namespace StorybrewEditor.Storyboarding
             foreach (var storyboardObject in storyboardObjects)
                 (storyboardObject as HasPostProcess)?.PostProcess();
 
-            segments.ForEach(s => s.PostProcess());
-
-            StartTime = Math.Min(storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty(double.MaxValue).Min(), segments.Select(s => s.StartTime).DefaultIfEmpty(double.MaxValue).Min());
-            EndTime = Math.Max(storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty(double.MinValue).Max(), segments.Select(s => s.EndTime).DefaultIfEmpty(double.MinValue).Max());
+            startTime = storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty(double.MaxValue).Min();
+            endTime = storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty(double.MinValue).Max();
         }
 
-        public void WriteOsbSprites(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)
         {
             foreach (var sbo in storyboardObjects)
                 sbo.WriteOsb(writer, exportSettings, osbLayer);
-
-            segments.ForEach(s => s.WriteOsbSprites(writer, exportSettings, osbLayer));
         }
 
         public int CalculateSize(OsbLayer osbLayer)
@@ -158,7 +161,6 @@ namespace StorybrewEditor.Storyboarding
             {
                 foreach (var sbo in storyboardObjects)
                     sbo.WriteOsb(writer, exportSettings, osbLayer);
-                segments.ForEach(s => s.WriteOsbSprites(writer, exportSettings, osbLayer));
 
                 return (int)stream.Length;
             }

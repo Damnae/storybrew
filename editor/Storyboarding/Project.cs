@@ -913,7 +913,7 @@ namespace StorybrewEditor.Storyboarding
                                         writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                                         foreach (var layer in localLayers)
                                             if (layer.OsbLayer == osbLayer && layer.DiffSpecific)
-                                                layer.WriteOsbSprites(writer, ExportSettings);
+                                                layer.WriteOsb(writer, ExportSettings);
                                     }
                                     inStoryboard = true;
                                 }
@@ -946,7 +946,7 @@ namespace StorybrewEditor.Storyboarding
                         writer.WriteLine($"//Storyboard Layer {(int)osbLayer} ({osbLayer})");
                         foreach (var layer in localLayers)
                             if (layer.OsbLayer == osbLayer && !layer.DiffSpecific)
-                                layer.WriteOsbSprites(writer, ExportSettings);
+                                layer.WriteOsb(writer, ExportSettings);
                     }
                     writer.WriteLine("//Storyboard Sound Samples");
                     stream.Commit();

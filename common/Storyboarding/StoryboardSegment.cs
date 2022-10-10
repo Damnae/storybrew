@@ -3,7 +3,7 @@ using System;
 
 namespace StorybrewCommon.Storyboarding
 {
-    public abstract class StoryboardSegment : MarshalByRefObject
+    public abstract class StoryboardSegment : StoryboardObject
     {
         public abstract StoryboardSegment CreateSegment();
 
