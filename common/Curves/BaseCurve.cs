@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Curves
 {
+    [Serializable]
     public abstract class BaseCurve : Curve
     {
         public abstract Vector2 EndPosition { get; }

@@ -33,7 +33,9 @@ namespace StorybrewScripts
                     (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime))
                     continue;
 
-                var hSprite = hitobjectLayer.CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position);
+                var stackOffset = hitobject.StackOffset;
+
+                var hSprite = hitobjectLayer.CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position + stackOffset);
                 hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeDuration, SpriteScale, SpriteScale * 0.2);
                 hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeDuration, 1, 0);
                 hSprite.Additive(hitobject.StartTime, hitobject.EndTime + FadeDuration);
@@ -51,7 +53,7 @@ namespace StorybrewScripts
                         if (complete) endTime = hitobject.EndTime;
 
                         var startPosition = hSprite.PositionAt(startTime);
-                        hSprite.Move(startTime, endTime, startPosition, hitobject.PositionAtTime(endTime));
+                        hSprite.Move(startTime, endTime, startPosition, hitobject.PositionAtTime(endTime) + stackOffset);
 
                         if (complete) break;
                         startTime += timestep;

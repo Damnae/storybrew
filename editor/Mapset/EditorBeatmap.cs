@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics;
+﻿using OpenTK;
+using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
@@ -23,6 +24,9 @@ namespace StorybrewEditor.Mapset
         private long id;
         public override long Id => id;
 
+        private double stackLeniency = .7;
+        public override double StackLeniency => stackLeniency;
+
         private readonly List<int> bookmarks = new List<int>();
         public override IEnumerable<int> Bookmarks => bookmarks;
 
@@ -44,8 +48,18 @@ namespace StorybrewEditor.Mapset
         private double sliderTickRate = 1;
         public override double SliderTickRate => sliderTickRate;
 
+        private bool hitObjectsPostProcessed;
         private readonly List<OsuHitObject> hitObjects = new List<OsuHitObject>();
-        public override IEnumerable<OsuHitObject> HitObjects => hitObjects;
+        public override IEnumerable<OsuHitObject> HitObjects
+        {
+            get
+            {
+                if (!hitObjectsPostProcessed)
+                    postProcessHitObjects();
+
+                return hitObjects;
+            }
+        }
 
         private readonly List<Color4> comboColors = new List<Color4>()
         {
@@ -147,6 +161,7 @@ namespace StorybrewEditor.Mapset
                 switch (key)
                 {
                     case "AudioFilename": beatmap.audioFilename = value; break;
+                    case "StackLeniency": beatmap.stackLeniency = double.Parse(value, CultureInfo.InvariantCulture); break;
                 }
             });
         }
@@ -255,6 +270,79 @@ namespace StorybrewEditor.Mapset
                 beatmap.hitObjects.Add(hitobject);
                 previousHitObject = hitobject;
             });
+        }
+
+        private void postProcessHitObjects()
+        {
+            hitObjectsPostProcessed = true;
+
+            var stackLenienceSquared = 3 * 3; // Distance in osuPixels
+            var preemtTime = GetDifficultyRange(ApproachRate, 1800, 1200, 450);
+
+            for (var i = hitObjects.Count - 1; i > 0; i--)
+            {
+                var objectI = hitObjects[i];
+
+                if (objectI.StackIndex != 0 || objectI is OsuSpinner) 
+                    continue;
+
+                var n = i;
+                if (objectI is OsuCircle)
+                {
+                    while (--n >= 0)
+                    {
+                        var objectN = hitObjects[n];
+                        if (objectN is OsuSpinner) 
+                            continue;
+
+                        if (objectI.StartTime - (preemtTime * StackLeniency) > objectN.EndTime)
+                            break;
+
+                        var spanN = objectN as OsuSlider;
+                        if (spanN != null && (spanN.PlayfieldEndPosition - objectI.PlayfieldPosition).LengthSquared < stackLenienceSquared)
+                        {
+                            var offset = objectI.StackIndex - objectN.StackIndex + 1;
+                            for (var j = n + 1; j <= i; j++)
+                            {
+                                if ((spanN.PlayfieldEndPosition - hitObjects[j].PlayfieldPosition).LengthSquared < stackLenienceSquared)
+                                    hitObjects[j].StackIndex -= offset;
+                            }
+                            break;
+                        }
+
+                        if ((objectN.PlayfieldPosition - objectI.PlayfieldPosition).LengthSquared < stackLenienceSquared)
+                        {
+                            objectN.StackIndex = objectI.StackIndex + 1;
+                            objectI = objectN;
+                        }
+                    }
+                }
+                else if (objectI is OsuSlider)
+                {
+                    while (--n >= 0)
+                    {
+                        var objectN = hitObjects[n];
+                        if (objectN is OsuSpinner) 
+                            continue;
+
+                        if (objectI.StartTime - (preemtTime * StackLeniency) > objectN.StartTime)
+                            break;
+
+                        var spanN = objectN as OsuSlider;
+                        if (((spanN?.PlayfieldEndPosition ?? objectN.PlayfieldPosition) - objectI.PlayfieldPosition).LengthSquared < stackLenienceSquared)
+                        {
+                            objectN.StackIndex = objectI.StackIndex + 1;
+                            objectI = objectN;
+                        }
+                    }
+                }
+            }
+
+            var hitobjectScale = (1.0f - 0.7f * (CircleSize - 5) / 5) / 2;
+            var hitObjectRadius = 64 * hitobjectScale;
+            var stackOffset = (float)hitObjectRadius / 10;
+
+            hitObjects.ForEach(h => h.StackOffset = new Vector2(-stackOffset, -stackOffset) * h.StackIndex);
         }
 
         private static string removePathQuotes(string path)

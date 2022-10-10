@@ -42,6 +42,9 @@ namespace StorybrewCommon.Mapset
         public bool NewCombo => (Flags & HitObjectFlag.NewCombo) > 0;
         public int ComboOffset => ((int)Flags >> 4) & 7;
 
+        public int StackIndex;
+        public Vector2 StackOffset;
+
         public virtual Vector2 PlayfieldPositionAtTime(double time) => PlayfieldPosition;
         public Vector2 PositionAtTime(double time) => PlayfieldPositionAtTime(time) + PlayfieldToStoryboardOffset;
 

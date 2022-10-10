@@ -17,6 +17,8 @@ namespace StorybrewCommon.Mapset
         public abstract string Name { get; }
         public abstract long Id { get; }
 
+        public abstract double StackLeniency { get; }
+
         public abstract double HpDrainRate { get; }
         public abstract double CircleSize { get; }
         public abstract double OverallDifficulty { get; }
@@ -58,5 +60,14 @@ namespace StorybrewCommon.Mapset
         public abstract ControlPoint GetTimingPointAt(int time);
 
         public abstract string AudioFilename { get; }
+
+        public static double GetDifficultyRange(double difficulty, double min, double mid, double max)
+        {
+            if (difficulty > 5)
+                return mid + (max - mid) * (difficulty - 5) / 5;
+            if (difficulty < 5)
+                return mid - (mid - min) * (5 - difficulty) / 5;
+            return mid;
+        }
     }
 }
