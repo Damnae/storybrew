@@ -1,7 +1,4 @@
-﻿using OpenTK;
-using System;
-
-namespace StorybrewCommon.Storyboarding
+﻿namespace StorybrewCommon.Storyboarding
 {
     public abstract class StoryboardLayer : StoryboardSegment
     {
