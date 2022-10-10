@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -15,8 +14,8 @@ namespace StorybrewEditor.Storyboarding
     {
         public Effect Effect { get; }
 
-        public double StartTime => storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty().Min();
-        public double EndTime => storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty().Max();
+        public double StartTime { get; private set; }
+        public double EndTime { get; private set; }
 
         public bool Highlight;
 
@@ -134,6 +133,9 @@ namespace StorybrewEditor.Storyboarding
                 (storyboardObject as HasPostProcess)?.PostProcess();
 
             segments.ForEach(s => s.PostProcess());
+
+            StartTime = Math.Min(storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty(double.MaxValue).Min(), segments.Select(s => s.StartTime).DefaultIfEmpty(double.MaxValue).Min());
+            EndTime = Math.Max(storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty(double.MinValue).Max(), segments.Select(s => s.EndTime).DefaultIfEmpty(double.MinValue).Max());
         }
 
         public void WriteOsbSprites(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)

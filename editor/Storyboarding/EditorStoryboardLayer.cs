@@ -62,8 +62,8 @@ namespace StorybrewEditor.Storyboarding
             }
         }
 
-        public double StartTime => segment.StartTime;
-        public double EndTime => segment.EndTime;
+        public double StartTime { get; private set; }
+        public double EndTime { get; private set; }
 
         public bool Highlight;
 
@@ -127,6 +127,15 @@ namespace StorybrewEditor.Storyboarding
         public void PostProcess()
         {
             segment.PostProcess();
+
+            StartTime = segment.StartTime;
+            if (StartTime == double.MaxValue)
+                StartTime = 0;
+
+            EndTime = segment.EndTime;
+            if (EndTime == double.MinValue)
+                EndTime = 0;
+
             EstimatedSize = segment.CalculateSize(osbLayer);
         }
 
