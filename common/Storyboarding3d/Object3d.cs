@@ -17,7 +17,7 @@ namespace StorybrewCommon.Storyboarding3d
 
         public readonly KeyframedValue<CommandColor> Coloring = new KeyframedValue<CommandColor>(InterpolatingFunctions.CommandColor, CommandColor.White);
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
-        public StoryboardLayer Layer;
+        public StoryboardSegment Segment;
 
         public bool DrawBelowParent = false;
 
@@ -37,10 +37,10 @@ namespace StorybrewCommon.Storyboarding3d
             return Matrix4.Identity;
         }
 
-        public void GenerateTreeSprite(StoryboardLayer parentLayer)
+        public void GenerateTreeSprite(StoryboardSegment parentSegment)
         {
-            var layer = Layer ?? parentLayer;
-            var childrenLayer = ChildrenInheritLayer ? layer : parentLayer;
+            var layer = Segment ?? parentSegment;
+            var childrenLayer = ChildrenInheritLayer ? layer : parentSegment;
 
             foreach (var child in children.Where(c => c.DrawBelowParent))
                 child.GenerateTreeSprite(childrenLayer);
@@ -99,7 +99,7 @@ namespace StorybrewCommon.Storyboarding3d
                 child.DoTreeSprite(action);
         }
 
-        public virtual void GenerateSprite(StoryboardLayer layer)
+        public virtual void GenerateSprite(StoryboardSegment parentSegment)
         {
         }
         public virtual void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)

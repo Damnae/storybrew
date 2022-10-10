@@ -69,18 +69,18 @@ namespace StorybrewCommon.Storyboarding3d
             }
         }
 
-        public override void GenerateSprite(StoryboardLayer layer)
+        public override void GenerateSprite(StoryboardSegment segment)
         {
-            spriteBody = spriteBody ?? layer.CreateSprite(SpritePathBody, OsbOrigin.Centre);
+            spriteBody = spriteBody ?? segment.CreateSprite(SpritePathBody, OsbOrigin.Centre);
             if (SpritePathEdge != null)
             {
-                spriteTopEdge = spriteTopEdge ?? layer.CreateSprite(SpritePathEdge, OsbOrigin.BottomCentre);
-                spriteBottomEdge = spriteBottomEdge ?? layer.CreateSprite(SpritePathEdge, OsbOrigin.TopCentre);
+                spriteTopEdge = spriteTopEdge ?? segment.CreateSprite(SpritePathEdge, OsbOrigin.BottomCentre);
+                spriteBottomEdge = spriteBottomEdge ?? segment.CreateSprite(SpritePathEdge, OsbOrigin.TopCentre);
             }
             if (SpritePathCap != null)
             {
-                spriteStartCap = spriteStartCap ?? layer.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreLeft : OsbOrigin.Centre);
-                spriteEndCapEnd = spriteEndCapEnd ?? layer.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreRight : OsbOrigin.Centre);
+                spriteStartCap = spriteStartCap ?? segment.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreLeft : OsbOrigin.Centre);
+                spriteEndCapEnd = spriteEndCapEnd ?? segment.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreRight : OsbOrigin.Centre);
             }
         }
 

@@ -5,7 +5,7 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbSpritePools : IDisposable
     {
-        private readonly StoryboardLayer layer;
+        private readonly StoryboardSegment segment;
         private readonly Dictionary<string, OsbSpritePool> pools = new Dictionary<string, OsbSpritePool>();
         private readonly Dictionary<string, OsbAnimationPool> animationPools = new Dictionary<string, OsbAnimationPool>();
 
@@ -22,9 +22,9 @@ namespace StorybrewCommon.Storyboarding.Util
             }
         }
 
-        public OsbSpritePools(StoryboardLayer layer)
+        public OsbSpritePools(StoryboardSegment segment)
         {
-            this.layer = layer;
+            this.segment = segment;
         }
 
         public void Clear()
@@ -54,7 +54,7 @@ namespace StorybrewCommon.Storyboarding.Util
             var key = getKey(path, origin, finalizeSprite, poolGroup);
 
             if (!pools.TryGetValue(key, out OsbSpritePool pool))
-                pools.Add(key, pool = new OsbSpritePool(layer, path, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
+                pools.Add(key, pool = new OsbSpritePool(segment, path, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
 
             return pool;
         }
@@ -64,7 +64,7 @@ namespace StorybrewCommon.Storyboarding.Util
             var key = getKey(path, frameCount, frameDelay, loopType, origin, finalizeSprite, poolGroup);
 
             if (!animationPools.TryGetValue(key, out OsbAnimationPool pool))
-                animationPools.Add(key, pool = new OsbAnimationPool(layer, path, frameCount, frameDelay, loopType, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
+                animationPools.Add(key, pool = new OsbAnimationPool(segment, path, frameCount, frameDelay, loopType, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
 
             return pool;
         }

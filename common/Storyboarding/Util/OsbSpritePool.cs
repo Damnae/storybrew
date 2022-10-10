@@ -5,7 +5,7 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbSpritePool : IDisposable
     {
-        private readonly StoryboardLayer layer;
+        private readonly StoryboardSegment segment;
         private readonly string path;
         private readonly OsbOrigin origin;
         private readonly Action<OsbSprite, double, double> finalizeSprite;
@@ -14,16 +14,16 @@ namespace StorybrewCommon.Storyboarding.Util
 
         public int MaxPoolDuration = 60000;
 
-        public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite = null)
+        public OsbSpritePool(StoryboardSegment segment, string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite = null)
         {
-            this.layer = layer;
+            this.segment = segment;
             this.path = path;
             this.origin = origin;
             this.finalizeSprite = finalizeSprite;
         }
 
-        public OsbSpritePool(StoryboardLayer layer, string path, OsbOrigin origin, bool additive)
-            : this(layer, path, origin, additive ? (sprite, startTime, endTime) => sprite.Additive(startTime, endTime) : (Action<OsbSprite, double, double>)null)
+        public OsbSpritePool(StoryboardSegment segment, string path, OsbOrigin origin, bool additive)
+            : this(segment, path, origin, additive ? (sprite, startTime, endTime) => sprite.Additive(startTime, endTime) : (Action<OsbSprite, double, double>)null)
         {
         }
 
@@ -44,7 +44,7 @@ namespace StorybrewCommon.Storyboarding.Util
                 return result.Sprite;
             }
 
-            var sprite = CreateSprite(layer, path, origin);
+            var sprite = CreateSprite(segment, path, origin);
             pooledSprites.Add(new PooledSprite(sprite, startTime, endTime));
             return sprite;
         }
@@ -61,8 +61,8 @@ namespace StorybrewCommon.Storyboarding.Util
             pooledSprites.Clear();
         }
 
-        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin)
-            => layer.CreateSprite(path, origin);
+        protected virtual OsbSprite CreateSprite(StoryboardSegment segment, string path, OsbOrigin origin)
+            => segment.CreateSprite(path, origin);
 
         private class PooledSprite
         {

@@ -25,9 +25,9 @@ namespace StorybrewCommon.Storyboarding3d
         public readonly CommandGenerator Generator = new CommandGenerator();
         public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator; } }
 
-        public override void GenerateSprite(StoryboardLayer layer)
+        public override void GenerateSprite(StoryboardSegment segment)
         {
-            sprite = sprite ?? layer.CreateSprite(SpritePath, SpriteOrigin);
+            sprite = sprite ?? segment.CreateSprite(SpritePath, SpriteOrigin);
         }
 
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)

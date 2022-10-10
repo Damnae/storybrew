@@ -15,25 +15,25 @@ namespace StorybrewCommon.Storyboarding3d
             Root.Add(child);
         }
 
-        public void Generate(Camera camera, StoryboardLayer defaultLayer, double startTime, double endTime, double timeStep)
+        public void Generate(Camera camera, StoryboardSegment defaultSegment, double startTime, double endTime, double timeStep)
         {
-            Root.GenerateTreeSprite(defaultLayer);
+            Root.GenerateTreeSprite(defaultSegment);
             for (var time = startTime; time < endTime + 5; time += timeStep)
                 Root.GenerateTreeStates(time, camera);
             Root.GenerateTreeCommands();
         }
 
-        public void Generate(Camera camera, StoryboardLayer defaultLayer, double startTime, double endTime, Beatmap beatmap, int divisor = 4)
+        public void Generate(Camera camera, StoryboardSegment defaultSegment, double startTime, double endTime, Beatmap beatmap, int divisor = 4)
         {
-            Root.GenerateTreeSprite(defaultLayer);
+            Root.GenerateTreeSprite(defaultSegment);
             beatmap.ForEachTick((int)startTime, (int)endTime, divisor, (timingPoint, time, beatCount, tickCount) =>
                 Root.GenerateTreeStates(time, camera));
             Root.GenerateTreeCommands();
         }
 
-        public void Generate(Camera camera, StoryboardLayer defaultLayer, double startTime, double endTime, double timeStep, int loopCount, Action<LoopCommand, OsbSprite> action = null)
+        public void Generate(Camera camera, StoryboardSegment defaultSegment, double startTime, double endTime, double timeStep, int loopCount, Action<LoopCommand, OsbSprite> action = null)
         {
-            Root.GenerateTreeSprite(defaultLayer);
+            Root.GenerateTreeSprite(defaultSegment);
             for (var time = startTime; time < endTime + 5; time += timeStep)
                 Root.GenerateTreeStates(time, camera);
             Root.GenerateTreeLoopCommands(startTime, endTime, loopCount, action, offsetCommands: true);

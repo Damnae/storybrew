@@ -30,10 +30,10 @@ namespace StorybrewCommon.Storyboarding3d
         private int edgeIndex = 0;
         public int FixedEdge = -1;
         
-        public override void GenerateSprite(StoryboardLayer layer)
+        public override void GenerateSprite(StoryboardSegment segment)
         {
-            sprite0 = sprite0 ?? layer.CreateSprite(SpritePath, OsbOrigin.BottomLeft);
-            sprite1 = sprite1 ?? layer.CreateSprite(SpritePath, OsbOrigin.BottomRight);
+            sprite0 = sprite0 ?? segment.CreateSprite(SpritePath, OsbOrigin.BottomLeft);
+            sprite1 = sprite1 ?? segment.CreateSprite(SpritePath, OsbOrigin.BottomRight);
         }
 
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
