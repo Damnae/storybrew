@@ -24,15 +24,20 @@ namespace StorybrewEditor.Storyboarding
         private string statusMessage = string.Empty;
         public override string StatusMessage => statusMessage;
 
+        private bool multithreaded;
+        public override bool Multithreaded => multithreaded;
+
         private bool beatmapDependant = true;
         public override bool BeatmapDependant => beatmapDependant;
 
-        public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer) : base(project)
+        public ScriptedEffect(Project project, ScriptContainer<StoryboardObjectGenerator> scriptContainer, bool multithreaded = false) : base(project)
         {
             statusStopwatch.Start();
 
             this.scriptContainer = scriptContainer;
             scriptContainer.OnScriptChanged += scriptContainer_OnScriptChanged;
+
+            this.multithreaded = multithreaded;
         }
 
         /// <summary>
@@ -130,6 +135,7 @@ namespace StorybrewEditor.Storyboarding
                     return;
                 }
 
+                multithreaded = context.Multithreaded;
                 beatmapDependant = context.BeatmapDependent;
                 dependencyWatcher?.Dispose();
                 dependencyWatcher = newDependencyWatcher;

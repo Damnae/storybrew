@@ -55,6 +55,8 @@ namespace StorybrewEditor.Storyboarding
 
         public bool BeatmapDependent { get; private set; }
 
+        public override bool Multithreaded { get; set; }
+
         private readonly StringBuilder log = new StringBuilder();
         public string Log => log.ToString();
 

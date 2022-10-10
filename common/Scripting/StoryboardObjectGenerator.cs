@@ -26,6 +26,12 @@ namespace StorybrewCommon.Scripting
         private GeneratorContext context;
 
         /// <summary>
+        /// Override to true if this script uses multiple threads.
+        /// It will prevent other effects from updating in parallel to this one.
+        /// </summary>
+        public virtual bool Multithreaded => false;
+
+        /// <summary>
         /// Creates or retrieves a layer. 
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
         /// Layers will be sorted by the order in which they are first retrieved.
@@ -391,6 +397,7 @@ namespace StorybrewCommon.Scripting
                 Current = this;
                 Generate();
 
+                context.Multithreaded = Multithreaded;
                 saveFontCache();
             }
             finally

@@ -207,7 +207,7 @@ namespace StorybrewEditor.Storyboarding
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false, Program.Settings.EffectThreads);
         public void QueueEffectUpdate(Effect effect)
         {
-            effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update());
+            effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update(), effect.Multithreaded);
             refreshEffectsStatus();
         }
         public void CancelEffectUpdates(bool stopThreads) => effectUpdateQueue.CancelQueuedActions(stopThreads);
@@ -223,11 +223,11 @@ namespace StorybrewEditor.Storyboarding
         public Effect GetEffectByName(string name)
             => effects.Find(e => e.Name == name);
 
-        public Effect AddScriptedEffect(string scriptName)
+        public Effect AddScriptedEffect(string scriptName, bool multithreaded = false)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(Project));
 
-            var effect = new ScriptedEffect(this, scriptManager.Get(scriptName))
+            var effect = new ScriptedEffect(this, scriptManager.Get(scriptName), multithreaded)
             {
                 Name = GetUniqueEffectName(scriptName),
             };
@@ -671,6 +671,7 @@ namespace StorybrewEditor.Storyboarding
                         { "FormatVersion", Version },
                         { "Name", effect.Name },
                         { "Script", effect.BaseName },
+                        { "Multithreaded", effect.Multithreaded },
                     };
 
                     var configRoot = new TinyObject();
@@ -768,7 +769,7 @@ namespace StorybrewEditor.Storyboarding
                     if (effectVersion > Version)
                         throw new InvalidOperationException("This project contains an effect that was saved with a more recent version, you need to update to open it");
 
-                    var effect = AddScriptedEffect(effectRoot.Value<string>("Script"));
+                    var effect = AddScriptedEffect(effectRoot.Value<string>("Script"), effectRoot.Value<bool>("Multithreaded"));
                     effect.Guid = Guid.Parse(guidMatch.Groups[1].Value);
                     effect.Name = effectRoot.Value<string>("Name");
 

@@ -35,6 +35,7 @@ namespace StorybrewEditor.Storyboarding
         public virtual EffectStatus Status { get; }
         public virtual string StatusMessage { get; }
 
+        public virtual bool Multithreaded { get; }
         public virtual bool BeatmapDependant { get; }
 
         public double StartTime => layers.Select(l => l.StartTime).DefaultIfEmpty().Min();

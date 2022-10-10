@@ -47,10 +47,10 @@ namespace StorybrewEditor.Util
                 actionRunners.Add(new ActionRunner(context, $"{threadName} #{i + 1}"));
         }
 
-        public void Queue(T target, Action<T> action)
-            => Queue(target, null, action);
+        public void Queue(T target, Action<T> action, bool mustRunAlone = false)
+            => Queue(target, null, action, mustRunAlone);
 
-        public void Queue(T target, string uniqueKey, Action<T> action)
+        public void Queue(T target, string uniqueKey, Action<T> action, bool mustRunAlone = false)
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(AsyncActionQueue<T>));
 
@@ -62,7 +62,13 @@ namespace StorybrewEditor.Util
                 if (!allowDuplicates && context.Queue.Any(q => q.Target.Equals(target)))
                     return;
 
-                context.Queue.Add(new ActionContainer() { Target = target, UniqueKey = uniqueKey, Action = action });
+                context.Queue.Add(new ActionContainer()
+                {
+                    Target = target,
+                    UniqueKey = uniqueKey,
+                    Action = action,
+                    MustRunAlone = mustRunAlone,
+                });
                 Monitor.PulseAll(context.Queue);
             }
         }
@@ -109,12 +115,14 @@ namespace StorybrewEditor.Util
             public T Target;
             public string UniqueKey;
             public Action<T> Action;
+            public bool MustRunAlone;
         }
 
         private class ActionQueueContext
         {
             public readonly List<ActionContainer> Queue = new List<ActionContainer>();
             public readonly HashSet<string> Running = new HashSet<string>();
+            public bool RunningLoneTask;
 
             public event ActionFailedEventHandler OnActionFailed;
             public bool TriggerActionFailed(T target, Exception e)
@@ -165,8 +173,16 @@ namespace StorybrewEditor.Util
                     Thread localThread = null;
                     thread = localThread = new Thread(() =>
                     {
+                        var mustSleep = false;
                         while (true)
                         {
+                            if (mustSleep)
+                            {
+                                // Thread must sleep with no lock taken in case the queue was not empty but no task was able to start.
+                                Thread.Sleep(200);
+                                mustSleep = false;
+                            }
+
                             ActionContainer task;
                             lock (context.Queue)
                             {
@@ -182,12 +198,25 @@ namespace StorybrewEditor.Util
 
                                 lock (context.Running)
                                 {
-                                    task = context.Queue.FirstOrDefault(t => !context.Running.Contains(t.UniqueKey));
-                                    if (task == null)
+                                    if (context.RunningLoneTask)
+                                    {
+                                        mustSleep = true;
                                         continue;
+                                    }
+
+                                    task = context.Queue.FirstOrDefault(t => !context.Running.Contains(t.UniqueKey)
+                                        && !t.MustRunAlone || t.MustRunAlone && context.Running.Count == 0);
+
+                                    if (task == null)
+                                    {
+                                        mustSleep = true;
+                                        continue;
+                                    }
 
                                     context.Queue.Remove(task);
                                     context.Running.Add(task.UniqueKey);
+                                    if (task.MustRunAlone)
+                                        context.RunningLoneTask = true;
                                 }
                             }
 
@@ -206,7 +235,11 @@ namespace StorybrewEditor.Util
                             }
 
                             lock (context.Running)
+                            {
                                 context.Running.Remove(task.UniqueKey);
+                                if (task.MustRunAlone)
+                                    context.RunningLoneTask = false;
+                            }
                         }
                     })
                     { Name = threadName, IsBackground = true, };
