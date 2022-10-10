@@ -95,6 +95,7 @@
     <Compile Include="Scripting\ScriptProvider.cs" />
     <Compile Include="Processes\ProcessWorker.cs" />
     <Compile Include="Storyboarding\EditorOsbSample.cs" />
+    <Compile Include="Storyboarding\EditorStoryboardSegment.cs" />
     <Compile Include="Storyboarding\EventObject.cs" />
     <Compile Include="ScreenLayers\ReferencedAssemblyConfig.cs" />
     <Compile Include="Storyboarding\FrameStats.cs" />

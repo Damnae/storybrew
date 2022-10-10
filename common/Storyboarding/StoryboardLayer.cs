@@ -3,7 +3,7 @@ using System;
 
 namespace StorybrewCommon.Storyboarding
 {
-    public abstract class StoryboardLayer : MarshalByRefObject
+    public abstract class StoryboardLayer : StoryboardSegment
     {
         public string Identifier { get; }
 
@@ -11,15 +11,5 @@ namespace StorybrewCommon.Storyboarding
         {
             Identifier = identifier;
         }
-
-        public abstract OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition);
-        public abstract OsbSprite CreateSprite(string path, OsbOrigin origin = OsbOrigin.Centre);
-
-        public abstract OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition);
-        public abstract OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre);
-
-        public abstract OsbSample CreateSample(string path, double time, double volume = 100);
-
-        public abstract void Discard(StoryboardObject storyboardObject);
     }
 }

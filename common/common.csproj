@@ -96,6 +96,7 @@
     <Compile Include="Storyboarding\OsbAnimationWriter.cs" />
     <Compile Include="Storyboarding\OsbSpriteWriter.cs" />
     <Compile Include="Storyboarding\OsbWriterFactory.cs" />
+    <Compile Include="Storyboarding\StoryboardSegment.cs" />
     <Compile Include="Storyboarding\Util\CommandGenerator.cs" />
     <Compile Include="Storyboarding\OsbSample.cs" />
     <Compile Include="Storyboarding\Util\OsbAnimationPool.cs" />
