@@ -48,7 +48,7 @@ namespace StorybrewEditor.Storyboarding
             if (sprite.FlipHAt(time)) scale.X = -scale.X;
             if (sprite.FlipVAt(time)) scale.Y = -scale.Y;
 
-            Texture2dRegion texture = null;
+            Texture2dRegion texture;
             var fullPath = Path.Combine(project.MapsetPath, sprite.GetTexturePathAt(time));
             try
             {
