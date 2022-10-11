@@ -75,7 +75,6 @@ namespace StorybrewCommon.Storyboarding.Commands
             if (commands.Count <= 0)
                 return;
 
-            var lines = new string[commands.Count + 1];
             writer.WriteLine(new string(' ', indentation) + GetCommandGroupHeader(exportSettings));
             foreach (var command in commands)
                 command.WriteOsb(writer, exportSettings, indentation + 1);
