@@ -11,6 +11,8 @@ namespace StorybrewCommon.Curves
         private readonly float scale;
         private readonly bool reversed;
 
+        public Curve Curve => curve;
+
         public TransformedCurve(Curve curve, Vector2 offset, float scale, bool reversed = false)
         {
             this.curve = curve;
