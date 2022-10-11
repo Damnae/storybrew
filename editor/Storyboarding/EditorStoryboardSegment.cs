@@ -141,8 +141,13 @@ namespace StorybrewEditor.Storyboarding
             foreach (var storyboardObject in storyboardObjects)
                 (storyboardObject as HasPostProcess)?.PostProcess();
 
-            startTime = storyboardObjects.Select(l => l.StartTime).DefaultIfEmpty(double.MaxValue).Min();
-            endTime = storyboardObjects.Select(l => l.EndTime).DefaultIfEmpty(double.MinValue).Max();
+            startTime = double.MaxValue;
+            endTime = double.MinValue;
+            foreach (var sbo in storyboardObjects)
+            {
+                startTime = Math.Min(startTime, sbo.StartTime);
+                endTime = Math.Max(endTime, sbo.EndTime);
+            }
         }
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)
