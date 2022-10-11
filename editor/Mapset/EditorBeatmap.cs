@@ -225,9 +225,7 @@ namespace StorybrewEditor.Mapset
             });
 
             if (beatmap.comboColors.Count == 0)
-            {
                 beatmap.comboColors.AddRange(defaultComboColors);
-            }
         }
         private static void parseEventsSection(EditorBeatmap beatmap, StreamReader reader)
         {
