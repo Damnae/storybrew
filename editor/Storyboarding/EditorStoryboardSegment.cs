@@ -111,6 +111,8 @@ namespace StorybrewEditor.Storyboarding
                 displayableObjects.Remove(displayableObject);
             if (storyboardObject is EventObject eventObject)
                 eventObjects.Remove(eventObject);
+            if (storyboardObject is EditorStoryboardSegment segment)
+                segments.Remove(segment);
         }
 
         public void TriggerEvents(double fromTime, double toTime)
