@@ -20,7 +20,7 @@ namespace StorybrewCommon.Curves
             this.precision = precision;
         }
 
-        protected override void Initialize(List<Tuple<float, Vector2>> distancePosition, out double length)
+        protected override void Initialize(List<ValueTuple<float, Vector2>> distancePosition, out double length)
         {
             var precision = points.Count > 2 ? this.precision : 0;
 
@@ -32,19 +32,24 @@ namespace StorybrewCommon.Curves
                 var nextPosition = positionAtDelta(delta);
 
                 distance += (nextPosition - previousPosition).Length;
-                distancePosition.Add(new Tuple<float, Vector2>(distance, nextPosition));
+                distancePosition.Add(new ValueTuple<float, Vector2>(distance, nextPosition));
 
                 previousPosition = nextPosition;
             }
             distance += (EndPosition - previousPosition).Length;
             length = distance;
+
         }
+
+        [ThreadStatic] private static Vector2[] intermediatePoints;
 
         private Vector2 positionAtDelta(float delta)
         {
             var pointsCount = points.Count;
 
-            var intermediatePoints = new Vector2[pointsCount];
+            if (intermediatePoints == null || intermediatePoints.Length < pointsCount)
+                intermediatePoints = new Vector2[pointsCount];
+
             for (var i = 0; i < pointsCount; ++i)
                 intermediatePoints[i] = points[i];
 

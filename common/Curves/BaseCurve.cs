@@ -10,7 +10,7 @@ namespace StorybrewCommon.Curves
         public abstract Vector2 EndPosition { get; }
         public abstract Vector2 StartPosition { get; }
 
-        private List<Tuple<float, Vector2>> distancePosition;
+        private List<ValueTuple<float, Vector2>> distancePosition;
 
         private double length;
         public double Length
@@ -24,11 +24,11 @@ namespace StorybrewCommon.Curves
 
         private void initialize()
         {
-            distancePosition = new List<Tuple<float, Vector2>>();
+            distancePosition = new List<ValueTuple<float, Vector2>>();
             Initialize(distancePosition, out length);
         }
 
-        protected abstract void Initialize(List<Tuple<float, Vector2>> distancePosition, out double length);
+        protected abstract void Initialize(List<ValueTuple<float, Vector2>> distancePosition, out double length);
 
         public Vector2 PositionAtDistance(double distance)
         {

@@ -21,7 +21,7 @@ namespace StorybrewCommon.Curves
             this.endPoint = endPoint;
         }
 
-        protected override void Initialize(List<Tuple<float, Vector2>> distancePosition, out double length)
+        protected override void Initialize(List<ValueTuple<float, Vector2>> distancePosition, out double length)
         {
             var d = 2 * (startPoint.X * (midPoint.Y - endPoint.Y) + midPoint.X * (endPoint.Y - startPoint.Y) + endPoint.X * (startPoint.Y - midPoint.Y));
             if (d == 0) throw new Exception("Invalid circle curve");
@@ -53,9 +53,9 @@ namespace StorybrewCommon.Curves
                 var angle = endAngle * progress + startAngle * (1 - progress);
 
                 var position = new Vector2((float)(Math.Cos(angle) * radius), (float)(Math.Sin(angle) * radius)) + centre;
-                distancePosition.Add(new Tuple<float, Vector2>((float)(progress * length), position));
+                distancePosition.Add(new ValueTuple<float, Vector2>((float)(progress * length), position));
             }
-            distancePosition.Add(new Tuple<float, Vector2>((float)length, endPoint));
+            distancePosition.Add(new ValueTuple<float, Vector2>((float)length, endPoint));
         }
 
         public static bool IsValid(Vector2 startPoint, Vector2 midPoint, Vector2 endPoint)
