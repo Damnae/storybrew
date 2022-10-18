@@ -68,6 +68,12 @@ namespace StorybrewEditor.Storyboarding
         private double endTime;
         public override double EndTime => endTime;
 
+        public override bool ReverseDepth
+        {
+            get => segment.ReverseDepth;
+            set => segment.ReverseDepth = value;
+        }
+
         public bool Highlight;
 
         public int EstimatedSize { get; private set; }

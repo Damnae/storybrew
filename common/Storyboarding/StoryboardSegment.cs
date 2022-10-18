@@ -4,6 +4,8 @@ namespace StorybrewCommon.Storyboarding
 {
     public abstract class StoryboardSegment : StoryboardObject
     {
+        public abstract bool ReverseDepth { get; set; }
+
         public abstract StoryboardSegment CreateSegment();
 
         public abstract OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition);

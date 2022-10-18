@@ -23,6 +23,8 @@ namespace StorybrewEditor.Storyboarding
 
         public bool Highlight;
 
+        public override bool ReverseDepth { get; set; }
+
         public event ChangedHandler OnChanged;
         protected void RaiseChanged(string propertyName)
             => EventHelper.InvokeStrict(() => OnChanged, d => ((ChangedHandler)d)(this, new ChangedEventArgs(propertyName)));
@@ -138,6 +140,12 @@ namespace StorybrewEditor.Storyboarding
 
         public void PostProcess()
         {
+            if (ReverseDepth)
+            {
+                storyboardObjects.Reverse();
+                displayableObjects.Reverse();
+            }
+
             foreach (var storyboardObject in storyboardObjects)
                 (storyboardObject as HasPostProcess)?.PostProcess();
 
