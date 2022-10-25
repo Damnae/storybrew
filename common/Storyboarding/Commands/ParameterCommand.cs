@@ -12,7 +12,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         }
 
         public override CommandParameter ValueAtProgress(double progress)
-            => StartValue;
+            => progress > 0 && progress < 1 || StartTime == EndTime ? StartValue : EndValue;
 
         public override CommandParameter Midpoint(Command<CommandParameter> endCommand, double progress)
             => StartValue;
