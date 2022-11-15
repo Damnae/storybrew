@@ -16,6 +16,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public double Duration => EndTime - StartTime;
         public TValue StartValue { get; set; }
         public TValue EndValue { get; set; }
+        public virtual bool MaintainValue => true;
         public virtual bool ExportEndValue => true;
         public bool Active => true;
         public int Cost => 1;
@@ -38,11 +39,11 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public TValue ValueAtTime(double time)
         {
-            if (time <= StartTime) return ValueAtProgress(0);
-            if (EndTime <= time) return ValueAtProgress(1);
+            if (time < StartTime) return MaintainValue ? ValueAtProgress(0) : default;
+            if (EndTime < time) return MaintainValue ? ValueAtProgress(1) : default;
 
             var duration = EndTime - StartTime;
-            var progress = Easing.Ease((time - StartTime) / duration);
+            var progress = duration > 0 ? Easing.Ease((time - StartTime) / duration) : 0;
             return ValueAtProgress(progress);
         }
 

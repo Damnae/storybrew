@@ -1,18 +1,22 @@
 ﻿using StorybrewCommon.Storyboarding.CommandValues;
+using System;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
     public class ParameterCommand : Command<CommandParameter>
     {
+        public override bool MaintainValue => StartTime == EndTime;
         public override bool ExportEndValue => false;
 
-        public ParameterCommand(OsbEasing easing, double startTime, double endTime, CommandParameter startValue)
-            : base("P", easing, startTime, endTime, startValue, ((int)endTime - (int)startTime) == 0 ? startValue : CommandParameter.None)
+        public ParameterCommand(OsbEasing easing, double startTime, double endTime, CommandParameter value)
+            : base("P", easing, startTime, endTime, value, value)
         {
+            if (value == CommandParameter.None)
+                throw new InvalidOperationException($"Parameter command cannot be None");
         }
 
         public override CommandParameter ValueAtProgress(double progress)
-            => progress > 0 && progress < 1 || StartTime == EndTime ? StartValue : EndValue;
+            => StartValue;
 
         public override CommandParameter Midpoint(Command<CommandParameter> endCommand, double progress)
             => StartValue;
