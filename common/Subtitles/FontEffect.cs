@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using System.Drawing;
-using Tiny;
 
 namespace StorybrewCommon.Subtitles
 {
@@ -10,8 +9,5 @@ namespace StorybrewCommon.Subtitles
 
         Vector2 Measure();
         void Draw(Bitmap bitmap, Graphics textGraphics, Font font, StringFormat stringFormat, string text, float x, float y);
-
-        bool Matches(TinyToken cachedEffectRoot);
-        TinyObject ToTinyObject();
     }
 }

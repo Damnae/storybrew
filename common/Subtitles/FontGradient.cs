@@ -3,7 +3,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using Tiny;
 
 namespace StorybrewCommon.Subtitles
 {
@@ -28,31 +27,5 @@ namespace StorybrewCommon.Subtitles
                 { WrapMode = WrapMode, })
                 textGraphics.DrawString(text, font, brush, x, y, stringFormat);
         }
-
-        public bool Matches(TinyToken cachedEffectRoot)
-            => cachedEffectRoot.Value<string>("Type") == GetType().FullName &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("OffsetX"), Offset.X, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("OffsetY"), Offset.Y, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("SizeX"), Size.X, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("SizeY"), Size.Y, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorR"), Color.R, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorG"), Color.G, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorB"), Color.B, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorA"), Color.A, 0.00001f) &&
-                cachedEffectRoot.Value<WrapMode>("WrapMode") == WrapMode;
-
-        public TinyObject ToTinyObject() => new TinyObject
-        {
-            { "Type", GetType().FullName },
-            { "OffsetX", Offset.X },
-            { "OffsetY", Offset.Y },
-            { "SizeX", Size.X },
-            { "SizeY", Size.Y },
-            { "ColorR", Color.R },
-            { "ColorG", Color.G },
-            { "ColorB", Color.B },
-            { "ColorA", Color.A },
-            { "WrapMode", WrapMode },
-        };
     }
 }

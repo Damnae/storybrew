@@ -260,12 +260,70 @@ namespace StorybrewCommon.Subtitles
                     return false;
 
                 for (var i = 0; i < effects.Length; i++)
-                    if (!effects[i].Matches(effectsRoot[i].Value<TinyToken>()))
+                    if (!matches(effects[i], effectsRoot[i].Value<TinyToken>()))
                         return false;
 
                 return true;
             }
             return false;
+        }
+
+        private bool matches(FontEffect fontEffect, TinyToken cache)
+        {
+            var effectType = fontEffect.GetType();
+            if (cache.Value<string>("Type") != effectType.FullName)
+                return false;
+
+            foreach (var field in effectType.GetFields())
+            {
+                var fieldType = field.FieldType;
+                if (fieldType == typeof(Color4))
+                {
+                    var color = (Color4)field.GetValue(fontEffect);
+                    if (!MathUtil.FloatEquals(cache.Value<float>($"{field.Name}R"), color.R, 0.00001f) ||
+                        !MathUtil.FloatEquals(cache.Value<float>($"{field.Name}G"), color.G, 0.00001f) ||
+                        !MathUtil.FloatEquals(cache.Value<float>($"{field.Name}B"), color.B, 0.00001f) ||
+                        !MathUtil.FloatEquals(cache.Value<float>($"{field.Name}A"), color.A, 0.00001f))
+                        return false;
+                }
+                else if (fieldType == typeof(Vector3))
+                {
+                    var vector = (Vector3)field.GetValue(fontEffect);
+                    if (!MathUtil.FloatEquals(cache.Value<float>($"{field.Name}X"), vector.X, 0.00001f) ||
+                        !MathUtil.FloatEquals(cache.Value<float>($"{field.Name}Y"), vector.Y, 0.00001f) ||
+                        !MathUtil.FloatEquals(cache.Value<float>($"{field.Name}Z"), vector.Z, 0.00001f))
+                        return false;
+                }
+                else if (fieldType == typeof(Vector2))
+                {
+                    var vector = (Vector2)field.GetValue(fontEffect);
+                    if (!MathUtil.FloatEquals(cache.Value<float>($"{field.Name}X"), vector.X, 0.00001f) ||
+                        !MathUtil.FloatEquals(cache.Value<float>($"{field.Name}Y"), vector.Y, 0.00001f))
+                        return false;
+                }
+                else if (fieldType == typeof(double))
+                {
+                    if (!MathUtil.DoubleEquals(cache.Value<double>(field.Name), (double)field.GetValue(fontEffect), 0.00001))
+                        return false;
+                }
+                else if (fieldType == typeof(float))
+                {
+                    if (!MathUtil.FloatEquals(cache.Value<float>(field.Name), (float)field.GetValue(fontEffect), 0.00001f))
+                        return false;
+                }
+                else if (fieldType == typeof(int) || fieldType.IsEnum)
+                {
+                    if (cache.Value<int>(field.Name) != (int)field.GetValue(fontEffect))
+                        return false;
+                }
+                else if (fieldType == typeof(string))
+                {
+                    if (cache.Value<string>(field.Name) != (string)field.GetValue(fontEffect))
+                        return false;
+                }
+                else throw new InvalidDataException($"Unexpected field type {fieldType} for {field.Name} in {effectType.FullName}");
+            }
+            return true;
         }
 
         internal TinyObject ToTinyObject() => new TinyObject
@@ -282,7 +340,7 @@ namespace StorybrewCommon.Subtitles
             { "TrimTransparency", description.TrimTransparency },
             { "EffectsOnly", description.EffectsOnly },
             { "Debug", description.Debug },
-            { "Effects", effects.Select(e => e.ToTinyObject())},
+            { "Effects", effects.Select(e => fontEffectToTinyObject(e))},
             { "Cache", textureCache.Where(l => !l.Value.IsEmpty).Select(l => letterToTinyObject(l))},
         };
 
@@ -298,5 +356,51 @@ namespace StorybrewCommon.Subtitles
             { "Width", letterEntry.Value.Width },
             { "Height", letterEntry.Value.Height },
         };
+
+        private TinyObject fontEffectToTinyObject(FontEffect fontEffect)
+        {
+            var effectType = fontEffect.GetType();
+            var cache = new TinyObject
+            {
+                ["Type"] = effectType.FullName,
+            };
+
+            foreach (var field in effectType.GetFields())
+            {
+                var fieldType = field.FieldType;
+                if (fieldType == typeof(Color4))
+                {
+                    var color = (Color4)field.GetValue(fontEffect);
+                    cache[$"{field.Name}R"] = color.R;
+                    cache[$"{field.Name}G"] = color.G;
+                    cache[$"{field.Name}B"] = color.B;
+                    cache[$"{field.Name}A"] = color.A;
+                }
+                else if (fieldType == typeof(Vector3))
+                {
+                    var vector = (Vector3)field.GetValue(fontEffect);
+                    cache[$"{field.Name}X"] = vector.X;
+                    cache[$"{field.Name}Y"] = vector.Y;
+                    cache[$"{field.Name}Z"] = vector.Z;
+                }
+                else if (fieldType == typeof(Vector2))
+                {
+                    var vector = (Vector2)field.GetValue(fontEffect);
+                    cache[$"{field.Name}X"] = vector.X;
+                    cache[$"{field.Name}Y"] = vector.Y;
+                }
+                else if (fieldType == typeof(double))
+                    cache[field.Name] = (double)field.GetValue(fontEffect);
+                else if (fieldType == typeof(float))
+                    cache[field.Name] = (float)field.GetValue(fontEffect);
+                else if (fieldType == typeof(int) || fieldType.IsEnum)
+                    cache[field.Name] = (int)field.GetValue(fontEffect);
+                else if (fieldType == typeof(string))
+                    cache[field.Name] = (string)field.GetValue(fontEffect);
+                else throw new InvalidDataException($"Unexpected field type {fieldType} for {field.Name} in {effectType.FullName}");
+            }
+
+            return cache;
+        }
     }
 }

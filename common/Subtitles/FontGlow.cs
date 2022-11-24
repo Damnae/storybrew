@@ -1,12 +1,10 @@
-﻿using BrewLib.Util;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Util;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using Tiny;
 
 namespace StorybrewCommon.Subtitles
 {
@@ -70,25 +68,5 @@ namespace StorybrewCommon.Subtitles
                     textGraphics.DrawImage(blurredBitmap.Bitmap, 0, 0);
             }
         }
-
-        public bool Matches(TinyToken cachedEffectRoot)
-            => cachedEffectRoot.Value<string>("Type") == GetType().FullName &&
-                cachedEffectRoot.Value<int>("Radius") == Radius &&
-                MathUtil.DoubleEquals(cachedEffectRoot.Value<double>("Power"), Power, 0.00001) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorR"), Color.R, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorG"), Color.G, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorB"), Color.B, 0.00001f) &&
-                MathUtil.FloatEquals(cachedEffectRoot.Value<float>("ColorA"), Color.A, 0.00001f);
-
-        public TinyObject ToTinyObject() => new TinyObject
-        {
-            { "Type", GetType().FullName },
-            { "Radius", Radius },
-            { "Power", Power },
-            { "ColorR", Color.R },
-            { "ColorG", Color.G },
-            { "ColorB", Color.B },
-            { "ColorA", Color.A },
-        };
     }
 }
