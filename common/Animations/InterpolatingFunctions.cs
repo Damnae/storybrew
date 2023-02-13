@@ -23,8 +23,8 @@ namespace StorybrewCommon.Animations
 
         private static double getShortestAngleDelta(double from, double to)
         {
-            var rotationDelta = to - from;
-            return rotationDelta - (Math.Floor((rotationDelta + MathHelper.Pi) / MathHelper.TwoPi) * MathHelper.TwoPi);
+            var difference = (to - from) % MathHelper.TwoPi;
+            return (2 * difference % MathHelper.TwoPi) - difference;
         }
     }
 }
