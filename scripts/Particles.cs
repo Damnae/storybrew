@@ -3,7 +3,6 @@ using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Util;
 using System;
 using System.Drawing;
 using System.Linq;
@@ -12,56 +11,29 @@ namespace StorybrewScripts
 {
     public class Particles : StoryboardObjectGenerator
     {
-        [Configurable]
-        public string Path = "sb/particle.png";
+        [Configurable] public int StartTime;
+        [Configurable] public int EndTime;
+        [Configurable] public int ParticleCount = 32;
+        [Configurable] public float Lifetime = 1000;
 
-        [Configurable]
-        public int StartTime;
+        [Group("Sprite")]
+        [Configurable] public string Path = "sb/particle.png";
+        [Configurable] public OsbOrigin Origin = OsbOrigin.Centre;
+        [Configurable] public Vector2 Scale = new Vector2(1, 1);
+        [Configurable] public float Rotation = 0;
+        [Configurable] public Color4 Color = Color4.White;
+        [Configurable] public float ColorVariance = 0.6f;
+        [Configurable] public bool Additive = false;
 
-        [Configurable]
-        public int EndTime;
+        [Group("Spawn")]
+        [Configurable] public Vector2 SpawnOrigin = new Vector2(420, 0);
+        [Configurable] public float SpawnSpread = 360;
 
-        [Configurable]
-        public int ParticleCount = 32;
-
-        [Configurable]
-        public Vector2 Scale = new Vector2(1, 1);
-
-        [Configurable]
-        public float Rotation = 0;
-
-        [Configurable]
-        public OsbOrigin Origin = OsbOrigin.Centre;
-
-        [Configurable]
-        public Color4 Color = Color4.White;
-
-        [Configurable]
-        public float ColorVariance = 0.6f;
-
-        [Configurable]
-        public bool Additive = false;
-
-        [Configurable]
-        public Vector2 SpawnOrigin = new Vector2(420, 0);
-
-        [Configurable]
-        public float SpawnSpread = 360;
-
-        [Configurable]
-        public float Angle = 110;
-
-        [Configurable]
-        public float AngleSpread = 60;
-
-        [Configurable]
-        public float Speed = 480;
-
-        [Configurable]
-        public float Lifetime = 1000;
-
-        [Configurable]
-        public OsbEasing Easing = OsbEasing.None;
+        [Group("Motion")]
+        [Configurable] public float Angle = 110;
+        [Configurable] public float AngleSpread = 60;
+        [Configurable] public float Speed = 480;
+        [Configurable] public OsbEasing Easing = OsbEasing.None;
 
         public override void Generate()
         {

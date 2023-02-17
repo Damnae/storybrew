@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -147,8 +148,27 @@ namespace StorybrewEditor.UserInterface.Components
             configFieldsLayout.ClearWidgets();
             if (effect == null) return;
 
+            var currentGroup = (string)null;
             foreach (var field in effect.Config.SortedFields)
             {
+                if (!string.IsNullOrWhiteSpace(field.BeginsGroup))
+                {
+                    currentGroup = field.BeginsGroup;
+                    configFieldsLayout.Add(new Label(Manager)
+                    {
+                        StyleName = "listGroup",
+                        Text = field.BeginsGroup,
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                    });
+                }
+
+                var displayName = field.DisplayName;
+                if (currentGroup != null)
+                    displayName = Regex.Replace(displayName, $@"^{Regex.Escape(currentGroup)}\s+", "");
+
+                var description = $"Variable: {field.Name}";
+
                 configFieldsLayout.Add(new LinearLayout(Manager)
                 {
                     AnchorFrom = BoxAlignment.Centre,
@@ -160,12 +180,13 @@ namespace StorybrewEditor.UserInterface.Components
                         new Label(Manager)
                         {
                             StyleName = "listItem",
-                            Text = field.DisplayName,
+                            Text = displayName,
                             AnchorFrom = BoxAlignment.TopLeft,
                             AnchorTo = BoxAlignment.TopLeft,
+                            Tooltip = description,
                         },
                         buildFieldEditor(field),
-                    }
+                    },
                 });
             }
         }

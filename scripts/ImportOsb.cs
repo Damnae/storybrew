@@ -12,8 +12,7 @@ namespace StorybrewScripts
 {
     public class ImportOsb : StoryboardObjectGenerator
     {
-        [Configurable]
-        public string Path = "storyboard.osb";
+        [Configurable] public string Path = "storyboard.osb";
 
         private Dictionary<string, string> variables = new Dictionary<string, string>();
 

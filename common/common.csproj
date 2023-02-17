@@ -96,6 +96,7 @@
     <Compile Include="Storyboarding3d\Sprite3d.cs" />
     <Compile Include="Storyboarding\Commands\CommandComparer.cs" />
     <Compile Include="Storyboarding\Commands\IFragmentableCommand.cs" />
+    <Compile Include="Storyboarding\GroupAttribute.cs" />
     <Compile Include="Storyboarding\OsbAnimationWriter.cs" />
     <Compile Include="Storyboarding\OsbSpriteWriter.cs" />
     <Compile Include="Storyboarding\OsbWriterFactory.cs" />

@@ -161,6 +161,15 @@
 			Outset: [-8, 0],
 		},
 
+		"groupBg":
+		{
+			_type: "NinePatch",
+			Texture: "ui-rounded-borders.png",
+			Borders: [3, 5, 5, 3],
+			Color: "@colorGroupBg",
+			Outset: [2, 2],
+		},
+
 		"previewBg":
 		{
 			_type: "NinePatch",

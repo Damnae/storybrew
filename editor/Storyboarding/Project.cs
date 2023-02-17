@@ -577,7 +577,7 @@ namespace StorybrewEditor.Storyboarding
                                     Value = allowedValue,
                                 };
                             }
-                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldIndex, fieldValue?.GetType(), fieldValue, allowedValues);
+                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldIndex, fieldValue?.GetType(), fieldValue, allowedValues, null);
                         }
                     }
                 }
@@ -686,6 +686,8 @@ namespace StorybrewEditor.Storyboarding
                         };
                         if (field.DisplayName != field.Name)
                             fieldRoot.Add("DisplayName", field.DisplayName);
+                        if (!string.IsNullOrWhiteSpace(field.BeginsGroup))
+                            fieldRoot.Add("BeginsGroup", field.BeginsGroup);
                         configRoot.Add(field.Name, fieldRoot);
 
                         if ((field.AllowedValues?.Length ?? 0) > 0)
@@ -781,6 +783,8 @@ namespace StorybrewEditor.Storyboarding
 
                         var fieldTypeName = fieldRoot.Value<string>("Type");
                         var fieldContent = fieldRoot.Value<string>("Value");
+                        var beginsGroup = fieldRoot.Value<string>("BeginsGroup");
+
                         var fieldValue = ObjectSerializer.FromString(fieldTypeName, fieldContent);
 
                         var allowedValues = fieldRoot
@@ -788,7 +792,7 @@ namespace StorybrewEditor.Storyboarding
                                 .Select(p => new NamedValue { Name = p.Key, Value = ObjectSerializer.FromString(fieldTypeName, p.Value.Value<string>()), })
                                 .ToArray();
 
-                        effect.Config.UpdateField(fieldProperty.Key, fieldRoot.Value<string>("DisplayName") ?? fieldProperty.Key, fieldIndex++, fieldValue?.GetType(), fieldValue, allowedValues);
+                        effect.Config.UpdateField(fieldProperty.Key, fieldRoot.Value<string>("DisplayName"), fieldIndex++, fieldValue?.GetType(), fieldValue, allowedValues, beginsGroup);
                     }
 
                     var layersRoot = effectRoot.Value<TinyObject>("Layers");

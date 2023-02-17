@@ -29,5 +29,8 @@
 		colorBgElement: [0.067, 0.067, 0.067],
 		colorBgElementHover: [0.02, 0.02, 0.02],
 		colorTooltip: [0, 0, 0, 0.8],
+		
+		colorGroupText: "White",
+		colorGroupBg: [0.3, 0.3, 0.3],
 	},
 }

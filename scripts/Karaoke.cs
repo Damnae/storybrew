@@ -12,65 +12,35 @@ namespace StorybrewScripts
 {
     public class Karaoke : StoryboardObjectGenerator
     {
-        [Configurable]
-        public string SubtitlesPath = "lyrics.srt";
+        [Configurable] public string SubtitlesPath = "lyrics.srt";
+        [Configurable] public float SubtitleY = 400;
 
-        [Configurable]
-        public string FontName = "Verdana";
+        [Group("Font")]
+        [Configurable] public string FontName = "Verdana";
+        [Configurable] public string SpritesPath = "sb/f";
+        [Configurable] public int FontSize = 26;
+        [Configurable] public float FontScale = 0.5f;
+        [Configurable] public Color4 FontColor = Color4.White;
+        [Configurable] public FontStyle FontStyle = FontStyle.Regular;
+        
+        [Group("Outline")]
+        [Configurable] public int OutlineThickness = 3;
+        [Configurable] public Color4 OutlineColor = new Color4(50, 50, 50, 200);
 
-        [Configurable]
-        public string SpritesPath = "sb/f";
+        [Group("Shadow")]
+        [Configurable] public int ShadowThickness = 0;
+        [Configurable] public Color4 ShadowColor = new Color4(0, 0, 0, 100);
 
-        [Configurable]
-        public int FontSize = 26;
+        [Group("Glow")]
+        [Configurable] public int GlowRadius = 0;
+        [Configurable] public Color4 GlowColor = new Color4(255, 255, 255, 100);
+        [Configurable] public bool GlowAdditive = true;
 
-        [Configurable]
-        public float FontScale = 0.5f;
-
-        [Configurable]
-        public Color4 FontColor = Color4.White;
-
-        [Configurable]
-        public FontStyle FontStyle = FontStyle.Regular;
-
-        [Configurable]
-        public int GlowRadius = 0;
-
-        [Configurable]
-        public Color4 GlowColor = new Color4(255, 255, 255, 100);
-
-        [Configurable]
-        public bool AdditiveGlow = true;
-
-        [Configurable]
-        public int OutlineThickness = 3;
-
-        [Configurable]
-        public Color4 OutlineColor = new Color4(50, 50, 50, 200);
-
-        [Configurable]
-        public int ShadowThickness = 0;
-
-        [Configurable]
-        public Color4 ShadowColor = new Color4(0, 0, 0, 100);
-
-        [Configurable]
-        public Vector2 Padding = Vector2.Zero;
-
-        [Configurable]
-        public float SubtitleY = 400;
-
-        [Configurable]
-        public bool TrimTransparency = true;
-
-        [Configurable]
-        public bool EffectsOnly = false;
-
-        [Configurable]
-        public bool Debug = false;
-
-        [Configurable]
-        public OsbOrigin Origin = OsbOrigin.Centre;
+        [Group("Misc")]
+        [Configurable] public bool TrimTransparency = true;
+        [Configurable] public bool EffectsOnly = false;
+        [Configurable] public Vector2 Padding = Vector2.Zero;
+        [Configurable] public OsbOrigin Origin = OsbOrigin.Centre;
 
         public override void Generate()
         {
@@ -83,11 +53,10 @@ namespace StorybrewScripts
                 FontStyle = FontStyle,
                 TrimTransparency = TrimTransparency,
                 EffectsOnly = EffectsOnly,
-                Debug = Debug,
             },
             new FontGlow()
             {
-                Radius = AdditiveGlow ? 0 : GlowRadius,
+                Radius = GlowAdditive ? 0 : GlowRadius,
                 Color = GlowColor,
             },
             new FontOutline()
@@ -103,7 +72,7 @@ namespace StorybrewScripts
 
             var subtitles = LoadSubtitles(SubtitlesPath);
 
-            if (GlowRadius > 0 && AdditiveGlow)
+            if (GlowRadius > 0 && GlowAdditive)
             {
                 var glowFont = LoadFont(Path.Combine(SpritesPath, "glow"), new FontDescription()
                 {
@@ -114,8 +83,7 @@ namespace StorybrewScripts
                     FontStyle = FontStyle,
                     TrimTransparency = TrimTransparency,
                     EffectsOnly = true,
-                    Debug = Debug,
-                }, 
+                },
                 new FontGlow()
                 {
                     Radius = GlowRadius,
@@ -150,7 +118,7 @@ namespace StorybrewScripts
                             lineHeight = Math.Max(lineHeight, texture.BaseHeight * FontScale);
                         }
                     }
- 
+
                     var karaokeStartTime = subtitleLine.StartTime;
                     var letterX = 320 - lineWidth * 0.5f;
                     foreach (Match match in matches)
@@ -173,7 +141,7 @@ namespace StorybrewScripts
                                 sprite.Scale(subtitleLine.StartTime, FontScale);
                                 sprite.Fade(subtitleLine.StartTime - 200, subtitleLine.StartTime, 0, 1);
                                 sprite.Fade(subtitleLine.EndTime - 200, subtitleLine.EndTime, 1, 0);
-                                if (additive) 
+                                if (additive)
                                     sprite.Additive(subtitleLine.StartTime - 200, subtitleLine.EndTime);
 
                                 applyKaraoke(sprite, subtitleLine, karaokeStartTime, karaokeEndTime);

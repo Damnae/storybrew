@@ -308,9 +308,9 @@ namespace StorybrewCommon.Scripting
 
                 try
                 {
-                    var displayName = configurableField.Attribute.DisplayName ?? field.Name;
+                    var displayName = configurableField.Attribute.DisplayName;
                     var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType, CultureInfo.InvariantCulture);
-                    config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues);
+                    config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues, configurableField.BeginsGroup);
 
                     var value = config.GetValue(field.Name);
                     field.SetValue(this, value);
@@ -353,23 +353,23 @@ namespace StorybrewCommon.Scripting
             var type = GetType();
             foreach (var field in type.GetFields())
             {
-                foreach (var attribute in field.GetCustomAttributes(true))
+                var configurable = field.GetCustomAttribute<ConfigurableAttribute>(true);
+                if (configurable == null)
+                    continue;
+
+                if (!field.FieldType.IsEnum && !ObjectSerializer.Supports(field.FieldType.FullName))
+                    continue;
+
+                var group = field.GetCustomAttribute<GroupAttribute>(true);
+
+                configurableFields.Add(new ConfigurableField()
                 {
-                    var configurable = attribute as ConfigurableAttribute;
-                    if (configurable == null) continue;
-
-                    if (!field.FieldType.IsEnum && !ObjectSerializer.Supports(field.FieldType.FullName))
-                        continue;
-
-                    configurableFields.Add(new ConfigurableField()
-                    {
-                        Field = field,
-                        Attribute = configurable,
-                        InitialValue = field.GetValue(this),
-                        Order = order++,
-                    });
-                    break;
-                }
+                    Field = field,
+                    Attribute = configurable,
+                    InitialValue = field.GetValue(this),
+                    BeginsGroup = group?.Name,
+                    Order = order++,
+                });
             }
         }
 
@@ -378,6 +378,7 @@ namespace StorybrewCommon.Scripting
             public FieldInfo Field;
             public ConfigurableAttribute Attribute;
             public object InitialValue;
+            public string BeginsGroup;
             public int Order;
 
             public override string ToString() => $"{Field.Name} {InitialValue}";

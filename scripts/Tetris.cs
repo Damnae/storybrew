@@ -9,53 +9,28 @@ namespace StorybrewScripts
 {
     public class Tetris : StoryboardObjectGenerator
     {
-        [Configurable]
-        public int StartTime = 0;
+        [Configurable] public int StartTime = 0;
+        [Configurable] public int EndTime = 0;
+        [Configurable] public double BeatDivisor = 1;
 
-        [Configurable]
-        public int EndTime = 0;
+        [Group("Sprite")]
+        [Configurable] public string SpritePath = "sb/sq.png";
+        [Configurable] public double SpriteScale = 0.625;
+        [Configurable] public Color4 Color;
 
-        [Configurable]
-        public double BeatDivisor = 1;
+        [Group("Grid")]
+        [Configurable] public Vector2 Offset = new Vector2(320, 240);
+        [Configurable] public Vector2 ShadowOffset = new Vector2(4, 4);
+        [Configurable] public double Rotation = 0;
+        [Configurable] public int GridWidth = 10;
+        [Configurable] public int GridHeight = 20;
+        [Configurable] public float CellSize = 20;
+        [Configurable] public int BlockLength = 4;
+        [Configurable] public int Blocks = 1;
 
-        [Configurable]
-        public string SpritePath = "sb/sq.png";
-
-        [Configurable]
-        public double SpriteScale = 0.625;
-
-        [Configurable]
-        public Vector2 Offset = new Vector2(320, 240);
-
-        [Configurable]
-        public Vector2 ShadowOffset = new Vector2(4, 4);
-
-        [Configurable]
-        public double Rotation = 0;
-
-        [Configurable]
-        public int GridWidth = 10;
-
-        [Configurable]
-        public int GridHeight = 20;
-
-        [Configurable]
-        public float CellSize = 20;
-
-        [Configurable]
-        public int BlockLength = 4;
-
-        [Configurable]
-        public int Blocks = 1;
-
-        [Configurable]
-        public bool Wait = true;
-
-        [Configurable]
-        public bool Dumb = false;
-
-        [Configurable]
-        public Color4 Color;
+        [Group("AI")]
+        [Configurable] public bool Wait = true;
+        [Configurable] public bool Dumb = false;
 
         public class Cell
         {

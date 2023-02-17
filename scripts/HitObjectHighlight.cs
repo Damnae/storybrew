@@ -6,30 +6,21 @@ namespace StorybrewScripts
 {
     public class HitObjectHighlight : StoryboardObjectGenerator
     {
-        [Configurable]
-        public int StartTime = 0;
+        [Configurable] public int StartTime = 0;
+        [Configurable] public int EndTime = 0;
+        [Configurable] public int BeatDivisor = 8;
 
-        [Configurable]
-        public int EndTime = 0;
-
-        [Configurable]
-        public int BeatDivisor = 8;
-
-        [Configurable]
-        public int FadeDuration = 200;
-
-        [Configurable]
-        public string SpritePath = "sb/glow.png";
-
-        [Configurable]
-        public double SpriteScale = 1;
+        [Group("Sprite")]
+        [Configurable] public string SpritePath = "sb/glow.png";
+        [Configurable] public double SpriteScale = 1;
+        [Configurable] public int FadeDuration = 200;
 
         public override void Generate()
         {
             var hitobjectLayer = GetLayer("");
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                if ((StartTime != 0 || EndTime != 0) && 
+                if ((StartTime != 0 || EndTime != 0) &&
                     (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime))
                     continue;
 

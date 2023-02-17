@@ -12,50 +12,21 @@ namespace StorybrewScripts
     /// </summary>
     public class Spectrum : StoryboardObjectGenerator
     {
-        [Configurable]
-        public int StartTime = 0;
-
-        [Configurable]
-        public int EndTime = 10000;
-
-        [Configurable]
-        public Vector2 Position = new Vector2(0, 400);
-
-        [Configurable]
-        public float Width = 640;
-
-        [Configurable]
-        public int BeatDivisor = 16;
-
-        [Configurable]
-        public int BarCount = 96;
-
-        [Configurable]
-        public string SpritePath = "sb/bar.png";
-
-        [Configurable]
-        public OsbOrigin SpriteOrigin = OsbOrigin.BottomLeft;
-
-        [Configurable]
-        public Vector2 Scale = new Vector2(1, 100);
-
-        [Configurable]
-        public int LogScale = 600;
-
-        [Configurable]
-        public double Tolerance = 0.2;
-
-        [Configurable]
-        public int CommandDecimals = 1;
-
-        [Configurable]
-        public float MinimalHeight = 0.05f;
-
-        [Configurable]
-        public OsbEasing FftEasing = OsbEasing.InExpo;
-
-        [Configurable]
-        public int FrequencyCutOff = 16000;
+        [Configurable] public int StartTime = 0;
+        [Configurable] public int EndTime = 10000;
+        [Configurable] public Vector2 Position = new Vector2(0, 400);
+        [Configurable] public float Width = 640;
+        [Configurable] public int BeatDivisor = 16;
+        [Configurable] public int BarCount = 96;
+        [Configurable] public string SpritePath = "sb/bar.png";
+        [Configurable] public OsbOrigin SpriteOrigin = OsbOrigin.BottomLeft;
+        [Configurable] public Vector2 Scale = new Vector2(1, 100);
+        [Configurable] public int LogScale = 600;
+        [Configurable] public double Tolerance = 0.2;
+        [Configurable] public int CommandDecimals = 1;
+        [Configurable] public float MinimalHeight = 0.05f;
+        [Configurable] public OsbEasing FftEasing = OsbEasing.InExpo;
+        [Configurable] public int FrequencyCutOff = 16000;
 
         public override void Generate()
         {
