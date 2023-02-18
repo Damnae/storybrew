@@ -16,8 +16,7 @@ namespace StorybrewEditor.Util
                 var fullPath = Path.GetFullPath(cachePath);
                 var folder = Path.GetDirectoryName(fullPath);
 
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
+                if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                 else if (File.Exists(cachePath) && File.GetLastWriteTimeUtc(cachePath).AddSeconds(cacheDuration) > DateTime.UtcNow)
                 {
                     Program.Schedule(() => action(File.ReadAllText(cachePath), null));
@@ -49,7 +48,6 @@ namespace StorybrewEditor.Util
                 Program.Schedule(() => action(null, e));
             }
         }
-
         public static void Post(string url, NameValueCollection data, Action<string, Exception> action)
         {
             try
@@ -75,7 +73,6 @@ namespace StorybrewEditor.Util
                 Program.Schedule(() => action(null, e));
             }
         }
-
         public static void BlockingPost(string url, NameValueCollection data, Action<string, Exception> action)
         {
             try
@@ -94,7 +91,6 @@ namespace StorybrewEditor.Util
                 action(null, e);
             }
         }
-
         public static void Download(string url, string filename, Func<float, bool> progressFunc, Action<Exception> completedAction)
         {
             try
@@ -102,33 +98,27 @@ namespace StorybrewEditor.Util
                 var fullPath = Path.GetFullPath(filename);
                 var folder = Path.GetDirectoryName(fullPath);
 
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
-                else if (File.Exists(filename))
-                    File.Delete(filename);
+                if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                else if (File.Exists(filename)) File.Delete(filename);
 
                 using (var webClient = new WebClient())
                 {
                     Debug.Print($"Downloading {url}");
                     webClient.Headers.Add("user-agent", Program.Name);
-                    webClient.DownloadProgressChanged += (sender, e) =>
-                        Program.Schedule(() =>
+                    webClient.DownloadProgressChanged += (sender, e) => Program.Schedule(() =>
+                    {
+                        if (!progressFunc((float)e.BytesReceived / e.TotalBytesToReceive)) webClient.CancelAsync();
+                    });
+                    webClient.DownloadFileCompleted += (sender, e) => Program.Schedule(() =>
+                    {
+                        if (e.Cancelled)
                         {
-                            if (!progressFunc((float)e.BytesReceived / e.TotalBytesToReceive))
-                                webClient.CancelAsync();
-                        });
-                    webClient.DownloadFileCompleted += (sender, e) =>
-                        Program.Schedule(() =>
-                        {
-                            if (e.Cancelled)
-                            {
-                                Debug.Print($"Download cancelled {url}");
-                                return;
-                            }
-                            if (e.Error == null)
-                                completedAction(null);
-                            else completedAction(e.Error);
-                        });
+                            Debug.Print($"Download cancelled {url}");
+                            return;
+                        }
+                        if (e.Error == null) completedAction(null);
+                        else completedAction(e.Error);
+                    });
                     webClient.DownloadFileAsync(new Uri(url), filename);
                 }
             }

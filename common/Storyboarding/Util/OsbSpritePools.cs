@@ -3,36 +3,32 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding.Util
 {
+#pragma warning disable CS1591
+    [Obsolete("Use StorybrewCommon.Storyboarding.SpritePools instead for better support.")]
     public class OsbSpritePools : IDisposable
     {
-        private readonly StoryboardSegment segment;
-        private readonly Dictionary<string, OsbSpritePool> pools = new Dictionary<string, OsbSpritePool>();
-        private readonly Dictionary<string, OsbAnimationPool> animationPools = new Dictionary<string, OsbAnimationPool>();
+        readonly StoryboardSegment segment;
+        readonly Dictionary<string, OsbSpritePool> pools = new Dictionary<string, OsbSpritePool>();
+        readonly Dictionary<string, OsbAnimationPool> animationPools = new Dictionary<string, OsbAnimationPool>();
 
-        private int maxPoolDuration = 60000;
+        int maxPoolDuration = 60000;
         public int MaxPoolDuration
         {
-            get { return maxPoolDuration; }
+            get => maxPoolDuration;
             set
             {
                 if (maxPoolDuration == value) return;
                 maxPoolDuration = value;
-                foreach (var pool in pools.Values)
-                    pool.MaxPoolDuration = maxPoolDuration;
+                foreach (var pool in pools.Values) pool.MaxPoolDuration = maxPoolDuration;
             }
         }
 
-        public OsbSpritePools(StoryboardSegment segment)
-        {
-            this.segment = segment;
-        }
+        public OsbSpritePools(StoryboardSegment segment) => this.segment = segment;
 
         public void Clear()
         {
-            foreach (var pool in pools)
-                pool.Value.Clear();
-            foreach (var pool in animationPools)
-                pool.Value.Clear();
+            foreach (var pool in pools) pool.Value.Clear();
+            foreach (var pool in animationPools) pool.Value.Clear();
             pools.Clear();
             animationPools.Clear();
         }
@@ -41,25 +37,27 @@ namespace StorybrewCommon.Storyboarding.Util
             => getPool(path, origin, finalizeSprite, poolGroup).Get(startTime, endTime);
 
         public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin, bool additive, int poolGroup = 0)
-            => Get(startTime, endTime, path, origin, additive ? (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime, spriteEndTime) : (Action<OsbSprite, double, double>)null, poolGroup);
+            => Get(startTime, endTime, path, origin, additive ?
+            (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime, spriteEndTime) : (Action<OsbSprite, double, double>)null, poolGroup);
 
         public OsbAnimation Get(double startTime, double endTime, string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin = OsbOrigin.Centre, Action<OsbSprite, double, double> finalizeSprite = null, int poolGroup = 0)
             => (OsbAnimation)getPool(path, frameCount, frameDelay, loopType, origin, finalizeSprite, poolGroup).Get(startTime, endTime);
 
         public OsbAnimation Get(double startTime, double endTime, string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, bool additive, int poolGroup = 0)
-            => Get(startTime, endTime, path, frameCount, frameDelay, loopType, origin, additive ? (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime, spriteEndTime) : (Action<OsbSprite, double, double>)null, poolGroup);
+            => Get(startTime, endTime, path, frameCount, frameDelay, loopType, origin, additive ?
+            (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime, spriteEndTime) : (Action<OsbSprite, double, double>)null, poolGroup);
 
-        private OsbSpritePool getPool(string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
+        OsbSpritePool getPool(string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
         {
             var key = getKey(path, origin, finalizeSprite, poolGroup);
 
             if (!pools.TryGetValue(key, out OsbSpritePool pool))
-                pools.Add(key, pool = new OsbSpritePool(segment, path, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration, });
+                pools.Add(key, pool = new OsbSpritePool(segment, path, origin, finalizeSprite) { MaxPoolDuration = maxPoolDuration });
 
             return pool;
         }
 
-        private OsbAnimationPool getPool(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
+        OsbAnimationPool getPool(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
         {
             var key = getKey(path, frameCount, frameDelay, loopType, origin, finalizeSprite, poolGroup);
 
@@ -69,32 +67,25 @@ namespace StorybrewCommon.Storyboarding.Util
             return pool;
         }
 
-        private string getKey(string path, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
+        string getKey(string path, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
             => $"{path}#{origin}#{action?.Target}.{action?.Method.Name}#{poolGroup}";
 
-        private string getKey(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
+        string getKey(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
             => $"{path}#{frameCount}#{frameDelay}#{loopType}#{origin}#{action?.Target}.{action?.Method.Name}#{poolGroup}";
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
+        bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    Clear();
-                }
+                if (disposing) Clear();
                 disposedValue = true;
             }
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+        public void Dispose() => Dispose(true);
 
         #endregion
     }

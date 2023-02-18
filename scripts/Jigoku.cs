@@ -1,61 +1,54 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using StorybrewCommon.Mapset;
-using StorybrewCommon.Scripting;
+﻿using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Storyboarding.Util;
 using System;
 
 namespace StorybrewScripts
 {
     /// <summary>
-    /// An example script containing en entire storyboard.
-    /// It is best to split yours into multiple effects, or it could take a long time to update in the editor.
-    /// 
-    /// To be used with https://osu.ppy.sh/s/183628
+    /// An example script containing en entire storyboard. <para/>
+    /// It is best to split yours into multiple effects, or it could take a long time to update in the editor. <para/>
+    /// To be used with <see href="https://osu.ppy.sh/s/183628"/>
     /// </summary>
-    public class Jigoku : StoryboardObjectGenerator
+    class Jigoku : StoryboardObjectGenerator
     {
         #region Timing
 
-        public static int Offset = 0;
-        public static int BeatDuration = 11715 - 11363;
+        static int Offset = 0;
+        static int BeatDuration = 11715 - 11363;
 
-        public static int TimeSbStart = Offset + 0;
-        public static int TimeIntro = Offset + 774;
-        public static int TimePart1 = Offset + 11363;
-        public static int TimePart2 = Offset + 22657;
-        public static int TimePart3 = Offset + 33951;
-        public static int TimePart4 = Offset + 45245;
-        public static int TimePart5 = Offset + 56539;
-        public static int TimePart6 = Offset + 67833;
-        public static int TimePart7 = Offset + 70657;
-        public static int TimePart8 = Offset + 91127;
-        public static int TimePart9 = Offset + 96068;
-        public static int TimePart10 = Offset + 107362;
-        public static int TimePart11 = Offset + 118657;
-        public static int TimeEnd = Offset + 124127;
-        public static int TimeSbEnd = Offset + 126774;
+        static int TimeSbStart = Offset + 0;
+        static int TimeIntro = Offset + 774;
+        static int TimePart1 = Offset + 11363;
+        static int TimePart2 = Offset + 22657;
+        static int TimePart3 = Offset + 33951;
+        static int TimePart4 = Offset + 45245;
+        static int TimePart5 = Offset + 56539;
+        static int TimePart6 = Offset + 67833;
+        static int TimePart7 = Offset + 70657;
+        static int TimePart8 = Offset + 91127;
+        static int TimePart9 = Offset + 96068;
+        static int TimePart10 = Offset + 107362;
+        static int TimePart11 = Offset + 118657;
+        static int TimeEnd = Offset + 124127;
+        static int TimeSbEnd = Offset + 126774;
 
         #endregion
 
-        public double BgScaling = 480.0 / 768;
-        public double DegToRad = Math.PI / 180;
+        double BgScaling = 480d / 768;
 
-        private StoryboardLayer bgLayer;
-        private StoryboardLayer mainLayer;
-        private OsbSpritePools spritePools;
+        StoryboardLayer bgLayer;
+        StoryboardLayer mainLayer;
+        SpritePools spritePools;
 
-        public override void Generate()
+        protected override void Generate()
         {
             bgLayer = GetLayer("Background");
             mainLayer = GetLayer("Main");
 
-            using (spritePools = new OsbSpritePools(mainLayer))
+            using (spritePools = new SpritePools(mainLayer))
             {
                 Intro(TimeIntro, TimePart1);
 
-                // Background
                 var bg = bgLayer.CreateSprite("bg.jpg", OsbOrigin.Centre);
                 bg.Scale(TimeSbStart, BgScaling);
                 bg.Fade(TimePart1 - BeatDuration * 2, TimePart1, 0, 1);
@@ -83,8 +76,7 @@ namespace StorybrewScripts
                 Outro(TimeEnd, TimeSbEnd);
             }
         }
-
-        private void Intro(int tStart, int tEnd)
+        void Intro(int tStart, int tEnd)
         {
             var bg = bgLayer.CreateSprite("sb/bgg.png", OsbOrigin.BottomCentre);
             bg.Scale(TimeSbStart, BgScaling);
@@ -107,7 +99,7 @@ namespace StorybrewScripts
                 MakeNote(8671 + Offset + i * BeatDuration / 32, 100 + i * 50, 370, angle, 0, 400, 2000);
             }
         }
-        private void Part1(int tStart, int tEnd)
+        void Part1(int tStart, int tEnd)
         {
             // Piano
             var x = -100;
@@ -228,12 +220,10 @@ namespace StorybrewScripts
                 MakeNote(21245 + Offset + BeatDuration * i / 32, x, y, angle, distance * (1.2 - i * 0.01), 200, 260);
             }
         }
-
-        private void Part2(int tStart, int tEnd)
+        void Part2(int tStart, int tEnd)
         {
         }
-
-        private void Part3(int tStart, int tEnd)
+        void Part3(int tStart, int tEnd)
         {
             for (var i = 0; i < 4; ++i)
             {
@@ -245,8 +235,7 @@ namespace StorybrewScripts
                 bg.Fade(OsbEasing.In, t0, t1, 1, 0);
             }
         }
-
-        private void Part4(int tStart, int tEnd)
+        void Part4(int tStart, int tEnd)
         {
             // Piano
             var x = -0.0;
@@ -470,24 +459,20 @@ namespace StorybrewScripts
                 MakeNote(56539 + Offset, x, y, angle + Math.PI, distance, 400, 2000);
             }
         }
-
-        private void Part5(int tStart, int tEnd)
+        void Part5(int tStart, int tEnd)
         {
             MakeCharacters(56539 + Offset, 1.0);
             MakeCharacters(59362 + Offset, 61833 + Offset, 1.05);
             MakeCharacters(62186 + Offset, 1.1);
             MakeCharacters(65010 + Offset, 1.15);
         }
-
-        private void Part6(int tStart, int tEnd)
+        void Part6(int tStart, int tEnd)
         {
         }
-
-        private void Part7(int tStart, int tEnd)
+        void Part7(int tStart, int tEnd)
         {
         }
-
-        private void Part8(int tStart, int tEnd)
+        void Part8(int tStart, int tEnd)
         {
             var x = 0.0;
             var y = 80.0;
@@ -540,34 +525,21 @@ namespace StorybrewScripts
                 MakeNote(95362 + Offset + BeatDuration * i / 32, x, y, angle, distance * (1.2 + i * 0.01), 200, 260);
             }
         }
-
-        private void Part9(int tStart, int tEnd)
+        void Part9(int tStart, int tEnd)
         {
         }
-
-        private void Part10(int tStart, int tEnd)
+        void Part10(int tStart, int tEnd)
         {
         }
-
-        private void Part11(int tStart, int tEnd)
+        void Part11(int tStart, int tEnd)
         {
         }
-
-        private void Outro(int tStart, int tEnd)
+        void Outro(int tStart, int tEnd)
         {
         }
-
-        private void MakeNote(int time, double angle, double distance)
-        {
-            MakeNote(time, 140, 340, angle, distance);
-        }
-
-        private void MakeNote(int time, double x, double y, double angle, double distance)
-        {
-            MakeNote(time, x, y, angle, distance, 200, 250);
-        }
-
-        private void MakeNote(int time, double x, double y, double angle, double distance, int inTime, int outTime)
+        void MakeNote(int time, double angle, double distance) => MakeNote(time, 140, 340, angle, distance);
+        void MakeNote(int time, double x, double y, double angle, double distance) => MakeNote(time, x, y, angle, distance, 200, 250);
+        void MakeNote(int time, double x, double y, double angle, double distance, int inTime, int outTime)
         {
             var fallDistance = 400;
 
@@ -580,8 +552,8 @@ namespace StorybrewScripts
 
             var x0 = x + Math.Cos(angle) * (distance + fallDistance);
             var y0 = y + Math.Sin(angle) * (distance + fallDistance);
-            var x1 = x + Math.Cos(angle) * (distance);
-            var y1 = y + Math.Sin(angle) * (distance);
+            var x1 = x + Math.Cos(angle) * distance;
+            var y1 = y + Math.Sin(angle) * distance;
 
             var lightX = x + Math.Cos(angle) * (distance - 70);
             var lightY = y + Math.Sin(angle) * (distance - 70);
@@ -613,11 +585,9 @@ namespace StorybrewScripts
             light.Rotate(t2, angle);
             light.ColorHsb(t2, outTime >= 260 ? hue1 : hue2, 0.4, 1);
 
-            if (outTime >= 260)
-                MakeNoteParticles(t2, x1, y1, angle, outTime / 1000.0);
+            if (outTime >= 260) MakeNoteParticles(t2, x1, y1, angle, outTime / 1000.0);
         }
-
-        private void MakeNoteParticles(int t, double x, double y, double angle, double effectStrengh)
+        void MakeNoteParticles(int t, double x, double y, double angle, double effectStrengh)
         {
             int particleCount = 3 + (int)(Random(4, 12) * (effectStrengh * 0.8));
             for (var i = 0; i < particleCount; ++i)
@@ -670,12 +640,8 @@ namespace StorybrewScripts
             }
         }
 
-        private void MakeCharacters(int t, double baseScale)
-        {
-            MakeCharacters(t, -1, baseScale);
-        }
-
-        private void MakeCharacters(int t, int interruptTime, double baseScale)
+        void MakeCharacters(int t, double baseScale) => MakeCharacters(t, -1, baseScale);
+        void MakeCharacters(int t, int interruptTime, double baseScale)
         {
             var t0 = t;
             var t1 = t0 + BeatDuration * 3 / 2;
@@ -712,7 +678,7 @@ namespace StorybrewScripts
 
             var c1 = spritePools.Get(t1, t5, "sb/c1.png", OsbOrigin.BottomRight);
             c1.Scale(t1, scale);
-            c1.Move(t1, x - (401) * scale, y);
+            c1.Move(t1, x - 401 * scale, y);
             c1.ColorHsb(OsbEasing.Out, t1, t2, 0, 1, 1, 0, 0, 1);
             if (interruptTime > 0)
             {

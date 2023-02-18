@@ -16,17 +16,15 @@ namespace StorybrewEditor.UserInterface.Components
 {
     public class EffectList : Widget
     {
-        private readonly LinearLayout layout;
-        private readonly LinearLayout effectsLayout;
-        private Project project;
-        private readonly EffectConfigUi effectConfigUi;
+        readonly LinearLayout layout, effectsLayout;
+        Project project;
+        readonly EffectConfigUi effectConfigUi;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
-        public event Action<Effect> OnEffectPreselect;
-        public event Action<Effect> OnEffectSelected;
+        public event Action<Effect> OnEffectPreselect, OnEffectSelected;
 
         public EffectList(WidgetManager manager, Project project, EffectConfigUi effectConfigUi) : base(manager)
         {
@@ -45,11 +43,11 @@ namespace StorybrewEditor.UserInterface.Components
                     new Label(manager)
                     {
                         Text = "Effects",
-                        CanGrow = false,
+                        CanGrow = false
                     },
                     new ScrollArea(manager, effectsLayout = new LinearLayout(manager)
                     {
-                        FitChildren = true,
+                        FitChildren = true
                     }),
                     new LinearLayout(manager)
                     {
@@ -64,18 +62,18 @@ namespace StorybrewEditor.UserInterface.Components
                                 StyleName = "small",
                                 Text = "Add effect",
                                 AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre
                             },
                             newScriptButton = new Button(Manager)
                             {
                                 StyleName = "small",
                                 Text = "New script",
                                 AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
-                            },
-                        },
-                    },
-                },
+                                AnchorTo = BoxAlignment.Centre
+                            }
+                        }
+                    }
+                }
             });
 
             addEffectButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowContextMenu("Select an effect", (effectName) => project.AddScriptedEffect(effectName), project.GetEffectNames());
@@ -84,34 +82,25 @@ namespace StorybrewEditor.UserInterface.Components
             project.OnEffectsChanged += project_OnEffectsChanged;
             refreshEffects();
         }
-
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                project.OnEffectsChanged -= project_OnEffectsChanged;
-            }
+            if (disposing) project.OnEffectsChanged -= project_OnEffectsChanged;
             project = null;
             base.Dispose(disposing);
         }
-
         protected override void Layout()
         {
             base.Layout();
             layout.Size = Size;
         }
-
-        private void project_OnEffectsChanged(object sender, EventArgs e)
-            => refreshEffects();
-
-        private void refreshEffects()
+        void project_OnEffectsChanged(object sender, EventArgs e) => refreshEffects();
+        void refreshEffects()
         {
             effectsLayout.ClearWidgets();
-            foreach (var effect in project.Effects.OrderBy(e => e.Name))
-                effectsLayout.Add(createEffectWidget(effect));
+            foreach (var effect in project.Effects.OrderBy(e => e.Name)) effectsLayout.Add(createEffectWidget(effect));
         }
 
-        private Widget createEffectWidget(Effect effect)
+        Widget createEffectWidget(Effect effect)
         {
             Label nameLabel, detailsLabel;
             Button renameButton, statusButton, configButton, editButton, removeButton;
@@ -132,7 +121,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Tooltip = "Rename",
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
                     new LinearLayout(Manager)
                     {
@@ -144,16 +133,16 @@ namespace StorybrewEditor.UserInterface.Components
                                 StyleName = "listItem",
                                 Text = effect.Name,
                                 AnchorFrom = BoxAlignment.Left,
-                                AnchorTo = BoxAlignment.Left,
+                                AnchorTo = BoxAlignment.Left
                             },
                             detailsLabel = new Label(Manager)
                             {
                                 StyleName = "listItemSecondary",
                                 Text = getEffectDetails(effect),
                                 AnchorFrom = BoxAlignment.Left,
-                                AnchorTo = BoxAlignment.Left,
-                            },
-                        },
+                                AnchorTo = BoxAlignment.Left
+                            }
+                        }
                     },
                     statusButton = new Button(Manager)
                     {
@@ -161,7 +150,7 @@ namespace StorybrewEditor.UserInterface.Components
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
                         CanGrow = false,
-                        Displayed = false,
+                        Displayed = false
                     },
                     configButton = new Button(Manager)
                     {
@@ -170,7 +159,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Tooltip = "Configure",
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
                     editButton = new Button(Manager)
                     {
@@ -180,7 +169,7 @@ namespace StorybrewEditor.UserInterface.Components
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
                         CanGrow = false,
-                        Disabled = effect.Path == null,
+                        Disabled = effect.Path == null
                     },
                     removeButton = new Button(Manager)
                     {
@@ -189,13 +178,12 @@ namespace StorybrewEditor.UserInterface.Components
                         Tooltip = "Remove",
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
-                        CanGrow = false,
-                    },
-                },
+                        CanGrow = false
+                    }
+                }
             };
 
             updateStatusButton(statusButton, effect);
-
             var ef = effect;
 
             EventHandler changedHandler;
@@ -249,12 +237,12 @@ namespace StorybrewEditor.UserInterface.Components
 
             return effectWidget;
         }
-
-        private static void updateStatusButton(Button button, Effect effect)
+        static void updateStatusButton(Button button, Effect effect)
         {
             button.Disabled = string.IsNullOrWhiteSpace(effect.StatusMessage);
             button.Displayed = effect.Status != EffectStatus.Ready || !button.Disabled;
             button.Tooltip = effect.Status.ToString();
+
             switch (effect.Status)
             {
                 case EffectStatus.Loading:
@@ -263,23 +251,25 @@ namespace StorybrewEditor.UserInterface.Components
                     button.Icon = IconFont.Spinner;
                     button.Disabled = true;
                     break;
+
                 case EffectStatus.ReloadPending:
                     button.Icon = IconFont.ChainBroken;
                     button.Disabled = true;
                     break;
+
                 case EffectStatus.CompilationFailed:
                 case EffectStatus.LoadingFailed:
                 case EffectStatus.ExecutionFailed:
                     button.Icon = IconFont.Bug;
                     break;
+
                 case EffectStatus.Ready:
                     button.Icon = IconFont.Leaf;
                     button.Tooltip = "Open log";
                     break;
             }
         }
-
-        private void createScript(string name)
+        void createScript(string name)
         {
             var resourceContainer = Manager.ScreenLayerManager.GetContext<Editor>().ResourceContainer;
 
@@ -302,8 +292,7 @@ namespace StorybrewEditor.UserInterface.Components
             File.WriteAllText(path, script);
             openEffectEditor(project.AddScriptedEffect(name));
         }
-
-        private void openEffectEditor(Effect effect)
+        void openEffectEditor(Effect effect)
         {
             var editorPath = Path.GetDirectoryName(Path.GetFullPath("."));
 
@@ -311,8 +300,7 @@ namespace StorybrewEditor.UserInterface.Components
             var solutionFolder = Path.GetDirectoryName(effect.Path);
             while (solutionFolder != root)
             {
-                if (solutionFolder == editorPath)
-                    break;
+                if (solutionFolder == editorPath) break;
 
                 var isSolution = false;
                 foreach (var file in Directory.GetFiles(solutionFolder, "*.sln"))
@@ -320,14 +308,12 @@ namespace StorybrewEditor.UserInterface.Components
                     isSolution = true;
                     break;
                 }
-                if (isSolution)
-                    break;
+                if (isSolution) break;
 
                 solutionFolder = Directory.GetParent(solutionFolder).FullName;
             }
 
-            if (solutionFolder == root)
-                solutionFolder = Path.GetDirectoryName(effect.Path);
+            if (solutionFolder == root) solutionFolder = Path.GetDirectoryName(effect.Path);
 
             var paths = new List<string>()
             {
@@ -336,8 +322,7 @@ namespace StorybrewEditor.UserInterface.Components
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft VS Code Insiders", "bin", "code-insiders"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code Insiders", "bin", "code-insiders")
             };
-            foreach (var path in Environment.GetEnvironmentVariable("path").Split(';'))
-                if (PathHelper.IsValidPath(path))
+            foreach (var path in Environment.GetEnvironmentVariable("path").Split(';')) if (PathHelper.IsValidPath(path))
                 {
                     paths.Add(Path.Combine(path, "code"));
                     paths.Add(Path.Combine(path, "code-insiders"));
@@ -345,8 +330,7 @@ namespace StorybrewEditor.UserInterface.Components
                 else Trace.WriteLine($"Invalid path in environment variables: {path}");
 
             var arguments = $"\"{solutionFolder}\" \"{effect.Path}\" -r";
-            if (Program.Settings.VerboseVsCode)
-                arguments += " --verbose";
+            if (Program.Settings.VerboseVsCode) arguments += " --verbose";
 
             foreach (var path in paths)
             {
@@ -373,12 +357,10 @@ namespace StorybrewEditor.UserInterface.Components
                 }
             }
             Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing)",
-                    () => Process.Start("https://code.visualstudio.com/"), true);
+                () => Process.Start("https://code.visualstudio.com/"), true);
         }
 
-        private static string getEffectDetails(Effect effect)
-            => effect.EstimatedSize > 40 * 1024 ?
-                $"using {effect.BaseName} ({StringHelper.ToByteSize(effect.EstimatedSize)})" :
-                $"using {effect.BaseName}";
+        static string getEffectDetails(Effect effect) => effect.EstimatedSize > 40 * 1024 ?
+            $"using {effect.BaseName} ({StringHelper.ToByteSize(effect.EstimatedSize)})" : $"using {effect.BaseName}";
     }
 }

@@ -6,3 +6,5 @@
 
 packages/*
 !packages/repositories.config
+nuget.exe
+GlobalSuppressions.cs

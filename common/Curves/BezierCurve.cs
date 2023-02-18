@@ -4,16 +4,23 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Curves
 {
+#pragma warning disable CS1591
     [Serializable]
     public class BezierCurve : BaseCurve
     {
-        private readonly List<Vector2> points;
-        private readonly int precision;
+        readonly List<Vector2> points;
+        readonly int precision;
 
+        ///<summary> The start position (the head) of the bézier curve. </summary>
         public override Vector2 StartPosition => points[0];
+
+        ///<summary> The end position (the tail) of the bézier curve. </summary>
         public override Vector2 EndPosition => points[points.Count - 1];
+
+        ///<summary> Whether the bézier curve is straight (linear). </summary>
         public bool IsLinear => points.Count < 3;
 
+        ///<summary> Constructs a bézier curve from a list of points <paramref name="points"/>. </summary>
         public BezierCurve(List<Vector2> points, int precision)
         {
             this.points = points;
@@ -24,11 +31,12 @@ namespace StorybrewCommon.Curves
         {
             var precision = points.Count > 2 ? this.precision : 0;
 
-            var distance = 0.0f;
+            var distance = 0f;
             var previousPosition = StartPosition;
-            for (var i = 1; i <= precision; ++i)
+
+            for (var i = 1f; i <= precision; ++i)
             {
-                var delta = (float)i / (precision + 1);
+                var delta = i / (precision + 1);
                 var nextPosition = positionAtDelta(delta);
 
                 distance += (nextPosition - previousPosition).Length;
@@ -38,26 +46,19 @@ namespace StorybrewCommon.Curves
             }
             distance += (EndPosition - previousPosition).Length;
             length = distance;
-
         }
 
-        [ThreadStatic] private static Vector2[] intermediatePoints;
+        [ThreadStatic] static Vector2[] intermediatePoints;
 
-        private Vector2 positionAtDelta(float delta)
+        Vector2 positionAtDelta(float delta)
         {
             var pointsCount = points.Count;
 
-            if (intermediatePoints == null || intermediatePoints.Length < pointsCount)
-                intermediatePoints = new Vector2[pointsCount];
+            if (intermediatePoints == null || intermediatePoints.Length < pointsCount) intermediatePoints = new Vector2[pointsCount];
 
-            for (var i = 0; i < pointsCount; ++i)
-                intermediatePoints[i] = points[i];
-
-            for (var i = 1; i < pointsCount; ++i)
-                for (var j = 0; j < pointsCount - i; ++j)
-                    intermediatePoints[j] =
-                        intermediatePoints[j] * (1 - delta) +
-                        intermediatePoints[j + 1] * delta;
+            for (var i = 0; i < pointsCount; ++i) intermediatePoints[i] = points[i];
+            for (var i = 1; i < pointsCount; ++i) for (var j = 0; j < pointsCount - i; ++j) intermediatePoints[j] =
+                intermediatePoints[j] * (1 - delta) + intermediatePoints[j + 1] * delta;
 
             return intermediatePoints[0];
         }

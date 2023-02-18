@@ -2,6 +2,7 @@
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.OpenTKUtil;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using StorybrewEditor.Storyboarding;
@@ -16,24 +17,22 @@ namespace StorybrewEditor.UserInterface.Components
 {
     public class EffectConfigUi : Widget
     {
-        private const string effectConfigFormat = "storybrewEffectConfig";
+        const string effectConfigFormat = "storybrewEffectConfig";
 
-        private readonly Label titleLabel;
-        private readonly LinearLayout layout;
-        private readonly LinearLayout configFieldsLayout;
+        readonly Label titleLabel;
+        readonly LinearLayout layout, configFieldsLayout;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
-        private Effect effect;
+        Effect effect;
         public Effect Effect
         {
-            get { return effect; }
+            get => effect;
             set
             {
                 if (effect == value) return;
-
                 if (effect != null)
                 {
                     effect.OnChanged -= Effect_OnChanged;
@@ -50,7 +49,6 @@ namespace StorybrewEditor.UserInterface.Components
                 updateFields();
             }
         }
-
         public EffectConfigUi(WidgetManager manager) : base(manager)
         {
             Button copyButton, pasteButton, closeButton;
@@ -73,7 +71,7 @@ namespace StorybrewEditor.UserInterface.Components
                         {
                             titleLabel = new Label(manager)
                             {
-                                Text = "Configuration",
+                                Text = "Configuration"
                             },
                             copyButton = new Button(Manager)
                             {
@@ -82,7 +80,7 @@ namespace StorybrewEditor.UserInterface.Components
                                 Tooltip = "Copy all fields",
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre,
-                                CanGrow = false,
+                                CanGrow = false
                             },
                             pasteButton = new Button(Manager)
                             {
@@ -91,7 +89,7 @@ namespace StorybrewEditor.UserInterface.Components
                                 Tooltip = "Paste all fields",
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre,
-                                CanGrow = false,
+                                CanGrow = false
                             },
                             closeButton = new Button(Manager)
                             {
@@ -99,15 +97,15 @@ namespace StorybrewEditor.UserInterface.Components
                                 Icon = IconFont.TimesCircle,
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre,
-                                CanGrow = false,
-                            },
-                        },
+                                CanGrow = false
+                            }
+                        }
                     },
                     new ScrollArea(manager, configFieldsLayout = new LinearLayout(manager)
                     {
-                        FitChildren = true,
-                    }),
-                },
+                        FitChildren = true
+                    })
+                }
             });
 
             copyButton.OnClick += (sender, e) => copyConfiguration();
@@ -118,32 +116,26 @@ namespace StorybrewEditor.UserInterface.Components
                 Displayed = false;
             };
         }
-
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                Effect = null;
-            }
+            if (disposing) Effect = null;
             base.Dispose(disposing);
         }
-
         protected override void Layout()
         {
             base.Layout();
             layout.Size = Size;
         }
 
-        private void Effect_OnChanged(object sender, EventArgs e) => updateEffect();
-        private void Effect_OnConfigFieldsChanged(object sender, EventArgs e) => updateFields();
+        void Effect_OnChanged(object sender, EventArgs e) => updateEffect();
+        void Effect_OnConfigFieldsChanged(object sender, EventArgs e) => updateFields();
 
-        private void updateEffect()
+        void updateEffect()
         {
             if (effect == null) return;
             titleLabel.Text = $"Configuration: {effect.Name} ({effect.BaseName})";
         }
-
-        private void updateFields()
+        void updateFields()
         {
             configFieldsLayout.ClearWidgets();
             if (effect == null) return;
@@ -183,15 +175,14 @@ namespace StorybrewEditor.UserInterface.Components
                             Text = displayName,
                             AnchorFrom = BoxAlignment.TopLeft,
                             AnchorTo = BoxAlignment.TopLeft,
-                            Tooltip = description,
+                            Tooltip = description
                         },
-                        buildFieldEditor(field),
-                    },
+                        buildFieldEditor(field)
+                    }
                 });
             }
         }
-
-        private Widget buildFieldEditor(EffectConfig.ConfigField field)
+        Widget buildFieldEditor(EffectConfig.ConfigField field)
         {
             if (field.AllowedValues != null)
             {
@@ -201,7 +192,7 @@ namespace StorybrewEditor.UserInterface.Components
                     Options = field.AllowedValues,
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
                 return widget;
@@ -213,12 +204,12 @@ namespace StorybrewEditor.UserInterface.Components
                     Value = field.Value,
                     Options = new NamedValue[]
                     {
-                        new NamedValue() { Name = true.ToString(), Value = true, },
-                        new NamedValue() { Name = false.ToString(), Value = false, },
+                        new NamedValue{ Name = true.ToString(), Value = true },
+                        new NamedValue{ Name = false.ToString(), Value = false }
                     },
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueChanged += (sender, e) => setFieldValue(field, widget.Value);
                 return widget;
@@ -231,7 +222,7 @@ namespace StorybrewEditor.UserInterface.Components
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
                     AcceptMultiline = true,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueCommited += (sender, e) =>
                 {
@@ -247,12 +238,44 @@ namespace StorybrewEditor.UserInterface.Components
                     Value = (Vector2)field.Value,
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueCommited += (sender, e) =>
                 {
                     setFieldValue(field, widget.Value);
                     widget.Value = (Vector2)effect.Config.GetValue(field.Name);
+                };
+                return widget;
+            }
+            else if (field.Type == typeof(Vector2d))
+            {
+                var widget = new Vector2dPicker(Manager)
+                {
+                    Value = (Vector2d)field.Value,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
+                    CanGrow = false
+                };
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = (Vector2d)effect.Config.GetValue(field.Name);
+                };
+                return widget;
+            }
+            else if (field.Type == typeof(Vector2i))
+            {
+                var widget = new Vector2iPicker(Manager)
+                {
+                    Value = (Vector2i)field.Value,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
+                    CanGrow = false
+                };
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = (Vector2i)effect.Config.GetValue(field.Name);
                 };
                 return widget;
             }
@@ -263,12 +286,44 @@ namespace StorybrewEditor.UserInterface.Components
                     Value = (Vector3)field.Value,
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueCommited += (sender, e) =>
                 {
                     setFieldValue(field, widget.Value);
                     widget.Value = (Vector3)effect.Config.GetValue(field.Name);
+                };
+                return widget;
+            }
+            else if (field.Type == typeof(Vector3d))
+            {
+                var widget = new Vector3dPicker(Manager)
+                {
+                    Value = (Vector3d)field.Value,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
+                    CanGrow = false
+                };
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = (Vector3d)effect.Config.GetValue(field.Name);
+                };
+                return widget;
+            }
+            else if (field.Type == typeof(Vector3i))
+            {
+                var widget = new Vector3iPicker(Manager)
+                {
+                    Value = (Vector3i)field.Value,
+                    AnchorFrom = BoxAlignment.Right,
+                    AnchorTo = BoxAlignment.Right,
+                    CanGrow = false
+                };
+                widget.OnValueCommited += (sender, e) =>
+                {
+                    setFieldValue(field, widget.Value);
+                    widget.Value = (Vector3i)effect.Config.GetValue(field.Name);
                 };
                 return widget;
             }
@@ -279,7 +334,7 @@ namespace StorybrewEditor.UserInterface.Components
                     Value = (Color4)field.Value,
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueCommited += (sender, e) =>
                 {
@@ -295,7 +350,7 @@ namespace StorybrewEditor.UserInterface.Components
                     Value = Convert.ToString(field.Value, CultureInfo.InvariantCulture),
                     AnchorFrom = BoxAlignment.Right,
                     AnchorTo = BoxAlignment.Right,
-                    CanGrow = false,
+                    CanGrow = false
                 };
                 widget.OnValueCommited += (sender, e) =>
                 {
@@ -309,7 +364,6 @@ namespace StorybrewEditor.UserInterface.Components
                 };
                 return widget;
             }
-
             return new Label(Manager)
             {
                 StyleName = "listItem",
@@ -317,17 +371,15 @@ namespace StorybrewEditor.UserInterface.Components
                 Tooltip = $"Values of type {field.Type.Name} cannot be edited",
                 AnchorFrom = BoxAlignment.Right,
                 AnchorTo = BoxAlignment.Right,
-                CanGrow = false,
+                CanGrow = false
             };
         }
 
-        private void setFieldValue(EffectConfig.ConfigField field, object value)
+        void setFieldValue(EffectConfig.ConfigField field, object value)
         {
-            if (effect.Config.SetValue(field.Name, value))
-                effect.Refresh();
+            if (effect.Config.SetValue(field.Name, value)) effect.Refresh();
         }
-
-        private void copyConfiguration()
+        void copyConfiguration()
         {
             using (var stream = new MemoryStream())
             using (var writer = new BinaryWriter(stream))
@@ -341,14 +393,12 @@ namespace StorybrewEditor.UserInterface.Components
                 }
             }
         }
-
-        private void pasteConfiguration()
+        void pasteConfiguration()
         {
             var changed = false;
             try
             {
-                using (var stream = (Stream)ClipboardHelper.GetData(effectConfigFormat))
-                using (var reader = new BinaryReader(stream))
+                using (var stream = (Stream)ClipboardHelper.GetData(effectConfigFormat)) using (var reader = new BinaryReader(stream))
                 {
                     var fieldCount = reader.ReadInt32();
                     for (var i = 0; i < fieldCount; i++)
@@ -358,8 +408,7 @@ namespace StorybrewEditor.UserInterface.Components
                         try
                         {
                             var field = effect.Config.Fields.First(f => f.Name == name);
-                            if (field.Value.Equals(value))
-                                continue;
+                            if (field.Value.Equals(value)) continue;
 
                             changed |= effect.Config.SetValue(name, value);
                         }

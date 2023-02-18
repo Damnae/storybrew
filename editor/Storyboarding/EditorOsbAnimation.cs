@@ -1,7 +1,7 @@
-﻿using OpenTK;
-using StorybrewCommon.Storyboarding;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
+using OpenTK;
+using StorybrewCommon.Storyboarding;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -12,8 +12,7 @@ namespace StorybrewEditor.Storyboarding
 
         public void PostProcess()
         {
-            if (InGroup) 
-                EndGroup();
+            if (InGroup) EndGroup();
         }
     }
 }

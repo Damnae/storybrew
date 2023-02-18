@@ -1,6 +1,6 @@
-﻿using OpenTK;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
+using OpenTK;
 
 namespace StorybrewEditor.Storyboarding
 {

@@ -8,15 +8,12 @@ using System.Security.Permissions;
 
 namespace StorybrewEditor.Scripting
 {
-    public class ScriptContainerAppDomain<TScript> : ScriptContainerBase<TScript>
-        where TScript : Script
+    public class ScriptContainerAppDomain<TScript> : ScriptContainerBase<TScript> where TScript : Script
     {
-        private AppDomain appDomain;
+        AppDomain appDomain;
 
         public ScriptContainerAppDomain(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
-            : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies)
-        {
-        }
+            : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies) { }
 
         protected override ScriptProvider<TScript> LoadScript()
         {
@@ -27,13 +24,13 @@ namespace StorybrewEditor.Scripting
                 var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid().ToString()}.dll");
                 ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
 
-                var setup = new AppDomainSetup()
+                var setup = new AppDomainSetup
                 {
                     ApplicationName = $"{Name} {Id}",
                     ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
                     DisallowCodeDownload = true,
                     DisallowPublisherPolicy = true,
-                    DisallowBindingRedirects = true,
+                    DisallowBindingRedirects = true
                 };
 
                 var permissions = new PermissionSet(PermissionState.Unrestricted);
@@ -47,6 +44,7 @@ namespace StorybrewEditor.Scripting
                     var scriptProviderHandle = Activator.CreateInstanceFrom(scriptDomain,
                         typeof(ScriptProvider<TScript>).Assembly.ManifestModule.FullyQualifiedName,
                         typeof(ScriptProvider<TScript>).FullName);
+
                     scriptProvider = (ScriptProvider<TScript>)scriptProviderHandle.Unwrap();
                     scriptProvider.Initialize(assemblyPath, ScriptTypeName);
                 }
@@ -77,14 +75,12 @@ namespace StorybrewEditor.Scripting
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
+        bool disposedValue = false;
         protected override void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                }
+                if (disposing) { }
                 if (appDomain != null) AppDomain.Unload(appDomain);
                 appDomain = null;
                 disposedValue = true;

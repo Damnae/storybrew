@@ -3,10 +3,12 @@ using System;
 
 namespace StorybrewCommon.Animations
 {
+    ///<summary> A static class providing keyframing easings. </summary>
     public static class EasingFunctions
     {
-        public static double Reverse(Func<double, double> function, double value) => 1 - function(1 - value);
-        public static double ToInOut(Func<double, double> function, double value) => .5 * (value < .5 ? function(2 * value) : (2 - function(2 - 2 * value)));
+#pragma warning disable CS1591
+        public static double Reverse(Func<double, double> func, double value) => 1 - func(1 - value);
+        public static double ToInOut(Func<double, double> func, double value) => .5 * (value < .5 ? func(2 * value) : (2 - func(2 - 2 * value)));
 
         public static Func<double, double> Step = x => x >= 1 ? 1 : 0;
         public static Func<double, double> Linear = x => x;
@@ -41,19 +43,23 @@ namespace StorybrewCommon.Animations
         public static Func<double, double> BackInOut = x => ToInOut((y) => y * y * ((1.70158 * 1.525 + 1) * y - 1.70158 * 1.525), x);
 
         public static Func<double, double> BounceIn = x => Reverse(BounceOut, x);
-        public static Func<double, double> BounceOut = x => x < 1 / 2.75 ? 7.5625 * x * x : x < 2 / 2.75 ? 7.5625 * (x -= (1.5 / 2.75)) * x + .75 : x < 2.5 / 2.75 ? 7.5625 * (x -= (2.25 / 2.75)) * x + .9375 : 7.5625 * (x -= (2.625 / 2.75)) * x + .984375;
+        public static Func<double, double> BounceOut = x => x < 1 / 2.75 ?
+            7.5625 * x * x : x < 2 / 2.75 ? 
+            7.5625 * (x -= 1.5 / 2.75) * x + .75 : x < 2.5 / 2.75 ? 
+            7.5625 * (x -= 2.25 / 2.75) * x + .9375 : 7.5625 * (x -= 2.625 / 2.75) * x + .984375;
         public static Func<double, double> BounceInOut = x => ToInOut(BounceIn, x);
 
         public static Func<double, double> ElasticIn = x => Reverse(ElasticOut, x);
-        public static Func<double, double> ElasticOut = x => Math.Pow(2, -10 * x) * Math.Sin((x - 0.075) * (2 * Math.PI) / .3) + 1;
-        public static Func<double, double> ElasticOutHalf = x => Math.Pow(2, -10 * x) * Math.Sin((0.5 * x - 0.075) * (2 * Math.PI) / .3) + 1;
-        public static Func<double, double> ElasticOutQuarter = x => Math.Pow(2, -10 * x) * Math.Sin((0.25 * x - 0.075) * (2 * Math.PI) / .3) + 1;
+        public static Func<double, double> ElasticOut = x => Math.Pow(2, -10 * x) * Math.Sin((x - .075) * (2 * Math.PI) / .3) + 1;
+        public static Func<double, double> ElasticOutHalf = x => Math.Pow(2, -10 * x) * Math.Sin((.5 * x - .075) * (2 * Math.PI) / .3) + 1;
+        public static Func<double, double> ElasticOutQuarter = x => Math.Pow(2, -10 * x) * Math.Sin((.25 * x - .075) * (2 * Math.PI) / .3) + 1;
         public static Func<double, double> ElasticInOut = x => ToInOut(ElasticIn, x);
 
-        public static double Ease(this OsbEasing easing, double value)
-            => easing.ToEasingFunction().Invoke(value);
+        public static double Ease(this OsbEasing easing, double value) => ToEasingFunction(easing).Invoke(value);
 
-        public static Func<double, double> ToEasingFunction(this OsbEasing easing)
+        ///<summary> Converts <see cref="OsbEasing"/> to <see cref="EasingFunctions"/>. </summary>
+        ///<param name="easing"> The original <see cref="OsbEasing"/>. </param>
+        public static Func<double, double> ToEasingFunction(OsbEasing easing)
         {
             switch (easing)
             {
@@ -69,9 +75,11 @@ namespace StorybrewCommon.Animations
                 case OsbEasing.InCubic: return CubicIn;
                 case OsbEasing.OutCubic: return CubicOut;
                 case OsbEasing.InOutCubic: return CubicInOut;
+
                 case OsbEasing.InQuart: return QuartIn;
                 case OsbEasing.OutQuart: return QuartOut;
                 case OsbEasing.InOutQuart: return QuartInOut;
+
                 case OsbEasing.InQuint: return QuintIn;
                 case OsbEasing.OutQuint: return QuintOut;
                 case OsbEasing.InOutQuint: return QuintInOut;
@@ -79,20 +87,25 @@ namespace StorybrewCommon.Animations
                 case OsbEasing.InSine: return SineIn;
                 case OsbEasing.OutSine: return SineOut;
                 case OsbEasing.InOutSine: return SineInOut;
+
                 case OsbEasing.InExpo: return ExpoIn;
                 case OsbEasing.OutExpo: return ExpoOut;
                 case OsbEasing.InOutExpo: return ExpoInOut;
+
                 case OsbEasing.InCirc: return CircIn;
                 case OsbEasing.OutCirc: return CircOut;
                 case OsbEasing.InOutCirc: return CircInOut;
+
                 case OsbEasing.InElastic: return ElasticIn;
                 case OsbEasing.OutElastic: return ElasticOut;
                 case OsbEasing.OutElasticHalf: return ElasticOutHalf;
                 case OsbEasing.OutElasticQuarter: return ElasticOutQuarter;
                 case OsbEasing.InOutElastic: return ElasticInOut;
+
                 case OsbEasing.InBack: return BackIn;
                 case OsbEasing.OutBack: return BackOut;
                 case OsbEasing.InOutBack: return BackInOut;
+
                 case OsbEasing.InBounce: return BounceIn;
                 case OsbEasing.OutBounce: return BounceOut;
                 case OsbEasing.InOutBounce: return BounceInOut;

@@ -1,57 +1,53 @@
-﻿#if DEBUG
-using OpenTK;
+﻿using OpenTK;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
-using StorybrewCommon.Storyboarding.Util;
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace StorybrewCommon.Storyboarding3d
 {
+#pragma warning disable CS1591
     public class Object3d
     {
-        private readonly List<Object3d> children = new List<Object3d>();
+        readonly List<Object3d> children = new List<Object3d>();
 
+        ///<summary> A keyframed value representing this instance's color keyframes. </summary>
         public readonly KeyframedValue<CommandColor> Coloring = new KeyframedValue<CommandColor>(InterpolatingFunctions.CommandColor, CommandColor.White);
+
+        ///<summary> A keyframed value representing this instance's opacity/fade keyframes. </summary>
         public readonly KeyframedValue<float> Opacity = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
+
+        ///<summary> Represents the instance's segment. </summary>
         public StoryboardSegment Segment;
 
-        public bool DrawBelowParent = false;
+        public bool InheritsColor = true, InheritsOpacity = true, DrawBelowParent = false, ChildrenInheritLayer = true;
 
-        public bool InheritsColor = true;
-        public bool InheritsOpacity = true;
-        public bool ChildrenInheritLayer = true;
-
+        ///<summary> Gets this instance's <see cref="CommandGenerator"/>s. </summary>
         public virtual IEnumerable<CommandGenerator> CommandGenerators { get { yield break; } }
 
-        public void Add(Object3d child)
-        {
-            children.Add(child);
-        }
+        ///<summary> Adds a 3D sub-object to this instance. </summary>
+        public void Add(Object3d child) => children.Add(child);
 
-        public virtual Matrix4 WorldTransformAt(double time)
-        {
-            return Matrix4.Identity;
-        }
+        ///<summary> Gets this instance's 3D-world transform at <paramref name="time"/>. </summary>
+        public virtual Matrix4 WorldTransformAt(double time) => Matrix4.Identity;
 
         public void GenerateTreeSprite(StoryboardSegment parentSegment)
         {
             var layer = Segment ?? parentSegment;
             var childrenLayer = ChildrenInheritLayer ? layer : parentSegment;
 
-            foreach (var child in children.Where(c => c.DrawBelowParent))
-                child.GenerateTreeSprite(childrenLayer);
-
+            foreach (var child in children.Where(c => c.DrawBelowParent)) child.GenerateTreeSprite(childrenLayer);
             GenerateSprite(layer);
-
-            foreach (var child in children.Where(c => !c.DrawBelowParent))
-                child.GenerateTreeSprite(childrenLayer);
+            foreach (var child in children.Where(c => !c.DrawBelowParent)) child.GenerateTreeSprite(childrenLayer);
         }
+
         public void GenerateTreeStates(double time, Camera camera, Object3dState parent3dState = null)
             => GenerateTreeStates(time, camera.StateAt(time), parent3dState);
+
         public void GenerateTreeStates(double time, CameraState cameraState, Object3dState parent3dState = null)
         {
             parent3dState = parent3dState ?? Object3dState.InitialState;
@@ -62,58 +58,51 @@ namespace StorybrewCommon.Storyboarding3d
                 Opacity.ValueAt(time) * (InheritsOpacity ? parent3dState.Opacity : 1));
 
             GenerateStates(time, cameraState, object3dState);
-            foreach (var child in children)
-                child.GenerateTreeStates(time, cameraState, object3dState);
+            foreach (var child in children.ToArray()) child.GenerateTreeStates(time, cameraState, object3dState);
         }
         public void GenerateTreeCommands(Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
         {
             GenerateCommands(action, startTime, endTime, timeOffset, loopable);
-            foreach (var child in children)
-                child.GenerateTreeCommands(action, startTime, endTime, timeOffset, loopable);
+            foreach (var child in children.ToArray()) child.GenerateTreeCommands(action, startTime, endTime, timeOffset, loopable);
         }
-
         public void GenerateTreeLoopCommands(double startTime, double endTime, int loopCount, Action<LoopCommand, OsbSprite> action = null, bool offsetCommands = true)
+            => GenerateTreeCommands((createCommands, s) =>
         {
-            GenerateTreeCommands((createCommands, s) =>
-            {
-                var loop = s.StartLoopGroup(startTime, loopCount);
-                createCommands();
-                action?.Invoke(loop, s);
-                s.EndGroup();
-            }, startTime, endTime, offsetCommands ? -startTime : 0, true);
-        }
-
+            var loop = s.StartLoopGroup(startTime, loopCount);
+            createCommands();
+            action?.Invoke(loop, s);
+            s.EndGroup();
+        }, startTime, endTime, offsetCommands ? -startTime : 0, true);
         public void DoTree(Action<Object3d> action)
         {
             action(this);
-            foreach (var child in children)
-                child.DoTree(action);
+            foreach (var child in children.ToArray()) child.DoTree(action);
         }
         public void DoTreeSprite(Action<OsbSprite> action)
         {
             var sprites = (this as HasOsbSprites)?.Sprites;
-            if (sprites != null)
-                foreach (var sprite in sprites)
-                    action(sprite);
-            foreach (var child in children)
-                child.DoTreeSprite(action);
+            if (sprites != null) foreach (var sprite in sprites) action(sprite);
+            foreach (var child in children.ToArray()) child.DoTreeSprite(action);
         }
 
-        public virtual void GenerateSprite(StoryboardSegment parentSegment)
-        {
-        }
-        public virtual void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
-        {
-        }
-        public virtual void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
-        {
-        }
+        public virtual void GenerateSprite(StoryboardSegment parentSegment) { }
+        public virtual void GenerateStates(double time, CameraState cameraState, Object3dState object3dState) { }
+        public virtual void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable) { }
 
-        public void ConfigureGenerators(Action<CommandGenerator> action)
+        public void ConfigureGenerators(Action<CommandGenerator> action) => Parallel.ForEach(CommandGenerators, generator => action(generator));
+    }
+    public class Object3dState
+    {
+        public static readonly Object3dState InitialState = new Object3dState(Matrix4.Identity, CommandColor.White, 1);
+        public readonly Matrix4 WorldTransform;
+        public readonly CommandColor Color;
+        public readonly float Opacity;
+
+        public Object3dState(Matrix4 worldTransform, CommandColor color, float opacity)
         {
-            foreach (var generator in CommandGenerators)
-                action(generator);
+            WorldTransform = worldTransform;
+            Color = color;
+            Opacity = opacity;
         }
     }
 }
-#endif

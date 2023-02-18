@@ -6,15 +6,12 @@ using System.IO;
 
 namespace StorybrewEditor.Scripting
 {
-    public class ScriptContainerProcess<TScript> : ScriptContainerBase<TScript>
-        where TScript : Script
+    public class ScriptContainerProcess<TScript> : ScriptContainerBase<TScript> where TScript : Script
     {
-        private RemoteProcessWorkerContainer workerProcess;
+        RemoteProcessWorkerContainer workerProcess;
 
         public ScriptContainerProcess(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
-            : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies)
-        {
-        }
+            : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies) { }
 
         protected override ScriptProvider<TScript> LoadScript()
         {
@@ -45,7 +42,7 @@ namespace StorybrewEditor.Scripting
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
+        bool disposedValue = false;
         protected override void Dispose(bool disposing)
         {
             if (!disposedValue)

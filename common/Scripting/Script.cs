@@ -3,29 +3,28 @@ using System.Runtime.Remoting.Lifetime;
 
 namespace StorybrewCommon.Scripting
 {
-    /// <summary>
-    /// Base class for all scripts
-    /// </summary>
+    ///<summary> Base class for all scripts. </summary>
     public abstract class Script : MarshalByRefObject
     {
-        private string identifier;
+        string identifier;
+
+        ///<summary> Script name </summary>
         public string Identifier
         {
-            get { return identifier; }
+            get => identifier;
             set
             {
                 if (identifier != null) throw new InvalidOperationException("This script already has an identifier");
                 identifier = value;
             }
         }
-
+        ///<summary/>
         public override object InitializeLifetimeService()
         {
-            ILease lease = (ILease)base.InitializeLifetimeService();
+            var lease = (ILease)base.InitializeLifetimeService();
             if (lease.CurrentState == LeaseState.Initial)
             {
                 lease.InitialLeaseTime = TimeSpan.FromMinutes(15);
-                //lease.SponsorshipTimeout = TimeSpan.FromSeconds(2);
                 lease.RenewOnCallTime = TimeSpan.FromMinutes(15);
             }
             return lease;

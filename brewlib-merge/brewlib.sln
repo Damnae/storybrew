@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "brewlib", "brewlib.csproj", "{A4F7CC21-B769-424B-AB59-89E93D781762}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A4F7CC21-B769-424B-AB59-89E93D781762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F7CC21-B769-424B-AB59-89E93D781762}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F7CC21-B769-424B-AB59-89E93D781762}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F7CC21-B769-424B-AB59-89E93D781762}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14D9E5F1-654A-4D48-B8AA-7E65DC347816}
+	EndGlobalSection
+EndGlobal

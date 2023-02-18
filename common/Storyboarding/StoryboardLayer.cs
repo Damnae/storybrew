@@ -1,12 +1,13 @@
 ﻿namespace StorybrewCommon.Storyboarding
 {
+    ///<summary> Layers for an <see cref="StoryboardObject"/>. </summary>
     public abstract class StoryboardLayer : StoryboardSegment
     {
-        public string Identifier { get; }
+        ///<summary> The name of the layer. </summary>
+        public string Name { get; }
 
-        public StoryboardLayer(string identifier)
-        {
-            Identifier = identifier;
-        }
+        ///<summary> Constructs a new layer with the given name. </summary>
+        ///<param name="name"> The name of the layer. </param>
+        public StoryboardLayer(string name) => Name = name;
     }
 }

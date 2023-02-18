@@ -1,44 +1,38 @@
 ﻿using System;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace StorybrewCommon.Util
 {
+#pragma warning disable CS1591
     public static class BitmapHelper
     {
-        public static PinnedBitmap Blur(Bitmap source, int radius, double power)
-            => Convolute(source, CalculateGaussianKernel(radius, power));
+        public static PinnedBitmap Blur(Bitmap source, int radius, double power) => Convolute(source, CalculateGaussianKernel(radius, power));
 
         public static double[,] CalculateGaussianKernel(int radius, double weight)
         {
             var length = radius * 2 + 1;
             var kernel = new double[length, length];
-            var total = 0.0;
+            var total = 0d;
 
             var scale = 1.0 / (2.0 * Math.PI * Math.Pow(weight, 2));
-            for (var y = -radius; y <= radius; y++)
-                for (var x = -radius; x <= radius; x++)
+            for (var y = -radius; y <= radius; y++) for (var x = -radius; x <= radius; x++)
                 {
                     var distance = (x * x + y * y) / (2 * weight * weight);
                     var value = kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
                     total += value;
                 }
 
-            for (var y = 0; y < length; y++)
-                for (var x = 0; x < length; x++)
-                    kernel[y, x] = kernel[y, x] / total;
-
+            for (var y = 0; y < length; y++) for (var x = 0; x < length; x++) kernel[y, x] = kernel[y, x] / total;
             return kernel;
         }
-
         public static PinnedBitmap Convolute(Bitmap source, double[,] kernel)
         {
             var kernelHeight = kernel.GetUpperBound(0) + 1;
             var kernelWidth = kernel.GetUpperBound(1) + 1;
 
-            if ((kernelWidth % 2) == 0 || (kernelHeight % 2) == 0)
-                throw new InvalidOperationException("Invalid kernel size");
+            if ((kernelWidth % 2) == 0 || (kernelHeight % 2) == 0) throw new InvalidOperationException("Invalid kernel size");
 
             using (var pinnedSource = PinnedBitmap.FromBitmap(source))
             {
@@ -50,29 +44,24 @@ namespace StorybrewCommon.Util
                 var halfKernelWidth = kernelWidth >> 1;
                 var halfKernelHeight = kernelHeight >> 1;
 
-                for (var y = 0; y < height; y++)
-                    for (var x = 0; x < width; x++)
+                for (var y = 0; y < height; y++) for (var x = 0; x < width; x++)
                     {
-                        var a = 0.0;
-                        var r = 0.0;
-                        var g = 0.0;
-                        var b = 0.0;
+                        var a = 0d;
+                        var r = 0d;
+                        var g = 0d;
+                        var b = 0d;
 
                         for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
                         {
                             var pixelX = kernelX + x;
-                            if (pixelX < 0)
-                                pixelX = 0;
-                            else if (pixelX >= width)
-                                pixelX = width - 1;
+                            if (pixelX < 0) pixelX = 0;
+                            else if (pixelX >= width) pixelX = width - 1;
 
                             for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
                             {
                                 var pixelY = kernelY + y;
-                                if (pixelY < 0)
-                                    pixelY = 0;
-                                else if (pixelY >= height)
-                                    pixelY = height - 1;
+                                if (pixelY < 0) pixelY = 0;
+                                else if (pixelY >= height) pixelY = height - 1;
 
                                 var col = pinnedSource.Data[pixelY * width + pixelX];
                                 var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
@@ -102,14 +91,12 @@ namespace StorybrewCommon.Util
                 return result;
             }
         }
-
         public static PinnedBitmap ConvoluteAlpha(Bitmap source, double[,] kernel, Color color)
         {
             var kernelHeight = kernel.GetUpperBound(0) + 1;
             var kernelWidth = kernel.GetUpperBound(1) + 1;
 
-            if ((kernelWidth % 2) == 0 || (kernelHeight % 2) == 0)
-                throw new InvalidOperationException("Invalid kernel size");
+            if ((kernelWidth % 2) == 0 || (kernelHeight % 2) == 0) throw new InvalidOperationException("Invalid kernel size");
 
             using (var pinnedSource = PinnedBitmap.FromBitmap(source))
             {
@@ -123,26 +110,21 @@ namespace StorybrewCommon.Util
 
                 var colorRgb = (color.R << 16) | (color.G << 8) | color.B;
 
-                for (var y = 0; y < height; y++)
-                    for (var x = 0; x < width; x++)
+                for (var y = 0; y < height; y++) for (var x = 0; x < width; x++)
                     {
-                        var a = 0.0;
+                        var a = 0d;
 
                         for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
                         {
                             var pixelX = kernelX + x;
-                            if (pixelX < 0)
-                                pixelX = 0;
-                            else if (pixelX >= width)
-                                pixelX = width - 1;
+                            if (pixelX < 0) pixelX = 0;
+                            else if (pixelX >= width) pixelX = width - 1;
 
                             for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
                             {
                                 var pixelY = kernelY + y;
-                                if (pixelY < 0)
-                                    pixelY = 0;
-                                else if (pixelY >= height)
-                                    pixelY = height - 1;
+                                if (pixelY < 0) pixelY = 0;
+                                else if (pixelY >= height) pixelY = height - 1;
 
                                 var col = pinnedSource.Data[pixelY * width + pixelX];
                                 var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
@@ -159,7 +141,6 @@ namespace StorybrewCommon.Util
                 return result;
             }
         }
-
         public static Rectangle? FindTransparencyBounds(Bitmap source)
         {
             var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -187,8 +168,7 @@ namespace StorybrewCommon.Util
                 if (stop) break;
             }
 
-            if (!foundPixel)
-                return null;
+            if (!foundPixel) return null;
 
             for (var y = 0; y < data.Height; y++)
             {
@@ -205,7 +185,6 @@ namespace StorybrewCommon.Util
                 }
                 if (stop) break;
             }
-
             for (var x = data.Width - 1; x >= xMin; x--)
             {
                 var stop = false;
@@ -221,7 +200,6 @@ namespace StorybrewCommon.Util
                 }
                 if (stop) break;
             }
-
             for (var y = data.Height - 1; y >= yMin; y--)
             {
                 var stop = false;
@@ -240,10 +218,9 @@ namespace StorybrewCommon.Util
 
             return Rectangle.Intersect(Rectangle.FromLTRB(xMin - 1, yMin - 1, xMax + 2, yMax + 2), new Rectangle(0, 0, source.Width, source.Height));
         }
-
         public class PinnedBitmap : IDisposable
         {
-            private GCHandle handle;
+            GCHandle handle;
 
             public readonly Bitmap Bitmap;
             public readonly int[] Data;
@@ -258,12 +235,11 @@ namespace StorybrewCommon.Util
             public static PinnedBitmap FromBitmap(Bitmap bitmap)
             {
                 var result = new PinnedBitmap(bitmap.Width, bitmap.Height);
-                using (var graphics = Graphics.FromImage(result.Bitmap))
-                    graphics.DrawImage(bitmap, 0, 0);
+                using (var graphics = Graphics.FromImage(result.Bitmap)) graphics.DrawImage(bitmap, 0, 0);
                 return result;
             }
 
-            private bool disposed;
+            bool disposed;
             public void Dispose()
             {
                 if (disposed) return;

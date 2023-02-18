@@ -1,5 +1,6 @@
 ﻿namespace StorybrewCommon.Storyboarding.Commands
 {
+#pragma warning disable CS1591
     public class TriggerCommand : CommandGroup
     {
         public string TriggerName { get; set; }
@@ -14,7 +15,7 @@
             Group = group;
         }
 
-        protected override string GetCommandGroupHeader(ExportSettings exportSettings)
-            => $"T,{TriggerName},{((int)StartTime).ToString(exportSettings.NumberFormat)},{((int)EndTime).ToString(exportSettings.NumberFormat)},{Group.ToString(exportSettings.NumberFormat)}";
+        protected override string GetCommandGroupHeader(ExportSettings exportSettings) =>
+            $"T,{TriggerName},{((int)StartTime).ToString(exportSettings.NumberFormat)},{((int)EndTime).ToString(exportSettings.NumberFormat)},{Group.ToString(exportSettings.NumberFormat)}";
     }
 }

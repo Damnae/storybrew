@@ -2,6 +2,7 @@
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
+#pragma warning disable CS1591
     public interface IFragmentableCommand : ICommand
     {
         bool IsFragmentable { get; }

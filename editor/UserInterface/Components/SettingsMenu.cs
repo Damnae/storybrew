@@ -9,8 +9,8 @@ namespace StorybrewEditor.UserInterface.Components
 {
     public class SettingsMenu : Widget
     {
-        private readonly LinearLayout layout;
-        private Project project;
+        readonly LinearLayout layout;
+        Project project;
 
         public override Vector2 MinSize => layout.MinSize;
         public override Vector2 MaxSize => layout.MaxSize;
@@ -31,11 +31,11 @@ namespace StorybrewEditor.UserInterface.Components
                 FitChildren = true,
                 Fill = true,
                 Children = new Widget[]
-                    {
+                {
                     new Label(manager)
                     {
                         Text = "Settings",
-                        CanGrow = false,
+                        CanGrow = false
                     },
                     new LinearLayout(manager)
                     {
@@ -48,13 +48,13 @@ namespace StorybrewEditor.UserInterface.Components
                             {
                                 Text = "Help!",
                                 AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre
                             },
                             referencedAssemblyButton = new Button(manager)
                             {
                                 Text = "Referenced Assemblies",
                                 AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre
                             },
                             new LinearLayout(manager)
                             {
@@ -65,7 +65,7 @@ namespace StorybrewEditor.UserInterface.Components
                                     dimLabel = new Label(manager)
                                     {
                                         StyleName = "small",
-                                        Text = "Dim",
+                                        Text = "Dim"
                                     },
                                     dimSlider = new Slider(manager)
                                     {
@@ -73,8 +73,8 @@ namespace StorybrewEditor.UserInterface.Components
                                         AnchorFrom = BoxAlignment.Centre,
                                         AnchorTo = BoxAlignment.Centre,
                                         Value = 0,
-                                        Step = .05f,
-                                    },
+                                        Step = .05f
+                                    }
                                 }
                             },
                             floatingPointTimeButton = new Button(manager)
@@ -84,11 +84,11 @@ namespace StorybrewEditor.UserInterface.Components
                                 AnchorTo = BoxAlignment.Centre,
                                 Checkable = true,
                                 Checked = project.ExportSettings.UseFloatForTime,
-                                Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer",
-                            },
+                                Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer"
+                            }
                         }
                     }
-                },
+                }
             });
 
             helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
@@ -100,13 +100,11 @@ namespace StorybrewEditor.UserInterface.Components
             };
             floatingPointTimeButton.OnValueChanged += (sender, e) => project.ExportSettings.UseFloatForTime = floatingPointTimeButton.Checked;
         }
-
         protected override void Dispose(bool disposing)
         {
             project = null;
             base.Dispose(disposing);
         }
-
         protected override void Layout()
         {
             base.Layout();

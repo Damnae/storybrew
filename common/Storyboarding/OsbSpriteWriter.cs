@@ -8,50 +8,45 @@ using System.Linq;
 
 namespace StorybrewCommon.Storyboarding
 {
+    ///<summary> A helper class for writing and exporting a storyboard. </summary>
     public class OsbSpriteWriter
     {
-        private readonly OsbSprite osbSprite;
-        private readonly AnimatedValue<CommandPosition> moveTimeline;
-        private readonly AnimatedValue<CommandDecimal> moveXTimeline;
-        private readonly AnimatedValue<CommandDecimal> moveYTimeline;
-        private readonly AnimatedValue<CommandDecimal> scaleTimeline;
-        private readonly AnimatedValue<CommandScale> scaleVecTimeline;
-        private readonly AnimatedValue<CommandDecimal> rotateTimeline;
-        private readonly AnimatedValue<CommandDecimal> fadeTimeline;
-        private readonly AnimatedValue<CommandColor> colorTimeline;
+        readonly OsbSprite sprite;
+        readonly AnimatedValue<CommandPosition> move;
+        readonly AnimatedValue<CommandDecimal> moveX, moveY, scale, rotate, fade;
+        readonly AnimatedValue<CommandScale> scaleVec;
+        readonly AnimatedValue<CommandColor> color;
+#pragma warning disable CS1591
         protected readonly TextWriter TextWriter;
         protected readonly ExportSettings ExportSettings;
-        protected readonly OsbLayer OsbLayer;
+        protected readonly OsbLayer Layer;
 
-        public OsbSpriteWriter(OsbSprite osbSprite, AnimatedValue<CommandPosition> moveTimeline,
-                                                    AnimatedValue<CommandDecimal> moveXTimeline,
-                                                    AnimatedValue<CommandDecimal> moveYTimeline,
-                                                    AnimatedValue<CommandDecimal> scaleTimeline,
-                                                    AnimatedValue<CommandScale> scaleVecTimeline,
-                                                    AnimatedValue<CommandDecimal> rotateTimeline,
-                                                    AnimatedValue<CommandDecimal> fadeTimeline,
-                                                    AnimatedValue<CommandColor> colorTimeline,
-                                                    TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
+        public OsbSpriteWriter(OsbSprite sprite,
+            AnimatedValue<CommandPosition> move, AnimatedValue<CommandDecimal> moveX, AnimatedValue<CommandDecimal> moveY,
+            AnimatedValue<CommandDecimal> scale, AnimatedValue<CommandScale> scaleVec,
+            AnimatedValue<CommandDecimal> rotate,
+            AnimatedValue<CommandDecimal> fade,
+            AnimatedValue<CommandColor> color,
+            TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
-            this.osbSprite = osbSprite;
-            this.moveTimeline = moveTimeline;
-            this.moveXTimeline = moveXTimeline;
-            this.moveYTimeline = moveYTimeline;
-            this.scaleTimeline = scaleTimeline;
-            this.scaleVecTimeline = scaleVecTimeline;
-            this.rotateTimeline = rotateTimeline;
-            this.fadeTimeline = fadeTimeline;
-            this.colorTimeline = colorTimeline;
+            this.sprite = sprite;
+            this.move = move;
+            this.moveX = moveX;
+            this.moveY = moveY;
+            this.scale = scale;
+            this.scaleVec = scaleVec;
+            this.rotate = rotate;
+            this.fade = fade;
+            this.color = color;
             TextWriter = writer;
             ExportSettings = exportSettings;
-            OsbLayer = layer;
+            Layer = layer;
         }
-
         public void WriteOsb()
         {
-            if (ExportSettings.OptimiseSprites && osbSprite.CommandSplitThreshold > 0 && osbSprite.CommandCount > osbSprite.CommandSplitThreshold && IsFragmentable())
+            if (ExportSettings.OptimiseSprites && sprite.CommandSplitThreshold > 0 && sprite.CommandCount > sprite.CommandSplitThreshold && IsFragmentable())
             {
-                var commands = osbSprite.Commands.Select(c => (IFragmentableCommand)c).ToList();
+                var commands = sprite.Commands.Select(c => (IFragmentableCommand)c).ToList();
                 var fragmentationTimes = GetFragmentationTimes(commands);
 
                 while (commands.Count > 0)
@@ -61,69 +56,53 @@ namespace StorybrewCommon.Storyboarding
                     writeOsbSprite(sprite);
                 }
             }
-            else writeOsbSprite(osbSprite);
+            else writeOsbSprite(sprite);
         }
-
         protected virtual OsbSprite CreateSprite(List<IFragmentableCommand> segment)
         {
-            var sprite = new OsbSprite()
+            var sprite = new OsbSprite
             {
-                TexturePath = osbSprite.TexturePath,
-                InitialPosition = osbSprite.InitialPosition,
-                Origin = osbSprite.Origin,
+                TexturePath = this.sprite.TexturePath,
+                InitialPosition = this.sprite.InitialPosition,
+                Origin = this.sprite.Origin
             };
-
-            foreach (var command in segment)
-                sprite.AddCommand(command);
-
+            foreach (var command in segment.ToArray()) sprite.AddCommand(command);
             return sprite;
         }
-
-        private void writeOsbSprite(OsbSprite sprite)
+        void writeOsbSprite(OsbSprite sprite)
         {
             WriteHeader(sprite);
-            foreach (var command in sprite.Commands)
-                command.WriteOsb(TextWriter, ExportSettings, 1);
+            foreach (var command in sprite.Commands) command.WriteOsb(TextWriter, ExportSettings, 1);
         }
-
         protected virtual void WriteHeader(OsbSprite sprite)
         {
-            TextWriter.Write($"Sprite,{OsbLayer},{sprite.Origin},\"{sprite.TexturePath.Trim()}\"");
-            if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
-                TextWriter.Write($",{sprite.InitialPosition.X.ToString(ExportSettings.NumberFormat)}");
+            TextWriter.Write($"Sprite,{Layer},{sprite.Origin},\"{sprite.TexturePath.Trim()}\"");
+            if (!move.HasCommands && !moveX.HasCommands) TextWriter.Write(
+                $",{sprite.InitialPosition.X.ToString(ExportSettings.NumberFormat)}");
             else TextWriter.Write($",0");
-            if (!moveTimeline.HasCommands && !moveYTimeline.HasCommands)
-                TextWriter.WriteLine($",{sprite.InitialPosition.Y.ToString(ExportSettings.NumberFormat)}");
+
+            if (!move.HasCommands && !moveY.HasCommands) TextWriter.WriteLine(
+                $",{sprite.InitialPosition.Y.ToString(ExportSettings.NumberFormat)}");
             else TextWriter.WriteLine($",0");
         }
-
         protected virtual bool IsFragmentable()
         {
             // if there are commands with non-deterministic results (aka triggercommands) the sprite can't reliably be split
-            if (osbSprite.Commands.Any(c => !(c is IFragmentableCommand)))
-                return false;
+            if (sprite.Commands.Any(c => !(c is IFragmentableCommand))) return false;
 
-            return !(moveTimeline.HasOverlap ||
-                     moveXTimeline.HasOverlap ||
-                     moveYTimeline.HasOverlap ||
-                     rotateTimeline.HasOverlap ||
-                     scaleTimeline.HasOverlap ||
-                     scaleVecTimeline.HasOverlap ||
-                     fadeTimeline.HasOverlap ||
-                     colorTimeline.HasOverlap);
+            return !(move.HasOverlap || moveX.HasOverlap || moveY.HasOverlap ||
+                rotate.HasOverlap ||
+                scale.HasOverlap || scaleVec.HasOverlap ||
+                fade.HasOverlap ||
+                color.HasOverlap);
         }
-
-        protected virtual HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragmentableCommands)
+        protected virtual HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragCommands)
         {
-            var fragmentationTimes = new HashSet<int>(Enumerable.Range((int)osbSprite.StartTime, (int)(osbSprite.EndTime - osbSprite.StartTime) + 1));
-
-            foreach (var command in fragmentableCommands)
-                fragmentationTimes.ExceptWith(command.GetNonFragmentableTimes());
-
-            return fragmentationTimes;
+            var fragTimes = new HashSet<int>(Enumerable.Range((int)sprite.StartTime, (int)(sprite.EndTime - sprite.StartTime) + 1));
+            foreach (var command in fragCommands) fragTimes.ExceptWith(command.GetNonFragmentableTimes());
+            return fragTimes;
         }
-
-        private List<IFragmentableCommand> getNextSegment(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
+        List<IFragmentableCommand> getNextSegment(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
         {
             var segment = new List<IFragmentableCommand>();
 
@@ -136,33 +115,26 @@ namespace StorybrewCommon.Storyboarding
                 var eTime = Math.Min(endTime, (int)Math.Round(cmd.EndTime));
 
                 IFragmentableCommand command;
-                if (sTime != (int)Math.Round(cmd.StartTime) || eTime != (int)Math.Round(cmd.EndTime))
-                    command = cmd.GetFragment(sTime, eTime);
+                if (sTime != (int)Math.Round(cmd.StartTime) || eTime != (int)Math.Round(cmd.EndTime)) command = cmd.GetFragment(sTime, eTime);
                 else command = cmd;
 
                 segment.Add(command);
             }
-
             addStaticCommands(segment, startTime);
 
             fragmentationTimes.RemoveWhere(t => t < endTime);
             commands.RemoveAll(c => c.EndTime <= endTime);
-
             return segment;
         }
-
-        private int getSegmentEndTime(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
+        int getSegmentEndTime(HashSet<int> fragmentationTimes, List<IFragmentableCommand> commands)
         {
             var startTime = fragmentationTimes.Min();
             int endTime;
-            var maxCommandCount = osbSprite.CommandSplitThreshold;
+            var maxCommandCount = sprite.CommandSplitThreshold;
 
             //split the last 2 segments evenly so we don't have weird 5 command leftovers
-            if (commands.Count < osbSprite.CommandSplitThreshold * 2 && commands.Count > osbSprite.CommandSplitThreshold)
-                maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
-
-            if (commands.Count < maxCommandCount)
-                endTime = fragmentationTimes.Max() + 1;
+            if (commands.Count < sprite.CommandSplitThreshold * 2 && commands.Count > sprite.CommandSplitThreshold) maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
+            if (commands.Count < maxCommandCount) endTime = fragmentationTimes.Max() + 1;
             else
             {
                 var lastCommand = commands.OrderBy(c => c.StartTime).ElementAt(maxCommandCount - 1);
@@ -173,63 +145,53 @@ namespace StorybrewCommon.Storyboarding
                     if (fragmentationTimes.Any(t => t < (int)lastCommand.StartTime))
                     {
                         endTime = fragmentationTimes.Where(t => t < (int)lastCommand.StartTime).Max();
-                        if (endTime == startTime) // segment can't be <= MaxCommandCount, so we use the smallest available
-                            endTime = fragmentationTimes.First(t => t > startTime);
+                        if (endTime == startTime) endTime = fragmentationTimes.First(t => t > startTime);
                     }
                     else endTime = fragmentationTimes.First(t => t > startTime);
                 }
             }
-
             return endTime;
         }
-
-        private void addStaticCommands(List<IFragmentableCommand> segment, int startTime)
+        void addStaticCommands(List<IFragmentableCommand> segment, int startTime)
         {
-            if (moveTimeline.HasCommands && !segment.Any(c => c is MoveCommand && c.StartTime == startTime))
+            if (move.HasCommands && !segment.Any(c => c is MoveCommand && c.StartTime == startTime))
             {
-                var value = moveTimeline.ValueAtTime(startTime);
+                var value = move.ValueAtTime(startTime);
                 segment.Add(new MoveCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (moveXTimeline.HasCommands && !segment.Any(c => c is MoveXCommand && c.StartTime == startTime))
+            if (moveX.HasCommands && !segment.Any(c => c is MoveXCommand && c.StartTime == startTime))
             {
-                var value = moveXTimeline.ValueAtTime(startTime);
+                var value = moveX.ValueAtTime(startTime);
                 segment.Add(new MoveXCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (moveYTimeline.HasCommands && !segment.Any(c => c is MoveYCommand && c.StartTime == startTime))
+            if (moveY.HasCommands && !segment.Any(c => c is MoveYCommand && c.StartTime == startTime))
             {
-                var value = moveYTimeline.ValueAtTime(startTime);
+                var value = moveY.ValueAtTime(startTime);
                 segment.Add(new MoveYCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (rotateTimeline.HasCommands && !segment.Any(c => c is RotateCommand && c.StartTime == startTime))
+            if (rotate.HasCommands && !segment.Any(c => c is RotateCommand && c.StartTime == startTime))
             {
-                var value = rotateTimeline.ValueAtTime(startTime);
+                var value = rotate.ValueAtTime(startTime);
                 segment.Add(new RotateCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (scaleTimeline.HasCommands && !segment.Any(c => c is ScaleCommand && c.StartTime == startTime))
+            if (scale.HasCommands && !segment.Any(c => c is ScaleCommand && c.StartTime == startTime))
             {
-                var value = scaleTimeline.ValueAtTime(startTime);
+                var value = scale.ValueAtTime(startTime);
                 segment.Add(new ScaleCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (scaleVecTimeline.HasCommands && !segment.Any(c => c is VScaleCommand && c.StartTime == startTime))
+            if (scaleVec.HasCommands && !segment.Any(c => c is VScaleCommand && c.StartTime == startTime))
             {
-                var value = scaleVecTimeline.ValueAtTime(startTime);
+                var value = scaleVec.ValueAtTime(startTime);
                 segment.Add(new VScaleCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (colorTimeline.HasCommands && !segment.Any(c => c is ColorCommand && c.StartTime == startTime))
+            if (color.HasCommands && !segment.Any(c => c is ColorCommand && c.StartTime == startTime))
             {
-                var value = colorTimeline.ValueAtTime(startTime);
+                var value = color.ValueAtTime(startTime);
                 segment.Add(new ColorCommand(OsbEasing.None, startTime, startTime, value, value));
             }
-
-            if (fadeTimeline.HasCommands && !segment.Any(c => c is FadeCommand && c.StartTime == startTime))
+            if (fade.HasCommands && !segment.Any(c => c is FadeCommand && c.StartTime == startTime))
             {
-                var value = fadeTimeline.ValueAtTime(startTime);
+                var value = fade.ValueAtTime(startTime);
                 segment.Add(new FadeCommand(OsbEasing.None, startTime, startTime, value, value));
             }
         }

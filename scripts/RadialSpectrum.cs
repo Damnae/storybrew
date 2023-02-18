@@ -7,10 +7,8 @@ using System.Linq;
 
 namespace StorybrewScripts
 {
-    /// <summary>
-    /// An example of a radial spectrum effect, using movement instead of scaling.
-    /// </summary>
-    public class RadialSpectrum : StoryboardObjectGenerator
+    ///<summary> An example of a radial spectrum effect, using movement instead of scaling. </summary>
+    class RadialSpectrum : StoryboardObjectGenerator
     {
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 10000;
@@ -28,7 +26,7 @@ namespace StorybrewScripts
         [Configurable] public OsbEasing FftEasing = OsbEasing.InExpo;
         [Configurable] public int FrequencyCutOff = 16000;
 
-        public override void Generate()
+        protected override void Generate()
         {
             if (StartTime == EndTime && Beatmap.HitObjects.FirstOrDefault() != null)
             {
@@ -41,8 +39,7 @@ namespace StorybrewScripts
             var bitmap = GetMapsetBitmap(SpritePath);
 
             var positionKeyframes = new KeyframedValue<Vector2>[BarCount];
-            for (var i = 0; i < BarCount; i++)
-                positionKeyframes[i] = new KeyframedValue<Vector2>(null);
+            for (var i = 0; i < BarCount; i++) positionKeyframes[i] = new KeyframedValue<Vector2>(null);
 
             var fftTimeStep = Beatmap.GetTimingPointAt(StartTime).BeatDuration / BeatDivisor;
             var fftOffset = fftTimeStep * 0.2;
@@ -61,7 +58,7 @@ namespace StorybrewScripts
             }
 
             var layer = GetLayer("Spectrum");
-            var barScale = ((Math.PI * 2 * Radius) / BarCount) / bitmap.Width;
+            var barScale = Math.PI * 2 * Radius / BarCount / bitmap.Width;
             for (var i = 0; i < BarCount; i++)
             {
                 var keyframes = positionKeyframes[i];
@@ -73,22 +70,19 @@ namespace StorybrewScripts
                 var bar = layer.CreateSprite(SpritePath, SpriteOrigin);
                 bar.CommandSplitThreshold = 300;
                 bar.ColorHsb(StartTime, (i * 360.0 / BarCount) + Random(-10.0, 10.0), 0.6 + Random(0.4), 1);
-                if (SpriteScale.X == SpriteScale.Y)
-                    bar.Scale(StartTime, barScale * SpriteScale.X);
+                if (SpriteScale.X == SpriteScale.Y) bar.Scale(StartTime, barScale * SpriteScale.X);
                 else bar.ScaleVec(StartTime, barScale * SpriteScale.X, barScale * SpriteScale.Y);
                 bar.Rotate(StartTime, angle);
                 bar.Additive(StartTime, EndTime);
 
                 var hasMove = false;
-                keyframes.ForEachPair(
-                    (start, end) =>
-                    {
-                        hasMove = true;
-                        bar.Move(start.Time, end.Time, start.Value, end.Value);
-                    },
-                    defaultPosition,
-                    s => new Vector2((float)Math.Round(s.X, CommandDecimals), (float)Math.Round(s.Y, CommandDecimals))
-                );
+                keyframes.ForEachPair((start, end) =>
+                {
+                    hasMove = true;
+                    bar.Move(start.Time, end.Time, start.Value, end.Value);
+                }, defaultPosition, s => new Vector2(
+                    (float)Math.Round(s.X, CommandDecimals), (float)Math.Round(s.Y, CommandDecimals)));
+
                 if (!hasMove) bar.Move(StartTime, defaultPosition);
             }
         }

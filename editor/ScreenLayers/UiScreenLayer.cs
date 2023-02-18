@@ -9,11 +9,9 @@ namespace StorybrewEditor.ScreenLayers
 {
     public class UiScreenLayer : ScreenLayer
     {
-        private CameraOrtho uiCamera;
-
+        CameraOrtho uiCamera;
         protected WidgetManager WidgetManager { get; private set; }
-
-        private float opacity = 0;
+        float opacity = 0;
 
         public override void Load()
         {
@@ -22,10 +20,9 @@ namespace StorybrewEditor.ScreenLayers
             var editor = Manager.GetContext<Editor>();
             AddInputHandler(WidgetManager = new WidgetManager(Manager, editor.InputManager, editor.Skin)
             {
-                Camera = uiCamera = new CameraOrtho(),
+                Camera = uiCamera = new CameraOrtho()
             });
         }
-
         public override void Resize(int width, int height)
         {
             uiCamera.VirtualHeight = (int)(height * Math.Max(1024f / width, 768f / height));
@@ -33,26 +30,23 @@ namespace StorybrewEditor.ScreenLayers
             WidgetManager.Size = new Vector2(uiCamera.VirtualWidth, uiCamera.VirtualHeight);
             base.Resize(width, height);
         }
-
         public override void Update(bool isTop, bool isCovered)
         {
             base.Update(isTop, isCovered);
 
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {
-                var targetOpacity = (isTop ? 1f : 0.3f);
+                var targetOpacity = isTop ? 1f : 0.3f;
                 if (Math.Abs(opacity - targetOpacity) <= 0.07f) opacity = targetOpacity;
                 else opacity = MathHelper.Clamp(opacity + (opacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
             }
             WidgetManager.Opacity = opacity * (float)TransitionProgress;
         }
-
         public override void Draw(DrawContext drawContext, double tween)
         {
             base.Draw(drawContext, tween);
             WidgetManager.Draw(drawContext);
         }
-
         protected void MakeTabs(Button[] buttons, Widget[] widgets)
         {
             for (var i = 0; i < buttons.Length; i++)
@@ -65,19 +59,18 @@ namespace StorybrewEditor.ScreenLayers
 
                 button.OnValueChanged += (sender, e) =>
                 {
-                    if (widget.Displayed = button.Checked)
-                        foreach (var otherButton in buttons)
-                            if (sender != otherButton) otherButton.Checked = false;
+                    if (widget.Displayed = button.Checked) foreach (var otherButton in buttons)
+                            if (sender != otherButton && otherButton.Checked != false) otherButton.Checked = false;
                 };
             }
         }
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
+        bool disposed = false;
         protected override void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!disposed)
             {
                 if (disposing)
                 {
@@ -86,7 +79,7 @@ namespace StorybrewEditor.ScreenLayers
                 }
                 WidgetManager = null;
                 uiCamera = null;
-                disposedValue = true;
+                disposed = true;
             }
             base.Dispose(disposing);
         }

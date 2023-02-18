@@ -3,6 +3,7 @@ using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
+#pragma warning disable CS1591
     public interface ICommand : IComparable<ICommand>
     {
         double StartTime { get; }

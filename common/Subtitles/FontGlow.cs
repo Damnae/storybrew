@@ -8,14 +8,16 @@ using System.Drawing.Imaging;
 
 namespace StorybrewCommon.Subtitles
 {
+    ///<summary> A font glow effect. </summary>
     public class FontGlow : FontEffect
     {
-        private double[,] kernel;
+        double[,] kernel;
 
-        private int radius = 6;
+        int radius = 6;
+        ///<summary> Gets or sets the radius of the glow. </summary>
         public int Radius
         {
-            get { return radius; }
+            get => radius;
             set
             {
                 if (radius == value) return;
@@ -24,10 +26,11 @@ namespace StorybrewCommon.Subtitles
             }
         }
 
-        private double power = 0;
+        double power = 0;
+        ///<summary> Gets or sets the intensity of the glow. </summary>
         public double Power
         {
-            get { return power; }
+            get => power;
             set
             {
                 if (power == value) return;
@@ -36,15 +39,19 @@ namespace StorybrewCommon.Subtitles
             }
         }
 
+        ///<summary> The coloring tint of the glow. </summary>
         public Color4 Color = new Color4(255, 255, 255, 100);
 
+        ///<inheritdoc/>
         public bool Overlay => false;
+
+        ///<inheritdoc/>
         public Vector2 Measure() => new Vector2(Radius * 2);
 
+        ///<inheritdoc/>
         public void Draw(Bitmap bitmap, Graphics textGraphics, Font font, StringFormat stringFormat, string text, float x, float y)
         {
-            if (Radius < 1)
-                return;
+            if (Radius < 1) return;
 
             using (var blurSource = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb))
             {
@@ -60,7 +67,7 @@ namespace StorybrewCommon.Subtitles
                 if (kernel == null)
                 {
                     var radius = Math.Min(Radius, 24);
-                    var power = Power >= 1 ? Power : Radius * 0.5;
+                    var power = Power >= 1 ? Power : Radius * .5;
                     kernel = BitmapHelper.CalculateGaussianKernel(radius, power);
                 }
 

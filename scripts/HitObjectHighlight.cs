@@ -1,10 +1,12 @@
-﻿using StorybrewCommon.Mapset;
+﻿using OpenTK;
+using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Animations;
 
 namespace StorybrewScripts
 {
-    public class HitObjectHighlight : StoryboardObjectGenerator
+    class HitObjectHighlight : StoryboardObjectGenerator
     {
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 0;
@@ -15,18 +17,14 @@ namespace StorybrewScripts
         [Configurable] public double SpriteScale = 1;
         [Configurable] public int FadeDuration = 200;
 
-        public override void Generate()
+        protected override void Generate()
         {
-            var hitobjectLayer = GetLayer("");
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                if ((StartTime != 0 || EndTime != 0) &&
-                    (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime))
+                if ((StartTime != 0 || EndTime != 0) && (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime))
                     continue;
 
-                var stackOffset = hitobject.StackOffset;
-
-                var hSprite = hitobjectLayer.CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position + stackOffset);
+                var hSprite = GetLayer("").CreateSprite(SpritePath, OsbOrigin.Centre, hitobject.Position + hitobject.StackOffset);
                 hSprite.Scale(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeDuration, SpriteScale, SpriteScale * 0.2);
                 hSprite.Fade(OsbEasing.In, hitobject.StartTime, hitobject.EndTime + FadeDuration, 1, 0);
                 hSprite.Additive(hitobject.StartTime, hitobject.EndTime + FadeDuration);
@@ -34,21 +32,25 @@ namespace StorybrewScripts
 
                 if (hitobject is OsuSlider)
                 {
+                    var keyframe = new KeyframedValue<Vector2>(null);
                     var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration / BeatDivisor;
                     var startTime = hitobject.StartTime;
+
                     while (true)
                     {
                         var endTime = startTime + timestep;
 
-                        var complete = hitobject.EndTime - endTime < 5;
+                        var complete = hitobject.EndTime - startTime < 5;
                         if (complete) endTime = hitobject.EndTime;
 
-                        var startPosition = hSprite.PositionAt(startTime);
-                        hSprite.Move(startTime, endTime, startPosition, hitobject.PositionAtTime(endTime) + stackOffset);
+                        var startPosition = hitobject.PositionAtTime(startTime);
+                        keyframe.Add(startTime, startPosition);
+                        keyframe.Simplify2dKeyframes(1, v => v);
 
                         if (complete) break;
                         startTime += timestep;
                     }
+                    keyframe.ForEachPair((sTime, eTime) => hSprite.Move(sTime.Time, eTime.Time, sTime.Value, eTime.Value));
                 }
             }
         }

@@ -10,8 +10,7 @@ namespace StorybrewEditor.Storyboarding
 
         public void TriggerEvent(Project project, double currentTime)
         {
-            if (EventTime + 1 < currentTime)
-                return;
+            if (EventTime + 1 < currentTime) return;
 
             AudioSample sample;
             var fullPath = Path.Combine(project.MapsetPath, AudioPath);

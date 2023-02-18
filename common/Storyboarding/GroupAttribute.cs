@@ -2,6 +2,7 @@
 
 namespace StorybrewCommon.Storyboarding
 {
+#pragma warning disable CS1591
     [AttributeUsage(AttributeTargets.Field)]
     public class GroupAttribute : Attribute
     {

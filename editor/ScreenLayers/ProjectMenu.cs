@@ -20,73 +20,48 @@ namespace StorybrewEditor.ScreenLayers
 {
     public class ProjectMenu : UiScreenLayer
     {
-        private Project project;
+        Project proj;
 
-        private DrawableContainer mainStoryboardContainer;
-        private StoryboardDrawable mainStoryboardDrawable;
+        DrawableContainer storyboardContainer, previewContainer;
+        StoryboardDrawable storyboardDrawable, previewDrawable;
 
-        private DrawableContainer previewContainer;
-        private StoryboardDrawable previewDrawable;
+        LinearLayout statusLayout, bottomLeftLayout, bottomRightLayout;
+        Label statusIcon, statusMessage, warningsLabel;
 
-        private LinearLayout statusLayout;
-        private Label statusIcon;
-        private Label statusMessage;
+        Button timeB, divisorB, audioTimeB, mapB, fitB, playB, projFolderB, mapFolderB, saveB, exportB, settingB, effectB, layerB;
 
-        private Label warningsLabel;
+        TimelineSlider timeline;
 
-        private LinearLayout bottomLeftLayout;
-        private LinearLayout bottomRightLayout;
-        private Button timeButton;
-        private Button divisorButton;
-        private Button audioTimeFactorButton;
-        private TimelineSlider timeline;
-        private Button changeMapButton;
-        private Button fitButton;
-        private Button playPauseButton;
-        private Button projectFolderButton;
-        private Button mapsetFolderButton;
-        private Button saveButton;
-        private Button exportButton;
+        EffectList effects;
+        LayerList layers;
+        SettingsMenu settings;
 
-        private Button settingsButton;
-        private Button effectsButton;
-        private Button layersButton;
+        EffectConfigUi effectUI;
 
-        private EffectList effectsList;
-        private LayerList layersList;
-        private SettingsMenu settingsMenu;
+        AudioStream audio;
+        TimeSourceExtender timeSource;
+        double? pendingSeek;
 
-        private EffectConfigUi effectConfigUi;
+        int defaultDiv = 4;
+        Vector2 storyboardPosition;
 
-        private AudioStream audio;
-        private TimeSourceExtender timeSource;
-        private double? pendingSeek;
-
-        private int snapDivisor = 4;
-        private Vector2 storyboardPosition;
-
-        public ProjectMenu(Project project)
-        {
-            this.project = project;
-        }
+        public ProjectMenu(Project project) => proj = project;
 
         public override void Load()
         {
             base.Load();
-
             refreshAudio();
 
-            WidgetManager.Root.Add(mainStoryboardContainer = new DrawableContainer(WidgetManager)
+            WidgetManager.Root.Add(storyboardContainer = new DrawableContainer(WidgetManager)
             {
-                Drawable = mainStoryboardDrawable = new StoryboardDrawable(project)
+                Drawable = storyboardDrawable = new StoryboardDrawable(proj)
                 {
-                    UpdateFrameStats = true,
+                    UpdateFrameStats = true
                 },
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = BoxAlignment.Centre,
-                AnchorTo = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre
             });
-
             WidgetManager.Root.Add(bottomLeftLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
@@ -97,63 +72,62 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    timeButton = new Button(WidgetManager)
+                    timeB = new Button(WidgetManager)
                     {
                         StyleName = "small",
                         AnchorFrom = BoxAlignment.Centre,
                         Text = "--:--:---",
                         Tooltip = "Current time\nCtrl-C to copy",
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    divisorButton = new Button(WidgetManager)
+                    divisorB = new Button(WidgetManager)
                     {
                         StyleName = "small",
-                        Text = $"1/{snapDivisor}",
+                        Text = $"1/{defaultDiv}",
                         Tooltip = "Snap divisor",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    audioTimeFactorButton = new Button(WidgetManager)
+                    audioTimeB = new Button(WidgetManager)
                     {
                         StyleName = "small",
                         Text = $"{timeSource.TimeFactor:P0}",
                         Tooltip = "Audio speed",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    timeline = new TimelineSlider(WidgetManager, project)
+                    timeline = new TimelineSlider(WidgetManager, proj)
                     {
                         AnchorFrom = BoxAlignment.Centre,
-                        SnapDivisor = snapDivisor,
+                        SnapDivisor = defaultDiv
                     },
-                    changeMapButton = new Button(WidgetManager)
+                    mapB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.FilesO,
                         Tooltip = "Change beatmap",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    fitButton = new Button(WidgetManager)
+                    fitB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.Desktop,
                         Tooltip = "Fit/Fill",
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
-                        Checkable = true,
+                        Checkable = true
                     },
-                    playPauseButton = new Button(WidgetManager)
+                    playB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.Play,
                         Tooltip = "Play/Pause\nShortcut: Space",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
-                    },
-                },
+                        CanGrow = false
+                    }
+                }
             });
-
             WidgetManager.Root.Add(bottomRightLayout = new LinearLayout(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
@@ -164,104 +138,101 @@ namespace StorybrewEditor.ScreenLayers
                 Fill = true,
                 Children = new Widget[]
                 {
-                    effectsButton = new Button(WidgetManager)
+                    effectB = new Button(WidgetManager)
                     {
                         StyleName = "small",
-                        Text = "Effects",
+                        Text = "Effects"
                     },
-                    layersButton = new Button(WidgetManager)
+                    layerB = new Button(WidgetManager)
                     {
                         StyleName = "small",
-                        Text = "Layers",
+                        Text = "Layers"
                     },
-                    settingsButton = new Button(WidgetManager)
+                    settingB = new Button(WidgetManager)
                     {
                         StyleName = "small",
-                        Text = "Settings",
+                        Text = "Settings"
                     },
-                    projectFolderButton = new Button(WidgetManager)
+                    projFolderB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.FolderOpen,
                         Tooltip = "Open project folder",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    mapsetFolderButton = new Button(WidgetManager)
+                    mapFolderB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.FolderOpen,
                         Tooltip = "Open mapset folder\n(Right click to change)",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    saveButton = new Button(WidgetManager)
+                    saveB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.Save,
                         Tooltip = "Save project\nShortcut: Ctrl-S",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
+                        CanGrow = false
                     },
-                    exportButton = new Button(WidgetManager)
+                    exportB = new Button(WidgetManager)
                     {
                         StyleName = "icon",
                         Icon = IconFont.PuzzlePiece,
                         Tooltip = "Export to .osb\n(Right click to export once for each diff)",
                         AnchorFrom = BoxAlignment.Centre,
-                        CanGrow = false,
-                    },
-                },
+                        CanGrow = false
+                    }
+                }
             });
-
-            WidgetManager.Root.Add(effectConfigUi = new EffectConfigUi(WidgetManager)
+            WidgetManager.Root.Add(effectUI = new EffectConfigUi(WidgetManager)
             {
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = BoxAlignment.TopLeft,
                 AnchorTo = BoxAlignment.TopLeft,
                 Offset = new Vector2(16, 16),
-                Displayed = false,
+                Displayed = false
             });
-            effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
+            effectUI.OnDisplayedChanged += (sender, e) => resizeStoryboard();
 
-            WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
+            WidgetManager.Root.Add(effects = new EffectList(WidgetManager, proj, effectUI)
             {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = BoxAlignment.BottomRight,
                 AnchorTo = BoxAlignment.TopRight,
-                Offset = new Vector2(-16, 0),
+                Offset = new Vector2(-16, 0)
             });
-            effectsList.OnEffectPreselect += effect =>
+            effects.OnEffectPreselect += effect =>
             {
                 if (effect != null)
                     timeline.Highlight(effect.StartTime, effect.EndTime);
                 else timeline.ClearHighlight();
             };
-            effectsList.OnEffectSelected += effect => timeline.Value = (float)effect.StartTime / 1000;
+            effects.OnEffectSelected += effect => timeline.Value = (float)effect.StartTime / 1000;
 
-            WidgetManager.Root.Add(layersList = new LayerList(WidgetManager, project.LayerManager)
+            WidgetManager.Root.Add(layers = new LayerList(WidgetManager, proj.LayerManager)
             {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = BoxAlignment.BottomRight,
                 AnchorTo = BoxAlignment.TopRight,
-                Offset = new Vector2(-16, 0),
+                Offset = new Vector2(-16, 0)
             });
-            layersList.OnLayerPreselect += layer =>
+            layers.OnLayerPreselect += layer =>
             {
-                if (layer != null)
-                    timeline.Highlight(layer.StartTime, layer.EndTime);
+                if (layer != null) timeline.Highlight(layer.StartTime, layer.EndTime);
                 else timeline.ClearHighlight();
             };
-            layersList.OnLayerSelected += layer => timeline.Value = (float)layer.StartTime / 1000;
+            layers.OnLayerSelected += layer => timeline.Value = (float)layer.StartTime / 1000;
 
-            WidgetManager.Root.Add(settingsMenu = new SettingsMenu(WidgetManager, project)
+            WidgetManager.Root.Add(settings = new SettingsMenu(WidgetManager, proj)
             {
                 AnchorTarget = bottomRightLayout,
                 AnchorFrom = BoxAlignment.BottomRight,
                 AnchorTo = BoxAlignment.TopRight,
-                Offset = new Vector2(-16, 0),
+                Offset = new Vector2(-16, 0)
             });
-
             WidgetManager.Root.Add(statusLayout = new LinearLayout(WidgetManager)
             {
                 StyleName = "tooltip",
@@ -278,66 +249,63 @@ namespace StorybrewEditor.ScreenLayers
                     {
                         StyleName = "icon",
                         AnchorFrom = BoxAlignment.Left,
-                        CanGrow = false,
+                        CanGrow = false
                     },
                     statusMessage = new Label(WidgetManager)
                     {
-                        AnchorFrom = BoxAlignment.Left,
-                    },
-                },
+                        AnchorFrom = BoxAlignment.Left
+                    }
+                }
             });
-
             WidgetManager.Root.Add(warningsLabel = new Label(WidgetManager)
             {
                 StyleName = "tooltip",
                 AnchorTarget = timeline,
                 AnchorFrom = BoxAlignment.BottomLeft,
                 AnchorTo = BoxAlignment.TopLeft,
-                Offset = new Vector2(0, -8),
+                Offset = new Vector2(0, -8)
             });
-
             WidgetManager.Root.Add(previewContainer = new DrawableContainer(WidgetManager)
             {
                 StyleName = "storyboardPreview",
-                Drawable = previewDrawable = new StoryboardDrawable(project),
+                Drawable = previewDrawable = new StoryboardDrawable(proj),
                 AnchorTarget = timeline,
                 AnchorFrom = BoxAlignment.Bottom,
                 AnchorTo = BoxAlignment.Top,
                 Hoverable = false,
                 Displayed = false,
-                Size = new Vector2(16, 9) * 16,
+                Size = new Vector2(16, 9) * 16
             });
-
-            timeButton.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", value =>
+            timeB.OnClick += (sender, e) => Manager.ShowPrompt("Skip to...", value =>
             {
-                if (float.TryParse(value, out float time))
-                    timeline.Value = time / 1000;
+                if (float.TryParse(value, out float time)) timeline.Value = time / 1000;
             });
 
             resizeTimeline();
             timeline.OnValueChanged += (sender, e) => pendingSeek = timeline.Value;
             timeline.OnValueCommited += (sender, e) => timeline.Snap();
             timeline.OnHovered += (sender, e) => previewContainer.Displayed = e.Hovered;
-            changeMapButton.OnClick += (sender, e) =>
-            {
-                if (project.MapsetManager.BeatmapCount > 2)
-                    Manager.ShowContextMenu("Select a beatmap", beatmap => project.SelectBeatmap(beatmap.Id, beatmap.Name), project.MapsetManager.Beatmaps);
-                else project.SwitchMainBeatmap();
-            };
-            Program.Settings.FitStoryboard.Bind(fitButton, () => resizeStoryboard());
-            playPauseButton.OnClick += (sender, e) => timeSource.Playing = !timeSource.Playing;
 
-            divisorButton.OnClick += (sender, e) =>
+            mapB.OnClick += (sender, e) =>
             {
-                snapDivisor++;
-                if (snapDivisor == 5 || snapDivisor == 7) snapDivisor++;
-                if (snapDivisor == 9) snapDivisor = 12;
-                if (snapDivisor == 13) snapDivisor = 16;
-                if (snapDivisor > 16) snapDivisor = 1;
-                timeline.SnapDivisor = snapDivisor;
-                divisorButton.Text = $"1/{snapDivisor}";
+                if (proj.MapsetManager.BeatmapCount > 2) Manager.ShowContextMenu("Select a beatmap", beatmap =>
+                    proj.SelectBeatmap(beatmap.Id, beatmap.Name), proj.MapsetManager.Beatmaps);
+                else proj.SwitchMainBeatmap();
             };
-            audioTimeFactorButton.OnClick += (sender, e) =>
+            Program.Settings.FitStoryboard.Bind(fitB, () => resizeStoryboard());
+            playB.OnClick += (sender, e) => timeSource.Playing = !timeSource.Playing;
+
+            divisorB.OnClick += (sender, e) =>
+            {
+                defaultDiv++;
+                if (defaultDiv == 5 || defaultDiv == 7) defaultDiv++;
+                if (defaultDiv == 9) defaultDiv = 12;
+                if (defaultDiv == 13) defaultDiv = 16;
+                if (defaultDiv > 16) defaultDiv = 1;
+                timeline.SnapDivisor = defaultDiv;
+                divisorB.Text = $"1/{defaultDiv}";
+            };
+            audioTimeB.OnClick += (sender, e) =>
             {
                 if (e == MouseButton.Left)
                 {
@@ -355,44 +323,37 @@ namespace StorybrewEditor.ScreenLayers
                     if (speed > 8) speed = 1;
                     timeSource.TimeFactor = speed;
                 }
-                else if (e == MouseButton.Middle)
-                    timeSource.TimeFactor = timeSource.TimeFactor == 8 ? 1 : 8;
+                else if (e == MouseButton.Middle) timeSource.TimeFactor = timeSource.TimeFactor == 8 ? 1 : 8;
 
-                audioTimeFactorButton.Text = $"{timeSource.TimeFactor:P0}";
+                audioTimeB.Text = $"{timeSource.TimeFactor:P0}";
             };
 
-            MakeTabs(
-                new Button[] { settingsButton, effectsButton, layersButton },
-                new Widget[] { settingsMenu, effectsList, layersList });
-            projectFolderButton.OnClick += (sender, e) =>
+            MakeTabs(new Button[] { settingB, effectB, layerB }, new Widget[] { settings, effects, layers });
+            projFolderB.OnClick += (sender, e) =>
             {
-                var path = Path.GetFullPath(project.ProjectFolderPath);
-                if (Directory.Exists(path))
-                    Process.Start(path);
+                var path = Path.GetFullPath(proj.ProjectFolderPath);
+                if (Directory.Exists(path)) Process.Start(path);
             };
-            mapsetFolderButton.OnClick += (sender, e) =>
+            mapFolderB.OnClick += (sender, e) =>
             {
-                var path = Path.GetFullPath(project.MapsetPath);
-                if (e == MouseButton.Right || !Directory.Exists(path))
-                    changeMapsetFolder();
+                var path = Path.GetFullPath(proj.MapsetPath);
+                if (e == MouseButton.Right || !Directory.Exists(path)) changeMapsetFolder();
                 else Process.Start(path);
             };
-            saveButton.OnClick += (sender, e) => saveProject();
-            exportButton.OnClick += (sender, e) =>
+            saveB.OnClick += (sender, e) => saveProject();
+            exportB.OnClick += (sender, e) =>
             {
-                if (e == MouseButton.Right)
-                    exportProjectAll();
+                if (e == MouseButton.Right) exportProjectAll();
                 else exportProject();
             };
 
-            project.OnMapsetPathChanged += project_OnMapsetPathChanged;
-            project.OnEffectsContentChanged += project_OnEffectsContentChanged;
-            project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
+            proj.OnMapsetPathChanged += project_OnMapsetPathChanged;
+            proj.OnEffectsContentChanged += project_OnEffectsContentChanged;
+            proj.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
 
-            if (!project.MapsetPathIsValid)
-                Manager.ShowMessage($"The mapset folder cannot be found.\n{project.MapsetPath}\n\nPlease select a new one.", () => changeMapsetFolder(), true);
+            if (!proj.MapsetPathIsValid) Manager.ShowMessage(
+                $"The mapset folder cannot be found.\n{proj.MapsetPath}\n\nPlease select a new one.", () => changeMapsetFolder(), true);
         }
-
         public override bool OnKeyDown(KeyboardKeyEventArgs e)
         {
             switch (e.Key)
@@ -400,15 +361,16 @@ namespace StorybrewEditor.ScreenLayers
                 case Key.Right:
                     if (e.Control)
                     {
-                        var nextBookmark = project.MainBeatmap.Bookmarks.FirstOrDefault(bookmark => bookmark > Math.Round(timeline.Value * 1000) + 50);
+                        var nextBookmark = proj.MainBeatmap.Bookmarks.FirstOrDefault(bookmark => bookmark > Math.Round(timeline.Value * 1000) + 50);
                         if (nextBookmark != 0) timeline.Value = nextBookmark * 0.001f;
                     }
                     else timeline.Scroll(e.Shift ? 4 : 1);
                     return true;
+
                 case Key.Left:
                     if (e.Control)
                     {
-                        var prevBookmark = project.MainBeatmap.Bookmarks.LastOrDefault(bookmark => bookmark < Math.Round(timeline.Value * 1000) - 500);
+                        var prevBookmark = proj.MainBeatmap.Bookmarks.LastOrDefault(bookmark => bookmark < Math.Round(timeline.Value * 1000) - 500);
                         if (prevBookmark != 0) timeline.Value = prevBookmark * 0.001f;
                     }
                     else timeline.Scroll(e.Shift ? -4 : -1);
@@ -419,12 +381,8 @@ namespace StorybrewEditor.ScreenLayers
             {
                 switch (e.Key)
                 {
-                    case Key.Space:
-                        playPauseButton.Click();
-                        return true;
-                    case Key.O:
-                        withSavePrompt(() => Manager.ShowOpenProject());
-                        return true;
+                    case Key.Space: playB.Click(); return true;
+                    case Key.O: withSavePrompt(() => Manager.ShowOpenProject()); return true;
                     case Key.S:
                         if (e.Control)
                         {
@@ -435,10 +393,8 @@ namespace StorybrewEditor.ScreenLayers
                     case Key.C:
                         if (e.Control)
                         {
-                            if (e.Shift)
-                                ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(timeSource.Current * 1000)).ToString(Program.Settings.TimeCopyFormat));
-                            else if (e.Alt)
-                                ClipboardHelper.SetText($"{storyboardPosition.X:###}, {storyboardPosition.Y:###}");
+                            if (e.Shift) ClipboardHelper.SetText(new TimeSpan(0, 0, 0, 0, (int)(timeSource.Current * 1000)).ToString(Program.Settings.TimeCopyFormat));
+                            else if (e.Alt) ClipboardHelper.SetText($"{storyboardPosition.X:###}, {storyboardPosition.Y:###}");
                             else ClipboardHelper.SetText(((int)(timeSource.Current * 1000)).ToString());
                             return true;
                         }
@@ -447,72 +403,60 @@ namespace StorybrewEditor.ScreenLayers
             }
             return base.OnKeyDown(e);
         }
-
         public override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
 
-            var bounds = mainStoryboardContainer.Bounds;
+            var bounds = storyboardContainer.Bounds;
             var scale = OsuHitObject.StoryboardSize.Y / bounds.Height;
 
             storyboardPosition = (WidgetManager.MousePosition - new Vector2(bounds.Left, bounds.Top)) * scale;
             storyboardPosition.X -= (bounds.Width * scale - OsuHitObject.StoryboardSize.X) / 2;
         }
-
         public override bool OnMouseWheel(MouseWheelEventArgs e)
         {
             var inputManager = Manager.GetContext<Editor>().InputManager;
             timeline.Scroll(-e.DeltaPrecise * (inputManager.Shift ? 4 : 1));
             return true;
         }
-
-        private void changeMapsetFolder()
+        void changeMapsetFolder()
         {
-            var initialDirectory = Path.GetFullPath(project.MapsetPath);
-            if (!Directory.Exists(initialDirectory))
-                initialDirectory = OsuHelper.GetOsuSongFolder();
+            var initialDirectory = Path.GetFullPath(proj.MapsetPath);
+            if (!Directory.Exists(initialDirectory)) initialDirectory = OsuHelper.GetOsuSongFolder();
 
             Manager.OpenFilePicker("Pick a new mapset location", "", initialDirectory, ".osu files (*.osu)|*.osu", (newPath) =>
             {
-                if (!Directory.Exists(newPath) && File.Exists(newPath))
-                    project.MapsetPath = Path.GetDirectoryName(newPath);
+                if (!Directory.Exists(newPath) && File.Exists(newPath)) proj.MapsetPath = Path.GetDirectoryName(newPath);
                 else Manager.ShowMessage("Invalid mapset path.");
             });
         }
-
-        private void saveProject()
-            => Manager.AsyncLoading("Saving", () => Program.RunMainThread(() => project.Save()));
-
-        private void exportProject()
-            => Manager.AsyncLoading("Exporting", () => project.ExportToOsb());
-
-        private void exportProjectAll()
+        void saveProject() => Manager.AsyncLoading("Saving", () => Program.RunMainThread(() => proj.Save()));
+        void exportProject() => Manager.AsyncLoading("Exporting", () => proj.ExportToOsb());
+        void exportProjectAll()
         {
             Manager.AsyncLoading("Exporting", () =>
             {
                 var first = true;
-                foreach (var beatmap in project.MapsetManager.Beatmaps)
+                foreach (var beatmap in proj.MapsetManager.Beatmaps)
                 {
-                    Program.RunMainThread(() => project.MainBeatmap = beatmap);
+                    Program.RunMainThread(() => proj.MainBeatmap = beatmap);
 
-                    while (project.EffectsStatus != EffectStatus.Ready)
+                    while (proj.EffectsStatus != EffectStatus.Ready)
                     {
-                        switch (project.EffectsStatus)
+                        switch (proj.EffectsStatus)
                         {
                             case EffectStatus.CompilationFailed:
                             case EffectStatus.ExecutionFailed:
-                            case EffectStatus.LoadingFailed:
-                                throw new Exception($"An effect failed to execute ({project.EffectsStatus})\nCheck its log for the actual error.");
+                            case EffectStatus.LoadingFailed: throw new Exception($"An effect failed to execute ({proj.EffectsStatus})\nCheck its log for the actual error.");
                         }
                         Thread.Sleep(200);
                     }
 
-                    project.ExportToOsb(first);
+                    proj.ExportToOsb(first);
                     first = false;
                 }
             });
         }
-
         public override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -523,7 +467,6 @@ namespace StorybrewEditor.ScreenLayers
                 pendingSeek = null;
             }
         }
-
         public override void Update(bool isTop, bool isCovered)
         {
             base.Update(isTop, isCovered);
@@ -531,10 +474,10 @@ namespace StorybrewEditor.ScreenLayers
             timeSource.Update();
             var time = (float)(pendingSeek ?? timeSource.Current);
 
-            changeMapButton.Disabled = project.MapsetManager.BeatmapCount < 2;
-            playPauseButton.Icon = timeSource.Playing ? IconFont.Pause : IconFont.Play;
-            saveButton.Disabled = !project.Changed;
-            exportButton.Disabled = !project.MapsetPathIsValid;
+            mapB.Disabled = proj.MapsetManager.BeatmapCount < 2;
+            playB.Icon = timeSource.Playing ? IconFont.Pause : IconFont.Play;
+            saveB.Disabled = !proj.Changed;
+            exportB.Disabled = !proj.MapsetPathIsValid;
             audio.Volume = WidgetManager.Root.Opacity;
 
             if (timeSource.Playing)
@@ -551,7 +494,7 @@ namespace StorybrewEditor.ScreenLayers
             timeline.SetValueSilent(time);
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {
-                timeButton.Text = Manager.GetContext<Editor>().InputManager.Alt ?
+                timeB.Text = Manager.GetContext<Editor>().InputManager.Alt ?
                     $"{storyboardPosition.X:000}, {storyboardPosition.Y:000}" :
                     $"{(time < 0 ? "-" : "")}{(int)Math.Abs(time / 60):00}:{(int)Math.Abs(time % 60):00}:{(int)Math.Abs(time * 1000) % 1000:000}";
 
@@ -561,46 +504,41 @@ namespace StorybrewEditor.ScreenLayers
                 warningsLabel.Pack();
             }
 
-            if (timeSource.Playing && mainStoryboardDrawable.Time < time)
-                project.TriggerEvents(mainStoryboardDrawable.Time, time);
+            if (timeSource.Playing && storyboardDrawable.Time < time) proj.TriggerEvents(storyboardDrawable.Time, time);
 
-            mainStoryboardDrawable.Time = time;
-            mainStoryboardDrawable.Clip = !Manager.GetContext<Editor>().InputManager.Alt;
-            if (previewContainer.Visible)
-                previewDrawable.Time = timeline.GetValueForPosition(Manager.GetContext<Editor>().InputManager.MousePosition);
+            storyboardDrawable.Time = time;
+            storyboardDrawable.Clip = !Manager.GetContext<Editor>().InputManager.Alt;
+            if (previewContainer.Visible) previewDrawable.Time = timeline.GetValueForPosition(Manager.GetContext<Editor>().InputManager.MousePosition);
         }
-
-        private string buildWarningMessage()
+        string buildWarningMessage()
         {
             var warnings = "";
 
-            var activeSpriteCount = project.FrameStats.SpriteCount;
-            if (activeSpriteCount >= 1500)
-                warnings += $"⚠ {activeSpriteCount:n0} Sprites\n";
+            var activeSpriteCount = proj.FrameStats.SpriteCount;
+            if (activeSpriteCount > 0 && activeSpriteCount < 1500) warnings += $"{activeSpriteCount:n0} Sprites\n";
+            else if (activeSpriteCount >= 1500) warnings += $"⚠ {activeSpriteCount:n0} Sprites\n";
 
-            var commandCount = project.FrameStats.CommandCount;
-            if (commandCount >= 15000)
-                warnings += $"⚠ {commandCount:n0} Commands\n";
+            var commandCount = proj.FrameStats.CommandCount;
+            if (commandCount > 0 && commandCount < 15000) warnings += $"{commandCount:n0} Commands\n";
+            else if (commandCount >= 15000) warnings += $"⚠ {commandCount:n0} Commands\n";
 
-            var effectiveCommandCount = project.FrameStats.EffectiveCommandCount;
+            var effectiveCommandCount = proj.FrameStats.EffectiveCommandCount;
             var unusedCommandCount = commandCount - effectiveCommandCount;
-            var unusedCommandFactor = (float)unusedCommandCount / commandCount;
-            if ((unusedCommandCount >= 5000 && unusedCommandFactor > .5f) ||
-                (unusedCommandCount >= 10000 && unusedCommandFactor > .2f) ||
+            var unusedCommandFactor = (double)unusedCommandCount / commandCount;
+            if ((unusedCommandCount >= 5000 && unusedCommandFactor > .5) ||
+                (unusedCommandCount >= 10000 && unusedCommandFactor > .2) ||
                 unusedCommandCount >= 20000)
                 warnings += $"⚠ {unusedCommandCount:n0} ({unusedCommandFactor:0%}) Commands on Hidden Sprites\n";
 
-            if (project.FrameStats.OverlappedCommands)
-                warnings += $"⚠ Overlapped Commands\n";
-            if (project.FrameStats.IncompatibleCommands)
-                warnings += $"⚠ Incompatible Commands\n";
+            if (proj.FrameStats.OverlappedCommands) warnings += $"⚠ Overlapped Commands\n";
+            if (proj.FrameStats.IncompatibleCommands) warnings += $"⚠ Incompatible Commands\n";
 
-            if (project.FrameStats.ScreenFill > 5)
-                warnings += $"⚠ {project.FrameStats.ScreenFill:0}x Screen Fill\n";
+            var screenFill = proj.FrameStats.ScreenFill;
+            if (screenFill > 0 && screenFill < 5) warnings += $"{(int)screenFill}x Screen Fill\n";
+            else if (screenFill >= 5) warnings += $"⚠ {(int)screenFill}x Screen Fill\n";
 
             return warnings.TrimEnd('\n');
         }
-
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);
@@ -608,65 +546,56 @@ namespace StorybrewEditor.ScreenLayers
             bottomRightLayout.Pack(374);
             bottomLeftLayout.Pack(WidgetManager.Size.X - bottomRightLayout.Width);
 
-            settingsMenu.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
-            effectsList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
-            layersList.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
+            settings.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
+            effects.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
+            layers.Pack(bottomRightLayout.Width - 24, WidgetManager.Root.Height - bottomRightLayout.Height - 16);
 
-            effectConfigUi.Pack(bottomRightLayout.Width, WidgetManager.Root.Height - bottomLeftLayout.Height - 16);
+            effectUI.Pack(bottomRightLayout.Width, WidgetManager.Root.Height - bottomLeftLayout.Height - 16);
             resizeStoryboard();
         }
-
-        private void resizeStoryboard()
+        void resizeStoryboard()
         {
             var parentSize = WidgetManager.Size;
-            if (effectConfigUi.Displayed)
+            if (effectUI.Displayed)
             {
-                mainStoryboardContainer.Offset = new Vector2(effectConfigUi.Bounds.Right / 2, 0);
-                parentSize.X -= effectConfigUi.Bounds.Right;
+                storyboardContainer.Offset = new Vector2(effectUI.Bounds.Right / 2, 0);
+                parentSize.X -= effectUI.Bounds.Right;
             }
-            else mainStoryboardContainer.Offset = Vector2.Zero;
-            mainStoryboardContainer.Size = fitButton.Checked ? new Vector2(parentSize.X, (parentSize.X * 9) / 16) : parentSize;
+            else storyboardContainer.Offset = Vector2.Zero;
+            storyboardContainer.Size = fitB.Checked ? new Vector2(parentSize.X, parentSize.X * 9 / 16) : parentSize;
         }
-
-        private void resizeTimeline()
+        void resizeTimeline()
         {
-            timeline.MinValue = (float)Math.Min(0, project.StartTime * 0.001);
-            timeline.MaxValue = (float)Math.Max(audio.Duration, project.EndTime * 0.001);
+            timeline.MinValue = (float)Math.Min(0, proj.StartTime * 0.001);
+            timeline.MaxValue = (float)Math.Max(audio.Duration, proj.EndTime * 0.001);
         }
-
-        public override void Close()
+        public override void Close() => withSavePrompt(() =>
         {
-            withSavePrompt(() =>
+            proj.StopEffectUpdates();
+            Manager.AsyncLoading("Stopping effect updates", () =>
             {
-                project.StopEffectUpdates();
-                Manager.AsyncLoading("Stopping effect updates", () =>
-                {
-                    project.CancelEffectUpdates(true);
-                    Program.Schedule(() => Manager.GetContext<Editor>().Restart());
-                });
+                proj.CancelEffectUpdates(true);
+                Program.Schedule(() => Manager.GetContext<Editor>().Restart());
             });
-        }
-
-        private void withSavePrompt(Action action)
+        });
+        void withSavePrompt(Action action)
         {
-            if (project.Changed)
+            if (proj.Changed)
             {
                 Manager.ShowMessage("Do you wish to save the project?", () => Manager.AsyncLoading("Saving", () =>
                 {
-                    project.Save();
+                    proj.Save();
                     Program.Schedule(() => action());
                 }), action, true);
             }
             else action();
         }
-
-        private void refreshAudio()
+        void refreshAudio()
         {
-            audio = Program.AudioManager.LoadStream(project.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
+            audio = Program.AudioManager.LoadStream(proj.AudioPath, Manager.GetContext<Editor>().ResourceContainer);
             timeSource = new TimeSourceExtender(new AudioChannelTimeSource(audio));
         }
-
-        private void project_OnMapsetPathChanged(object sender, EventArgs e)
+        void project_OnMapsetPathChanged(object sender, EventArgs e)
         {
             var previousAudio = audio;
             var previousTimeSource = timeSource;
@@ -682,53 +611,48 @@ namespace StorybrewEditor.ScreenLayers
                 previousAudio.Dispose();
             }
         }
-
-        private void project_OnEffectsContentChanged(object sender, EventArgs e)
+        void project_OnEffectsContentChanged(object sender, EventArgs e) => resizeTimeline();
+        void project_OnEffectsStatusChanged(object sender, EventArgs e)
         {
-            resizeTimeline();
-        }
-
-        private void project_OnEffectsStatusChanged(object sender, EventArgs e)
-        {
-            switch (project.EffectsStatus)
+            switch (proj.EffectsStatus)
             {
                 case EffectStatus.ExecutionFailed:
                     statusIcon.Icon = IconFont.Bug;
-                    statusMessage.Text = "An effect failed to execute.\nClick the Effects tabs, then the bug icon to see its error message.";
+                    statusMessage.Text = "An effect failed to execute.\nClick the Effects tab and the bug icon to see the error message.";
                     statusLayout.Pack(1024 - bottomRightLayout.Width - 24);
                     statusLayout.Displayed = true;
                     break;
+
                 case EffectStatus.Updating:
                     statusIcon.Icon = IconFont.Spinner;
                     statusMessage.Text = "Updating effects...";
                     statusLayout.Pack(1024 - bottomRightLayout.Width - 24);
                     statusLayout.Displayed = true;
                     break;
-                default:
-                    statusLayout.Displayed = false;
-                    break;
+
+                default: statusLayout.Displayed = false; break;
             }
         }
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
+        bool disposed = false;
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (!disposedValue)
+            if (!disposed)
             {
                 if (disposing)
                 {
-                    project.OnEffectsContentChanged -= project_OnEffectsContentChanged;
-                    project.OnEffectsStatusChanged -= project_OnEffectsStatusChanged;
-                    project.Dispose();
+                    proj.OnEffectsContentChanged -= project_OnEffectsContentChanged;
+                    proj.OnEffectsStatusChanged -= project_OnEffectsStatusChanged;
+                    proj.Dispose();
                     audio.Dispose();
                 }
-                project = null;
+                proj = null;
                 audio = null;
                 timeSource = null;
-                disposedValue = true;
+                disposed = true;
             }
         }
 

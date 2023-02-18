@@ -7,13 +7,11 @@ namespace StorybrewEditor.ScreenLayers.Util
 {
     public class MessageBox : UiScreenLayer
     {
-        private readonly string message;
-        private LinearLayout mainLayout;
-        private LinearLayout buttonsLayout;
+        readonly string message;
+        LinearLayout mainLayout, buttonsLayout;
 
-        private readonly Action yesAction;
-        private readonly Action noAction;
-        private readonly bool cancelable;
+        readonly Action yesAction, noAction;
+        readonly bool cancelable;
 
         public override bool IsPopup => true;
 
@@ -43,23 +41,22 @@ namespace StorybrewEditor.ScreenLayers.Util
                     new ScrollArea(WidgetManager, new Label(WidgetManager)
                     {
                         Text = message,
-                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre
                     })
                     {
-                        ScrollsHorizontally = true,
+                        ScrollsHorizontally = true
                     },
                     buttonsLayout = new LinearLayout(WidgetManager)
                     {
                         Horizontal = true,
-                        AnchorFrom = BoxAlignment.Centre,
-                    },
-                },
+                        AnchorFrom = BoxAlignment.Centre
+                    }
+                }
             });
-
             var yesButton = new Button(WidgetManager)
             {
                 Text = noAction != null ? "Yes" : "Ok",
-                AnchorFrom = BoxAlignment.Centre,
+                AnchorFrom = BoxAlignment.Centre
             };
             yesButton.OnClick += (sender, e) =>
             {
@@ -73,7 +70,7 @@ namespace StorybrewEditor.ScreenLayers.Util
                 var noButton = new Button(WidgetManager)
                 {
                     Text = "No",
-                    AnchorFrom = BoxAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre
                 };
                 noButton.OnClick += (sender, e) =>
                 {
@@ -82,19 +79,17 @@ namespace StorybrewEditor.ScreenLayers.Util
                 };
                 buttonsLayout.Add(noButton);
             }
-
             if (cancelable)
             {
                 var cancelButton = new Button(WidgetManager)
                 {
                     Text = "Cancel",
-                    AnchorFrom = BoxAlignment.Centre,
+                    AnchorFrom = BoxAlignment.Centre
                 };
                 cancelButton.OnClick += (sender, e) => Exit();
                 buttonsLayout.Add(cancelButton);
             }
         }
-
         public override bool OnKeyDown(KeyboardKeyEventArgs e)
         {
             if (!e.IsRepeat)
@@ -112,7 +107,6 @@ namespace StorybrewEditor.ScreenLayers.Util
             }
             return base.OnKeyDown(e);
         }
-
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);

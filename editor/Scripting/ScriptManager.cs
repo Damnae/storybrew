@@ -13,32 +13,27 @@ using System.Xml;
 
 namespace StorybrewEditor.Scripting
 {
-    public class ScriptManager<TScript> : IDisposable
-        where TScript : Script
+    public class ScriptManager<TScript> : IDisposable where TScript : Script
     {
-        private readonly ResourceContainer resourceContainer;
-        private readonly string scriptsNamespace;
-        private readonly string commonScriptsPath;
-        private readonly string scriptsLibraryPath;
-        private readonly string compiledScriptsPath;
+        readonly ResourceContainer resourceContainer;
+        readonly string scriptsNamespace, commonScriptsPath, scriptsLibraryPath, compiledScriptsPath;
 
-        private List<string> referencedAssemblies = new List<string>();
+        List<string> referencedAssemblies = new List<string>();
         public IEnumerable<string> ReferencedAssemblies
         {
-            get { return referencedAssemblies; }
+            get => referencedAssemblies;
             set
             {
                 referencedAssemblies = new List<string>(value);
-                foreach (var scriptContainer in scriptContainers.Values)
-                    scriptContainer.ReferencedAssemblies = referencedAssemblies;
+                foreach (var scriptContainer in scriptContainers.Values) scriptContainer.ReferencedAssemblies = referencedAssemblies;
                 updateSolutionFiles();
             }
         }
 
-        private FileSystemWatcher scriptWatcher;
-        private readonly FileSystemWatcher libraryWatcher;
-        private ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
-        private Dictionary<string, ScriptContainer<TScript>> scriptContainers = new Dictionary<string, ScriptContainer<TScript>>();
+        FileSystemWatcher scriptWatcher;
+        readonly FileSystemWatcher libraryWatcher;
+        ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
+        Dictionary<string, ScriptContainer<TScript>> scriptContainers = new Dictionary<string, ScriptContainer<TScript>>();
 
         public string ScriptsPath { get; }
 
@@ -53,12 +48,13 @@ namespace StorybrewEditor.Scripting
 
             ReferencedAssemblies = referencedAssemblies;
 
-            scriptWatcher = new FileSystemWatcher()
+            scriptWatcher = new FileSystemWatcher
             {
                 Filter = "*.cs",
                 Path = scriptsSourcePath,
-                IncludeSubdirectories = false,
+                IncludeSubdirectories = false
             };
+
             scriptWatcher.Created += scriptWatcher_Changed;
             scriptWatcher.Changed += scriptWatcher_Changed;
             scriptWatcher.Renamed += scriptWatcher_Changed;
@@ -67,12 +63,13 @@ namespace StorybrewEditor.Scripting
             scriptWatcher.EnableRaisingEvents = true;
             Trace.WriteLine($"Watching (script): {scriptsSourcePath}");
 
-            libraryWatcher = new FileSystemWatcher()
+            libraryWatcher = new FileSystemWatcher
             {
                 Filter = "*.cs",
                 Path = scriptsLibraryPath,
-                IncludeSubdirectories = true,
+                IncludeSubdirectories = true
             };
+
             libraryWatcher.Created += libraryWatcher_Changed;
             libraryWatcher.Changed += libraryWatcher_Changed;
             libraryWatcher.Renamed += libraryWatcher_Changed;
@@ -85,9 +82,7 @@ namespace StorybrewEditor.Scripting
         public ScriptContainer<TScript> Get(string scriptName)
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(ScriptManager<TScript>));
-
-            if (scriptContainers.TryGetValue(scriptName, out ScriptContainer<TScript> scriptContainer))
-                return scriptContainer;
+            if (scriptContainers.TryGetValue(scriptName, out ScriptContainer<TScript> scriptContainer)) return scriptContainer;
 
             var scriptTypeName = $"{scriptsNamespace}.{scriptName}";
             var sourcePath = Path.Combine(ScriptsPath, $"{scriptName}.cs");
@@ -103,65 +98,51 @@ namespace StorybrewEditor.Scripting
             }
 
             scriptContainer = new ScriptContainerAppDomain<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
-            //scriptContainer = new ScriptContainerProcess<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             scriptContainers.Add(scriptName, scriptContainer);
             return scriptContainer;
         }
-
         public IEnumerable<string> GetScriptNames()
         {
             var projectScriptNames = new List<string>();
-            foreach (var scriptPath in Directory.GetFiles(ScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
+            foreach (var scriptPath in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
             {
                 var name = Path.GetFileNameWithoutExtension(scriptPath);
                 projectScriptNames.Add(name);
                 yield return name;
             }
-            foreach (var scriptPath in Directory.GetFiles(commonScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
+            foreach (var scriptPath in Directory.EnumerateFiles(commonScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
             {
                 var name = Path.GetFileNameWithoutExtension(scriptPath);
-                if (!projectScriptNames.Contains(name))
-                    yield return name;
+                if (!projectScriptNames.Contains(name)) yield return name;
             }
         }
-
-        private void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
+        void scriptWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var change = e.ChangeType.ToString().ToLowerInvariant();
             Trace.WriteLine($"Watched script file {change}: {e.FullPath}");
 
-            if (e.ChangeType != WatcherChangeTypes.Changed && e.ChangeType != WatcherChangeTypes.Renamed)
-                scheduleSolutionUpdate();
+            if (e.ChangeType != WatcherChangeTypes.Changed) scheduleSolutionUpdate();
+            if (e.ChangeType != WatcherChangeTypes.Deleted) scheduler?.Schedule(e.FullPath, key =>
+            {
+                if (disposedValue) return;
+                var scriptName = Path.GetFileNameWithoutExtension(e.Name);
 
-            if (e.ChangeType != WatcherChangeTypes.Deleted)
-                scheduler?.Schedule(e.FullPath, key =>
-                {
-                    if (disposedValue) return;
-                    var scriptName = Path.GetFileNameWithoutExtension(e.Name);
-
-                    if (scriptContainers.TryGetValue(scriptName, out ScriptContainer<TScript> container))
-                        container.ReloadScript();
-                });
+                if (scriptContainers.TryGetValue(scriptName, out ScriptContainer<TScript> container)) container.ReloadScript();
+            });
         }
-
-        private void libraryWatcher_Changed(object sender, FileSystemEventArgs e)
+        void libraryWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var change = e.ChangeType.ToString().ToLowerInvariant();
             Trace.WriteLine($"Watched library file {change}: {e.FullPath}");
 
-            if (e.ChangeType != WatcherChangeTypes.Changed)
-                scheduleSolutionUpdate();
-
-            if (e.ChangeType != WatcherChangeTypes.Deleted)
-                scheduler?.Schedule(e.FullPath, key =>
-                {
-                    if (disposedValue) return;
-                    foreach (var container in scriptContainers.Values)
-                        container.ReloadScript();
-                });
+            if (e.ChangeType != WatcherChangeTypes.Changed) scheduleSolutionUpdate();
+            if (e.ChangeType != WatcherChangeTypes.Deleted) scheduler?.Schedule(e.FullPath, key =>
+            {
+                if (disposedValue) return;
+                foreach (var container in scriptContainers.Values) container.ReloadScript();
+            });
         }
-
-        private void scheduleSolutionUpdate()
+        void scheduleSolutionUpdate()
         {
             scheduler?.Schedule($"*{nameof(updateSolutionFiles)}", key =>
             {
@@ -169,24 +150,15 @@ namespace StorybrewEditor.Scripting
                 updateSolutionFiles();
             });
         }
-
-        private void updateSolutionFiles()
+        void updateSolutionFiles()
         {
             Trace.WriteLine($"Updating solution files");
 
             var slnPath = Path.Combine(ScriptsPath, "storyboard.sln");
             File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative));
 
-            var vsCodePath = Path.Combine(ScriptsPath, ".vscode");
-            if (!Directory.Exists(vsCodePath))
-                Directory.CreateDirectory(vsCodePath);
-
-            var vsCodeSettingsPath = Path.Combine(vsCodePath, "settings.json");
-            if (!File.Exists(vsCodeSettingsPath))
-                File.WriteAllBytes(vsCodeSettingsPath, resourceContainer.GetBytes("project/vscode_settings.json", ResourceSource.Embedded | ResourceSource.Relative));
-
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
-            var document = new XmlDocument() { PreserveWhitespace = false, };
+            var document = new XmlDocument { PreserveWhitespace = false };
             try
             {
                 using (var stream = resourceContainer.GetStream("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative))
@@ -228,7 +200,7 @@ namespace StorybrewEditor.Scripting
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
+        bool disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -237,8 +209,7 @@ namespace StorybrewEditor.Scripting
                 {
                     scriptWatcher.Dispose();
                     libraryWatcher.Dispose();
-                    foreach (var entry in scriptContainers)
-                        entry.Value.Dispose();
+                    foreach (var entry in scriptContainers) entry.Value.Dispose();
                 }
                 scheduler = null;
                 scriptWatcher = null;
@@ -247,11 +218,7 @@ namespace StorybrewEditor.Scripting
                 disposedValue = true;
             }
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+        public void Dispose() => Dispose(true);
 
         #endregion
     }

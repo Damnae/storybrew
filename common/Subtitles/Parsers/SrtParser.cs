@@ -1,15 +1,17 @@
-﻿using System;
+﻿using BrewLib.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace StorybrewCommon.Subtitles.Parsers
 {
+#pragma warning disable CS1591
     public class SrtParser
     {
         public SubtitleSet Parse(string path)
         {
-            using (var stream = BrewLib.Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            using (var stream = Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 return Parse(stream);
         }
 
@@ -27,8 +29,7 @@ namespace StorybrewCommon.Subtitles.Parsers
             }
             return new SubtitleSet(lines);
         }
-
-        private IEnumerable<string> parseBlocks(Stream stream)
+        IEnumerable<string> parseBlocks(Stream stream)
         {
             using (var reader = new StreamReader(stream))
             {
@@ -51,7 +52,6 @@ namespace StorybrewCommon.Subtitles.Parsers
             }
         }
 
-        private double parseTimestamp(string timestamp)
-            => TimeSpan.Parse(timestamp.Replace(',', '.')).TotalMilliseconds;
+        double parseTimestamp(string timestamp) => TimeSpan.Parse(timestamp.Replace(',', '.')).TotalMilliseconds;
     }
 }

@@ -6,15 +6,15 @@ using System.Diagnostics;
 
 namespace StorybrewCommon.Storyboarding.Display
 {
-    public class AnimatedValue<TValue>
-        where TValue : CommandValue
+#pragma warning disable CS1591
+    public class AnimatedValue<TValue> where TValue : CommandValue
     {
         public TValue DefaultValue;
 
-        private readonly List<ITypedCommand<TValue>> commands = new List<ITypedCommand<TValue>>();
+        readonly List<ITypedCommand<TValue>> commands = new List<ITypedCommand<TValue>>();
         public IEnumerable<ITypedCommand<TValue>> Commands => commands;
-        public bool HasCommands => commands.Count > 0;
 
+        public bool HasCommands => commands.Count > 0;
         public bool HasOverlap { get; private set; }
 
         public double StartTime => commands.Count > 0 ? commands[0].StartTime : 0;
@@ -23,28 +23,20 @@ namespace StorybrewCommon.Storyboarding.Display
         public TValue StartValue => commands.Count > 0 ? commands[0].StartValue : DefaultValue;
         public TValue EndValue => commands.Count > 0 ? commands[commands.Count - 1].EndValue : DefaultValue;
 
-        public AnimatedValue()
-        {
-        }
-
-        public AnimatedValue(TValue defaultValue)
-        {
-            DefaultValue = defaultValue;
-        }
+        public AnimatedValue() { }
+        public AnimatedValue(TValue defaultValue) => DefaultValue = defaultValue;
 
         public void Add(ITypedCommand<TValue> command)
         {
             var triggerable = command as TriggerDecorator<TValue>;
             if (triggerable == null)
             {
-                if (command.EndTime < command.StartTime)
-                    Debug.Print($"'{command}' ends before it starts");
+                if (command.EndTime < command.StartTime) Debug.Print($"'{command}' ends before it starts");
 
                 findCommandIndex(command.StartTime, out int index);
                 while (index < commands.Count)
                 {
-                    if (commands[index].CompareTo(command) < 0)
-                        index++;
+                    if (commands[index].CompareTo(command) < 0) index++;
                     else break;
                 }
 
@@ -56,28 +48,21 @@ namespace StorybrewCommon.Storyboarding.Display
             }
             else triggerable.OnStateChanged += triggerable_OnStateChanged;
         }
-
         public void Remove(ITypedCommand<TValue> command)
         {
             var triggerable = command as TriggerDecorator<TValue>;
-            if (triggerable == null)
-                commands.Remove(command);
+            if (triggerable == null) commands.Remove(command);
             else triggerable.OnStateChanged -= triggerable_OnStateChanged;
         }
 
-        public bool IsActive(double time)
-            => commands.Count > 0 && StartTime <= time && time <= EndTime;
-
+        public bool IsActive(double time) => commands.Count > 0 && StartTime <= time && time <= EndTime;
         public TValue ValueAtTime(double time)
         {
             if (commands.Count == 0) return DefaultValue;
 
-            if (!findCommandIndex(time, out int index) && index > 0)
-                index--;
+            if (!findCommandIndex(time, out int index) && index > 0) index--;
 
-            if (HasOverlap)
-                for (var i = 0; i < index; i++)
-                    if (time < commands[i].EndTime)
+            if (HasOverlap) for (var i = 0; i < index; i++) if (time < commands[i].EndTime)
                     {
                         index = i;
                         break;
@@ -86,8 +71,7 @@ namespace StorybrewCommon.Storyboarding.Display
             var command = commands[index];
             return command.ValueAtTime(time);
         }
-
-        private bool findCommandIndex(double time, out int index)
+        bool findCommandIndex(double time, out int index)
         {
             var left = 0;
             var right = commands.Count - 1;
@@ -95,17 +79,14 @@ namespace StorybrewCommon.Storyboarding.Display
             {
                 index = left + ((right - left) >> 1);
                 var commandTime = commands[index].StartTime;
-                if (commandTime == time)
-                    return true;
-                else if (commandTime < time)
-                    left = index + 1;
+                if (commandTime == time) return true;
+                else if (commandTime < time) left = index + 1;
                 else right = index - 1;
             }
             index = left;
             return false;
         }
-
-        private void triggerable_OnStateChanged(object sender, EventArgs e)
+        void triggerable_OnStateChanged(object sender, EventArgs e)
         {
             var command = (ITypedCommand<TValue>)sender;
 

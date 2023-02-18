@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 namespace StorybrewEditor.Scripting
 {
-    public interface ScriptContainer<TScript> : IDisposable
-        where TScript : Script
+    public interface ScriptContainer<TScript> : IDisposable where TScript : Script
     {
         string Name { get; }
         string ScriptTypeName { get; }

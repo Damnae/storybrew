@@ -2,22 +2,19 @@
 
 namespace StorybrewCommon.Mapset
 {
-    [Serializable]
-    public class OsuBreak
+#pragma warning disable CS1591
+    [Serializable] public class OsuBreak
     {
-        public double StartTime;
-        public double EndTime;
+        public double StartTime, EndTime;
 
-        public override string ToString()
-            => $"Break from {StartTime}ms to {EndTime}ms";
-
-        public static OsuBreak Parse(Beatmap beatmap, string line)
+        public override string ToString() => $"Break from {StartTime}ms to {EndTime}ms";
+        public static OsuBreak Parse(string line)
         {
             var values = line.Split(',');
-            return new OsuBreak()
+            return new OsuBreak
             {
                 StartTime = int.Parse(values[1]),
-                EndTime = int.Parse(values[2]),
+                EndTime = int.Parse(values[2])
             };
         }
     }

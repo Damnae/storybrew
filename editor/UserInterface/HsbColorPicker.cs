@@ -1,34 +1,31 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using BrewLib.Graphics;
+﻿using BrewLib.Graphics;
 using BrewLib.Graphics.Drawables;
+using BrewLib.UserInterface;
+using BrewLib.UserInterface.Skinning.Styles;
+using BrewLib.Util;
+using OpenTK;
+using OpenTK.Graphics;
 using StorybrewEditor.UserInterface.Skinning.Styles;
 using System;
 using System.Drawing;
-using BrewLib.Util;
-using BrewLib.UserInterface;
-using BrewLib.UserInterface.Skinning.Styles;
 
 namespace StorybrewEditor.UserInterface
 {
     public class HsbColorPicker : Widget, Field
     {
-        private Sprite previewSprite;
-        private readonly LinearLayout layout;
-        private readonly Slider hueSlider;
-        private readonly Slider saturationSlider;
-        private readonly Slider brightnessSlider;
-        private readonly Slider alphaSlider;
-        private readonly Textbox htmlTextbox;
+        Sprite previewSprite;
+        readonly LinearLayout layout;
+        readonly Slider hueSlider, saturationSlider, brightnessSlider, alphaSlider;
+        readonly Textbox htmlTextbox;
 
         public override Vector2 MinSize => new Vector2(layout.MinSize.X, layout.MinSize.Y + previewHeight);
         public override Vector2 MaxSize => Vector2.Zero;
         public override Vector2 PreferredSize => new Vector2(layout.PreferredSize.X, layout.PreferredSize.Y + previewHeight);
 
-        private Color4 value;
+        Color4 value;
         public Color4 Value
         {
-            get { return value; }
+            get => value;
             set
             {
                 if (this.value == value) return;
@@ -38,17 +35,16 @@ namespace StorybrewEditor.UserInterface
                 OnValueChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-
         public object FieldValue
         {
-            get { return Value; }
-            set { Value = (Color4)value; }
+            get => Value;
+            set => Value = (Color4)value;
         }
 
-        private float previewHeight = 24;
+        float previewHeight = 24;
         public float PreviewHeight
         {
-            get { return previewHeight; }
+            get => previewHeight;
             set
             {
                 previewHeight = value;
@@ -56,15 +52,14 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        public event EventHandler OnValueChanged;
-        public event EventHandler OnValueCommited;
+        public event EventHandler OnValueChanged, OnValueCommited;
 
         public HsbColorPicker(WidgetManager manager) : base(manager)
         {
-            previewSprite = new Sprite()
+            previewSprite = new Sprite
             {
                 Texture = DrawState.WhitePixel,
-                ScaleMode = ScaleMode.Fill,
+                ScaleMode = ScaleMode.Fill
             };
             Add(layout = new LinearLayout(manager)
             {
@@ -82,7 +77,7 @@ namespace StorybrewEditor.UserInterface
                         StyleName = "small",
                         MinValue = 0,
                         MaxValue = 1,
-                        Value = 0,
+                        Value = 0
                     },
                     new Label(manager)
                     {
@@ -94,7 +89,7 @@ namespace StorybrewEditor.UserInterface
                         StyleName = "small",
                         MinValue = 0,
                         MaxValue = 1,
-                        Value = 0.7f,
+                        Value = 0.7f
                     },
                     new Label(manager)
                     {
@@ -106,7 +101,7 @@ namespace StorybrewEditor.UserInterface
                         StyleName = "small",
                         MinValue = 0,
                         MaxValue = 1,
-                        Value = 1,
+                        Value = 1
                     },
                     new Label(manager)
                     {
@@ -118,13 +113,13 @@ namespace StorybrewEditor.UserInterface
                         StyleName = "small",
                         MinValue = 0,
                         MaxValue = 1,
-                        Value = 1,
+                        Value = 1
                     },
                     htmlTextbox = new Textbox(manager)
                     {
-                        EnterCommits = true,
-                    },
-                },
+                        EnterCommits = true
+                    }
+                }
             });
             updateWidgets();
 
@@ -140,17 +135,15 @@ namespace StorybrewEditor.UserInterface
             htmlTextbox.OnValueCommited += htmlTextbox_OnValueCommited;
         }
 
-        private void slider_OnValueChanged(object sender, EventArgs e)
-            => Value = Color4.FromHsv(new Vector4(hueSlider.Value % 1f, saturationSlider.Value, brightnessSlider.Value, alphaSlider.Value));
+        void slider_OnValueChanged(object sender, EventArgs e) => Value = Color4.FromHsv(new Vector4(
+            hueSlider.Value % 1f, saturationSlider.Value, brightnessSlider.Value, alphaSlider.Value));
 
-        private void slider_OnValueCommited(object sender, EventArgs e)
-            => OnValueCommited?.Invoke(this, EventArgs.Empty);
+        void slider_OnValueCommited(object sender, EventArgs e) => OnValueCommited?.Invoke(this, EventArgs.Empty);
 
-        private void htmlTextbox_OnValueCommited(object sender, EventArgs e)
+        void htmlTextbox_OnValueCommited(object sender, EventArgs e)
         {
             var htmlColor = htmlTextbox.Value.Trim();
-            if (!htmlColor.StartsWith("#"))
-                htmlColor = "#" + htmlColor;
+            if (!htmlColor.StartsWith("#")) htmlColor = "#" + htmlColor;
 
             Color color;
             try
@@ -165,8 +158,7 @@ namespace StorybrewEditor.UserInterface
             Value = new Color4(color.R / 255f, color.G / 255f, color.B / 255f, alphaSlider.Value);
             OnValueCommited?.Invoke(this, EventArgs.Empty);
         }
-
-        private void updateWidgets()
+        void updateWidgets()
         {
             previewSprite.Color = value;
 
@@ -214,7 +206,6 @@ namespace StorybrewEditor.UserInterface
             base.ApplyStyle(style);
             var textboxStyle = (ColorPickerStyle)style;
         }
-
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)
         {
             base.DrawBackground(drawContext, actualOpacity);
@@ -222,17 +213,12 @@ namespace StorybrewEditor.UserInterface
             var bounds = Bounds;
             previewSprite.Draw(drawContext, Manager.Camera, new Box2(bounds.Left, bounds.Top, bounds.Right, bounds.Top + previewHeight), actualOpacity);
         }
-
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                previewSprite.Dispose();
-            }
+            if (disposing) previewSprite.Dispose();
             previewSprite = null;
             base.Dispose(disposing);
         }
-
         protected override void Layout()
         {
             base.Layout();

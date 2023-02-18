@@ -4,16 +4,20 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Curves
 {
-    [Serializable]
-    public class CircleCurve : BaseCurve
+    ///<summary> Represents a perfect circular curve. </summary>
+    [Serializable] public class CircleCurve : BaseCurve
     {
-        private Vector2 startPoint;
-        private Vector2 midPoint;
-        private Vector2 endPoint;
+        Vector2 startPoint;
+        Vector2 midPoint;
+        Vector2 endPoint;
 
+        ///<inheritdoc/>
         public override Vector2 StartPosition => startPoint;
+
+        ///<inheritdoc/>
         public override Vector2 EndPosition => endPoint;
 
+        ///<summary> Constructs a perfect circular curve from given control points. </summary>
         public CircleCurve(Vector2 startPoint, Vector2 midPoint, Vector2 endPoint)
         {
             this.startPoint = startPoint;
@@ -21,10 +25,11 @@ namespace StorybrewCommon.Curves
             this.endPoint = endPoint;
         }
 
+        ///<summary/>
         protected override void Initialize(List<ValueTuple<float, Vector2>> distancePosition, out double length)
         {
             var d = 2 * (startPoint.X * (midPoint.Y - endPoint.Y) + midPoint.X * (endPoint.Y - startPoint.Y) + endPoint.X * (startPoint.Y - midPoint.Y));
-            if (d == 0) throw new Exception("Invalid circle curve");
+            if (d == 0) throw new ArgumentException("Invalid circle curve");
 
             var startPointLS = startPoint.LengthSquared;
             var midPointLS = midPoint.LengthSquared;
@@ -45,9 +50,9 @@ namespace StorybrewCommon.Curves
             if (midAngle > endAngle) endAngle -= 2 * Math.PI;
 
             length = Math.Abs((endAngle - startAngle) * radius);
-            var precision = (int)(length * 0.125f);
+            var precision = (int)(length / 8);
 
-            for (int i = 1; i < precision; i++)
+            for (var i = 1; i < precision; i++)
             {
                 var progress = (double)i / precision;
                 var angle = endAngle * progress + startAngle * (1 - progress);
@@ -58,9 +63,9 @@ namespace StorybrewCommon.Curves
             distancePosition.Add(new ValueTuple<float, Vector2>((float)length, endPoint));
         }
 
+        ///<summary> Returns whether or not the curve is a valid circle curve based on given control points. </summary>
         public static bool IsValid(Vector2 startPoint, Vector2 midPoint, Vector2 endPoint)
-            => startPoint != midPoint
-            && midPoint != endPoint
+            => startPoint != midPoint && midPoint != endPoint
             && 2 * (startPoint.X * (midPoint.Y - endPoint.Y) + midPoint.X * (endPoint.Y - startPoint.Y) + endPoint.X * (startPoint.Y - midPoint.Y)) != 0;
     }
 }

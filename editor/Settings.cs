@@ -19,11 +19,11 @@ namespace StorybrewEditor
         public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
         public readonly Setting<bool> ShowStats = new Setting<bool>(false);
         public readonly Setting<bool> VerboseVsCode = new Setting<bool>(false);
-        public readonly Setting<bool> UseRoslyn = new Setting<bool>(true);
+        public readonly Setting<bool> UseRoslyn = new Setting<bool>(false);
         public readonly Setting<int> EffectThreads = new Setting<int>(0);
         public readonly Setting<string> TimeCopyFormat = new Setting<string>(@"h\:mm\:ss\.ff");
 
-        private readonly string path;
+        readonly string path;
 
         public Settings(string path = DefaultPath)
         {
@@ -65,7 +65,6 @@ namespace StorybrewEditor
                 Save();
             }
         }
-
         public void Save()
         {
             Trace.WriteLine($"Saving settings at '{path}'");
@@ -85,22 +84,16 @@ namespace StorybrewEditor
             }
         }
     }
-
     public interface Setting
     {
         void Set(object value);
     }
-
     public class Setting<T> : Setting
     {
-        private T value;
-
+        T value;
         public event EventHandler OnValueChanged;
 
-        public Setting(T defaultValue)
-        {
-            value = defaultValue;
-        }
+        public Setting(T defaultValue) => value = defaultValue;
 
         public void Set(T value)
         {
@@ -127,9 +120,7 @@ namespace StorybrewEditor
 
         public override string ToString()
         {
-            if (typeof(T).GetInterface(nameof(IConvertible)) != null)
-                return Convert.ToString(value, CultureInfo.InvariantCulture);
-
+            if (typeof(T).GetInterface(nameof(IConvertible)) != null) return Convert.ToString(value, CultureInfo.InvariantCulture);
             return value.ToString();
         }
     }

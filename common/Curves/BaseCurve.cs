@@ -4,15 +4,20 @@ using System.Collections.Generic;
 
 namespace StorybrewCommon.Curves
 {
-    [Serializable]
-    public abstract class BaseCurve : Curve
+    ///<summary> Represents a base curve. </summary>
+    [Serializable] public abstract class BaseCurve : Curve
     {
+        ///<inheritdoc/>
         public abstract Vector2 EndPosition { get; }
+
+        ///<inheritdoc/>
         public abstract Vector2 StartPosition { get; }
 
-        private List<ValueTuple<float, Vector2>> distancePosition;
+        List<ValueTuple<float, Vector2>> distancePosition;
 
-        private double length;
+        double length;
+
+        ///<inheritdoc/>
         public double Length
         {
             get
@@ -22,19 +27,21 @@ namespace StorybrewCommon.Curves
             }
         }
 
-        private void initialize()
+        void initialize()
         {
             distancePosition = new List<ValueTuple<float, Vector2>>();
             Initialize(distancePosition, out length);
         }
 
+        ///<summary/>
         protected abstract void Initialize(List<ValueTuple<float, Vector2>> distancePosition, out double length);
 
+        ///<inheritdoc/>
         public Vector2 PositionAtDistance(double distance)
         {
             if (distancePosition == null) initialize();
 
-            var previousDistance = 0.0f;
+            var previousDistance = 0f;
             var previousPosition = StartPosition;
 
             var nextDistance = length;
@@ -64,7 +71,7 @@ namespace StorybrewCommon.Curves
             return previousPosition + previousToNext * (float)delta;
         }
 
-        public Vector2 PositionAtDelta(double delta)
-            => PositionAtDistance(delta * Length);
+        ///<inheritdoc/>
+        public Vector2 PositionAtDelta(double delta) => PositionAtDistance(delta * Length);
     }
 }

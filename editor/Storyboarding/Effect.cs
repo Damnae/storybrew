@@ -7,21 +7,20 @@ namespace StorybrewEditor.Storyboarding
 {
     public abstract class Effect : IDisposable
     {
-        private List<EditorStoryboardLayer> layers;
-        private EditorStoryboardLayer placeHolderLayer;
+        List<EditorStoryboardLayer> layers;
+        EditorStoryboardLayer placeHolderLayer;
 
         public Project Project { get; }
 
         public Guid Guid { get; set; } = Guid.NewGuid();
 
-        private string name = "Unnamed Effect";
+        string name = "Unnamed Effect";
         public string Name
         {
             get => name;
             set
             {
-                if (name == value)
-                    return;
+                if (name == value) return;
 
                 name = value;
                 RaiseChanged();
@@ -42,16 +41,14 @@ namespace StorybrewEditor.Storyboarding
         public double EndTime => layers.Select(l => l.EndTime).DefaultIfEmpty().Max();
         public bool Highlight;
 
-        public int EstimatedSize { get; private set; }
+        public int EstimatedSize { get; set; }
 
         public event EventHandler OnChanged;
-        protected void RaiseChanged()
-            => OnChanged?.Invoke(this, EventArgs.Empty);
+        protected void RaiseChanged() => OnChanged?.Invoke(this, EventArgs.Empty);
 
         public EffectConfig Config = new EffectConfig();
         public event EventHandler OnConfigFieldsChanged;
-        protected void RaiseConfigFieldsChanged()
-            => OnConfigFieldsChanged?.Invoke(this, EventArgs.Empty);
+        protected void RaiseConfigFieldsChanged() => OnConfigFieldsChanged?.Invoke(this, EventArgs.Empty);
 
         public Effect(Project project)
         {
@@ -65,9 +62,7 @@ namespace StorybrewEditor.Storyboarding
             Project.LayerManager.Add(placeHolderLayer);
         }
 
-        /// <summary>
-        /// Used at load time to let the effect know about placeholder layers it should use.
-        /// </summary>
+        ///<summary> Used at load time to let the effect know about placeholder layers it should use. </summary>
         public void AddPlaceholder(EditorStoryboardLayer layer)
         {
             if (placeHolderLayer != null)
@@ -81,7 +76,6 @@ namespace StorybrewEditor.Storyboarding
 
             Project.LayerManager.Add(layer);
         }
-
         protected void UpdateLayers(List<EditorStoryboardLayer> newLayers)
         {
             if (placeHolderLayer != null)
@@ -95,72 +89,47 @@ namespace StorybrewEditor.Storyboarding
             refreshEstimatedSize();
         }
 
-        /// <summary>
-        /// Queues an Update call
-        /// </summary>
+        ///<summary> Queues an update call. </summary>
         public void Refresh()
         {
-            if (Project.IsDisposed) return;
+            if (Project.Disposed) return;
             Project.QueueEffectUpdate(this);
         }
 
-        /// <summary>
-        /// Should only be called by Project.QueueEffectUpdate(Effect).
-        /// Doesn't run on the main thread.
-        /// </summary>
+        ///<summary> Should only be called by <see cref="Project.QueueEffectUpdate(Effect)"/>. Doesn't run on the main thread. </summary>
         public abstract void Update();
 
-        private void refreshLayerNames()
+        void refreshLayerNames()
         {
-            foreach (var layer in layers)
-                layer.Name = string.IsNullOrWhiteSpace(layer.Identifier) ? $"{name}" : $"{name} ({layer.Identifier})";
+            foreach (var layer in layers.ToArray()) layer._Name = string.IsNullOrWhiteSpace(layer.Name) ? $"{name}" : $"{name} ({layer.Name})";
         }
-
-        private void refreshEstimatedSize()
+        void refreshEstimatedSize()
         {
             EstimatedSize = 0;
-            foreach (var layer in layers)
-                EstimatedSize += layer.EstimatedSize;
+            foreach (var layer in layers.ToArray()) EstimatedSize += layer.EstimatedSize;
             RaiseChanged();
         }
 
         #region IDisposable Support
 
-        public bool IsDisposed { get; private set; } = false;
-
+        public bool Disposed { get; set; } = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (!IsDisposed)
+            if (!Disposed)
             {
-                if (disposing)
-                {
-                    foreach (var layer in layers)
-                        Project.LayerManager.Remove(layer);
-                }
+                if (disposing) foreach (var layer in layers.ToArray()) Project.LayerManager.Remove(layer);
                 layers = null;
                 OnChanged = null;
-                IsDisposed = true;
+                Disposed = true;
             }
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+        public void Dispose() => Dispose(true);
 
         #endregion
     }
-
     public enum EffectStatus
     {
-        Initializing,
-        Loading,
-        Configuring,
-        Updating,
-        ReloadPending,
-        Ready,
-        CompilationFailed,
-        LoadingFailed,
-        ExecutionFailed,
+        Initializing, Loading, Configuring, Updating, ReloadPending, Ready,
+        CompilationFailed, LoadingFailed, ExecutionFailed
     }
 }

@@ -1,45 +1,33 @@
-﻿using System.IO;
-using StorybrewCommon.Storyboarding.CommandValues;
+﻿using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
+using System.IO;
 
 namespace StorybrewCommon.Storyboarding
 {
+#pragma warning disable CS1591
     public class OsbWriterFactory
     {
-        public static OsbSpriteWriter CreateWriter(OsbSprite osbSprite, AnimatedValue<CommandPosition> moveTimeline,
-                                                                        AnimatedValue<CommandDecimal> moveXTimeline,
-                                                                        AnimatedValue<CommandDecimal> moveYTimeline,
-                                                                        AnimatedValue<CommandDecimal> scaleTimeline,
-                                                                        AnimatedValue<CommandScale> scaleVecTimeline,
-                                                                        AnimatedValue<CommandDecimal> rotateTimeline,
-                                                                        AnimatedValue<CommandDecimal> fadeTimeline,
-                                                                        AnimatedValue<CommandColor> colorTimeline,
-                                                                        TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
+        public static OsbSpriteWriter CreateWriter(OsbSprite sprite,
+            AnimatedValue<CommandPosition> move, AnimatedValue<CommandDecimal> moveX, AnimatedValue<CommandDecimal> moveY,
+            AnimatedValue<CommandDecimal> scale, AnimatedValue<CommandScale> scaleVec,
+            AnimatedValue<CommandDecimal> rotate,
+            AnimatedValue<CommandDecimal> fade, AnimatedValue<CommandColor> color,
+            TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
-            if (osbSprite is OsbAnimation osbAnimation)
-            {
-                return new OsbAnimationWriter(osbAnimation, moveTimeline,
-                                                            moveXTimeline,
-                                                            moveYTimeline,
-                                                            scaleTimeline,
-                                                            scaleVecTimeline,
-                                                            rotateTimeline,
-                                                            fadeTimeline,
-                                                            colorTimeline,
-                                                            writer, exportSettings, layer);
-            }
-            else
-            {
-                return new OsbSpriteWriter(osbSprite, moveTimeline,
-                                                      moveXTimeline,
-                                                      moveYTimeline,
-                                                      scaleTimeline,
-                                                      scaleVecTimeline,
-                                                      rotateTimeline,
-                                                      fadeTimeline,
-                                                      colorTimeline,
-                                                      writer, exportSettings, layer);
-            }
+            if (sprite is OsbAnimation animation) return new OsbAnimationWriter(animation,
+                move, moveX, moveY,
+                scale, scaleVec,
+                rotate,
+                fade,
+                color,
+                writer, exportSettings, layer);
+
+            else return new OsbSpriteWriter(sprite,
+                move, moveX, moveY,
+                scale, scaleVec,
+                rotate,
+                fade, color,
+                writer, exportSettings, layer);
         }
     }
 }

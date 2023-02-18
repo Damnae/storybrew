@@ -9,11 +9,10 @@ namespace StorybrewEditor.ScreenLayers
 {
     public class NewProjectMenu : UiScreenLayer
     {
-        private LinearLayout mainLayout;
-        private Textbox projectNameTextbox;
-        private PathSelector mapsetPathSelector;
-        private Button startButton;
-        private Button cancelButton;
+        LinearLayout mainLayout;
+        Textbox projectNameTextbox;
+        PathSelector mapsetPathSelector;
+        Button startButton, cancelButton;
 
         public override void Load()
         {
@@ -32,19 +31,19 @@ namespace StorybrewEditor.ScreenLayers
                     new Label(WidgetManager)
                     {
                         Text = "New Project",
-                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre
                     },
                     projectNameTextbox = new Textbox(WidgetManager)
                     {
                         LabelText = "Project Name",
-                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorFrom = BoxAlignment.Centre
                     },
                     mapsetPathSelector = new PathSelector(WidgetManager, PathSelectorMode.OpenDirectory)
                     {
                         Value = OsuHelper.GetOsuSongFolder(),
                         LabelText = "Mapset Path",
                         AnchorFrom = BoxAlignment.Centre,
-                        Filter = ".osu files (*.osu)|*.osu",
+                        Filter = ".osu files (*.osu)|*.osu"
                     },
                     new LinearLayout(WidgetManager)
                     {
@@ -56,26 +55,26 @@ namespace StorybrewEditor.ScreenLayers
                             startButton = new Button(WidgetManager)
                             {
                                 Text = "Start",
-                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorFrom = BoxAlignment.Centre
                             },
                             cancelButton = new Button(WidgetManager)
                             {
                                 Text = "Cancel",
-                                AnchorFrom = BoxAlignment.Centre,
-                            },
-                        },
-                    },
-                },
+                                AnchorFrom = BoxAlignment.Centre
+                            }
+                        }
+                    }
+                }
             });
 
             projectNameTextbox.OnValueChanged += (sender, e) => updateButtonsState();
             projectNameTextbox.OnValueCommited += (sender, e) =>
             {
                 var name = projectNameTextbox.Value;
-                foreach (var character in Path.GetInvalidFileNameChars())
-                    name = name.Replace(character, '_');
+                foreach (var character in Path.GetInvalidFileNameChars()) name = name.Replace(character, '_');
                 projectNameTextbox.Value = name;
             };
+
             mapsetPathSelector.OnValueChanged += (sender, e) => updateButtonsState();
             mapsetPathSelector.OnValueCommited += (sender, e) =>
             {
@@ -91,14 +90,12 @@ namespace StorybrewEditor.ScreenLayers
             startButton.OnClick += (sender, e) => createProject();
             cancelButton.OnClick += (sender, e) => Exit();
         }
-
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);
             mainLayout.Pack(300, 0);
         }
-
-        private void createProject()
+        void createProject()
         {
             Manager.AsyncLoading("Creating project", () =>
             {
@@ -107,13 +104,8 @@ namespace StorybrewEditor.ScreenLayers
                 Program.Schedule(() => Manager.Set(new ProjectMenu(project)));
             });
         }
-
-        private void updateButtonsState()
-        {
-            startButton.Disabled = !updateFieldsValid();
-        }
-
-        private bool updateFieldsValid()
+        void updateButtonsState() => startButton.Disabled = !updateFieldsValid();
+        bool updateFieldsValid()
         {
             var projectFolderName = projectNameTextbox.Value;
             if (string.IsNullOrWhiteSpace(projectFolderName))
@@ -128,20 +120,18 @@ namespace StorybrewEditor.ScreenLayers
                 startButton.Tooltip = $"A project named '{projectFolderName}' already exists";
                 return false;
             }
-
             if (!Directory.Exists(mapsetPathSelector.Value))
             {
                 startButton.Tooltip = "The selected mapset folder does not exist";
                 return false;
             }
-
             if (Directory.GetFiles(mapsetPathSelector.Value, "*.osu", SearchOption.TopDirectoryOnly).Length == 0)
             {
                 startButton.Tooltip = $"No .osu found in the selected mapset folder";
                 return false;
             }
 
-            startButton.Tooltip = string.Empty;
+            startButton.Tooltip = "";
             return true;
         }
     }

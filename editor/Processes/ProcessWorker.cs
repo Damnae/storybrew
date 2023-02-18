@@ -10,7 +10,7 @@ namespace StorybrewEditor.Processes
 {
     public static class ProcessWorker
     {
-        private static bool exit;
+        static bool exit;
 
         public static void Run(string identifier)
         {
@@ -20,7 +20,7 @@ namespace StorybrewEditor.Processes
             try
             {
                 var name = $"sbrew-worker-{identifier}";
-                var channel = new IpcServerChannel(name, name, new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+                var channel = new IpcServerChannel(name, name, new BinaryServerFormatterSinkProvider { TypeFilterLevel = TypeFilterLevel.Full });
 
                 ChannelServices.RegisterChannel(channel, false);
                 try
@@ -45,7 +45,6 @@ namespace StorybrewEditor.Processes
                 Trace.WriteLine($"ProcessWorker failed: {e}");
             }
         }
-
         public static void Exit()
         {
             Trace.WriteLine($"exiting");

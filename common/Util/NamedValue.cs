@@ -2,6 +2,7 @@
 
 namespace StorybrewCommon.Util
 {
+#pragma warning disable CS1591
     [Serializable]
     public struct NamedValue
     {

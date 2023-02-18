@@ -2,7 +2,5 @@
 
 namespace StorybrewEditor.UserInterface.Skinning.Styles
 {
-    public class ColorPickerStyle : WidgetStyle
-    {
-    }
+    public class ColorPickerStyle : WidgetStyle { }
 }

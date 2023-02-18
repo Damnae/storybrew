@@ -8,14 +8,13 @@ namespace StorybrewEditor.ScreenLayers
 {
     public class ContextMenu<T> : UiScreenLayer
     {
-        private readonly string title;
-        private readonly Action<T> callback;
-        private readonly List<Option> options = new List<Option>();
+        readonly string title;
+        readonly Action<T> callback;
+        readonly List<Option> options = new List<Option>();
 
-        private LinearLayout mainLayout;
-        private LinearLayout optionsLayout;
-        private Textbox searchTextbox;
-        private Button cancelButton;
+        LinearLayout mainLayout, optionsLayout;
+        Textbox searchTextbox;
+        Button cancelButton;
 
         public override bool IsPopup => true;
 
@@ -25,21 +24,17 @@ namespace StorybrewEditor.ScreenLayers
             this.callback = callback;
             this.options.AddRange(options);
         }
-
         public ContextMenu(string title, Action<T> callback, params T[] options)
         {
             this.title = title;
             this.callback = callback;
-            foreach (var option in options)
-                this.options.Add(new Option(option.ToString(), option));
+            foreach (var option in options) this.options.Add(new Option(option.ToString(), option));
         }
-
         public ContextMenu(string title, Action<T> callback, IEnumerable<T> options)
         {
             this.title = title;
             this.callback = callback;
-            foreach (var option in options)
-                this.options.Add(new Option(option.ToString(), option));
+            foreach (var option in options) this.options.Add(new Option(option.ToString(), option));
         }
 
         public override void Load()
@@ -64,41 +59,40 @@ namespace StorybrewEditor.ScreenLayers
                         {
                             new Label(WidgetManager)
                             {
-                                Text = title,
+                                Text = title
                             },
                             searchTextbox = new Textbox(WidgetManager)
                             {
                                 AnchorFrom = BoxAlignment.Centre,
-                                DefaultSize = new Vector2(120, 0),
+                                DefaultSize = new Vector2(120, 0)
                             },
                             cancelButton = new Button(WidgetManager)
                             {
                                 StyleName = "icon",
                                 Icon = IconFont.TimesCircle,
                                 AnchorFrom = BoxAlignment.Centre,
-                                CanGrow = false,
-                            },
-                        },
+                                CanGrow = false
+                            }
+                        }
                     },
                     new ScrollArea(WidgetManager, optionsLayout = new LinearLayout(WidgetManager)
                     {
-                        FitChildren = true,
-                    }),
-                },
+                        FitChildren = true
+                    })
+                }
             });
             cancelButton.OnClick += (sender, e) => Exit();
 
             searchTextbox.OnValueChanged += (sender, e) => refreshOptions();
             refreshOptions();
         }
-        
-        private void refreshOptions()
+        void refreshOptions()
         {
             optionsLayout.ClearWidgets();
             foreach (var option in options)
             {
-                if (!string.IsNullOrEmpty(searchTextbox.Value) && !option.Name.ToLowerInvariant().Contains(searchTextbox.Value.ToLowerInvariant()))
-                    continue;
+                if (!string.IsNullOrEmpty(searchTextbox.Value) && !option.Name.ToLowerInvariant().Contains(
+                    searchTextbox.Value.ToLowerInvariant())) continue;
 
                 Button button;
                 optionsLayout.Add(button = new Button(WidgetManager)
@@ -116,19 +110,16 @@ namespace StorybrewEditor.ScreenLayers
                 };
             }
         }
-
         public override void OnTransitionIn()
         {
             base.OnTransitionIn();
             WidgetManager.KeyboardFocus = searchTextbox;
         }
-
         public override void Resize(int width, int height)
         {
             base.Resize(width, height);
             mainLayout.Pack(400, 0, 0, 600);
         }
-
         public struct Option
         {
             public readonly string Name;

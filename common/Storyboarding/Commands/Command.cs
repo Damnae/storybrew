@@ -6,8 +6,8 @@ using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public abstract class Command<TValue> : ITypedCommand<TValue>, IFragmentableCommand, IOffsetable
-        where TValue : CommandValue
+#pragma warning disable CS1591
+    public abstract class Command<TValue> : ITypedCommand<TValue>, IFragmentableCommand, IOffsetable where TValue : CommandValue
     {
         public string Identifier { get; set; }
         public OsbEasing Easing { get; set; }
@@ -36,7 +36,6 @@ namespace StorybrewCommon.Storyboarding.Commands
             StartTime += offset;
             EndTime += offset;
         }
-
         public TValue ValueAtTime(double time)
         {
             if (time < StartTime) return MaintainValue ? ValueAtProgress(0) : default;
@@ -57,14 +56,12 @@ namespace StorybrewCommon.Storyboarding.Commands
         public IEnumerable<int> GetNonFragmentableTimes()
         {
             var nonFragmentableTimes = new HashSet<int>();
-            if (!IsFragmentable)
-                nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + 1, (int)(EndTime - StartTime - 1)));
+            if (!IsFragmentable) nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + 1, (int)(EndTime - StartTime - 1)));
 
             return nonFragmentableTimes;
         }
 
-        public int CompareTo(ICommand other)
-            => CommandComparer.CompareCommands(this, other);
+        public int CompareTo(ICommand other) => CommandComparer.CompareCommands(this, other);
 
         public virtual string ToOsbString(ExportSettings exportSettings)
         {
@@ -73,8 +70,7 @@ namespace StorybrewCommon.Storyboarding.Commands
             var startValueString = StartValue.ToOsbString(exportSettings);
             var endValueString = (ExportEndValue ? EndValue : StartValue).ToOsbString(exportSettings);
 
-            if (startTimeString == endTimeString)
-                endTimeString = string.Empty;
+            if (startTimeString == endTimeString) endTimeString = string.Empty;
 
             string[] parameters =
             {
@@ -83,16 +79,11 @@ namespace StorybrewCommon.Storyboarding.Commands
             };
 
             var result = string.Join(",", parameters);
-            if (startValueString != endValueString)
-                result += "," + endValueString;
-
+            if (startValueString != endValueString) result += "," + endValueString;
             return result;
         }
 
-        public virtual void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
-            => writer.WriteLine(new string(' ', indentation) + ToOsbString(exportSettings));
-
-        public override string ToString()
-            => ToOsbString(ExportSettings.Default);
+        public virtual void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation) => writer.WriteLine(new string(' ', indentation) + ToOsbString(exportSettings));
+        public override string ToString() => ToOsbString(ExportSettings.Default);
     }
 }

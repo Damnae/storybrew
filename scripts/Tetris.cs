@@ -7,7 +7,7 @@ using System;
 
 namespace StorybrewScripts
 {
-    public class Tetris : StoryboardObjectGenerator
+    class Tetris : StoryboardObjectGenerator
     {
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 0;
@@ -34,40 +34,33 @@ namespace StorybrewScripts
 
         public class Cell
         {
-            public int X;
-            public int Y;
-
-            public OsbSprite Sprite;
-            public OsbSprite Shadow;
-
-            public bool HasSprite { get { return Sprite != null; } }
+            internal int X, Y;
+            internal OsbSprite Sprite, Shadow;
+            internal bool HasSprite 
+            { 
+                get => Sprite != null; 
+            }
         }
-        private Cell[,] cells;
+        Cell[,] cells;
 
-        public override void Generate()
+        protected override void Generate()
         {
             var beatDuration = Beatmap.GetTimingPointAt(0).BeatDuration;
             var timestep = beatDuration / BeatDivisor;
 
             cells = new Cell[GridWidth, GridHeight];
-            for (var x = 0; x < GridWidth; x++)
-                for (var y = 0; y < GridHeight; y++)
-                    cells[x, y] = new Cell() { X = x, Y = y, };
+            for (var x = 0; x < GridWidth; x++) for (var y = 0; y < GridHeight; y++) cells[x, y] = new Cell() { X = x, Y = y };
+
             for (var time = (double)StartTime; time < EndTime; time += timestep)
             {
-                for (var i = 0; i < Blocks; i++)
-                    addBlock(time - timestep, time);
-                if (clearLines(time, time + timestep))
-                    time += Wait ? timestep : 0;
+                for (var i = 0; i < Blocks; i++) addBlock(time - timestep, time);
+                if (clearLines(time, time + timestep)) time += Wait ? timestep : 0;
             }
 
-            for (var x = 0; x < GridWidth; x++)
-                for (var y = 0; y < GridHeight; y++)
-                    if (cells[x, y].HasSprite)
-                        killCell(EndTime, EndTime + timestep, x, y);
+            for (var x = 0; x < GridWidth; x++) for (var y = 0; y < GridHeight; y++) if (cells[x, y].HasSprite)
+                killCell(EndTime, EndTime + timestep, x, y);
         }
-
-        private void addBlock(double startTime, double endTime)
+        void addBlock(double startTime, double endTime)
         {
             var brightness = (float)Random(0.3, 1.0);
             var color = new Color4(Color.R * brightness, Color.G * brightness, Color.B * brightness, 1);
@@ -78,17 +71,14 @@ namespace StorybrewScripts
             {
                 for (var y = 0; y < GridHeight; y++)
                 {
-                    if (cells[x, y].HasSprite)
-                        break;
-
+                    if (cells[x, y].HasSprite) break;
                     heightMap[x] = y;
                 }
                 bottom = Math.Max(bottom, heightMap[x]);
             }
 
             var dropX = Random(GridWidth);
-            while (!Dumb && heightMap[dropX] != bottom)
-                dropX = Random(GridWidth);
+            while (!Dumb && heightMap[dropX] != bottom) dropX = Random(GridWidth);
 
             var dropY = heightMap[dropX];
 
@@ -111,14 +101,9 @@ namespace StorybrewScripts
                         case 3: nextDropY--; break;
                     }
 
-                    if (nextDropX < 0 || nextDropX >= GridWidth || nextDropY < 0 || nextDropY >= GridHeight)
-                        continue;
-
-                    if (cells[nextDropX, nextDropY].HasSprite)
-                        continue;
-
-                    if (heightMap[nextDropX] < nextDropY)
-                        continue;
+                    if (nextDropX < 0 || nextDropX >= GridWidth || nextDropY < 0 || nextDropY >= GridHeight) continue;
+                    if (cells[nextDropX, nextDropY].HasSprite) continue;
+                    if (heightMap[nextDropX] < nextDropY) continue;
 
                     dropX = nextDropX;
                     dropY = nextDropY;
@@ -127,40 +112,34 @@ namespace StorybrewScripts
                 }
             }
         }
-
-        private bool clearLines(double startTime, double endTime)
+        bool clearLines(double startTime, double endTime)
         {
             var anyCombo = false;
             var dropHeight = 0;
             for (var y = GridHeight - 1; y >= 0; y--)
             {
                 var combo = true;
-                for (var x = 0; x < GridWidth; x++)
-                    if (!cells[x, y].HasSprite)
-                    {
-                        combo = false;
-                        break;
-                    }
+                for (var x = 0; x < GridWidth; x++) if (!cells[x, y].HasSprite)
+                {
+                    combo = false;
+                    break;
+                }
 
                 if (combo)
                 {
                     anyCombo = true;
-                    for (var x = 0; x < GridWidth; x++)
-                        killCell(startTime, endTime, x, y);
+                    for (var x = 0; x < GridWidth; x++) killCell(startTime, endTime, x, y);
 
                     dropHeight++;
                 }
                 else if (dropHeight > 0)
                 {
-                    for (var x = 0; x < GridWidth; x++)
-                        if (cells[x, y].HasSprite)
-                            dropCell(startTime, endTime, x, y, dropHeight);
+                    for (var x = 0; x < GridWidth; x++) if (cells[x, y].HasSprite) dropCell(startTime, endTime, x, y, dropHeight);
                 }
             }
             return anyCombo;
         }
-
-        private void fillCell(double startTime, double endTime, int dropX, int dropY, Color4 color)
+        void fillCell(double startTime, double endTime, int dropX, int dropY, Color4 color)
         {
             var shadow = GetLayer("Shadows").CreateSprite(SpritePath, OsbOrigin.TopCentre);
             var sprite = GetLayer("Blocks").CreateSprite(SpritePath, OsbOrigin.TopCentre);
@@ -182,8 +161,7 @@ namespace StorybrewScripts
             shadow.Fade(startTime, 0.5);
             shadow.Move(OsbEasing.In, startTime, endTime, transform(startPosition) + ShadowOffset, transform(targetPosition) + ShadowOffset);
         }
-
-        private void killCell(double startTime, double endTime, int dropX, int dropY)
+        void killCell(double startTime, double endTime, int dropX, int dropY)
         {
             var sprite = cells[dropX, dropY].Sprite;
             var shadow = cells[dropX, dropY].Shadow;
@@ -195,8 +173,7 @@ namespace StorybrewScripts
 
             shadow.Scale(startTime, endTime, SpriteScale, 0);
         }
-
-        private void dropCell(double startTime, double endTime, int dropX, int dropY, int dropHeight)
+        void dropCell(double startTime, double endTime, int dropX, int dropY, int dropHeight)
         {
             var sprite = cells[dropX, dropY].Sprite;
             var shadow = cells[dropX, dropY].Shadow;
@@ -213,14 +190,12 @@ namespace StorybrewScripts
             sprite.Move(OsbEasing.In, startTime, endTime, transform(startPosition), transform(targetPosition));
             shadow.Move(OsbEasing.In, startTime, endTime, transform(startPosition) + ShadowOffset, transform(targetPosition) + ShadowOffset);
         }
-
-        private Vector2 transform(Vector2 position)
+        Vector2 transform(Vector2 position)
         {
             position = new Vector2(position.X - GridWidth * CellSize * 0.5f, position.Y - GridHeight * CellSize);
             return Vector2.Transform(position, Quaternion.FromEulerAngles((float)(Rotation / 180 * Math.PI), 0, 0)) + Offset;
         }
-
-        private void shuffle(int[] array)
+        void shuffle(int[] array)
         {
             var n = array.Length;
             while (n > 1)

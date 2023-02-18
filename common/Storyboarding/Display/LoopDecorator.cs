@@ -5,12 +5,12 @@ using System.IO;
 
 namespace StorybrewCommon.Storyboarding.Display
 {
-    public class LoopDecorator<TValue> : ITypedCommand<TValue>
-        where TValue : CommandValue
+#pragma warning disable CS1591
+    public class LoopDecorator<TValue> : ITypedCommand<TValue> where TValue : CommandValue
     {
-        private readonly ITypedCommand<TValue> command;
-        private readonly double repeatDuration;
-        private readonly int repeats;
+        readonly ITypedCommand<TValue> command;
+        readonly double repeatDuration;
+        readonly int repeats;
 
         public OsbEasing Easing { get { throw new InvalidOperationException(); } }
         public double StartTime { get; }
@@ -45,24 +45,18 @@ namespace StorybrewCommon.Storyboarding.Display
                 repeated = true;
             }
 
-            if (repeatTime < command.StartTime)
-                if (repeated && repeatTime < command.StartTime)
-                    return command.ValueAtTime(command.EndTime);
+            if (repeatTime < command.StartTime) if (repeated && repeatTime < command.StartTime) return command.ValueAtTime(command.EndTime);
                 else return command.ValueAtTime(command.StartTime);
 
-            if (command.EndTime < repeatTime)
-                return command.ValueAtTime(command.EndTime);
+            if (command.EndTime < repeatTime) return command.ValueAtTime(command.EndTime);
             return command.ValueAtTime(repeatTime);
         }
-
-        public int CompareTo(ICommand other)
-            => CommandComparer.CompareCommands(this, other);
+        public int CompareTo(ICommand other) => CommandComparer.CompareCommands(this, other);
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
         {
             throw new InvalidOperationException();
         }
-
         public override string ToString() => $"loop x{repeats} ({StartTime}s - {EndTime}s)";
     }
 }

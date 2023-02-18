@@ -1,9 +1,10 @@
-﻿using System;
-using StorybrewCommon.Mapset;
+﻿using StorybrewCommon.Mapset;
+using System;
 using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding
 {
+#pragma warning disable CS1591
     public abstract class GeneratorContext : MarshalByRefObject
     {
         public abstract string ProjectPath { get; }

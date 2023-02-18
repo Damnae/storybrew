@@ -4,27 +4,21 @@ using System;
 
 namespace StorybrewCommon.Storyboarding.Display
 {
-    public class AnimatedValueBuilder<TValue> : IAnimatedValueBuilder
-        where TValue : CommandValue
+#pragma warning disable CS1591
+    public class AnimatedValueBuilder<TValue> : IAnimatedValueBuilder where TValue : CommandValue
     {
-        private readonly AnimatedValue<TValue> value;
-        private CompositeCommand<TValue> composite;
-        private Func<ITypedCommand<TValue>, ITypedCommand<TValue>> decorate;
+        readonly AnimatedValue<TValue> value;
+        CompositeCommand<TValue> composite;
+        Func<ITypedCommand<TValue>, ITypedCommand<TValue>> decorate;
 
-        public AnimatedValueBuilder(AnimatedValue<TValue> value)
-        {
-            this.value = value;
-        }
+        public AnimatedValueBuilder(AnimatedValue<TValue> value) => this.value = value;
 
-        public void Add(ICommand command)
-            => Add(command as Command<TValue>);
-
+        public void Add(ICommand command) => Add(command as Command<TValue>);
         public void Add(Command<TValue> command)
         {
             if (command == null) return;
             (composite ?? value).Add(command);
         }
-
         public void StartDisplayLoop(LoopCommand loopCommand)
         {
             if (composite != null) throw new InvalidOperationException("Cannot start loop: already inside a loop or trigger");
@@ -36,7 +30,6 @@ namespace StorybrewCommon.Storyboarding.Display
             };
             composite = new CompositeCommand<TValue>();
         }
-
         public void StartDisplayTrigger(TriggerCommand triggerCommand)
         {
             if (composite != null) throw new InvalidOperationException("Cannot start trigger: already inside a loop or trigger");
@@ -44,13 +37,10 @@ namespace StorybrewCommon.Storyboarding.Display
             decorate = (command) => new TriggerDecorator<TValue>(command);
             composite = new CompositeCommand<TValue>();
         }
-
         public void EndDisplayComposite()
         {
             if (composite == null) throw new InvalidOperationException("Cannot complete loop or trigger: Not inside one");
-
-            if (composite.HasCommands)
-                value.Add(decorate(composite));
+            if (composite.HasCommands) value.Add(decorate(composite));
 
             composite = null;
             decorate = null;

@@ -10,16 +10,16 @@ namespace StorybrewEditor.UserInterface
 {
     public class Selectbox : Widget, Field
     {
-        private readonly Button button;
+        readonly Button button;
 
         public override Vector2 MinSize => button.MinSize;
         public override Vector2 MaxSize => button.MaxSize;
         public override Vector2 PreferredSize => button.PreferredSize;
 
-        private NamedValue[] options;
+        NamedValue[] options;
         public NamedValue[] Options
         {
-            get { return options; }
+            get => options;
             set
             {
                 if (options == value) return;
@@ -29,10 +29,10 @@ namespace StorybrewEditor.UserInterface
             }
         }
 
-        private object value;
+        object value;
         public object Value
         {
-            get { return value; }
+            get => value;
             set
             {
                 if (this.value == value) return;
@@ -44,8 +44,8 @@ namespace StorybrewEditor.UserInterface
         }
         public object FieldValue
         {
-            get { return Value; }
-            set { Value = value; }
+            get => Value;
+            set => Value = value;
         }
 
         public event EventHandler OnValueChanged;
@@ -55,10 +55,8 @@ namespace StorybrewEditor.UserInterface
             Add(button = new Button(manager));
             button.OnClick += (sender, e) =>
             {
-                if (options == null)
-                    return;
-                else if (options.Length > 2)
-                    Manager.ScreenLayerManager.ShowContextMenu("Select a value", optionValue => Value = optionValue.Value, options);
+                if (options == null) return;
+                else if (options.Length > 2) Manager.ScreenLayerManager.ShowContextMenu("Select a value", optionValue => Value = optionValue.Value, options);
                 else
                 {
                     var optionFound = false;
@@ -70,11 +68,9 @@ namespace StorybrewEditor.UserInterface
                             optionFound = false;
                             break;
                         }
-                        else if (option.Value.Equals(value))
-                            optionFound = true;
+                        else if (option.Value.Equals(value)) optionFound = true;
                     }
-                    if (optionFound)
-                        Value = options[0].Value;
+                    if (optionFound) Value = options[0].Value;
                 }
             };
         }
@@ -88,21 +84,15 @@ namespace StorybrewEditor.UserInterface
 
             button.StyleName = selectboxStyle.ButtonStyle;
         }
-
         protected override void Layout()
         {
             base.Layout();
             button.Size = Size;
         }
-
-        private string findValueName(object value)
+        string findValueName(object value)
         {
             if (options == null) return string.Empty;
-            foreach (var option in options)
-            {
-                if (option.Value.Equals(value))
-                    return option.Name;
-            }
+            foreach (var option in options) if (option.Value.Equals(value)) return option.Name;
             return string.Empty;
         }
     }
