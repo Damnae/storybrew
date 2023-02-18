@@ -163,11 +163,10 @@
 
 		"groupBg":
 		{
-			_type: "NinePatch",
-			Texture: "ui-rounded-borders.png",
-			Borders: [3, 5, 5, 3],
+			_type: "Sprite",
+			Texture: "ui-stripes.png",
 			Color: "@colorGroupBg",
-			Outset: [2, 2],
+			ScaleMode: "Fill",
 		},
 
 		"previewBg":

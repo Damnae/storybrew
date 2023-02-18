@@ -577,7 +577,7 @@ namespace StorybrewEditor.Storyboarding
                                     Value = allowedValue,
                                 };
                             }
-                            effect.Config.UpdateField(fieldName, fieldDisplayName, fieldIndex, fieldValue?.GetType(), fieldValue, allowedValues, null);
+                            effect.Config.UpdateField(fieldName, fieldDisplayName, null, fieldIndex, fieldValue?.GetType(), fieldValue, allowedValues, null);
                         }
                     }
                 }
@@ -792,7 +792,7 @@ namespace StorybrewEditor.Storyboarding
                                 .Select(p => new NamedValue { Name = p.Key, Value = ObjectSerializer.FromString(fieldTypeName, p.Value.Value<string>()), })
                                 .ToArray();
 
-                        effect.Config.UpdateField(fieldProperty.Key, fieldRoot.Value<string>("DisplayName"), fieldIndex++, fieldValue?.GetType(), fieldValue, allowedValues, beginsGroup);
+                        effect.Config.UpdateField(fieldProperty.Key, fieldRoot.Value<string>("DisplayName"), null, fieldIndex++, fieldValue?.GetType(), fieldValue, allowedValues, beginsGroup);
                     }
 
                     var layersRoot = effectRoot.Value<TinyObject>("Layers");

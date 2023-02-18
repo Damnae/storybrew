@@ -6,10 +6,12 @@ namespace StorybrewScripts
 {
     public class Background : StoryboardObjectGenerator
     {
+        [Group("Timing")]
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 0;
         
         [Group("Sprite")]
+        [Description("Leave empty to automatically use the map's background.")]
         [Configurable] public string SpritePath = "";
         [Configurable] public double Opacity = 0.2;
 

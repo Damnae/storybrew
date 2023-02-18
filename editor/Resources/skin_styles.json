@@ -26,7 +26,7 @@
 			{
 				FontSize: "@fontSizeNormal",
 				Color: "@colorGroupText",
-				TextAlignment: "Centre",
+				TextAlignment: "Left",
 				Background: "groupBg",
 			},
 			"listHeader":

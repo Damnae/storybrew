@@ -150,6 +150,7 @@
     <Compile Include="Util\OsuHelper.cs" />
     <Compile Include="Util\NetHelper.cs" />
     <EmbeddedResource Include="Resources\project\vscode_settings.json" />
+    <EmbeddedResource Include="Resources\ui-stripes-opt.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -195,6 +196,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ui-stripes.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -32,7 +32,7 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
-        public void UpdateField(string name, string displayName, int order, Type fieldType, object defaultValue, NamedValue[] allowedValues, string beginsGroup)
+        public void UpdateField(string name, string displayName, string description, int order, Type fieldType, object defaultValue, NamedValue[] allowedValues, string beginsGroup)
         {
             if (fieldType == null)
                 return;
@@ -62,6 +62,7 @@ namespace StorybrewCommon.Storyboarding
             {
                 Name = name,
                 DisplayName = displayName,
+                Description = description?.Trim(),
                 Value = value,
                 Type = fieldType,
                 AllowedValues = allowedValues,
@@ -84,9 +85,11 @@ namespace StorybrewCommon.Storyboarding
             {
                 Name = field.Name,
                 DisplayName = field.DisplayName,
+                Description = field.Description,
                 Value = value,
                 Type = field.Type,
                 AllowedValues = field.AllowedValues,
+                BeginsGroup = field.BeginsGroup,
                 Order = field.Order,
             };
             return true;
@@ -114,6 +117,7 @@ namespace StorybrewCommon.Storyboarding
         {
             public string Name;
             public string DisplayName;
+            public string Description;
             public object Value;
             public Type Type;
             public NamedValue[] AllowedValues;

@@ -136,8 +136,9 @@ namespace StorybrewCommon.Scripting
 
         #region Random
 
-        [Configurable(DisplayName = "Random seed")]
-        public int RandomSeed;
+        [Group("Common")]
+        [Description("Changes the result of Random(...) calls.")]
+        [Configurable] public int RandomSeed;
 
         private Random random;
         public int Random(int minValue, int maxValue) => random.Next(minValue, maxValue);
@@ -228,7 +229,7 @@ namespace StorybrewCommon.Scripting
         public FontGenerator LoadFont(string directory, bool asAsset, FontDescription description, params FontEffect[] effects)
         {
             var assetDirectory = asAsset ? context.ProjectAssetPath : context.MapsetPath;
-            
+
             var fontDirectory = Path.GetFullPath(Path.Combine(assetDirectory, directory));
             if (fontDirectories.Contains(fontDirectory))
                 throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
@@ -310,7 +311,7 @@ namespace StorybrewCommon.Scripting
                 {
                     var displayName = configurableField.Attribute.DisplayName;
                     var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType, CultureInfo.InvariantCulture);
-                    config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues, configurableField.BeginsGroup);
+                    config.UpdateField(field.Name, displayName, configurableField.Description, configurableField.Order, fieldType, initialValue, allowedValues, configurableField.BeginsGroup);
 
                     var value = config.GetValue(field.Name);
                     field.SetValue(this, value);
@@ -361,13 +362,15 @@ namespace StorybrewCommon.Scripting
                     continue;
 
                 var group = field.GetCustomAttribute<GroupAttribute>(true);
+                var description = field.GetCustomAttribute<DescriptionAttribute>(true);
 
                 configurableFields.Add(new ConfigurableField()
                 {
                     Field = field,
                     Attribute = configurable,
                     InitialValue = field.GetValue(this),
-                    BeginsGroup = group?.Name,
+                    BeginsGroup = group?.Name?.Trim(),
+                    Description = description?.Content?.Trim(),
                     Order = order++,
                 });
             }
@@ -379,6 +382,7 @@ namespace StorybrewCommon.Scripting
             public ConfigurableAttribute Attribute;
             public object InitialValue;
             public string BeginsGroup;
+            public string Description;
             public int Order;
 
             public override string ToString() => $"{Field.Name} {InitialValue}";

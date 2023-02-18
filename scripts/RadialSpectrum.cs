@@ -12,20 +12,27 @@ namespace StorybrewScripts
     /// </summary>
     public class RadialSpectrum : StoryboardObjectGenerator
     {
+        [Group("Timing")]
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 10000;
-        [Configurable] public Vector2 Position = new Vector2(320, 240);
         [Configurable] public int BeatDivisor = 8;
-        [Configurable] public int BarCount = 20;
+
+        [Group("Sprite")]
         [Configurable] public string SpritePath = "sb/bar.png";
         [Configurable] public OsbOrigin SpriteOrigin = OsbOrigin.Centre;
         [Configurable] public Vector2 SpriteScale = Vector2.One;
+
+        [Group("Bars")]
+        [Configurable] public Vector2 Position = new Vector2(320, 240);
+        [Configurable] public int BarCount = 20;
         [Configurable] public int Radius = 50;
         [Configurable] public float Scale = 50;
         [Configurable] public int LogScale = 600;
+        [Configurable] public OsbEasing FftEasing = OsbEasing.InExpo;
+
+        [Group("Optimization")]
         [Configurable] public double Tolerance = 2;
         [Configurable] public int CommandDecimals = 0;
-        [Configurable] public OsbEasing FftEasing = OsbEasing.InExpo;
         [Configurable] public int FrequencyCutOff = 16000;
 
         public override void Generate()

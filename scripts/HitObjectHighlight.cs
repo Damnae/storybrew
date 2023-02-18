@@ -6,6 +6,7 @@ namespace StorybrewScripts
 {
     public class HitObjectHighlight : StoryboardObjectGenerator
     {
+        [Group("Timing")]
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 0;
         [Configurable] public int BeatDivisor = 8;
