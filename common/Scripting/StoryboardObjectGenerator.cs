@@ -349,14 +349,16 @@ namespace StorybrewCommon.Scripting
                 if (configurable == null) continue;
                 if (!field.FieldType.IsEnum && !ObjectSerializer.Supports(field.FieldType.FullName)) continue;
 
+                var group = field.GetCustomAttribute<GroupAttribute>(true);
+
                 configurableFields.Add(new ConfigurableField
                 {
                     Field = field,
                     Attribute = configurable,
                     InitialValue = field.GetValue(this),
+                    BeginsGroup = group?.Name,
                     Order = order++
                 });
-                break;
             }
         }
         struct ConfigurableField

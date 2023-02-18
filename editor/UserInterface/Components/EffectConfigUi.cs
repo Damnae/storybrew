@@ -151,7 +151,7 @@ namespace StorybrewEditor.UserInterface.Components
                         StyleName = "listGroup",
                         Text = field.BeginsGroup,
                         AnchorFrom = BoxAlignment.Centre,
-                        AnchorTo = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre
                     });
                 }
 
