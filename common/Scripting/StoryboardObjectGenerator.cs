@@ -122,7 +122,8 @@ namespace StorybrewCommon.Scripting
         #region Random
 
         ///<summary/>
-        [Configurable(DisplayName = "Random seed")] public int RandomSeed;
+        [Group("Common")] [Description("Changes the result of Random(...) calls.")]
+        [Configurable] public int RandomSeed;
 
         Random rnd = new Random();
 
@@ -303,7 +304,7 @@ namespace StorybrewCommon.Scripting
                 {
                     var displayName = configurableField.Attribute.DisplayName;
                     var initialValue = Convert.ChangeType(configurableField.InitialValue, fieldType);
-                    config.UpdateField(field.Name, displayName, configurableField.Order, fieldType, initialValue, allowedValues, configurableField.BeginsGroup);
+                    config.UpdateField(field.Name, displayName, configurableField.Description, configurableField.Order, fieldType, initialValue, allowedValues, configurableField.BeginsGroup);
 
                     var value = config.GetValue(field.Name);
                     field.SetValue(this, value);
@@ -350,13 +351,15 @@ namespace StorybrewCommon.Scripting
                 if (!field.FieldType.IsEnum && !ObjectSerializer.Supports(field.FieldType.FullName)) continue;
 
                 var group = field.GetCustomAttribute<GroupAttribute>(true);
+                var description = field.GetCustomAttribute<DescriptionAttribute>(true);
 
                 configurableFields.Add(new ConfigurableField
                 {
                     Field = field,
                     Attribute = configurable,
                     InitialValue = field.GetValue(this),
-                    BeginsGroup = group?.Name,
+                    BeginsGroup = group?.Name?.Trim(),
+                    Description = description?.Content?.Trim(),
                     Order = order++
                 });
             }
@@ -367,6 +370,7 @@ namespace StorybrewCommon.Scripting
             public ConfigurableAttribute Attribute;
             public object InitialValue;
             public string BeginsGroup;
+            public string Description;
             public int Order;
 
             public override string ToString() => $"{Field.Name} {InitialValue}";

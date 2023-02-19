@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net48</TargetFramework>
     <Platforms>AnyCPU;x86</Platforms>
-    <Version>1.88</Version>
+    <Version>1.89</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">

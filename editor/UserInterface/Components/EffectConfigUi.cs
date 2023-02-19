@@ -159,7 +159,9 @@ namespace StorybrewEditor.UserInterface.Components
                 if (currentGroup != null)
                     displayName = Regex.Replace(displayName, $@"^{Regex.Escape(currentGroup)}\s+", "");
 
-                var description = $"Variable: {field.Name}";
+                var description = $"Variable: {field.Name} ({field.Type.Name})";
+                if (!string.IsNullOrWhiteSpace(field.Description))
+                    description = "  " + description + "\n" + field.Description;
 
                 configFieldsLayout.Add(new LinearLayout(Manager)
                 {

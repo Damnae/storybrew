@@ -11,28 +11,37 @@ namespace StorybrewScripts
 {
     class Particles : StoryboardObjectGenerator
     {
+        [Group("Timing")]
         [Configurable] public int StartTime;
         [Configurable] public int EndTime;
-        [Configurable] public int ParticleCount = 32;
-        [Configurable] public float Lifetime = 1000;
 
         [Group("Sprite")]
         [Configurable] public string Path = "sb/particle.png";
         [Configurable] public OsbOrigin Origin = OsbOrigin.Centre;
         [Configurable] public Vector2 Scale = new Vector2(1, 1);
+        [Description("Rotation of the sprite; does not influences particle motion direction.")]
         [Configurable] public float Rotation = 0;
         [Configurable] public Color4 Color = Color4.White;
+        [Description("Varies the saturation and brightness of the selected Color for each particle.")]
         [Configurable] public float ColorVariance = 0.6f;
         [Configurable] public bool Additive = false;
 
         [Group("Spawn")]
+        [Configurable] public int ParticleCount = 32;
+        [Configurable] public float Lifetime = 1000;
+        [Description("The point around which particles will be created.")]
         [Configurable] public Vector2 SpawnOrigin = new Vector2(420, 0);
+        [Description("The distance around the Spawn Origin point where particles will be created.")]
         [Configurable] public float SpawnSpread = 360;
 
         [Group("Motion")]
+        [Description("The angle in degrees at which particles will be moving.\n0 is to the right, positive values rotate counterclockwise.")]
         [Configurable] public float Angle = 110;
+        [Description("The spread in degrees around Angle.")]
         [Configurable] public float AngleSpread = 60;
+        [Description("The speed at which particles move, in osupixels.")]
         [Configurable] public float Speed = 480;
+        [Description("Eases the motion of particles.")]
         [Configurable] public OsbEasing Easing = OsbEasing.None;
 
         protected override void Generate()

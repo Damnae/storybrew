@@ -9,6 +9,7 @@ namespace StorybrewScripts
 {
     class Tetris : StoryboardObjectGenerator
     {
+        [Group("Timing")]
         [Configurable] public int StartTime = 0;
         [Configurable] public int EndTime = 0;
         [Configurable] public double BeatDivisor = 1;
