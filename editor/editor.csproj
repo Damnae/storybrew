@@ -63,6 +63,7 @@
     <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
     <EmbeddedResource Include="Resources\ui-rounded-borders-opt.json" />
     <EmbeddedResource Include="Resources\ui-line-opt.json" />
+    <EmbeddedResource Include="Resources\ui-stripes-opt.json" />
     <EmbeddedResource Include="Resources\skin_styles.json" />
     <EmbeddedResource Include="Resources\skin_drawables_debug.json" />
     <EmbeddedResource Include="Resources\skin_drawables.json" />
@@ -77,6 +78,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\project\storyboard.sln" />
     <EmbeddedResource Include="Resources\ui-line.png" />
+    <EmbeddedResource Include="Resources\ui-stripes.png" />
     <EmbeddedResource Include="Resources\ui-rounded-borders.png" />
   </ItemGroup>
 
