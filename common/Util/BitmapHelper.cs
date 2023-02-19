@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImageMagick;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -10,13 +11,18 @@ namespace StorybrewCommon.Util
     {
         public static PinnedBitmap Blur(Bitmap source, int radius, double power) => Convolute(source, CalculateGaussianKernel(radius, power));
 
+        public static bool LosslessCompress(string filePath)
+        {
+            var opt = new ImageOptimizer();
+            return opt.LosslessCompress(filePath);
+        }
         public static double[,] CalculateGaussianKernel(int radius, double weight)
         {
             var length = radius * 2 + 1;
             var kernel = new double[length, length];
             var total = 0d;
 
-            var scale = 1.0 / (2.0 * Math.PI * Math.Pow(weight, 2));
+            var scale = 1 / (2.0 * Math.PI * Math.Pow(weight, 2));
             for (var y = -radius; y <= radius; y++) for (var x = -radius; x <= radius; x++)
                 {
                     var distance = (x * x + y * y) / (2 * weight * weight);

@@ -515,11 +515,11 @@ namespace StorybrewEditor.ScreenLayers
             var warnings = "";
 
             var activeSpriteCount = proj.FrameStats.SpriteCount;
-            if (activeSpriteCount > 0 && activeSpriteCount < 1500) warnings += $"{activeSpriteCount:n0} Sprites\n";
+            if (activeSpriteCount > 0 && activeSpriteCount < 1500 && proj.DisplayDebugWarning) warnings += $"{activeSpriteCount:n0} Sprites\n";
             else if (activeSpriteCount >= 1500) warnings += $"⚠ {activeSpriteCount:n0} Sprites\n";
 
             var commandCount = proj.FrameStats.CommandCount;
-            if (commandCount > 0 && commandCount < 15000) warnings += $"{commandCount:n0} Commands\n";
+            if (commandCount > 0 && commandCount < 15000 && proj.DisplayDebugWarning) warnings += $"{commandCount:n0} Commands\n";
             else if (commandCount >= 15000) warnings += $"⚠ {commandCount:n0} Commands\n";
 
             var effectiveCommandCount = proj.FrameStats.EffectiveCommandCount;
@@ -534,7 +534,7 @@ namespace StorybrewEditor.ScreenLayers
             if (proj.FrameStats.IncompatibleCommands) warnings += $"⚠ Incompatible Commands\n";
 
             var screenFill = proj.FrameStats.ScreenFill;
-            if (screenFill > 0 && screenFill < 5) warnings += $"{(int)screenFill}x Screen Fill\n";
+            if (screenFill > 0 && screenFill < 5 && proj.DisplayDebugWarning) warnings += $"{(int)screenFill}x Screen Fill\n";
             else if (screenFill >= 5) warnings += $"⚠ {(int)screenFill}x Screen Fill\n";
 
             return warnings.TrimEnd('\n');

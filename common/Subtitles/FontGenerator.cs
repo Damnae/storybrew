@@ -12,6 +12,7 @@ using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
+using ImageMagick;
 using Tiny;
 
 namespace StorybrewCommon.Subtitles
@@ -212,10 +213,10 @@ namespace StorybrewCommon.Subtitles
                             foreach (var effect in effects) if (effect.Overlay) effect.Draw(bitmap, textGraphics, font, stringFormat, text, textX, textY);
 
                             if (description.Debug) using (var pen = new Pen(Color.FromArgb(255, 0, 0)))
-                                {
-                                    textGraphics.DrawLine(pen, textX, textY, textX, textY + baseHeight);
-                                    textGraphics.DrawLine(pen, textX - baseWidth * .5f, textY, textX + baseWidth * .5f, textY);
-                                }
+                            {
+                                textGraphics.DrawLine(pen, textX, textY, textX, textY + baseHeight);
+                                textGraphics.DrawLine(pen, textX - baseWidth / 2f, textY, textX + baseWidth / 2f, textY);
+                            }
                         }
 
                         var bounds = description.TrimTransparency ? BitmapHelper.FindTransparencyBounds(bitmap) : null;
@@ -233,6 +234,8 @@ namespace StorybrewCommon.Subtitles
                             }
                         }
                         else BrewLib.Util.Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
+
+                        if (File.Exists(bitmapPath)) BitmapHelper.LosslessCompress(bitmapPath);
                     }
                 }
             }

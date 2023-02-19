@@ -42,6 +42,7 @@
 
   <ItemGroup>
     <PackageReference Include="Damnae.Tiny" Version="1.1.0" />
+    <PackageReference Include="Magick.NET-Q16-x86" Version="12.3.0" />
     <PackageReference Include="OpenTK" Version="3.3.3" />
   </ItemGroup>
 

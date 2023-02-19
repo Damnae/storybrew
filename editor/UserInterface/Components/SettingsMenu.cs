@@ -20,7 +20,7 @@ namespace StorybrewEditor.UserInterface.Components
         {
             this.project = project;
 
-            Button referencedAssemblyButton, floatingPointTimeButton, helpButton;
+            Button referencedAssemblyButton, floatingPointTimeButton, helpButton, displayWarningbutton;
             Label dimLabel;
             Slider dimSlider;
 
@@ -52,7 +52,7 @@ namespace StorybrewEditor.UserInterface.Components
                             },
                             referencedAssemblyButton = new Button(manager)
                             {
-                                Text = "Referenced Assemblies",
+                                Text = "View referenced assemblies",
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre
                             },
@@ -79,12 +79,21 @@ namespace StorybrewEditor.UserInterface.Components
                             },
                             floatingPointTimeButton = new Button(manager)
                             {
-                                Text = "Export Time as Floating Point",
+                                Text = "Export time as floating-point",
                                 AnchorFrom = BoxAlignment.Centre,
                                 AnchorTo = BoxAlignment.Centre,
                                 Checkable = true,
                                 Checked = project.ExportSettings.UseFloatForTime,
-                                Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer"
+                                Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer."
+                            },
+                            displayWarningbutton = new Button(manager)
+                            {
+                                Text = "Toggle debug warnings",
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
+                                Checkable = true,
+                                Checked = project.DisplayDebugWarning,
+                                Tooltip = "Toggle to display debug diagnostics about\nyour storyboard."
                             }
                         }
                     }
@@ -99,6 +108,7 @@ namespace StorybrewEditor.UserInterface.Components
                 dimLabel.Text = $"Dim ({project.DimFactor:p})";
             };
             floatingPointTimeButton.OnValueChanged += (sender, e) => project.ExportSettings.UseFloatForTime = floatingPointTimeButton.Checked;
+            displayWarningbutton.OnValueChanged += (sender, e) => project.DisplayDebugWarning = displayWarningbutton.Checked;
         }
         protected override void Dispose(bool disposing)
         {

@@ -38,6 +38,8 @@ namespace StorybrewEditor.Storyboarding
         public string ProjectFolderPath => Path.GetDirectoryName(projectPath);
         public string ProjectAssetFolderPath => Path.Combine(ProjectFolderPath, "assetlibrary");
 
+        internal bool DisplayDebugWarning = false;
+
         public string ScriptsPath { get; }
         public string CommonScriptsPath { get; }
         public string ScriptsLibraryPath { get; }

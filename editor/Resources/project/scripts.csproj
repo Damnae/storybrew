@@ -36,6 +36,9 @@
 		<Reference Include="StorybrewCommon">
 			<HintPath>..\..\StorybrewCommon.dll</HintPath>
 		</Reference>
+		<Reference Include="Magick.NET-Q16-x86">
+			<HintPath>..\..\Magick.NET-Q16-x86.dll</HintPath>
+		</Reference>
 		<Reference Include="System" />
 		<Reference Include="System.Core" />
 		<Reference Include="System.Drawing" />

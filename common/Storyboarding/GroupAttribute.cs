@@ -2,15 +2,14 @@
 
 namespace StorybrewCommon.Storyboarding
 {
-#pragma warning disable CS1591
+    ///<summary> Represents a group for configurable variables. </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class GroupAttribute : Attribute
     {
+        ///<summary> The name of the group. </summary>
         public string Name { get; set; }
 
-        public GroupAttribute(string name)
-        {
-            Name = name;
-        }
+        ///<summary/>
+        public GroupAttribute(string name) => Name = name;
     }
 }
