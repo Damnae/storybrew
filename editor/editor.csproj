@@ -5,7 +5,7 @@
     <RootNamespace>StorybrewEditor</RootNamespace>
     <AssemblyName>StorybrewEditor</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <Platforms>AnyCPU;x86</Platforms>
     <Version>1.89</Version>
   </PropertyGroup>
@@ -36,27 +36,48 @@
 
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <PackageId>storybrew editor</PackageId>
+    <PackageId>storybrew</PackageId>
     <Authors>storybrew</Authors>
     <Product>storybrew editor</Product>
-    <Description>Copyright © Damnae 2016</Description>
+    <Description></Description>
     <PlatformTarget>x86</PlatformTarget>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <Title>storybrew edtior</Title>
+    <Copyright>Copyright © Damnae 2016</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
+    <WarningLevel>7</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+    <DebugType>embedded</DebugType>
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <WarningLevel>7</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\scripttemplate.csx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="App.config" />
     <EmbeddedResource Include="Resources\FontAwesome.ttf" />
     <EmbeddedResource Include="Resources\Roboto-Light.ttf" />

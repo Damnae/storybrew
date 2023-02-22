@@ -21,7 +21,7 @@ namespace StorybrewEditor.Processes
             var identifier = $"{Guid.NewGuid()}";
             var workerUrl = $"ipc://sbrew-worker-{identifier}/worker";
 
-            channel = new IpcChannel(new Hashtable()
+            channel = new IpcChannel(new Hashtable
             {
                 ["name"] = $"sbrew-{identifier}",
                 ["portName"] = $"sbrew-{identifier}"
