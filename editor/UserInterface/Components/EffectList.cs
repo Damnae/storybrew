@@ -229,7 +229,7 @@ namespace StorybrewEditor.UserInterface.Components
                 ef.OnChanged -= changedHandler;
             };
 
-            statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status}\n\n{ef.StatusMessage}");
+            statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status} (v{Program.Version})\n\n{ef.StatusMessage}");
             renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", ef.Name, (newName) =>
             {
                 ef.Name = newName;
