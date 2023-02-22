@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <RootNamespace>BrewLib</RootNamespace>
+    <RootNamespace>brewlib</RootNamespace>
     <AssemblyName>BrewLib</AssemblyName>
     <TargetFramework>net481</TargetFramework>
-    <PackageId>brewlib</PackageId>
     <Copyright>Copyright © Damnae 2016</Copyright>
     <UseWindowsForms>true</UseWindowsForms>
-    <Product>brewlib</Product>
+    <Product>BrewLib</Product>
+	<Title>BrewLib</Title>
+	<Version>1.1</Version>
     <Company>storybrew</Company>
-    <Authors>storybrew</Authors>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 

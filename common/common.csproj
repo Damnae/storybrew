@@ -2,47 +2,42 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <RootNamespace>StorybrewCommon</RootNamespace>
+    <RootNamespace>common</RootNamespace>
     <AssemblyName>StorybrewCommon</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net481</TargetFramework>
-    <PackageId>storybrew common</PackageId>
-    <Authors>storybrew</Authors>
     <Company>storybrew</Company>
     <Product>storybrew common</Product>
-    <Description>Copyright © Damnae 2016</Description>
-    <Version>1.0.7909.25927</Version>
+	<Title>storybrew common</Title>
+    <Copyright>Copyright © Damnae 2016</Copyright>
+    <Version>1.1</Version>
     <Platforms>AnyCPU;x86</Platforms>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningLevel>4</WarningLevel>
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <WarningLevel>4</WarningLevel>
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <WarningLevel>4</WarningLevel>
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <WarningLevel>4</WarningLevel>
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Damnae.Tiny" Version="1.1.0" />
-    <PackageReference Include="Magick.NET-Q16-x86" Version="12.3.0" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="12.3.0" />
     <PackageReference Include="OpenTK" Version="3.3.3" />
   </ItemGroup>
 

@@ -2,15 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <RootNamespace>StorybrewScripts</RootNamespace>
-    <AssemblyName>StorybrewScripts</AssemblyName>
-    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>scripts</RootNamespace>
+    <AssemblyName>scripts</AssemblyName>
     <TargetFramework>net481</TargetFramework>
     <PackageId>storybrew scripts</PackageId>
-    <Authors>storybrew</Authors>
     <Company>storybrew</Company>
     <Product>storybrew scripts</Product>
-    <Description>Copyright © Damnae 2016</Description>
+    <Copyright>Copyright © Damnae 2016</Copyright>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
