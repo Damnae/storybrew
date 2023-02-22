@@ -104,13 +104,13 @@ namespace StorybrewEditor.Scripting
         public IEnumerable<string> GetScriptNames()
         {
             var projectScriptNames = new List<string>();
-            foreach (var scriptPath in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
+            foreach (var scriptPath in Directory.GetFiles(ScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
             {
                 var name = Path.GetFileNameWithoutExtension(scriptPath);
                 projectScriptNames.Add(name);
                 yield return name;
             }
-            foreach (var scriptPath in Directory.EnumerateFiles(commonScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
+            foreach (var scriptPath in Directory.GetFiles(commonScriptsPath, "*.cs", SearchOption.TopDirectoryOnly))
             {
                 var name = Path.GetFileNameWithoutExtension(scriptPath);
                 if (!projectScriptNames.Contains(name)) yield return name;
@@ -167,7 +167,7 @@ namespace StorybrewEditor.Scripting
                 var xmlns = document.DocumentElement.GetAttribute("xmlns");
                 var compileGroup = document.CreateElement("ItemGroup", xmlns);
                 document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
+                foreach (var path in Directory.GetFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
                 {
                     var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
 

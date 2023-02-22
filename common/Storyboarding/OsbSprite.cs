@@ -108,7 +108,7 @@ namespace StorybrewCommon.Storyboarding
         void refreshStartEndTimes()
         {
             clearStartEndTimes();
-            foreach (var command in commands.ToArray())
+            foreach (var command in commands)
             {
                 if (!command.Active) continue;
                 commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
@@ -679,22 +679,13 @@ namespace StorybrewCommon.Storyboarding
             displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipHorizontal, new AnimatedValueBuilder<CommandParameter>(flipHTimeline)));
             displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipVertical, new AnimatedValueBuilder<CommandParameter>(flipVTimeline)));
         }
-        void addDisplayCommand(ICommand command)
+        void addDisplayCommand(ICommand command) => displayValueBuilders.ForEach(builders =>
         {
-            foreach (var builders in displayValueBuilders.ToArray()) if (builders.Key(command)) builders.Value.Add(command);
-        }
-        void startDisplayLoop(LoopCommand loopCommand)
-        {
-            foreach (var builders in displayValueBuilders.ToArray()) builders.Value.StartDisplayLoop(loopCommand);
-        }
-        void startDisplayTrigger(TriggerCommand triggerCommand)
-        {
-            foreach (var builders in displayValueBuilders.ToArray()) builders.Value.StartDisplayTrigger(triggerCommand);
-        }
-        void endDisplayComposites()
-        {
-            foreach (var builders in displayValueBuilders.ToArray()) builders.Value.EndDisplayComposite();
-        }
+            if (builders.Key(command)) builders.Value.Add(command);
+        });
+        void startDisplayLoop(LoopCommand loopCommand) => displayValueBuilders.ForEach(builders => builders.Value.StartDisplayLoop(loopCommand));
+        void startDisplayTrigger(TriggerCommand triggerCommand) => displayValueBuilders.ForEach(builders => builders.Value.StartDisplayTrigger(triggerCommand));
+        void endDisplayComposites() => displayValueBuilders.ForEach(builders => builders.Value.EndDisplayComposite());
 
         #endregion
 

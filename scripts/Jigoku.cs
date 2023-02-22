@@ -13,28 +13,28 @@ namespace StorybrewScripts
     {
         #region Timing
 
-        static int Offset = 0;
-        static int BeatDuration = 11715 - 11363;
+        static readonly int Offset = 0;
+        static readonly int BeatDuration = 11715 - 11363;
 
-        static int TimeSbStart = Offset + 0;
-        static int TimeIntro = Offset + 774;
-        static int TimePart1 = Offset + 11363;
-        static int TimePart2 = Offset + 22657;
-        static int TimePart3 = Offset + 33951;
-        static int TimePart4 = Offset + 45245;
-        static int TimePart5 = Offset + 56539;
-        static int TimePart6 = Offset + 67833;
-        static int TimePart7 = Offset + 70657;
-        static int TimePart8 = Offset + 91127;
-        static int TimePart9 = Offset + 96068;
-        static int TimePart10 = Offset + 107362;
-        static int TimePart11 = Offset + 118657;
-        static int TimeEnd = Offset + 124127;
-        static int TimeSbEnd = Offset + 126774;
+        static readonly int TimeSbStart = Offset + 0;
+        static readonly int TimeIntro = Offset + 774;
+        static readonly int TimePart1 = Offset + 11363;
+        static readonly int TimePart2 = Offset + 22657;
+        static readonly int TimePart3 = Offset + 33951;
+        static readonly int TimePart4 = Offset + 45245;
+        static readonly int TimePart5 = Offset + 56539;
+        static readonly int TimePart6 = Offset + 67833;
+        static readonly int TimePart7 = Offset + 70657;
+        static readonly int TimePart8 = Offset + 91127;
+        static readonly int TimePart9 = Offset + 96068;
+        static readonly int TimePart10 = Offset + 107362;
+        static readonly int TimePart11 = Offset + 118657;
+        static readonly int TimeEnd = Offset + 124127;
+        static readonly int TimeSbEnd = Offset + 126774;
 
         #endregion
 
-        double BgScaling = 480d / 768;
+        readonly double BgScaling = 480d / 768;
 
         StoryboardLayer bgLayer;
         StoryboardLayer mainLayer;

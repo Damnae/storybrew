@@ -66,7 +66,7 @@ namespace StorybrewCommon.Storyboarding
                 InitialPosition = this.sprite.InitialPosition,
                 Origin = this.sprite.Origin
             };
-            foreach (var command in segment.ToArray()) sprite.AddCommand(command);
+            foreach (var command in segment) sprite.AddCommand(command);
             return sprite;
         }
         void writeOsbSprite(OsbSprite sprite)
@@ -132,14 +132,13 @@ namespace StorybrewCommon.Storyboarding
             int endTime;
             var maxCommandCount = sprite.CommandSplitThreshold;
 
-            //split the last 2 segments evenly so we don't have weird 5 command leftovers
-            if (commands.Count < sprite.CommandSplitThreshold * 2 && commands.Count > sprite.CommandSplitThreshold) maxCommandCount = (int)Math.Ceiling(commands.Count / 2.0);
+            // split the last 2 segments evenly so we don't have weird 5 command leftovers
+            if (commands.Count < sprite.CommandSplitThreshold * 2 && commands.Count > sprite.CommandSplitThreshold) maxCommandCount = (int)Math.Ceiling(commands.Count / 2d);
             if (commands.Count < maxCommandCount) endTime = fragmentationTimes.Max() + 1;
             else
             {
                 var lastCommand = commands.OrderBy(c => c.StartTime).ElementAt(maxCommandCount - 1);
-                if (fragmentationTimes.Contains((int)lastCommand.StartTime) && lastCommand.StartTime > startTime)
-                    endTime = (int)lastCommand.StartTime;
+                if (fragmentationTimes.Contains((int)lastCommand.StartTime) && lastCommand.StartTime > startTime) endTime = (int)lastCommand.StartTime;
                 else
                 {
                     if (fragmentationTimes.Any(t => t < (int)lastCommand.StartTime))

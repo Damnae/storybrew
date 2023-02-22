@@ -55,6 +55,5 @@ namespace StorybrewCommon.Storyboarding.Display
             throw new InvalidOperationException();
         }
         public override string ToString() => $"triggerable ({StartTime}s - {EndTime}s active:{Active})";
-
     }
 }

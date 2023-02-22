@@ -69,7 +69,6 @@ namespace StorybrewEditor
                     enableScheduling();
                     ProcessWorker.Run(args[1]);
                     return true;
-
             }
             return false;
         }
@@ -142,13 +141,7 @@ namespace StorybrewEditor
         static GameWindow createWindow(DisplayDevice displayDevice)
         {
             var graphicsMode = new GraphicsMode(new ColorFormat(32), 24, 8, 0, ColorFormat.Empty, 2, false);
-
-#if DEBUG
-            var contextFlags = GraphicsContextFlags.Debug | GraphicsContextFlags.ForwardCompatible;
-#else
             var contextFlags = GraphicsContextFlags.ForwardCompatible;
-#endif
-
             var primaryScreenArea = Screen.PrimaryScreen.WorkingArea;
 
             int windowWidth = 1366, windowHeight = 768;
@@ -162,8 +155,8 @@ namespace StorybrewEditor
             Trace.WriteLine($"Window dpi scale: {window.Height / (float)windowHeight}");
 
             window.Location = new Point(
-                (int)(primaryScreenArea.Left + (primaryScreenArea.Width - window.Size.Width) * 0.5f),
-                (int)(primaryScreenArea.Top + (primaryScreenArea.Height - window.Size.Height) * 0.5f)
+                (int)(primaryScreenArea.Left + (primaryScreenArea.Width - window.Size.Width) / 2f),
+                (int)(primaryScreenArea.Top + (primaryScreenArea.Height - window.Size.Height) / 2f)
             );
             if (window.Location.X < 0 || window.Location.Y < 0)
             {
@@ -186,12 +179,7 @@ namespace StorybrewEditor
         }
         static void runMainLoop(GameWindow window, Editor editor, double fixedRateUpdateDuration, double targetFrameDuration)
         {
-            var previousTime = 0.0;
-            var fixedRateTime = 0.0;
-            var averageFrameTime = 0.0;
-            var averageActiveTime = 0.0;
-            var longestFrameTime = 0.0;
-            var lastStatTime = 0.0;
+            double previousTime = 0, fixedRateTime = 0, averageFrameTime = 0, averageActiveTime = 0, longestFrameTime = 0, lastStatTime = 0;
             var windowDisplayed = false;
             var watch = new Stopwatch();
 
@@ -239,8 +227,6 @@ namespace StorybrewEditor
 
                 var frameTime = currentTime - previousTime;
                 previousTime = currentTime;
-
-                // Stats
 
                 averageFrameTime = (frameTime + averageFrameTime) / 2;
                 averageActiveTime = (activeDuration + averageActiveTime) / 2;
@@ -297,7 +283,6 @@ namespace StorybrewEditor
                 action();
                 return;
             }
-
             using (var completed = new ManualResetEvent(false))
             {
                 Exception exception = null;
@@ -332,18 +317,14 @@ namespace StorybrewEditor
 
             foreach (var action in actionsToRun)
             {
-#if !DEBUG
                 try
                 {
-#endif
                     action.Invoke();
-#if !DEBUG
                 }
                 catch (Exception e)
                 {
                     Trace.WriteLine($"Scheduled task {action.Method} failed:\n{e}");
                 }
-#endif
             }
         }
 
@@ -353,7 +334,6 @@ namespace StorybrewEditor
 
         public const string DefaultLogPath = "logs";
 
-        static TraceLogger logger;
         static readonly object errorHandlerLock = new object();
         static volatile bool insideErrorHandler;
 
@@ -372,7 +352,6 @@ namespace StorybrewEditor
                 if (File.Exists(exceptionPath)) File.Delete(exceptionPath);
             }
 
-            logger = new TraceLogger(tracePath);
             Trace.WriteLine($"{FullName}\n");
 
             AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(e.Exception, exceptionPath, null, false);
@@ -415,16 +394,13 @@ namespace StorybrewEditor
                 }
             }
         }
-        public static void Report(string type, Exception e)
+        public static void Report(string type, Exception e) => NetHelper.BlockingPost("http://a-damnae.rhcloud.com/storybrew/report.php", new NameValueCollection
         {
-            NetHelper.BlockingPost("http://a-damnae.rhcloud.com/storybrew/report.php", new NameValueCollection
-            {
-                ["reporttype"] = type,
-                ["source"] = Settings?.Id ?? "-",
-                ["version"] = Version.ToString(),
-                ["content"] = e.ToString()
-            }, (response, exception) => { });
-        }
+            ["reporttype"] = type,
+            ["source"] = Settings?.Id ?? "-",
+            ["version"] = Version.ToString(),
+            ["content"] = e.ToString()
+        }, (r, ex) => { });
         static void setupFreezeCheck(Action<Exception> action)
         {
             var mainThread = Thread.CurrentThread;

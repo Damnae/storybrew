@@ -4,9 +4,9 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StorybrewCommon.Storyboarding3d
 {
@@ -58,12 +58,12 @@ namespace StorybrewCommon.Storyboarding3d
                 Opacity.ValueAt(time) * (InheritsOpacity ? parent3dState.Opacity : 1));
 
             GenerateStates(time, cameraState, object3dState);
-            foreach (var child in children.ToArray()) child.GenerateTreeStates(time, cameraState, object3dState);
+            children.ForEach(child => child.GenerateTreeStates(time, cameraState, object3dState));
         }
         public void GenerateTreeCommands(Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
         {
             GenerateCommands(action, startTime, endTime, timeOffset, loopable);
-            foreach (var child in children.ToArray()) child.GenerateTreeCommands(action, startTime, endTime, timeOffset, loopable);
+            children.ForEach(child => child.GenerateTreeCommands(action, startTime, endTime, timeOffset, loopable));
         }
         public void GenerateTreeLoopCommands(double startTime, double endTime, int loopCount, Action<LoopCommand, OsbSprite> action = null, bool offsetCommands = true)
             => GenerateTreeCommands((createCommands, s) =>
@@ -76,13 +76,13 @@ namespace StorybrewCommon.Storyboarding3d
         public void DoTree(Action<Object3d> action)
         {
             action(this);
-            foreach (var child in children.ToArray()) child.DoTree(action);
+            children.ForEach(child => child.DoTree(action));
         }
         public void DoTreeSprite(Action<OsbSprite> action)
         {
             var sprites = (this as HasOsbSprites)?.Sprites;
             if (sprites != null) foreach (var sprite in sprites) action(sprite);
-            foreach (var child in children.ToArray()) child.DoTreeSprite(action);
+            children.ForEach(child => child.DoTreeSprite(action));
         }
 
         public virtual void GenerateSprite(StoryboardSegment parentSegment) { }

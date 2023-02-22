@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Input;
+using System;
+using System.Collections.Generic;
 
 namespace BrewLib.Input
 {
@@ -10,8 +10,7 @@ namespace BrewLib.Input
         readonly InputHandler handler;
         readonly GameWindow window;
 
-        bool hadMouseFocus;
-        bool hasMouseHover;
+        bool hadMouseFocus, hasMouseHover;
         public bool HasMouseFocus => window.Focused && hasMouseHover;
         public bool HasWindowFocus => window.Focused;
 
@@ -52,7 +51,7 @@ namespace BrewLib.Input
         }
         public void Dispose()
         {
-            foreach (var gamepadIndex in new List<int>(gamepadManagers.Keys)) DisableGamepadEvents(gamepadIndex);
+            foreach (var gamepadIndex in gamepadManagers.Keys) DisableGamepadEvents(gamepadIndex);
             gamepadManagers.Clear();
 
             window.FocusedChanged -= window_FocusedChanged;

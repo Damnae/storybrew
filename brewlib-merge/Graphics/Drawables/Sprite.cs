@@ -26,8 +26,8 @@ namespace BrewLib.Graphics.Drawables
             var renderer = DrawState.Prepare(drawContext.Get<QuadRenderer>(), camera, RenderStates);
             var color = Color.WithOpacity(opacity);
 
-            var textureX0 = .0f;
-            var textureY0 = .0f;
+            var textureX0 = 0f;
+            var textureY0 = 0f;
             var textureX1 = Texture.Width;
             var textureY1 = Texture.Height;
 
@@ -41,13 +41,13 @@ namespace BrewLib.Graphics.Drawables
                     if (scaleH > scaleV)
                     {
                         scale = scaleH;
-                        textureY0 = (Texture.Height - bounds.Height / scale) * .5f;
+                        textureY0 = (Texture.Height - bounds.Height / scale) / 2;
                         textureY1 = Texture.Height - textureY0;
                     }
                     else
                     {
                         scale = scaleV;
-                        textureX0 = (Texture.Width - bounds.Width / scale) * .5f;
+                        textureX0 = (Texture.Width - bounds.Width / scale) / 2;
                         textureX1 = Texture.Width - textureX0;
                     }
                     break;
@@ -69,8 +69,8 @@ namespace BrewLib.Graphics.Drawables
                     break;
 
                 default:
-                    renderer.Draw(Texture, (bounds.Left + bounds.Right) * .5f, (bounds.Top + bounds.Bottom) * .5f,
-                    (textureX1 - textureX0) * .5f, (textureY1 - textureY0) * .5f,
+                    renderer.Draw(Texture, (bounds.Left + bounds.Right) / 2, (bounds.Top + bounds.Bottom) / 2,
+                    (textureX1 - textureX0) / 2, (textureY1 - textureY0) / 2,
                     scale, scale, Rotation, color, textureX0, textureY0, textureX1, textureY1);
                     break;
             }

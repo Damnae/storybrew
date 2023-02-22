@@ -45,28 +45,28 @@ namespace StorybrewCommon.Storyboarding
         public double PositionTolerance = 1;
 
         ///<summary> The tolerance threshold for scaling keyframe simplification. </summary>
-        public double ScaleTolerance = .1;
+        public double ScaleTolerance = .5;
 
         ///<summary> The tolerance threshold for rotation keyframe simplification. </summary>
-        public double RotationTolerance = .1;
+        public double RotationTolerance = .25;
 
         ///<summary> The tolerance threshold for coloring keyframe simplification. </summary>
         public double ColorTolerance = 2;
 
         ///<summary> The tolerance threshold for opacity keyframe simplification. </summary>
-        public double OpacityTolerance = .01;
+        public double OpacityTolerance = .1;
 
         ///<summary> The amount of decimal digits for position keyframes. </summary>
         public int PositionDecimals = 1;
 
         ///<summary> The amount of decimal digits for scaling keyframes. </summary>
-        public int ScaleDecimals = 2;
+        public int ScaleDecimals = 3;
 
         ///<summary> The amount of decimal digits for rotation keyframes. </summary>
-        public int RotationDecimals = 3;
+        public int RotationDecimals = 4;
 
         ///<summary> The amount of decimal digits for opacity keyframes. </summary>
-        public int OpacityDecimals = 2;
+        public int OpacityDecimals = 1;
 
         public Action<State> PostProcess;
 
@@ -99,7 +99,7 @@ namespace StorybrewCommon.Storyboarding
             var imageSize = Vector2.One;
             var distFade = false;
 
-            foreach (var state in states.ToArray())
+            states.ForEach(state =>
             {
                 var time = state.Time + timeOffset;
                 var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.TexturePath);
@@ -131,7 +131,7 @@ namespace StorybrewCommon.Storyboarding
                 previousState = state;
                 distFade = state.UseDistanceFade;
                 wasVisible = isVisible;
-            }
+            });
 
             if (wasVisible) commitKeyframes(imageSize);
             if (everVisible)
@@ -148,7 +148,7 @@ namespace StorybrewCommon.Storyboarding
             positions.Simplify2dKeyframes(PositionTolerance, v => v);
             positions.TransferKeyframes(finalPositions);
 
-            scales.Simplify2dKeyframes(ScaleTolerance, f => new Vector2(f.X * imageSize.X, f.Y * imageSize.Y));
+            scales.Simplify2dKeyframes(ScaleTolerance, f => f * imageSize);
             scales.TransferKeyframes(finalScales);
 
             rotations.Simplify1dKeyframes(RotationTolerance, f => f);
@@ -164,31 +164,45 @@ namespace StorybrewCommon.Storyboarding
         }
         void convertToCommands(OsbSprite sprite, double? startTime, double? endTime, double timeOffset, bool loopable, bool distFade)
         {
-            var startStateTime = loopable ? (startTime ?? StartState.Time) + timeOffset : (double?)null;
-            var endStateTime = loopable ? (endTime ?? EndState.Time) + timeOffset : (double?)null;
+            var startState = loopable ? (startTime ?? StartState.Time) + timeOffset : (double?)null;
+            var endState = loopable ? (endTime ?? EndState.Time) + timeOffset : (double?)null;
 
-            finalPositions.ForEachPair((s, e) => sprite.Move(s.Time, e.Time, s.Value, e.Value), new Vector2(320, 240),
-                p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startStateTime, loopable: loopable);
+            var first = finalPositions.FirstOrDefault();
+            bool moveX = finalPositions.All(k => k.Value.Y == first.Value.Y), moveY = finalPositions.All(k => k.Value.X == first.Value.X);
+            finalPositions.ForEachPair((s, e) =>
+            {
+                if (moveX && !moveY)
+                {
+                    sprite.MoveX(s.Time, e.Time, s.Value.X, e.Value.X);
+                    sprite.InitialPosition = new Vector2(0, s.Value.Y);
+                }
+                else if (moveY && !moveX)
+                {
+                    sprite.MoveY(s.Time, e.Time, s.Value.Y, e.Value.Y);
+                    sprite.InitialPosition = new Vector2(s.Value.X, 0);
+                }
+                else sprite.Move(s.Time, e.Time, s.Value, e.Value);
+            }, new Vector2(320, 240), p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startState, loopable: loopable);
 
-            var vec = finalScales.Any(k => (float)Math.Round(k.Value.X, ScaleDecimals) != (float)Math.Round(k.Value.Y, ScaleDecimals));
+            var vec = finalScales.Any(k => Math.Round(k.Value.X, ScaleDecimals > 5 ? 5 : ScaleDecimals) != Math.Round(k.Value.Y, ScaleDecimals > 5 ? 5 : ScaleDecimals));
             finalScales.ForEachPair((s, e) =>
             {
                 if (vec) sprite.ScaleVec(s.Time, e.Time, s.Value, e.Value);
                 else sprite.Scale(s.Time, e.Time, s.Value.X, e.Value.X);
-            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)), startStateTime, loopable: loopable);
+            }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)), startState, loopable: loopable);
 
             finalRotations.ForEachPair((s, e) => sprite.Rotate(s.Time, e.Time, s.Value, e.Value), 0,
-                r => (float)Math.Round(r, RotationDecimals), startStateTime, loopable: loopable);
+                r => (float)Math.Round(r, RotationDecimals), startState, loopable: loopable);
 
             finalColors.ForEachPair((s, e) => sprite.Color(s.Time, e.Time, s.Value, e.Value), CommandColor.White,
-                c => CommandColor.FromRgb(c.R, c.G, c.B), startStateTime, loopable: loopable);
+                c => CommandColor.FromRgb(c.R, c.G, c.B), startState, loopable: loopable);
 
             finalfades.ForEachPair((s, e) =>
             {
                 if (!((s.Time == sprite.CommandsStartTime && s.Time == e.Time && e.Value == 1 && distFade) ||
                     (s.Time == sprite.CommandsEndTime && s.Time == e.Time && e.Value == 0)))
                 sprite.Fade(s.Time, e.Time, s.Value, e.Value);
-            }, -1, o => (float)Math.Round(o, OpacityDecimals), startStateTime, endStateTime, loopable: loopable);
+            }, -1, o => (float)Math.Round(o, OpacityDecimals), startState, endState, loopable: loopable);
 
             flipH.ForEachFlag((f, t) => sprite.FlipH(f, t));
             flipV.ForEachFlag((f, t) => sprite.FlipV(f, t));

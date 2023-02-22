@@ -8,7 +8,7 @@ namespace StorybrewCommon.Animations
     {
 #pragma warning disable CS1591
         public static double Reverse(Func<double, double> func, double value) => 1 - func(1 - value);
-        public static double ToInOut(Func<double, double> func, double value) => .5 * (value < .5 ? func(2 * value) : (2 - func(2 - 2 * value)));
+        public static double ToInOut(Func<double, double> func, double value) => (value < .5 ? func(2 * value) : (2 - func(2 - 2 * value))) / 2;
 
         public static Func<double, double> Step = x => x >= 1 ? 1 : 0;
         public static Func<double, double> Linear = x => x;

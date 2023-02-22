@@ -61,12 +61,11 @@ namespace StorybrewCommon.Storyboarding.Display
             if (commands.Count == 0) return DefaultValue;
 
             if (!findCommandIndex(time, out int index) && index > 0) index--;
-
             if (HasOverlap) for (var i = 0; i < index; i++) if (time < commands[i].EndTime)
-                    {
-                        index = i;
-                        break;
-                    }
+            {
+                index = i;
+                break;
+            }
 
             var command = commands[index];
             return command.ValueAtTime(time);

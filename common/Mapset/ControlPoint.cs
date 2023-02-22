@@ -69,7 +69,7 @@ namespace StorybrewCommon.Mapset
             var values = line.Split(',');
             if (values.Length < 2) throw new InvalidOperationException($"Control point has less than the 2 required parameters: {line}");
 
-            return new ControlPoint()
+            return new ControlPoint
             {
                 Offset = double.Parse(values[0], CultureInfo.InvariantCulture),
                 beatDurationSV = double.Parse(values[1], CultureInfo.InvariantCulture),

@@ -114,9 +114,7 @@ namespace BrewLib.Graphics.Cameras
             var far = Vector4.Transform(new Vector4(deviceX, deviceY, FarPlane, 1), invertedProjectionView).Xyz;
             var direction = Vector3.Normalize(far - near);
 
-            // The screen ray is parallel to the world plane
             if (direction.Z == 0) return Vector3.Zero;
-
             return near - direction * (near.Z / direction.Z);
         }
         public Box2 FromScreen(Box2 screenBox2) => new Box2(
@@ -130,7 +128,7 @@ namespace BrewLib.Graphics.Cameras
             var transformedPosition = Vector4.Transform(new Vector4(worldCoords, 1), projectionView);
             var devicePosition = transformedPosition.Xyz / Math.Abs(transformedPosition.W);
 
-            return new Vector3((devicePosition.X + 1) * .5f * viewport.Width, (-devicePosition.Y + 1) * .5f * viewport.Height, devicePosition.Z);
+            return new Vector3((devicePosition.X + 1) / 2 * viewport.Width, (-devicePosition.Y + 1) / 2 * viewport.Height, devicePosition.Z);
         }
 
         public Vector3 ToScreen(Vector2 worldCoords) => ToScreen(new Vector3(worldCoords));

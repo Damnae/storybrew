@@ -12,16 +12,11 @@ namespace StorybrewEditor
     {
         public const string DefaultPath = "settings.cfg";
 
-        public readonly Setting<string> Id = new Setting<string>(Guid.NewGuid().ToString("N"));
-        public readonly Setting<int> FrameRate = new Setting<int>(0);
-        public readonly Setting<int> UpdateRate = new Setting<int>(60);
-        public readonly Setting<float> Volume = new Setting<float>(0.5f);
-        public readonly Setting<bool> FitStoryboard = new Setting<bool>(false);
-        public readonly Setting<bool> ShowStats = new Setting<bool>(false);
-        public readonly Setting<bool> VerboseVsCode = new Setting<bool>(false);
-        public readonly Setting<bool> UseRoslyn = new Setting<bool>(false);
-        public readonly Setting<int> EffectThreads = new Setting<int>(0);
-        public readonly Setting<string> TimeCopyFormat = new Setting<string>(@"h\:mm\:ss\.ff");
+        public readonly Setting<string> Id = new Setting<string>(Guid.NewGuid().ToString("N")), TimeCopyFormat = new Setting<string>(@"h\:mm\:ss\.ff");
+        public readonly Setting<int> FrameRate = new Setting<int>(0), UpdateRate = new Setting<int>(60), EffectThreads = new Setting<int>(0);
+        public readonly Setting<float> Volume = new Setting<float>(.5f);
+        public readonly Setting<bool> FitStoryboard = new Setting<bool>(false), ShowStats = new Setting<bool>(false),
+            VerboseVsCode = new Setting<bool>(false), UseRoslyn = new Setting<bool>(false);
 
         readonly string path;
 
@@ -42,22 +37,22 @@ namespace StorybrewEditor
             {
                 using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                    reader.ParseKeyValueSection((key, value) =>
-                    {
-                        var field = type.GetField(key);
-                        if (field == null || !field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
-                            return;
+                reader.ParseKeyValueSection((key, value) =>
+                {
+                    var field = type.GetField(key);
+                    if (field == null || !field.FieldType.IsGenericType || !typeof(Setting).IsAssignableFrom(field.FieldType.GetGenericTypeDefinition()))
+                        return;
 
-                        try
-                        {
-                            var setting = (Setting)field.GetValue(this);
-                            setting.Set(value);
-                        }
-                        catch (Exception e)
-                        {
-                            Trace.WriteLine($"Failed to load setting {key} with value {value}: {e}");
-                        }
-                    });
+                    try
+                    {
+                        var setting = (Setting)field.GetValue(this);
+                        setting.Set(value);
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLine($"Failed to load setting {key} with value {value}: {e}");
+                    }
+                });
             }
             catch (Exception e)
             {

@@ -8,7 +8,7 @@ namespace StorybrewEditor.Util
     public class MultiFileWatcher : IDisposable
     {
         Dictionary<string, FileSystemWatcher> folderWatchers = new Dictionary<string, FileSystemWatcher>();
-        Dictionary<string, FileSystemWatcher> recursiveFolderWatchers = new Dictionary<string, FileSystemWatcher>();
+        readonly Dictionary<string, FileSystemWatcher> recursiveFolderWatchers = new Dictionary<string, FileSystemWatcher>();
         HashSet<string> watchedFilenames = new HashSet<string>();
         readonly ThrottledActionScheduler scheduler = new ThrottledActionScheduler();
 

@@ -6,7 +6,6 @@ namespace BrewLib.Graphics.Renderers.PrimitiveStreamers
 {
     public class PrimitiveStreamerBufferData<TPrimitive> : PrimitiveStreamerVao<TPrimitive> where TPrimitive : struct
     {
-
         public PrimitiveStreamerBufferData(VertexDeclaration vertexDeclaration, int minRenderableVertexCount, ushort[] indexes = null)
             : base(vertexDeclaration, minRenderableVertexCount, indexes) { }
 

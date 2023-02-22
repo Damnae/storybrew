@@ -12,7 +12,6 @@ using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
-using ImageMagick;
 using Tiny;
 
 namespace StorybrewCommon.Subtitles
@@ -165,7 +164,7 @@ namespace StorybrewCommon.Subtitles
                     fontFamily = fontCollection.Families[0];
                 }
 
-                var dpiScale = 96f / graphics.DpiY;
+                var dpiScale = 96 / graphics.DpiY;
                 var fontStyle = description.FontStyle;
                 using (var font = fontFamily != null ? new Font(fontFamily, description.FontSize * dpiScale, fontStyle) : new Font(fontPath, description.FontSize * dpiScale, fontStyle))
                 {
@@ -184,9 +183,9 @@ namespace StorybrewCommon.Subtitles
                     width = (int)Math.Ceiling(baseWidth + effectsWidth + description.Padding.X * 2);
                     height = (int)Math.Ceiling(baseHeight + effectsHeight + description.Padding.Y * 2);
 
-                    var paddingX = description.Padding.X + effectsWidth * .5f;
-                    var paddingY = description.Padding.Y + effectsHeight * .5f;
-                    var textX = paddingX + measuredSize.Width * .5f;
+                    var paddingX = description.Padding.X + effectsWidth / 2;
+                    var paddingY = description.Padding.Y + effectsHeight / 2;
+                    var textX = paddingX + measuredSize.Width / 2;
                     var textY = paddingY;
 
                     offsetX = -paddingX;

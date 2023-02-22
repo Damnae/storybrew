@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -44,17 +43,17 @@ namespace StorybrewEditor
             {
                 addFile(archive, mainExecutablePath, appDirectory);
                 addFile(archive, "StorybrewEditor.exe.config", appDirectory);
-                foreach (var path in Directory.EnumerateFiles(appDirectory, "*.dll", SearchOption.TopDirectoryOnly))
+                foreach (var path in Directory.GetFiles(appDirectory, "*.dll", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, appDirectory);
 
-                foreach (var path in Directory.EnumerateFiles(appDirectory, "*.xml", SearchOption.TopDirectoryOnly))
+                foreach (var path in Directory.GetFiles(appDirectory, "*.xml", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, appDirectory);
 
-                foreach (var path in Directory.EnumerateFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))
+                foreach (var path in Directory.GetFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, scriptsDirectory, "scripts");
             }
         }
-        static void testUpdate(string archiveName)
+        /* static void testUpdate(string archiveName)
         {
             var previousVersion = $"{Program.Version.Major}.{Program.Version.Minor - 1}";
             var previousArchiveName = $"storybrew.{previousVersion}.zip";
@@ -84,7 +83,7 @@ namespace StorybrewEditor
             {
                 WorkingDirectory = updateFolderPath,
             });
-        }
+        } */
         static void addFile(ZipArchive archive, string path, string sourceDirectory, string targetPath = null)
         {
             path = Path.GetFullPath(path);

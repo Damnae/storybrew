@@ -98,27 +98,27 @@ namespace StorybrewCommon.Storyboarding3d
             var targetPosition = TargetPosition.ValueAt(time);
             var up = Up.ValueAt(time).Normalized();
 
-            float fovY;
+            double fovY;
             if (HorizontalFov.Count > 0)
             {
-                var fovX = MathHelper.DegreesToRadians(HorizontalFov.ValueAt(time));
-                fovY = 2 * (float)Math.Atan(Math.Tan(fovX / 2) / aspectRatio);
+                var fovX = (double)MathHelper.DegreesToRadians(HorizontalFov.ValueAt(time));
+                fovY = 2 * Math.Atan(Math.Tan(fovX / 2) / aspectRatio);
             }
             else
             {
                 fovY = VerticalFov.Count > 0 ? MathHelper.DegreesToRadians(VerticalFov.ValueAt(time)) :
-                2 * (float)Math.Atan(Resolution.Y / 2D / Math.Max(.0001, (cameraPosition - targetPosition).Length));
+                2 * Math.Atan(Resolution.Y / 2D / Math.Max(.0001, (cameraPosition - targetPosition).Length));
             }
 
             var focusDistance = Resolution.Y / 2D / Math.Tan(fovY / 2D);
-            var nearClip = NearClip.Count > 0 ? NearClip.ValueAt(time) : Math.Min((float)focusDistance / 2, 1);
-            var farClip = FarClip.Count > 0 ? FarClip.ValueAt(time) : (float)focusDistance * 1.5f;
+            var nearClip = NearClip.Count > 0 ? NearClip.ValueAt(time) : Math.Min(focusDistance / 2, 1);
+            var farClip = FarClip.Count > 0 ? FarClip.ValueAt(time) : focusDistance * 1.5;
 
             var nearFade = NearFade.Count > 0 ? NearFade.ValueAt(time) : nearClip;
             var farFade = FarFade.Count > 0 ? FarFade.ValueAt(time) : farClip;
 
             var view = Matrix4.LookAt(cameraPosition, targetPosition, up);
-            var projection = Matrix4.CreatePerspectiveFieldOfView(fovY, (float)aspectRatio, nearClip, farClip);
+            var projection = Matrix4.CreatePerspectiveFieldOfView((float)fovY, (float)aspectRatio, (float)nearClip, (float)farClip);
 
             return new CameraState(view * projection, aspectRatio, focusDistance, ResolutionScale, nearClip, nearFade, farFade, farClip);
         }

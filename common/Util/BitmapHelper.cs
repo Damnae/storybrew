@@ -14,7 +14,17 @@ namespace StorybrewCommon.Util
         public static bool LosslessCompress(string filePath)
         {
             var opt = new ImageOptimizer();
-            return opt.LosslessCompress(filePath);
+            bool success;
+            try
+            {
+                success = opt.LosslessCompress(filePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return success;
         }
         public static double[,] CalculateGaussianKernel(int radius, double weight)
         {

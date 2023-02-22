@@ -17,7 +17,6 @@ namespace BrewLib.Graphics.Cameras
                 Invalidate();
             }
         }
-
         public CameraIso()
         {
             NearPlane = -1000;
@@ -35,8 +34,8 @@ namespace BrewLib.Graphics.Cameras
 
             internalViewport = extendedViewport = screenViewport;
             projection = Matrix4.CreateOrthographicOffCenter(
-                -screenViewport.Width / 2.0f, screenViewport.Width / 2,
-                -(screenViewport.Height / 2), screenViewport.Height / 2,
+                -screenViewport.Width / 2f, screenViewport.Width / 2f,
+                -(screenViewport.Height / 2f), screenViewport.Height / 2f,
                 NearPlane, FarPlane);
 
             view = Matrix4.LookAt(Position, Position + Forward, Up);

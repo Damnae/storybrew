@@ -30,12 +30,13 @@ namespace BrewLib.Graphics.Drawables
             {
                 var maxWidth = 0f;
                 var maxHeight = 0f;
-                foreach (var drawable in Drawables)
+
+                Drawables.ForEach(drawable =>
                 {
                     var preferredSize = drawable.PreferredSize;
                     maxWidth = Math.Min(maxWidth, preferredSize.X);
                     maxHeight = Math.Min(maxHeight, preferredSize.Y);
-                }
+                });
                 return new Vector2(maxWidth, maxHeight);
             }
         }

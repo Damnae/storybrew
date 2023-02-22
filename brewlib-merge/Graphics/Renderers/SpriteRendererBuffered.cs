@@ -51,21 +51,21 @@ namespace BrewLib.Graphics.Renderers
 
         #endregion
 
-        private Shader shader;
-        private bool ownsShader;
+        Shader shader;
+        readonly bool ownsShader;
         public Shader Shader => ownsShader ? null : shader;
 
-        private Action flushAction;
+        Action flushAction;
         public Action FlushAction
         {
             get { return flushAction; }
             set { flushAction = value; }
         }
 
-        private PrimitiveStreamer<SpritePrimitive> primitiveStreamer;
-        private SpritePrimitive[] spriteArray;
+        PrimitiveStreamer<SpritePrimitive> primitiveStreamer;
+        SpritePrimitive[] spriteArray;
 
-        private Camera camera;
+        Camera camera;
         public Camera Camera
         {
             get { return camera; }
@@ -79,7 +79,7 @@ namespace BrewLib.Graphics.Renderers
             }
         }
 
-        private Matrix4 transformMatrix = Matrix4.Identity;
+        Matrix4 transformMatrix = Matrix4.Identity;
         public Matrix4 TransformMatrix
         {
             get { return transformMatrix; }
@@ -93,14 +93,14 @@ namespace BrewLib.Graphics.Renderers
             }
         }
 
-        private int spritesInBatch;
-        private int maxSpritesPerBatch;
+        int spritesInBatch;
+        readonly int maxSpritesPerBatch;
 
-        private BindableTexture currentTexture;
-        private int currentSamplerUnit;
-        private bool rendering;
+        BindableTexture currentTexture;
+        int currentSamplerUnit;
+        bool rendering;
 
-        private int currentLargestBatch;
+        int currentLargestBatch;
 
         public int RenderedSpriteCount { get; private set; }
         public int FlushedBufferCount { get; private set; }
@@ -120,8 +120,7 @@ namespace BrewLib.Graphics.Renderers
                 throw new NotSupportedException();
 
             }, shader, flushAction, maxSpritesPerBatch, primitiveBufferSize)
-        {
-        }
+        {}
 
         public SpriteRendererBuffered(CreatePrimitiveStreamerDelegate<SpritePrimitive> createPrimitiveStreamer, Shader shader = null, Action flushAction = null, int maxSpritesPerBatch = 4096, int primitiveBufferSize = 0)
         {
@@ -147,14 +146,11 @@ namespace BrewLib.Graphics.Renderers
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         public void Dispose(bool disposing)
         {
-            if (!disposing)
-                return;
+            if (!disposing) return;
 
-            if (rendering)
-                EndRendering();
+            if (rendering) EndRendering();
 
             spriteArray = null;
 
@@ -174,7 +170,6 @@ namespace BrewLib.Graphics.Renderers
 
             rendering = true;
         }
-
         public void EndRendering()
         {
             if (!rendering) throw new InvalidOperationException("Not rendering");
@@ -186,7 +181,7 @@ namespace BrewLib.Graphics.Renderers
             rendering = false;
         }
 
-        private bool lastFlushWasBuffered = false;
+        bool lastFlushWasBuffered = false;
         public void Flush(bool canBuffer = false)
         {
             if (spritesInBatch == 0)
@@ -245,10 +240,10 @@ namespace BrewLib.Graphics.Renderers
             var width = textureX1 - textureX0;
             var height = textureY1 - textureY0;
 
-            float fx = -originX;
-            float fy = -originY;
-            float fx2 = width - originX;
-            float fy2 = height - originY;
+            var fx = -originX;
+            var fy = -originY;
+            var fx2 = width - originX;
+            var fy2 = height - originY;
 
             var flipX = false;
             var flipY = false;
@@ -266,23 +261,16 @@ namespace BrewLib.Graphics.Renderers
                 fy2 *= absScaleY;
             }
 
-            float p1x = fx;
-            float p1y = fy;
-            float p2x = fx;
-            float p2y = fy2;
-            float p3x = fx2;
-            float p3y = fy2;
-            float p4x = fx2;
-            float p4y = fy;
+            var p1x = fx;
+            var p1y = fy;
+            var p2x = fx;
+            var p2y = fy2;
+            var p3x = fx2;
+            var p3y = fy2;
+            var p4x = fx2;
+            var p4y = fy;
 
-            float x1;
-            float y1;
-            float x2;
-            float y2;
-            float x3;
-            float y3;
-            float x4;
-            float y4;
+            float x1, y1, x2, y2, x3, y3, x4, y4;
 
             if (rotation != 0)
             {
@@ -311,7 +299,6 @@ namespace BrewLib.Graphics.Renderers
             }
 
             var spritePrimitive = default(SpritePrimitive);
-
             spritePrimitive.x1 = x1 + x;
             spritePrimitive.y1 = y1 + y;
             spritePrimitive.x2 = x2 + x;

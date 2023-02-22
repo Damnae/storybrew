@@ -125,7 +125,7 @@ namespace StorybrewCommon.Scripting
         [Group("Common")] [Description("Changes the result of Random(...) calls.")]
         [Configurable] public int RandomSeed;
 
-        Random rnd = new Random();
+        Random rnd;
 
         ///<summary> Gets a pseudo-random integer with minimum value <paramref name="minValue"/> and maximum value <paramref name="maxValue"/>. </summary>
         public int Random(int minValue, int maxValue) => rnd.Next(minValue, maxValue);
@@ -229,7 +229,7 @@ namespace StorybrewCommon.Scripting
             var assetDirectory = asAsset ? context.ProjectAssetPath : context.MapsetPath;
             var fontDirectory = Path.GetFullPath(Path.Combine(assetDirectory, directory));
             if (fontDirectories.Contains(fontDirectory)) throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
-            fontDirectories.Add(fontDirectory);
+            _ = fontDirectories.Add(fontDirectory);
 
             var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, assetDirectory);
             fontGenerators.Add(fontGenerator);
@@ -251,7 +251,7 @@ namespace StorybrewCommon.Scripting
             var cachePath = fontCacheDirectory;
             if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
 
-            foreach (var fontGenerator in fontGenerators.ToArray())
+            fontGenerators.ForEach(fontGenerator =>
             {
                 var path = Path.Combine(cachePath, HashHelper.GetMd5(fontGenerator.Directory) + ".yaml");
 
@@ -264,7 +264,7 @@ namespace StorybrewCommon.Scripting
                 {
                     Trace.WriteLine($"Failed to save font cache for {path} ({e.GetType().FullName})");
                 }
-            }
+            });
         }
 
         #endregion
@@ -309,14 +309,14 @@ namespace StorybrewCommon.Scripting
                     var value = config.GetValue(field.Name);
                     field.SetValue(this, value);
 
-                    remainingFieldNames.Remove(field.Name);
+                    _ = remainingFieldNames.Remove(field.Name);
                 }
                 catch (Exception e)
                 {
                     Trace.WriteLine($"Failed to update configuration for {field.Name} with type {fieldType}:\n{e}");
                 }
             }
-            foreach (var name in remainingFieldNames.ToArray()) config.RemoveField(name);
+            remainingFieldNames.ForEach(name => config.RemoveField(name));
         }
 
         ///<summary/>
@@ -324,7 +324,7 @@ namespace StorybrewCommon.Scripting
         {
             if (context != null) throw new InvalidOperationException();
 
-            foreach (var configurableField in configurableFields.ToArray())
+            configurableFields.ForEach(configurableField =>
             {
                 var field = configurableField.Field;
                 try
@@ -336,7 +336,7 @@ namespace StorybrewCommon.Scripting
                 {
                     Trace.WriteLine($"Failed to apply configuration for {field.Name}:\n{e}");
                 }
-            }
+            });
         }
         void initializeConfigurableFields()
         {
@@ -401,7 +401,7 @@ namespace StorybrewCommon.Scripting
                 bitmaps.Clear();
             }
         }
-        ///<summary> Main body for storyboard object generators. Interpreted by storybrew to create storyboards. </summary>
+        ///<summary> Main body for storyboard generation. </summary>
         protected abstract void Generate();
     }
 }

@@ -22,7 +22,7 @@ namespace StorybrewCommon.Mapset
             var objectSampleSet = (SampleSet)int.Parse(specialValues[1]);
             var objectAdditionsSampleSet = (SampleSet)int.Parse(specialValues[2]);
             var objectCustomSampleSet = int.Parse(specialValues[3]);
-            var objectVolume = 0.0f;
+            var objectVolume = 0f;
             if (specialValues.Length > 4) objectVolume = int.Parse(specialValues[4]);
             if (specialValues.Length > 5) samplePath = specialValues[5];
 
@@ -33,7 +33,7 @@ namespace StorybrewCommon.Mapset
             }
             if (objectAdditionsSampleSet != 0) additionsSampleSet = objectAdditionsSampleSet;
             if (objectCustomSampleSet != 0) customSampleSet = objectCustomSampleSet;
-            if (objectVolume > 0.001f) volume = objectVolume;
+            if (objectVolume > .001) volume = objectVolume;
 
             return new OsuHold
             {

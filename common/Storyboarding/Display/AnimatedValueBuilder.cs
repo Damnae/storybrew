@@ -19,14 +19,14 @@ namespace StorybrewCommon.Storyboarding.Display
             if (command == null) return;
             (composite ?? value).Add(command);
         }
-        public void StartDisplayLoop(LoopCommand loopCommand)
+        public void StartDisplayLoop(LoopCommand loop)
         {
             if (composite != null) throw new InvalidOperationException("Cannot start loop: already inside a loop or trigger");
 
-            decorate = (command) =>
+            decorate = command =>
             {
-                if (loopCommand.CommandsStartTime != 0) throw new InvalidOperationException($"Commands in a loop must start at 0ms, but start at {loopCommand.CommandsStartTime}ms");
-                return new LoopDecorator<TValue>(command, loopCommand.StartTime, loopCommand.CommandsDuration, loopCommand.LoopCount);
+                if (loop.CommandsStartTime != 0) throw new InvalidOperationException($"Commands in a loop must start at 0ms, but start at {loop.CommandsStartTime}ms");
+                return new LoopDecorator<TValue>(command, loop.StartTime, loop.CommandsDuration, loop.LoopCount);
             };
             composite = new CompositeCommand<TValue>();
         }

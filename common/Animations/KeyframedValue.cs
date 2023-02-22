@@ -120,7 +120,7 @@ namespace StorybrewCommon.Animations
         ///<param name="edit"> A delegate encapsulating edits to the pairs' values. </param>
         ///<param name="explicitStartTime"> The explicit start time for the keyframed value in this method. </param>
         ///<param name="explicitEndTime"> The explicit end time for the keyframed value in this method. </param>
-        ///<param name="loopable"> Whether <paramref name="pair"/> encapsulates a <see cref="Storyboarding.Commands.LoopCommand"/>. </param>
+        ///<param name="loopable"> Whether <paramref name="pair"/> is encapsulated in a <see cref="Storyboarding.Commands.LoopCommand"/>. </param>
         public void ForEachPair(Action<Keyframe<TValue>, Keyframe<TValue>> pair,
             TValue defaultValue = default, Func<TValue, TValue> edit = null,
             double? explicitStartTime = null, double? explicitEndTime = null, bool loopable = false)
@@ -136,7 +136,7 @@ namespace StorybrewCommon.Animations
             Keyframe<TValue>? stepStart = null;
             Keyframe<TValue>? previousPairEnd = null;
 
-            foreach (var keyframe in keyframes.ToArray())
+            keyframes.ForEach(keyframe =>
             {
                 var endKeyframe = editKeyframe(keyframe, edit);
                 if (previous.HasValue)
@@ -178,7 +178,7 @@ namespace StorybrewCommon.Animations
                     }
                 }
                 previous = endKeyframe;
-            }
+            });
             if (stepStart.HasValue)
             {
                 if (!hasPair && explicitStartTime.HasValue && startTime < stepStart.Value.Time)
@@ -241,7 +241,7 @@ namespace StorybrewCommon.Animations
             var linearKeyframes = new List<Keyframe<TValue>>();
 
             var previousKeyframe = (Keyframe<TValue>?)null;
-            foreach (var keyframe in keyframes.ToArray())
+            keyframes.ForEach(keyframe =>
             {
                 if (previousKeyframe.HasValue)
                 {
@@ -258,7 +258,7 @@ namespace StorybrewCommon.Animations
                     }
                 }
                 previousKeyframe = keyframe;
-            }
+            });
             var endTime = keyframes[keyframes.Count - 1].Time;
             linearKeyframes.Add(new Keyframe<TValue>(endTime, ValueAt(endTime)));
 
@@ -302,7 +302,7 @@ namespace StorybrewCommon.Animations
             var middle = new Vector2d(middleKeyframe.Time, getComponent(middleKeyframe.Value));
             var end = new Vector2d(endKeyframe.Time, getComponent(endKeyframe.Value));
 
-            var area = Math.Abs(.5 * (start.X * end.Y + end.X * middle.Y + middle.X * start.Y - end.X * start.Y - middle.X * end.Y - start.X * middle.Y));
+            var area = Math.Abs((start.X * end.Y + end.X * middle.Y + middle.X * start.Y - end.X * start.Y - middle.X * end.Y - start.X * middle.Y) / 2);
             var bottom = Math.Sqrt(Math.Pow(start.X - end.X, 2) + Math.Pow(start.Y - end.Y, 2));
             return area / bottom * 2;
         });
@@ -347,7 +347,7 @@ namespace StorybrewCommon.Animations
                 Vector4d.Dot(startToMiddle, startToEnd) / Vector4d.Dot(startToEnd, startToEnd) * startToEnd).Length;
         });
 
-        ///<summary> Simplifies keyframes on ommands. </summary>
+        ///<summary> Simplifies keyframes on commands. </summary>
         ///<param name="tolerance"> Distance threshold from which keyframes can be removed.  </param>
         ///<param name="getDistance"> Distance between keyframes. </param>
         public void SimplifyKeyframes(double tolerance, Func<Keyframe<TValue>, Keyframe<TValue>, Keyframe<TValue>, double> getDistance)
@@ -363,11 +363,11 @@ namespace StorybrewCommon.Animations
 
             keyframesToKeep.Sort();
             var simplifiedKeyframes = new List<Keyframe<TValue>>(keyframesToKeep.Count);
-            foreach (var index in keyframesToKeep.ToArray())
+            keyframesToKeep.ForEach(index =>
             {
                 var keyframe = keyframes[index];
                 simplifiedKeyframes.Add(new Keyframe<TValue>(keyframe.Time, keyframe.Value));
-            }
+            });
             keyframes = simplifiedKeyframes;
         }
         void getSimplifiedKeyframeIndexes(ref List<int> keyframesToKeep, int firstPoint, int lastPoint, double tolerance, Func<Keyframe<TValue>, Keyframe<TValue>, Keyframe<TValue>, double> getDistance)

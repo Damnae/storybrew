@@ -206,8 +206,7 @@ namespace StorybrewEditor.ScreenLayers
             });
             effects.OnEffectPreselect += effect =>
             {
-                if (effect != null)
-                    timeline.Highlight(effect.StartTime, effect.EndTime);
+                if (effect != null) timeline.Highlight(effect.StartTime, effect.EndTime);
                 else timeline.ClearHighlight();
             };
             effects.OnEffectSelected += effect => timeline.Value = (float)effect.StartTime / 1000;

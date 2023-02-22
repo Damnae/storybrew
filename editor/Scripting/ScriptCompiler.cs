@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
-using Microsoft.CodeAnalysis.Text;
 
 namespace StorybrewEditor.Scripting
 {
@@ -37,27 +37,24 @@ namespace StorybrewEditor.Scripting
                     typeof(ScriptCompiler).Assembly.ManifestModule.FullyQualifiedName,
                     typeof(ScriptCompiler).FullName);
 
-                compiler.compile(sourcePaths, outputPath, Program.Settings.UseRoslyn, referencedAssemblies);
+                compiler.compile(sourcePaths, outputPath, referencedAssemblies);
             }
             finally
             {
                 AppDomain.Unload(compilerDomain);
             }
         }
-        void compile(string[] sourcePaths, string outputPath, bool useRoslyn, IEnumerable<string> referencedAssemblies)
+        void compile(string[] sourcePaths, string outputPath, IEnumerable<string> referencedAssemblies)
         {
             var symbolPath = Path.ChangeExtension(outputPath, "pdb");
             var trees = new Dictionary<SyntaxTree, KeyValuePair<string, SourceText>>();
-            foreach (var sourcePath in sourcePaths)
+            foreach (var sourcePath in sourcePaths) using (var sourceStream = File.OpenRead(sourcePath))
             {
-                using (var sourceStream = File.OpenRead(sourcePath))
-                {
-                    var sourceText = SourceText.From(sourceStream, canBeEmbedded: true);
-                    var parseOptions = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest);
+                var sourceText = SourceText.From(sourceStream, canBeEmbedded: true);
+                var parseOptions = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest);
 
-                    var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, parseOptions);
-                    trees.Add(syntaxTree, new KeyValuePair<string, SourceText>(sourcePath, sourceText));
-                }
+                var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, parseOptions);
+                trees.Add(syntaxTree, new KeyValuePair<string, SourceText>(sourcePath, sourceText));
             }
             var references = new List<MetadataReference>
             {

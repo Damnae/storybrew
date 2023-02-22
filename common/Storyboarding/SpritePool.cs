@@ -97,7 +97,7 @@ namespace StorybrewCommon.Storyboarding
         {
             PooledSprite result = null;
 
-            foreach (var pooledSprite in pooledSprites.ToArray())
+            foreach (var pooledSprite in pooledSprites)
                 if (getPoolDuration(startTime, endTime, MaxPoolDuration, pooledSprite) &&
                 (result == null || pooledSprite.StartTime < result.StartTime)) result = pooledSprite;
 
@@ -118,12 +118,11 @@ namespace StorybrewCommon.Storyboarding
 
         internal void Clear()
         {
-            if (attributes != null)
-                foreach (var pooledSprite in pooledSprites.ToArray())
-                {
-                    var sprite = pooledSprite.Sprite;
-                    attributes(sprite, sprite.CommandsStartTime, pooledSprite.EndTime);
-                }
+            if (attributes != null) foreach (var pooledSprite in pooledSprites)
+            {
+                var sprite = pooledSprite.Sprite;
+                attributes(sprite, sprite.CommandsStartTime, pooledSprite.EndTime);
+            }
             pooledSprites.Clear();
         }
 
