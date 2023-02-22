@@ -36,7 +36,7 @@ namespace StorybrewEditor
         {
             Trace.WriteLine($"\n\nBuilding {archiveName}\n");
 
-            var scriptsDirectory = Path.GetFullPath(Path.Combine(appDirectory, "../../../../../scripts"));
+            var scriptsDirectory = Path.GetFullPath(Path.Combine(appDirectory, "../../../../scripts"));
 
             using (var stream = new FileStream(archiveName, FileMode.Create, FileAccess.ReadWrite))
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Create))
