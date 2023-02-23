@@ -26,7 +26,7 @@ namespace StorybrewEditor.Scripting
             var setup = new AppDomainSetup
             {
                 ApplicationName = $"ScriptCompiler {nextId++}",
-                ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
+                ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase
             };
 
             Debug.Print($"{nameof(Scripting)}: Compiling {string.Join(", ", sourcePaths)}");
@@ -99,30 +99,21 @@ namespace StorybrewEditor.Scripting
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                     .WithPlatform(Platform.AnyCpu)
                     .WithOptimizationLevel(OptimizationLevel.Debug)
-                    .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default)
-            );
+                    .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default));
 
-            using (var assemblyStream = File.Create(outputPath))
-            using (var symbolsStream = File.Create(symbolPath))
+            using (var assemblyStream = File.Create(outputPath)) using (var symbolsStream = File.Create(symbolPath))
             {
                 var emitOptions = new EmitOptions(
                     debugInformationFormat: DebugInformationFormat.PortablePdb,
                     pdbFilePath: symbolPath);
 
-                var embeddedTexts = trees.Values.Select(k => EmbeddedText.FromSource(k.Key, k.Value)).ToList();
-
-                var result = compilation.Emit(
-                    peStream: assemblyStream,
-                    pdbStream: symbolsStream,
-                    embeddedTexts: embeddedTexts,
-                    options: emitOptions
-                );
+                var embeddedTexts = trees.Values.Select(k => EmbeddedText.FromSource(k.Key, k.Value));
+                var result = compilation.Emit(assemblyStream, symbolsStream, embeddedTexts: embeddedTexts, options: emitOptions);
 
                 if (result.Success) return;
 
-                var failures = result.Diagnostics.Where(diagnostic =>
-                    diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
-                    .ToList();
+                var failures = result.Diagnostics.Where(diagnostic => 
+                    diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error).ToList();
 
                 failures.Reverse();
                 var failureGroup = failures.GroupBy(k =>

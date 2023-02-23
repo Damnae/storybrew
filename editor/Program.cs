@@ -41,7 +41,7 @@ namespace StorybrewEditor
 
         [STAThread] static void Main(string[] args)
         {
-            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            mainThreadId = Environment.CurrentManagedThreadId;
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 
             if (args.Length != 0 && handleArguments(args)) return;

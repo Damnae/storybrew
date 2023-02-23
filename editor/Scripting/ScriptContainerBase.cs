@@ -11,8 +11,6 @@ namespace StorybrewEditor.Scripting
         static int nextId;
         public readonly int Id = nextId++;
 
-        readonly ScriptManager<TScript> manager;
-
         public string CompiledScriptsPath { get; }
 
         ScriptProvider<TScript> scriptProvider;
@@ -59,9 +57,8 @@ namespace StorybrewEditor.Scripting
         public bool HasScript => scriptProvider != null || currentVersion != targetVersion;
         public event EventHandler OnScriptChanged;
 
-        public ScriptContainerBase(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
+        public ScriptContainerBase(string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
         {
-            this.manager = manager;
             ScriptTypeName = scriptTypeName;
             MainSourcePath = mainSourcePath;
             LibraryFolder = libraryFolder;

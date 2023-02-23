@@ -310,15 +310,15 @@ namespace StorybrewEditor.ScreenLayers
                 {
                     var speed = timeSource.TimeFactor;
                     if (speed > 1) speed = 2;
-                    speed *= 0.5;
-                    if (speed < 0.2) speed = 1;
+                    speed /= 2;
+                    if (speed < .2) speed = 1;
                     timeSource.TimeFactor = speed;
                 }
                 else if (e == MouseButton.Right)
                 {
                     var speed = timeSource.TimeFactor;
                     if (speed < 1) speed = 1;
-                    speed += speed >= 2 ? 1 : 0.5;
+                    speed += speed >= 2 ? 1 : .5;
                     if (speed > 8) speed = 1;
                     timeSource.TimeFactor = speed;
                 }
@@ -361,7 +361,7 @@ namespace StorybrewEditor.ScreenLayers
                     if (e.Control)
                     {
                         var nextBookmark = proj.MainBeatmap.Bookmarks.FirstOrDefault(bookmark => bookmark > Math.Round(timeline.Value * 1000) + 50);
-                        if (nextBookmark != 0) timeline.Value = nextBookmark * 0.001f;
+                        if (nextBookmark != 0) timeline.Value = nextBookmark * .001f;
                     }
                     else timeline.Scroll(e.Shift ? 4 : 1);
                     return true;
@@ -370,7 +370,7 @@ namespace StorybrewEditor.ScreenLayers
                     if (e.Control)
                     {
                         var prevBookmark = proj.MainBeatmap.Bookmarks.LastOrDefault(bookmark => bookmark < Math.Round(timeline.Value * 1000) - 500);
-                        if (prevBookmark != 0) timeline.Value = prevBookmark * 0.001f;
+                        if (prevBookmark != 0) timeline.Value = prevBookmark * .001f;
                     }
                     else timeline.Scroll(e.Shift ? -4 : -1);
                     return true;
@@ -459,7 +459,6 @@ namespace StorybrewEditor.ScreenLayers
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-
             if (pendingSeek.HasValue)
             {
                 timeSource.Seek(pendingSeek.Value);
@@ -526,7 +525,7 @@ namespace StorybrewEditor.ScreenLayers
             var unusedCommandFactor = (double)unusedCommandCount / commandCount;
             if ((unusedCommandCount >= 5000 && unusedCommandFactor > .5) ||
                 (unusedCommandCount >= 10000 && unusedCommandFactor > .2) ||
-                unusedCommandCount >= 20000)
+                unusedCommandCount >= 15000)
                 warnings += $"⚠ {unusedCommandCount:n0} ({unusedCommandFactor:0%}) Commands on Hidden Sprites\n";
 
             if (proj.FrameStats.OverlappedCommands) warnings += $"⚠ Overlapped Commands\n";
@@ -565,8 +564,8 @@ namespace StorybrewEditor.ScreenLayers
         }
         void resizeTimeline()
         {
-            timeline.MinValue = (float)Math.Min(0, proj.StartTime * 0.001);
-            timeline.MaxValue = (float)Math.Max(audio.Duration, proj.EndTime * 0.001);
+            timeline.MinValue = (float)Math.Min(0, proj.StartTime * .001);
+            timeline.MaxValue = (float)Math.Max(audio.Duration, proj.EndTime * .001);
         }
         public override void Close() => withSavePrompt(() =>
         {

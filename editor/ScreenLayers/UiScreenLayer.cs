@@ -36,9 +36,9 @@ namespace StorybrewEditor.ScreenLayers
 
             if (Manager.GetContext<Editor>().IsFixedRateUpdate)
             {
-                var targetOpacity = isTop ? 1f : 0.3f;
-                if (Math.Abs(opacity - targetOpacity) <= 0.07f) opacity = targetOpacity;
-                else opacity = MathHelper.Clamp(opacity + (opacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
+                var targetOpacity = isTop ? 1 : .3f;
+                if (Math.Abs(opacity - targetOpacity) <= .07) opacity = targetOpacity;
+                else opacity = MathHelper.Clamp(opacity + (opacity < targetOpacity ? .07f : -.07f), 0, 1);
             }
             WidgetManager.Opacity = opacity * (float)TransitionProgress;
         }
@@ -60,7 +60,7 @@ namespace StorybrewEditor.ScreenLayers
                 button.OnValueChanged += (sender, e) =>
                 {
                     if (widget.Displayed = button.Checked) foreach (var otherButton in buttons)
-                            if (sender != otherButton && otherButton.Checked != false) otherButton.Checked = false;
+                        if (sender != otherButton && otherButton.Checked != false) otherButton.Checked = false;
                 };
             }
         }

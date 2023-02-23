@@ -12,7 +12,6 @@ namespace StorybrewEditor.ScreenLayers
     public class ReferencedAssemblyConfig : UiScreenLayer
     {
         LinearLayout layout, assembliesLayout, buttonsLayout;
-
         Button okButton, cancelButton;
 
         public override bool IsPopup => true;
@@ -28,7 +27,6 @@ namespace StorybrewEditor.ScreenLayers
         public override void Load()
         {
             base.Load();
-
             Button addAssemblyButton, addSystemAssemblyButton;
 
             WidgetManager.Root.Add(layout = new LinearLayout(WidgetManager)

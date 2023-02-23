@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
+using MessageBox = StorybrewEditor.ScreenLayers.Util.MessageBox;
 
 namespace StorybrewEditor.ScreenLayers
 {
@@ -15,24 +17,24 @@ namespace StorybrewEditor.ScreenLayers
         {
             screenLayer.AsyncLoading("Select a folder", () =>
             {
-                using (var dialog = new System.Windows.Forms.FolderBrowserDialog()
+                using (var dialog = new FolderBrowserDialog
                 {
                     Description = description,
                     ShowNewFolderButton = true,
                     SelectedPath = initialValue
                 })
-                    if (dialog.ShowDialog(screenLayer.GetContext<Editor>().FormsWindow) == System.Windows.Forms.DialogResult.OK)
-                    {
-                        var path = dialog.SelectedPath;
-                        Program.Schedule(() => callback.Invoke(path));
-                    }
+                if (dialog.ShowDialog(screenLayer.GetContext<Editor>().FormsWindow) == DialogResult.OK)
+                {
+                    var path = dialog.SelectedPath;
+                    Program.Schedule(() => callback.Invoke(path));
+                }
             });
         }
         public static void OpenFilePicker(this ScreenLayerManager screenLayer, string description, string initialValue, string initialDirectory, string filter, Action<string> callback)
         {
             screenLayer.AsyncLoading("Select a file", () =>
             {
-                using (var dialog = new System.Windows.Forms.OpenFileDialog()
+                using (var dialog = new OpenFileDialog
                 {
                     Title = description,
                     RestoreDirectory = true,
@@ -41,18 +43,18 @@ namespace StorybrewEditor.ScreenLayers
                     Filter = filter,
                     InitialDirectory = initialDirectory != null ? Path.GetFullPath(initialDirectory) : string.Empty
                 })
-                    if (dialog.ShowDialog(screenLayer.GetContext<Editor>().FormsWindow) == System.Windows.Forms.DialogResult.OK)
-                    {
-                        var path = dialog.FileName;
-                        Program.Schedule(() => callback.Invoke(path));
-                    }
+                if (dialog.ShowDialog(screenLayer.GetContext<Editor>().FormsWindow) == DialogResult.OK)
+                {
+                    var path = dialog.FileName;
+                    Program.Schedule(() => callback.Invoke(path));
+                }
             });
         }
         public static void OpenSaveLocationPicker(this ScreenLayerManager screenLayer, string description, string initialValue, string extension, string filter, Action<string> callback)
         {
             screenLayer.AsyncLoading("Select a location", () =>
             {
-                using (var dialog = new System.Windows.Forms.SaveFileDialog()
+                using (var dialog = new SaveFileDialog
                 {
                     Title = description,
                     RestoreDirectory = true,
@@ -62,11 +64,11 @@ namespace StorybrewEditor.ScreenLayers
                     DefaultExt = extension,
                     Filter = filter
                 })
-                    if (dialog.ShowDialog(screenLayer.GetContext<Editor>().FormsWindow) == System.Windows.Forms.DialogResult.OK)
-                    {
-                        var path = dialog.FileName;
-                        Program.Schedule(() => callback.Invoke(path));
-                    }
+                if (dialog.ShowDialog(screenLayer.GetContext<Editor>().FormsWindow) == DialogResult.OK)
+                {
+                    var path = dialog.FileName;
+                    Program.Schedule(() => callback.Invoke(path));
+                }
             });
         }
 

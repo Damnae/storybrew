@@ -35,7 +35,7 @@ namespace StorybrewEditor.Processes
         {
             var executablePath = Assembly.GetExecutingAssembly().Location;
             var workingDirectory = Path.GetDirectoryName(executablePath);
-            process = new Process()
+            process = new Process
             {
                 StartInfo = new ProcessStartInfo(executablePath, $"worker \"{identifier}\"")
                 {

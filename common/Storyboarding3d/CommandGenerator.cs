@@ -145,16 +145,16 @@ namespace StorybrewCommon.Storyboarding
         }
         void commitKeyframes(Vector2 imageSize)
         {
-            positions.Simplify2dKeyframes(PositionTolerance, v => v);
+            positions.Simplify2dKeyframes(PositionTolerance, s => s);
             positions.TransferKeyframes(finalPositions);
 
-            scales.Simplify2dKeyframes(ScaleTolerance, f => f * imageSize);
+            scales.Simplify2dKeyframes(ScaleTolerance, v => v * imageSize);
             scales.TransferKeyframes(finalScales);
 
-            rotations.Simplify1dKeyframes(RotationTolerance, f => f);
+            rotations.Simplify1dKeyframes(RotationTolerance, r => r);
             rotations.TransferKeyframes(finalRotations);
 
-            colors.Simplify3dKeyframes(ColorTolerance, b => new Vector3(b.R, b.G, b.B));
+            colors.Simplify3dKeyframes(ColorTolerance, c => new Vector3(c.R, c.G, c.B));
             colors.TransferKeyframes(finalColors);
 
             fades.Simplify1dKeyframes(OpacityTolerance, f => f);
@@ -167,8 +167,8 @@ namespace StorybrewCommon.Storyboarding
             var startState = loopable ? (startTime ?? StartState.Time) + timeOffset : (double?)null;
             var endState = loopable ? (endTime ?? EndState.Time) + timeOffset : (double?)null;
 
-            var first = finalPositions.FirstOrDefault();
-            bool moveX = finalPositions.All(k => k.Value.Y == first.Value.Y), moveY = finalPositions.All(k => k.Value.X == first.Value.X);
+            var first = finalPositions.FirstOrDefault().Value;
+            bool moveX = finalPositions.All(k => k.Value.Y == first.Y), moveY = finalPositions.All(k => k.Value.X == first.X);
             finalPositions.ForEachPair((s, e) =>
             {
                 if (moveX && !moveY)

@@ -97,7 +97,7 @@ namespace StorybrewEditor.Scripting
                 }
             }
 
-            scriptContainer = new ScriptContainerAppDomain<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
+            scriptContainer = new ScriptContainerAppDomain<TScript>(scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             scriptContainers.Add(scriptName, scriptContainer);
             return scriptContainer;
         }
@@ -142,14 +142,11 @@ namespace StorybrewEditor.Scripting
                 foreach (var container in scriptContainers.Values) container.ReloadScript();
             });
         }
-        void scheduleSolutionUpdate()
+        void scheduleSolutionUpdate() => scheduler?.Schedule($"*{nameof(updateSolutionFiles)}", key =>
         {
-            scheduler?.Schedule($"*{nameof(updateSolutionFiles)}", key =>
-            {
-                if (disposedValue) return;
-                updateSolutionFiles();
-            });
-        }
+            if (disposedValue) return;
+            updateSolutionFiles();
+        });
         void updateSolutionFiles()
         {
             Trace.WriteLine($"Updating solution files");
