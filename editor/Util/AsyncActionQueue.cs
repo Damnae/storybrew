@@ -234,8 +234,9 @@ namespace StorybrewEditor.Util
 
                 if (!localThread.Join(millisecondsTimeout))
                 {
-                    Trace.WriteLine($"Aborting thread {localThread.Name}.");
-                    localThread.Abort();
+                    Trace.WriteLine($"Canceling thread {localThread.Name}.");
+                    var token = new CancellationToken(true);
+                    token.ThrowIfCancellationRequested();
                 }
             }
         }

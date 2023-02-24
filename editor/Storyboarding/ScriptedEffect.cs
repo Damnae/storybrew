@@ -81,7 +81,7 @@ namespace StorybrewEditor.Storyboarding
             }
             catch (RemotingException e)
             {
-                Debug.Print($"Script execution failed with RemotingException, reloading {BaseName} ({e.Message})");
+                Debug.Print($"Script execution failed with IOException, reloading {BaseName} ({e.Message})");
                 changeStatus(EffectStatus.ReloadPending);
                 Program.Schedule(() =>
                 {
