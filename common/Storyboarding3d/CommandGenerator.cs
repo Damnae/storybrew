@@ -89,7 +89,6 @@ namespace StorybrewCommon.Storyboarding
 
             states.Insert(index, state);
         }
-        public void ClearStates() => states.Clear();
 
         public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false) 
             => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action, startTime, endTime, timeOffset, loopable);
@@ -229,15 +228,14 @@ namespace StorybrewCommon.Storyboarding
             flipH.Clear();
             flipV.Clear();
             additive.Clear();
+            states.Clear();
+            states.TrimExcess();
         }
         public class State : IComparable<State>
         {
-            public double Time;
-            public Vector2 Position = new Vector2(320, 240);
-            public Vector2 Scale = Vector2.One;
-            public double Rotation = 0;
+            public double Time, Rotation = 0, Opacity = 1;
+            public Vector2 Position = new Vector2(320, 240), Scale = Vector2.One;
             public CommandColor Color = CommandColor.White;
-            public double Opacity = 1;
             public bool FlipH, FlipV, Additive, UseDistanceFade;
 
             public bool IsVisible(int width, int height, OsbOrigin origin, Box2 bounds)

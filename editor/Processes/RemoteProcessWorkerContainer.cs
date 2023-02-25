@@ -38,7 +38,7 @@ namespace StorybrewEditor.Processes
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine($"Couldn't start ipc: {e}");
+                    Trace.WriteLine($"Couldn't start pipe: {e}");
                 }
             }
         }
@@ -61,7 +61,11 @@ namespace StorybrewEditor.Processes
                         Trace.WriteLine($"Failed to dispose the worker: {e}");
                     }
                     if (!process.WaitForExit(2000)) process.Kill();
+
+                    pipeServer.Disconnect();
+                    pipeServer.Dispose();
                 }
+
                 Worker = null;
                 process = null;
                 disposed = true;

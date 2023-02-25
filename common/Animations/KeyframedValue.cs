@@ -131,11 +131,8 @@ namespace StorybrewCommon.Animations
             var startTime = explicitStartTime ?? keyframes[0].Time;
             var endTime = explicitEndTime ?? keyframes[keyframes.Count - 1].Time;
 
-            var hasPair = false;
-            var forceNextFlat = loopable;
-            Keyframe<TValue>? previous = null;
-            Keyframe<TValue>? stepStart = null;
-            Keyframe<TValue>? previousPairEnd = null;
+            bool hasPair = false, forceNextFlat = loopable;
+            Keyframe<TValue>? previous = null, stepStart = null, previousPairEnd = null;
 
             keyframes.ForEach(keyframe =>
             {
@@ -180,7 +177,6 @@ namespace StorybrewCommon.Animations
                 }
                 previous = endKeyframe;
             });
-
             if (stepStart.HasValue)
             {
                 if (!hasPair && explicitStartTime.HasValue && startTime < stepStart.Value.Time)

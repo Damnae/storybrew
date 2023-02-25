@@ -4,6 +4,7 @@ using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Remoting;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -81,6 +82,17 @@ namespace StorybrewEditor.Storyboarding
             catch (IOException e)
             {
                 Debug.Print($"Script execution failed with IOException, reloading {BaseName} ({e.Message})");
+                changeStatus(EffectStatus.ReloadPending);
+                Program.Schedule(() =>
+                {
+                    if (Project.Disposed) return;
+                    scriptContainer.ReloadScript();
+                });
+                return;
+            }
+            catch (RemotingException e)
+            {
+                Debug.Print($"Script execution failed with RemotingException, reloading {BaseName} ({e.Message})");
                 changeStatus(EffectStatus.ReloadPending);
                 Program.Schedule(() =>
                 {

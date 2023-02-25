@@ -242,8 +242,7 @@ namespace StorybrewEditor.Storyboarding
         void refreshEffectsStatus()
         {
             var previousStatus = EffectsStatus;
-            var pendingTasks = effectUpdateQueue.TaskCount;
-            var isUpdating = pendingTasks > 0;
+            var isUpdating = effectUpdateQueue.TaskCount > 0;
             var hasError = false;
 
             foreach (var effect in effects)
@@ -512,7 +511,7 @@ namespace StorybrewEditor.Storyboarding
                     var guid = version >= 6 ? new Guid(r.ReadBytes(16)) : Guid.NewGuid();
                     var identifier = r.ReadString();
                     var effectIndex = r.ReadInt32();
-                    var diffSpecific = version >= 3 ? r.ReadBoolean() : false;
+                    var diffSpecific = version >= 3 && r.ReadBoolean();
                     var osbLayer = version >= 2 ? (OsbLayer)r.ReadInt32() : OsbLayer.Background;
                     var visible = r.ReadBoolean();
 
