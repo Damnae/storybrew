@@ -22,8 +22,7 @@ namespace StorybrewEditor
 {
     class Program
     {
-        public const string Name = "storybrew editor";
-        public const string Repository = "Damnae/storybrew";
+        public const string Name = "storybrew editor", Repository = "Damnae/storybrew";
         public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public static string FullName => $"{Name} {Version} ({Repository})";
         public static string DiscordUrl = $"https://discord.gg/0qfFOucX93QDNVN7";
@@ -155,8 +154,8 @@ namespace StorybrewEditor
             Trace.WriteLine($"Window dpi scale: {window.Height / (float)windowHeight}");
 
             window.Location = new Point(
-                (int)(primaryScreenArea.Left + (primaryScreenArea.Width - window.Size.Width) / 2f),
-                (int)(primaryScreenArea.Top + (primaryScreenArea.Height - window.Size.Height) / 2f)
+                (int)(primaryScreenArea.Left + (primaryScreenArea.Width - window.Size.Width) / 2d),
+                (int)(primaryScreenArea.Top + (primaryScreenArea.Height - window.Size.Height) / 2d)
             );
             if (window.Location.X < 0 || window.Location.Y < 0)
             {
@@ -247,7 +246,6 @@ namespace StorybrewEditor
         #region Scheduling
 
         public static bool SchedulingEnabled { get; set; }
-
         static readonly Queue<Action> scheduledActions = new Queue<Action>();
 
         public static void enableScheduling() => SchedulingEnabled = true;
@@ -259,7 +257,7 @@ namespace StorybrewEditor
         public static void Schedule(Action action)
         {
             if (SchedulingEnabled) lock (scheduledActions) scheduledActions.Enqueue(action);
-            else throw new InvalidOperationException("Scheduling isn't enabled");
+            else throw new InvalidOperationException("Scheduling isn't enabled!");
         }
 
         /// <summary>
@@ -315,16 +313,13 @@ namespace StorybrewEditor
                 scheduledActions.Clear();
             }
 
-            foreach (var action in actionsToRun)
+            foreach (var action in actionsToRun) try
             {
-                try
-                {
-                    action.Invoke();
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine($"Scheduled task {action.Method} failed:\n{e}");
-                }
+                action.Invoke();
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Scheduled task {action.Method} failed:\n{e}");
             }
         }
 
@@ -377,7 +372,6 @@ namespace StorybrewEditor
                     }
 
                     if (reportType != null) Report(reportType, e);
-
                     if (show)
                     {
                         var result = MessageBox.Show($"An error occured:\n\n{e.Message} ({e.GetType().Name})\n\nClick Ok if you want to receive and invitation to a Discord server where you can get help with this problem.", FullName, MessageBoxButtons.OKCancel);

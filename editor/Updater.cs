@@ -9,17 +9,12 @@ namespace StorybrewEditor
 {
     public static class Updater
     {
-        static readonly string[] ignoredPaths = { ".vscode/", "cache/", "logs/", "settings.cfg" };
-        static readonly string[] readOnlyPaths = { "scripts/" };
-
-        public const string UpdateArchivePath = "cache/net/update";
-        public const string UpdateFolderPath = "cache/update";
-        public const string FirstRunPath = "firstrun";
+        static readonly string[] ignoredPaths = { ".vscode/", "cache/", "logs/", "settings.cfg" }, readOnlyPaths = { "scripts/" };
+        public const string UpdateArchivePath = "cache/net/update", UpdateFolderPath = "cache/update", FirstRunPath = "firstrun";
 
         static readonly Version readOnlyVersion = new Version(1, 8);
 
         public static void OpenLastestReleasePage() => Process.Start($"https://github.com/{Program.Repository}/releases/latest");
-
         public static void Update(string destinationFolder, Version fromVersion)
         {
             Trace.WriteLine($"Updating from version {fromVersion} to {Program.Version}");
@@ -37,7 +32,6 @@ namespace StorybrewEditor
                 Program.Report("updatefail", e);
                 return;
             }
-
             try
             {
                 updateData(destinationFolder, fromVersion);
@@ -49,12 +43,11 @@ namespace StorybrewEditor
                 Program.Report("updatefail", e);
             }
 
-            // Start the updated process
             var relativeProcessPath = PathHelper.GetRelativePath(sourceFolder, updaterPath);
             var processPath = Path.Combine(destinationFolder, relativeProcessPath);
 
             Trace.WriteLine($"\nUpdate complete, starting {processPath}");
-            Process.Start(new ProcessStartInfo()
+            Process.Start(new ProcessStartInfo
             {
                 FileName = processPath,
                 WorkingDirectory = destinationFolder
@@ -75,7 +68,7 @@ namespace StorybrewEditor
         {
             var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
             if (fromVersion < new Version(1, 53)) settings.UseRoslyn.Set(true);
-            if (fromVersion < new Version(1, 70)) settings.Volume.Set(Math.Pow(settings.Volume, 1 / 4f));
+            if (fromVersion < new Version(1, 70)) settings.Volume.Set(Math.Pow(settings.Volume, .25));
             settings.Save();
 
             if (fromVersion < new Version(1, 57))

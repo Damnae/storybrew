@@ -46,10 +46,10 @@ namespace StorybrewEditor
         public void Initialize(ScreenLayer initialLayer = null)
         {
             ResourceContainer = new AssemblyResourceContainer(Assembly.GetEntryAssembly(), $"{nameof(StorybrewEditor)}.Resources", "resources");
-
             DrawState.Initialize(ResourceContainer, Window.Width, Window.Height);
+
             drawContext = new DrawContext();
-            drawContext.Register(this, false);
+            drawContext.Register(this);
             drawContext.Register<TextureContainer>(new TextureContainerAtlas(ResourceContainer), true);
             drawContext.Register<QuadRenderer>(new QuadRendererBuffered(), true);
             drawContext.Register<LineRenderer>(new LineRendererBuffered(), true);
@@ -153,7 +153,7 @@ namespace StorybrewEditor
                     },
                     volumeSlider = new Slider(overlay)
                     {
-                        Step = 0.01f,
+                        Step = .01f,
                         AnchorTo = BoxAlignment.Centre
                     }
                 }
@@ -179,9 +179,9 @@ namespace StorybrewEditor
                 var showAltOverlayTop = InputManager.AltOnly || (altOverlayTop.Displayed && bounds.Top < mousePosition.Y && mousePosition.Y < bounds.Bottom);
 
                 var altOpacity = altOverlayTop.Opacity;
-                var targetOpacity = showAltOverlayTop ? 1f : 0f;
-                if (Math.Abs(altOpacity - targetOpacity) <= 0.07f) altOpacity = targetOpacity;
-                else altOpacity = MathHelper.Clamp(altOpacity + (altOpacity < targetOpacity ? 0.07f : -0.07f), 0, 1);
+                var targetOpacity = showAltOverlayTop ? 1f : 0;
+                if (Math.Abs(altOpacity - targetOpacity) <= .07) altOpacity = targetOpacity;
+                else altOpacity = MathHelper.Clamp(altOpacity + (altOpacity < targetOpacity ? .07f : -.07f), 0, 1);
 
                 overlayTop.Opacity = 1 - altOpacity;
                 overlayTop.Displayed = altOpacity < 1;
@@ -228,7 +228,6 @@ namespace StorybrewEditor
         public string GetStats()
         {
             var spriteRenderer = drawContext.Get<QuadRenderer>();
-
             return string.Format("Sprite - t:{0}k f:{1:0.0}k b:{2} w:{3} lb:{4}",
                 spriteRenderer.RenderedQuadCount / 1000, spriteRenderer.FlushedBufferCount / 1000f, spriteRenderer.DiscardedBufferCount, spriteRenderer.BufferWaitCount, spriteRenderer.LargestBatch);
         }
@@ -243,7 +242,7 @@ namespace StorybrewEditor
 
             DrawState.Viewport = new Rectangle(0, 0, width, height);
 
-            overlayCamera.VirtualHeight = (int)(height * Math.Max(1024f / width, 768f / height));
+            overlayCamera.VirtualHeight = (int)(height * Math.Max(1024d / width, 768d / height));
             overlayCamera.VirtualWidth = width * overlayCamera.VirtualHeight / height;
             overlay.Size = new Vector2(overlayCamera.VirtualWidth, overlayCamera.VirtualHeight);
         }

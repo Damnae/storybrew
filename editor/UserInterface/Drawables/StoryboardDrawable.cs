@@ -17,18 +17,14 @@ namespace StorybrewEditor.UserInterface.Drawables
         readonly RenderStates linesRenderStates = new RenderStates();
 
         public double Time;
-        public bool Clip = true;
-        public bool UpdateFrameStats;
+        public bool Clip = true, UpdateFrameStats;
 
         public StoryboardDrawable(Project project) => this.project = project;
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity = 1)
         {
             project.DisplayTime = Time;
-            if (Clip)
-            {
-                using (DrawState.Clip(bounds, camera)) project.Draw(drawContext, camera, bounds, opacity, UpdateFrameStats);
-            }
+            if (Clip) using (DrawState.Clip(bounds, camera)) project.Draw(drawContext, camera, bounds, opacity, UpdateFrameStats);
             else
             {
                 project.Draw(drawContext, camera, bounds, opacity, UpdateFrameStats);

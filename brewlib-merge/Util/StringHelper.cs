@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace BrewLib.Util
+﻿namespace BrewLib.Util
 {
     public static class StringHelper
     {
@@ -14,7 +12,7 @@ namespace BrewLib.Util
                 order++;
                 byteCount /= 1024;
             }
-            return string.Format(CultureInfo.InvariantCulture, format, byteCount, sizeOrders[order]);
+            return string.Format(format, byteCount, sizeOrders[order]);
         }
     }
 }

@@ -97,12 +97,13 @@ namespace StorybrewCommon.Animations
         ///<summary> Returns the value of the keyframed value at <paramref name="time"/>. </summary>
         public TValue ValueAt(double time)
         {
-            if (keyframes.Count == 0) return defaultValue;
-            if (keyframes.Count == 1) return keyframes[0].Value;
+            var count = keyframes.Count;
+            if (count == 0) return defaultValue;
+            if (count == 1) return keyframes[0].Value;
 
             var index = indexAt(time, false);
             if (index == 0) return keyframes[0].Value;
-            else if (index == keyframes.Count) return keyframes[keyframes.Count - 1].Value;
+            else if (index == count) return keyframes[count - 1].Value;
             else
             {
                 var from = keyframes[index - 1];
@@ -179,6 +180,7 @@ namespace StorybrewCommon.Animations
                 }
                 previous = endKeyframe;
             });
+
             if (stepStart.HasValue)
             {
                 if (!hasPair && explicitStartTime.HasValue && startTime < stepStart.Value.Time)

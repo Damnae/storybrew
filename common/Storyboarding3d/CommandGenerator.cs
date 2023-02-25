@@ -35,7 +35,7 @@ namespace StorybrewCommon.Storyboarding
 
         readonly List<State> states = new List<State>();
 
-        ///<summary> Gets the <see cref="CommandGenerator"/>'s starting state. </summary>
+        ///<summary> Gets the <see cref="CommandGenerator"/>'s start state. </summary>
         public State StartState => states.Count == 0 ? null : states[0];
 
         ///<summary> Gets the <see cref="CommandGenerator"/>'s end state. </summary>
@@ -72,18 +72,22 @@ namespace StorybrewCommon.Storyboarding
 
         public void Add(State state, bool before = false)
         {
-            if (states.Count == 0 || states[states.Count - 1].Time < state.Time) states.Add(state);
-            else
+            var count = states.Count;
+            if (count == 0 || states[count - 1].Time < state.Time)
             {
-                var index = states.BinarySearch(state);
-                if (index >= 0)
-                {
-                    if (before) while (index > 0 && states[index].Time >= state.Time) index--;
-                    else while (index < states.Count && states[index].Time <= state.Time) index++;
-                }
-                else index = ~index;
-                states.Insert(index, state);
+                states.Add(state);
+                return;
             }
+
+            var index = states.BinarySearch(state);
+            if (index >= 0)
+            {
+                if (before) while (index > 0 && states[index - 1].Time >= state.Time) index--;
+                else while (index < count - 1 && states[index + 1].Time <= state.Time) index++;
+            }
+            else index = ~index;
+
+            states.Insert(index, state);
         }
         public void ClearStates() => states.Clear();
 
@@ -93,19 +97,14 @@ namespace StorybrewCommon.Storyboarding
         public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
         {
             State previousState = null;
-            var wasVisible = false;
-            var everVisible = false;
-            var stateAdded = false;
-            var imageSize = Vector2.One;
-            var distFade = false;
+            bool wasVisible = false, everVisible = false, stateAdded = false, distFade = false;
+
+            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.TexturePath);
+            var imageSize = new Vector2(bitmap.Width, bitmap.Height);
 
             states.ForEach(state =>
             {
                 var time = state.Time + timeOffset;
-                var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.TexturePath);
-                imageSize = new Vector2(bitmap.Width, bitmap.Height);
-
-                PostProcess?.Invoke(state);
                 var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
 
                 if (isVisible) everVisible = true;
@@ -140,7 +139,7 @@ namespace StorybrewCommon.Storyboarding
                 else convertToCommands(sprite, startTime, endTime, timeOffset, loopable, distFade);
             }
 
-            clearFinalKeyframes();
+            clearKeyframes();
             return everVisible;
         }
         void commitKeyframes(Vector2 imageSize)
@@ -184,7 +183,8 @@ namespace StorybrewCommon.Storyboarding
                 else sprite.Move(s.Time, e.Time, s.Value, e.Value);
             }, new Vector2(320, 240), p => new Vector2((float)Math.Round(p.X, PositionDecimals), (float)Math.Round(p.Y, PositionDecimals)), startState, loopable: loopable);
 
-            var vec = finalScales.Any(k => Math.Round(k.Value.X, ScaleDecimals > 5 ? 5 : ScaleDecimals) != Math.Round(k.Value.Y, ScaleDecimals > 5 ? 5 : ScaleDecimals));
+            var checkScale = ScaleDecimals > 5 ? 5 : ScaleDecimals;
+            var vec = finalScales.Any(k => Math.Round(k.Value.X, checkScale) != Math.Round(k.Value.Y, checkScale));
             finalScales.ForEachPair((s, e) =>
             {
                 if (vec) sprite.ScaleVec(s.Time, e.Time, s.Value, e.Value);
@@ -219,7 +219,7 @@ namespace StorybrewCommon.Storyboarding
             flipV.Add(time, state.FlipV);
             additive.Add(time, state.Additive);
         }
-        void clearFinalKeyframes()
+        void clearKeyframes()
         {
             finalPositions.Clear();
             finalScales.Clear();

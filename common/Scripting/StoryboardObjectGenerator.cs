@@ -92,14 +92,14 @@ namespace StorybrewCommon.Scripting
 
                     try
                     {
-                        bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(alternatePath)));
+                        bitmaps.Add(path, bitmap = Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(alternatePath)));
                     }
                     catch (FileNotFoundException e)
                     {
                         throw new FileNotFoundException(path, e);
                     }
                 }
-                else bitmaps.Add(path, bitmap = BrewLib.Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
+                else bitmaps.Add(path, bitmap = Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
             }
             return bitmap;
         }
@@ -114,7 +114,7 @@ namespace StorybrewCommon.Scripting
         {
             path = Path.GetFullPath(path);
             if (watch) context.AddDependency(path);
-            return BrewLib.Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+            return Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
         #endregion
@@ -188,9 +188,7 @@ namespace StorybrewCommon.Scripting
 
         #region Subtitles
 
-        readonly SrtParser srt = new SrtParser();
-        readonly AssParser ass = new AssParser();
-        readonly SbvParser sbv = new SbvParser();
+        readonly SubtitleParser srt = new SrtParser(), ass = new AssParser(), sbv = new SbvParser();
 
         readonly HashSet<string> fontDirectories = new HashSet<string>();
         readonly List<FontGenerator> fontGenerators = new List<FontGenerator>();
@@ -369,8 +367,7 @@ namespace StorybrewCommon.Scripting
             public FieldInfo Field;
             public ConfigurableAttribute Attribute;
             public object InitialValue;
-            public string BeginsGroup;
-            public string Description;
+            public string BeginsGroup, Description;
             public int Order;
 
             public override string ToString() => $"{Field.Name} {InitialValue}";

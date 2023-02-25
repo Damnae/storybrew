@@ -15,7 +15,7 @@ namespace StorybrewCommon.Storyboarding3d
         public float DistanceForVerticalFov(double fov) => (float)(Resolution.Y / 2 / Math.Tan(MathHelper.DegreesToRadians(fov) / 2));
         public abstract CameraState StateAt(double time);
     }
-    public class CameraState
+    public struct CameraState
     {
         public readonly Matrix4 ViewProjection;
         public readonly double AspectRatio, FocusDistance, ResolutionScale, NearClip, NearFade, FarFade, FarClip;
@@ -57,16 +57,16 @@ namespace StorybrewCommon.Storyboarding3d
     ///<summary> Represents a three-dimensional perspective camera. </summary>
     public class PerspectiveCamera : Camera
     {
-        ///<summary> Represents the camera's X-position. </summary>
+        ///<summary> Represents the camera's X-position in the 3D world. </summary>
         public readonly KeyframedValue<float> PositionX = new KeyframedValue<float>(InterpolatingFunctions.Float);
 
-        ///<summary> Represents the camera's Y-position. </summary>
+        ///<summary> Represents the camera's Y-position in the 3D world. </summary>
         public readonly KeyframedValue<float> PositionY = new KeyframedValue<float>(InterpolatingFunctions.Float);
 
-        ///<summary> Represents the camera's Z-position. </summary>
+        ///<summary> Represents the camera's Z-position in the 3D world. </summary>
         public readonly KeyframedValue<float> PositionZ = new KeyframedValue<float>(InterpolatingFunctions.Float);
 
-        ///<summary> Represents the position the camera is facing towards. </summary>
+        ///<summary> Represents the 3D-position the camera is facing towards. </summary>
         public readonly KeyframedValue<Vector3> TargetPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
 
         ///<summary> Represents the camera's up vector. </summary>

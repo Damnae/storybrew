@@ -6,14 +6,17 @@ using System.Text;
 
 namespace StorybrewCommon.Subtitles.Parsers
 {
-#pragma warning disable CS1591
-    public class SbvParser
+    ///<summary> Parsing methods for .sbv subtitle files. </summary>
+    public class SbvParser : SubtitleParser
     {
+        ///<inheritdoc/>
         public SubtitleSet Parse(string path)
         {
             using (var stream = Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 return Parse(stream);
         }
+
+        ///<inheritdoc/>
         public SubtitleSet Parse(Stream stream)
         {
             var lines = new List<SubtitleLine>();

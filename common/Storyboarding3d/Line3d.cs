@@ -164,7 +164,7 @@ namespace StorybrewCommon.Storyboarding3d
             var opacity = startVector.W < 0 && endVector.W < 0 ? 0 : object3dState.Opacity;
             if (UseDistanceFade) opacity *= Math.Max(cameraState.OpacityAt(startVector.W), cameraState.OpacityAt(endVector.W));
 
-            var bitmapBody = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteBody.GetTexturePathAt(time));
+            var bitmapBody = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteBody.TexturePath);
             var bodyScale = new Vector2(length / bitmapBody.Width, bodyHeight / bitmapBody.Height);
 
             var positionBody = startVector.Xy + delta / 2;
@@ -178,12 +178,12 @@ namespace StorybrewCommon.Storyboarding3d
                 Rotation = rotation,
                 Color = object3dState.Color,
                 Opacity = bodyOpacity,
-                Additive = Additive,
+                Additive = Additive
             });
 
             if (SpritePathEdge != null)
             {
-                var bitmapEdge = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteTopEdge.GetTexturePathAt(time));
+                var bitmapEdge = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteTopEdge.TexturePath);
                 var edgeScale = new Vector2(length / bitmapEdge.Width, edgeHeight / bitmapEdge.Height);
 
                 var edgeOffset = new Vector2((float)Math.Cos(angle - Math.PI / 2), (float)Math.Sin(angle - Math.PI / 2)) * (bodyHeight / 2 - EdgeOverlap);
@@ -218,7 +218,7 @@ namespace StorybrewCommon.Storyboarding3d
             }
             if (SpritePathCap != null)
             {
-                var bitmapCap = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteStartCap.GetTexturePathAt(time));
+                var bitmapCap = StoryboardObjectGenerator.Current.GetMapsetBitmap(spriteStartCap.TexturePath);
                 var startCapScale = new Vector2(startScale / bitmapCap.Width, startScale / bitmapCap.Height);
                 var endCapScale = new Vector2(endScale / bitmapCap.Width, endScale / bitmapCap.Height);
 

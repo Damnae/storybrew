@@ -8,7 +8,7 @@ namespace StorybrewCommon.Storyboarding3d
     ///<summary> Represents a 3D scene with a camera and root. </summary>
     public class Scene3d
     {
-        ///<summary> Represents the scene's root. </summary>
+        ///<summary> Represents the scene's base node or root. </summary>
         public readonly Node3d Root = new Node3d();
 
         ///<summary> Adds a 3D object to the scene's root. </summary>

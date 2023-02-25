@@ -6,15 +6,17 @@ using System.Text;
 
 namespace StorybrewCommon.Subtitles.Parsers
 {
-#pragma warning disable CS1591
-    public class SrtParser
+    ///<summary> Parsing methods for .srt subtitle files. </summary>
+    public class SrtParser : SubtitleParser
     {
+        ///<inheritdoc/>
         public SubtitleSet Parse(string path)
         {
             using (var stream = Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 return Parse(stream);
         }
 
+        ///<inheritdoc/>
         public SubtitleSet Parse(Stream stream)
         {
             var lines = new List<SubtitleLine>();

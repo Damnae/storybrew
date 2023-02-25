@@ -236,7 +236,15 @@ namespace StorybrewEditor.Util
                 {
                     Trace.WriteLine($"Canceling thread {localThread.Name}.");
                     var token = new CancellationToken(true);
-                    token.ThrowIfCancellationRequested();
+
+                    try
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+                    catch (OperationCanceledException e)
+                    {
+                        Trace.WriteLine($"Thread cancel success: {e}");
+                    }
                 }
             }
         }

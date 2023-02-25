@@ -64,8 +64,7 @@ namespace StorybrewEditor
         {
             Trace.WriteLine($"Saving settings at '{path}'");
 
-            using (var stream = new SafeWriteStream(path))
-            using (var writer = new StreamWriter(stream, System.Text.Encoding.UTF8))
+            using (var stream = new SafeWriteStream(path)) using (var writer = new StreamWriter(stream, System.Text.Encoding.UTF8))
             {
                 foreach (var field in GetType().GetFields())
                 {
@@ -119,7 +118,6 @@ namespace StorybrewEditor
             return value.ToString();
         }
     }
-
     public static class SettingsExtensions
     {
         public static void BindToSetting<T>(this Button button, Setting<T> setting, Action changedAction)
