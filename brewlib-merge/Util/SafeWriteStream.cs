@@ -4,10 +4,8 @@ namespace BrewLib.Util
 {
     public class SafeWriteStream : FileStream
     {
-        readonly string temporaryPath;
-        readonly string path;
-        bool commited;
-        bool disposed;
+        readonly string temporaryPath, path;
+        bool commited, disposed;
 
         public SafeWriteStream(string path) : base(prepare(path), FileMode.Create)
         {

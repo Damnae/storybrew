@@ -13,8 +13,7 @@ namespace StorybrewEditor.Processes
         public RemoteProcessWorker Worker { get; private set; }
         public RemoteProcessWorkerContainer()
         {
-            var identifier = Guid.NewGuid().ToString();
-            pipeServer = new NamedPipeServerStream($"sbrew-{identifier}");
+            pipeServer = new NamedPipeServerStream($"sbrew-{Guid.NewGuid()}");
             pipeServer.WaitForConnection();
 
             Worker = retrieveWorker(pipeServer);

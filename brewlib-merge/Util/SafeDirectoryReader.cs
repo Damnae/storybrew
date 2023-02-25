@@ -10,7 +10,7 @@ namespace BrewLib.Util
         public SafeDirectoryReader(string targetDirectory)
         {
             var backupDirectory = targetDirectory + ".bak";
-            this.Path = Directory.Exists(targetDirectory) || !Directory.Exists(backupDirectory) ? targetDirectory : backupDirectory;
+            Path = Directory.Exists(targetDirectory) || !Directory.Exists(backupDirectory) ? targetDirectory : backupDirectory;
         }
 
         public string GetPath(string path) => System.IO.Path.Combine(Path, path);

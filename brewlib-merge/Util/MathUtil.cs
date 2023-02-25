@@ -19,8 +19,13 @@ namespace BrewLib.Util
         }
         public static double ShortestAngleDelta(double from, double to)
         {
-            var rotationDelta = to - from;
-            return rotationDelta - (Math.Floor((rotationDelta + Math.PI) / (Math.PI * 2)) * (Math.PI * 2));
+            if (from == to) return 0;
+            if (from == 0) return to;
+            if (to == 0) return -from;
+            if (Math.Abs(from) == Math.Abs(to)) return Math.Abs(from) + Math.Abs(to);
+
+            var diff = (to - from) % (Math.PI * 2);
+            return (2 * diff % (Math.PI * 2)) - diff;
         }
     }
 }

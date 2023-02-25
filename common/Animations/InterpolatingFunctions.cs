@@ -23,15 +23,6 @@ namespace StorybrewCommon.Animations
 
         public static Func<CommandColor, CommandColor, double, CommandColor> CommandColor = (from, to, progress) => from + (to - from) * (float)progress;
 
-        static double getShortestAngleDelta(double from, double to)
-        {
-            if (from == to) return 0;
-            if (from == 0) return to;
-            if (to == 0) return -from;
-            if (Math.Abs(from) == Math.Abs(to)) return Math.Abs(from) + Math.Abs(to);
-
-            var diff = (to - from) % (Math.PI * 2);
-            return (2 * diff % (Math.PI * 2)) - diff;
-        }
+        static double getShortestAngleDelta(double from, double to) => BrewLib.Util.MathUtil.ShortestAngleDelta(from, to);
     }
 }

@@ -2,8 +2,9 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using static System.Drawing.Graphics;
 
-namespace Brewlib.Util
+namespace BrewLib.Util
 {
     public static class BitmapHelper
     {
@@ -259,7 +260,7 @@ namespace Brewlib.Util
             public static PinnedBitmap FromBitmap(Bitmap bitmap)
             {
                 var result = new PinnedBitmap(bitmap.Width, bitmap.Height);
-                using (var graphics = Graphics.FromImage(result.Bitmap)) graphics.DrawImage(bitmap, 0, 0);
+                using (var graphics = FromImage(result.Bitmap)) graphics.DrawImage(bitmap, 0, 0);
                 return result;
             }
 

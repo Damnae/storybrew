@@ -6,15 +6,11 @@ namespace BrewLib.Util
 {
     public static class Misc
     {
-        public static void WithRetries(Action action, int timeout = 2000, bool canThrow = true)
+        public static void WithRetries(Action action, int timeout = 2000, bool canThrow = true) => WithRetries(() =>
         {
-            WithRetries(() =>
-            {
-                action();
-                return true;
-            },
-            timeout, canThrow);
-        }
+            action();
+            return true;
+        }, timeout, canThrow);
         public static T WithRetries<T>(Func<T> action, int timeout = 2000, bool canThrow = true)
         {
             var sleepTime = 0;

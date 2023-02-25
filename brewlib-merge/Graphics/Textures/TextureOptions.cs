@@ -1,5 +1,5 @@
-﻿using Brewlib.Util;
-using BrewLib.Data;
+﻿using BrewLib.Data;
+using BrewLib.Util;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;

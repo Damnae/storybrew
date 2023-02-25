@@ -125,7 +125,7 @@ namespace StorybrewEditor.UserInterface.Components
                                 nameLabel = new Label(Manager)
                                 {
                                     StyleName = "listItem",
-                                    Text = layer.Name,
+                                    Text = effect.BaseName + (layer.Name != "" ? $" ({layer.Name})" : ""),
                                     AnchorFrom = BoxAlignment.Left,
                                     AnchorTo = BoxAlignment.Left
                                 },

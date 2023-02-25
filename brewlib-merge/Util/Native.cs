@@ -40,7 +40,7 @@ namespace BrewLib.Util
         public static IntPtr FindProcessWindow(string title)
         {
             foreach (var hWnd in EnumerateProcessWindowHandles(Process.GetCurrentProcess())) if (GetWindowText(hWnd) == title)
-                    return hWnd;
+                return hWnd;
 
             return IntPtr.Zero;
         }

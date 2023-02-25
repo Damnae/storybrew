@@ -2,7 +2,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
-using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +12,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using Tiny;
+using BitmapHelper = StorybrewCommon.Util.BitmapHelper;
 
 namespace StorybrewCommon.Subtitles
 {
@@ -229,10 +229,10 @@ namespace StorybrewCommon.Subtitles
                                 width = trimmedBitmap.Width;
                                 height = trimmedBitmap.Height;
                                 using (var trimGraphics = Graphics.FromImage(trimmedBitmap)) trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
-                                BrewLib.Util.Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
+                                Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
                             }
                         }
-                        else BrewLib.Util.Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
+                        else Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
 
                         if (File.Exists(bitmapPath)) BitmapHelper.LosslessCompress(bitmapPath);
                     }
