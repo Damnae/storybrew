@@ -212,7 +212,11 @@ namespace StorybrewCommon.Animations
             new Keyframe<TValue>(keyframe.Time, edit(keyframe.Value), keyframe.Ease) : keyframe;
 
         ///<summary> Removes all keyframes in the keyframed value. </summary>
-        public void Clear() => keyframes.Clear();
+        public void Clear()
+        {
+            keyframes.Clear();
+            keyframes.TrimExcess();
+        }
 
         ///<summary> Returns an enumerator that iterates through the keyframed value. </summary>
         public IEnumerator<Keyframe<TValue>> GetEnumerator() => keyframes.GetEnumerator();

@@ -11,13 +11,28 @@ namespace StorybrewCommon.Util
     {
         public static PinnedBitmap Blur(Bitmap source, int radius, double power) => Convolute(source, CalculateGaussianKernel(radius, power));
 
-        public static bool LosslessCompress(string filePath)
+        public static bool LosslessCompress(string filePath, bool optimize = false)
         {
-            var opt = new ImageOptimizer();
+            var opt = new ImageOptimizer { OptimalCompression = optimize };
             bool success;
             try
             {
                 success = opt.LosslessCompress(filePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return success;
+        }
+        public static bool Compress(string filePath, bool optimize = false)
+        {
+            var opt = new ImageOptimizer { OptimalCompression = optimize };
+            bool success;
+            try
+            {
+                success = opt.Compress(filePath);
             }
             catch
             {

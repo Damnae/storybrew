@@ -81,7 +81,7 @@ namespace StorybrewCommon.Storyboarding3d
             var opacity = screenPosition.W < 0 ? 0 : object3dState.Opacity;
             if (UseDistanceFade) opacity *= cameraState.OpacityAt(screenPosition.W);
 
-            gen.Add(new CommandGenerator.State
+            gen.Add(new State
             {
                 Time = time,
                 Position = screenPosition.Xy,

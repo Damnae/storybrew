@@ -21,6 +21,7 @@ namespace StorybrewCommon.Storyboarding3d
             StartPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3), 
             EndPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
         public readonly KeyframedValue<float> Thickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
+
         public readonly CommandGenerator Generator = new CommandGenerator();
 
         public override void GenerateSprite(StoryboardSegment segment) => sprite = sprite ?? segment.CreateSprite(SpritePath, SpriteOrigin);
@@ -53,7 +54,7 @@ namespace StorybrewCommon.Storyboarding3d
                 case OsbOrigin.TopCentre: case OsbOrigin.Centre: case OsbOrigin.BottomCentre: position = startVector.Xy + delta / 2; break;
                 case OsbOrigin.TopRight: case OsbOrigin.CentreRight: case OsbOrigin.BottomRight: position = endVector.Xy; break;
             }
-            Generator.Add(new CommandGenerator.State
+            Generator.Add(new State
             {
                 Time = time,
                 Position = position,
@@ -89,10 +90,9 @@ namespace StorybrewCommon.Storyboarding3d
         }
 
         public string SpritePathBody, SpritePathEdge, SpritePathCap;
-        public bool Additive, UseDistanceFade = true;
+        public bool Additive, UseDistanceFade = true, EnableStartCap = true, EnableEndCap = true, OrientedCaps;
 
         public float EdgeOverlap = .5f, CapOverlap = .2f;
-        public bool EnableStartCap = true, EnableEndCap = true, OrientedCaps;
 
         public readonly KeyframedValue<Vector3> 
             StartPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3),
@@ -108,7 +108,6 @@ namespace StorybrewCommon.Storyboarding3d
             GeneratorBottomEdge = new CommandGenerator(),
             GeneratorStartCap = new CommandGenerator(),
             GeneratorEndCap = new CommandGenerator();
-
         public override IEnumerable<CommandGenerator> CommandGenerators
         {
             get
@@ -170,7 +169,7 @@ namespace StorybrewCommon.Storyboarding3d
             var positionBody = startVector.Xy + delta / 2;
             var bodyOpacity = opacity;
 
-            GeneratorBody.Add(new CommandGenerator.State
+            GeneratorBody.Add(new State
             {
                 Time = time,
                 Position = positionBody,
@@ -192,7 +191,7 @@ namespace StorybrewCommon.Storyboarding3d
 
                 var edgeOpacity = ignoreEdges ? 0 : opacity;
 
-                GeneratorTopEdge.Add(new CommandGenerator.State
+                GeneratorTopEdge.Add(new State
                 {
                     Time = time,
                     Position = positionTop,
@@ -203,7 +202,7 @@ namespace StorybrewCommon.Storyboarding3d
                     FlipH = flip,
                     Additive = Additive
                 });
-                GeneratorBottomEdge.Add(new CommandGenerator.State
+                GeneratorBottomEdge.Add(new State
                 {
                     Time = time,
                     Position = positionBottom,
@@ -233,7 +232,7 @@ namespace StorybrewCommon.Storyboarding3d
                 var startCapOpacity = startScale > .5 ? opacity : 0;
                 var endCapOpacity = endScale > .5 ? opacity : 0;
 
-                GeneratorStartCap.Add(new CommandGenerator.State
+                GeneratorStartCap.Add(new State
                 {
                     Time = time,
                     Position = startVector.Xy + capOffset,
@@ -243,7 +242,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Opacity = startCapOpacity,
                     Additive = Additive
                 });
-                GeneratorEndCap.Add(new CommandGenerator.State
+                GeneratorEndCap.Add(new State
                 {
                     Time = time,
                     Position = endVector.Xy - capOffset,

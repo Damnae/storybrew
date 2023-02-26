@@ -117,16 +117,18 @@ namespace StorybrewCommon.Subtitles
         readonly FontDescription description;
         readonly FontEffect[] effects;
         readonly string projectDirectory, assetDirectory;
+        readonly bool optimize;
 
         readonly Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
 
-        internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string assetDirectory)
+        internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string assetDirectory, bool optimize)
         {
             Directory = directory;
             this.description = description;
             this.effects = effects;
             this.projectDirectory = projectDirectory;
             this.assetDirectory = assetDirectory;
+            this.optimize = optimize;
         }
 
         ///<summary> Gets the texture path of a texture sprite. </summary>
@@ -234,7 +236,7 @@ namespace StorybrewCommon.Subtitles
                         }
                         else Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
 
-                        if (File.Exists(bitmapPath)) BitmapHelper.LosslessCompress(bitmapPath);
+                        if (File.Exists(bitmapPath)) BitmapHelper.LosslessCompress(bitmapPath, optimize);
                     }
                 }
             }

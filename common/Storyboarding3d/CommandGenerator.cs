@@ -2,6 +2,7 @@ using OpenTK;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
+using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Util;
 using System;
@@ -10,7 +11,7 @@ using System.Linq;
 
 namespace StorybrewCommon.Storyboarding
 {
-#pragma warning disable CS1591
+    ///<summary> Generates commands on an <see cref="OsbSprite"/> based on the states of that sprite. </summary>
     public class CommandGenerator
     {
         readonly KeyframedValue<Vector2> 
@@ -48,7 +49,7 @@ namespace StorybrewCommon.Storyboarding
         public double ScaleTolerance = .5;
 
         ///<summary> The tolerance threshold for rotation keyframe simplification. </summary>
-        public double RotationTolerance = .25;
+        public double RotationTolerance = .1;
 
         ///<summary> The tolerance threshold for coloring keyframe simplification. </summary>
         public double ColorTolerance = 2;
@@ -63,13 +64,14 @@ namespace StorybrewCommon.Storyboarding
         public int ScaleDecimals = 3;
 
         ///<summary> The amount of decimal digits for rotation keyframes. </summary>
-        public int RotationDecimals = 4;
+        public int RotationDecimals = 5;
 
         ///<summary> The amount of decimal digits for opacity keyframes. </summary>
         public int OpacityDecimals = 1;
 
-        public Action<State> PostProcess;
-
+        /// <summary> 
+        /// Adds a <see cref="State"/> to this instance. If <paramref name="before"/> is <see langword="true"/>, adds the state at the beginning of the list.
+        /// </summary>
         public void Add(State state, bool before = false)
         {
             var count = states.Count;
@@ -90,12 +92,29 @@ namespace StorybrewCommon.Storyboarding
             states.Insert(index, state);
         }
 
+        ///<summary> Generates commands on a sprite based on this generator's states. </summary>
+        ///<param name="sprite"> The <see cref="OsbSprite"/> to have commands generated on. </param>
+        ///<param name="action"> Encapsulates a group of commands to be generated on <paramref name="sprite"/>. </param>
+        ///<param name="startTime"> The explicit start time of the command generation. Can be left <see langword="null"/> if <see cref="State.Time"/> is used. </param>
+        ///<param name="endTime"> The explicit end time of the command generation. Can be left <see langword="null"/> if <see cref="State.Time"/> is used. </param>
+        ///<param name="timeOffset"> The time offset of the command times. </param>
+        ///<param name="loopable"> Whether the commands to be generated are contained within a <see cref="LoopCommand"/>. </param>
+        ///<returns> <see langword="true"/> if any commands were generated, else returns <see langword="false"/>. </returns>
         public bool GenerateCommands(OsbSprite sprite, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false) 
             => GenerateCommands(sprite, OsuHitObject.WidescreenStoryboardBounds, action, startTime, endTime, timeOffset, loopable);
 
+        ///<summary> Generates commands on a sprite based on this generator's states. </summary>
+        ///<param name="sprite"> The <see cref="OsbSprite"/> to have commands generated on. </param>
+        ///<param name="bounds"> The rectangular boundary for the sprite to be generated within. </param>
+        ///<param name="action"> Encapsulates a group of commands to be generated on <paramref name="sprite"/>. </param>
+        ///<param name="startTime"> The explicit start time of the command generation. Can be left <see langword="null"/> if <see cref="State.Time"/> is used. </param>
+        ///<param name="endTime"> The explicit end time of the command generation. Can be left <see langword="null"/> if <see cref="State.Time"/> is used. </param>
+        ///<param name="timeOffset"> The time offset of the command times. </param>
+        ///<param name="loopable"> Whether the commands to be generated are contained within a <see cref="LoopCommand"/>. </param>
+        ///<returns> <see langword="true"/> if any commands were generated, else returns <see langword="false"/>. </returns>
         public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
         {
-            State previousState = null;
+            State previousState = default;
             bool wasVisible = false, everVisible = false, stateAdded = false, distFade = false;
 
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.TexturePath);
@@ -104,7 +123,7 @@ namespace StorybrewCommon.Storyboarding
             states.ForEach(state =>
             {
                 var time = state.Time + timeOffset;
-                var isVisible = state.IsVisible(bitmap.Width, bitmap.Height, sprite.Origin, bounds);
+                var isVisible = state.IsVisible(imageSize, sprite.Origin, bounds);
 
                 if (isVisible) everVisible = true;
                 if (!wasVisible && isVisible)
@@ -231,42 +250,74 @@ namespace StorybrewCommon.Storyboarding
             states.Clear();
             states.TrimExcess();
         }
-        public class State : IComparable<State>
+    }
+
+    ///<summary> Defines all of an <see cref="OsbSprite"/>'s states as a class. </summary>
+    public class State : IComparable<State>
+    {
+        ///<summary> Represents the base time, in milliseconds, of this state. </summary>
+        public double Time;
+
+        ///<summary> Represents the rotation, in radians, of this state. </summary>
+        public double Rotation = 0;
+
+        ///<summary> Represents the opacity, from 0 to 1, of this state. </summary>
+        public double Opacity = 0;
+
+        ///<summary> Represents the position, in osu!pixels, of this state. </summary>
+        public Vector2 Position = new Vector2(320, 240);
+
+        ///<summary> Represents the scale, in osu!pixels, of this state. </summary>
+        public Vector2 Scale = Vector2.One;
+
+        ///<summary> Represents the color, in RGB values, of this state. </summary>
+        public CommandColor Color = CommandColor.White;
+
+        ///<summary> Represents the horizontal flip condition of this state. </summary>
+        public bool FlipH;
+
+        ///<summary> Represents the vertical flip condition of this state. </summary>
+        public bool FlipV;
+
+        ///<summary> Represents the additive toggle condition of this state. </summary>
+        public bool Additive;
+
+        internal bool UseDistanceFade;
+
+        /// <summary> 
+        /// Returns the visibility of the sprite in the current <see cref="State"/> based on its image size, <see cref="OsbOrigin"/>, and screen boundaries. 
+        /// </summary>
+        /// <returns> <see langword="true"/> if the sprite is within <paramref name="bounds"/>, else returns <see langword="false"/>. </returns>
+        public bool IsVisible(Vector2 imageSize, OsbOrigin origin, Box2 bounds)
         {
-            public double Time, Rotation = 0, Opacity = 1;
-            public Vector2 Position = new Vector2(320, 240), Scale = Vector2.One;
-            public CommandColor Color = CommandColor.White;
-            public bool FlipH, FlipV, Additive, UseDistanceFade;
-
-            public bool IsVisible(int width, int height, OsbOrigin origin, Box2 bounds)
+            if (Additive && Color == CommandColor.Black || Opacity <= 0 || Scale.X == 0 || Scale.Y == 0) return false;
+            if (!bounds.Contains(Position))
             {
-                if (Additive && Color == CommandColor.Black || Opacity <= 0 || Scale.X == 0 || Scale.Y == 0) return false;
-                if (!bounds.Contains(Position))
+                var w = imageSize.X * Scale.X;
+                var h = imageSize.Y * Scale.Y;
+                Vector2 originVector;
+
+                switch (origin)
                 {
-                    var w = width * Scale.X;
-                    var h = height * Scale.Y;
-                    Vector2 originVector;
-
-                    switch (origin)
-                    {
-                        default:
-                        case OsbOrigin.TopLeft: originVector = Vector2.Zero; break;
-                        case OsbOrigin.TopCentre: originVector = new Vector2(w / 2, 0); break;
-                        case OsbOrigin.TopRight: originVector = new Vector2(w, 0); break;
-                        case OsbOrigin.CentreLeft: originVector = new Vector2(0, h / 2); break;
-                        case OsbOrigin.Centre: originVector = new Vector2(w / 2, h / 2); break;
-                        case OsbOrigin.CentreRight: originVector = new Vector2(w, h / 2); break;
-                        case OsbOrigin.BottomLeft: originVector = new Vector2(0, h); break;
-                        case OsbOrigin.BottomCentre: originVector = new Vector2(w / 2, h); break;
-                        case OsbOrigin.BottomRight: originVector = new Vector2(w, h); break;
-                    }
-
-                    var obb = new OrientedBoundingBox(Position, originVector, w, h, Rotation);
-                    if (!obb.Intersects(bounds)) return false;
+                    default:
+                    case OsbOrigin.TopLeft: originVector = Vector2.Zero; break;
+                    case OsbOrigin.TopCentre: originVector = new Vector2(w / 2, 0); break;
+                    case OsbOrigin.TopRight: originVector = new Vector2(w, 0); break;
+                    case OsbOrigin.CentreLeft: originVector = new Vector2(0, h / 2); break;
+                    case OsbOrigin.Centre: originVector = new Vector2(w / 2, h / 2); break;
+                    case OsbOrigin.CentreRight: originVector = new Vector2(w, h / 2); break;
+                    case OsbOrigin.BottomLeft: originVector = new Vector2(0, h); break;
+                    case OsbOrigin.BottomCentre: originVector = new Vector2(w / 2, h); break;
+                    case OsbOrigin.BottomRight: originVector = new Vector2(w, h); break;
                 }
-                return true;
+
+                var obb = new OrientedBoundingBox(Position, originVector, w, h, Rotation);
+                if (!obb.Intersects(bounds)) return false;
             }
-            public int CompareTo(State other) => Math.Sign(Time - other.Time);
+            return true;
         }
+
+        ///<inheritdoc/>
+        public int CompareTo(State other) => Math.Sign(Time - other.Time);
     }
 }

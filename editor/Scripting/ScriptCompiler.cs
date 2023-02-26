@@ -17,7 +17,7 @@ namespace StorybrewEditor.Scripting
         {
             Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "WPF"),
             Path.GetDirectoryName(typeof(object).Assembly.Location),
-            Environment.CurrentDirectory,
+            Environment.CurrentDirectory
         };
         static int nextId;
 

@@ -214,22 +214,25 @@ namespace StorybrewCommon.Scripting
         ///<summary> Gets a <see cref="FontGenerator"/> to create and load textures. </summary>
         ///<param name="directory"> The path to the font file. </param>
         ///<param name="description"> A <see cref="FontDescription"/> class with information of the texture. </param>
+        ///<param name="optimize"> Whether to optimize the font images. </param>
         ///<param name="effects"> A list of font effects, such as <see cref="FontGlow"/>. </param>
-        public FontGenerator LoadFont(string directory, FontDescription description, params FontEffect[] effects) => LoadFont(directory, false, description, effects);
+        public FontGenerator LoadFont(string directory, FontDescription description, bool optimize = false, params FontEffect[] effects) 
+            => LoadFont(directory, false, description, optimize, effects);
 
         ///<summary> Gets a <see cref="FontGenerator"/> to create and load textures. </summary>
         ///<param name="directory"> The path to the font file. </param>
         ///<param name="asAsset"> Whether to place textures in the asset library directory or the beatmap's storyboard directory. </param>
         ///<param name="description"> A <see cref="FontDescription"/> class with information of the texture. </param>
+        ///<param name="optimize"> Whether to optimize the font images. </param>
         ///<param name="effects"> A list of font effects, such as <see cref="FontGlow"/>. </param>
-        public FontGenerator LoadFont(string directory, bool asAsset, FontDescription description, params FontEffect[] effects)
+        public FontGenerator LoadFont(string directory, bool asAsset, FontDescription description, bool optimize = false, params FontEffect[] effects)
         {
             var assetDirectory = asAsset ? context.ProjectAssetPath : context.MapsetPath;
             var fontDirectory = Path.GetFullPath(Path.Combine(assetDirectory, directory));
             if (fontDirectories.Contains(fontDirectory)) throw new InvalidOperationException($"This effect already generated a font inside \"{fontDirectory}\"");
-            _ = fontDirectories.Add(fontDirectory);
+            fontDirectories.Add(fontDirectory);
 
-            var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, assetDirectory);
+            var fontGenerator = new FontGenerator(directory, description, effects, context.ProjectPath, assetDirectory, optimize);
             fontGenerators.Add(fontGenerator);
 
             var cachePath = fontCacheDirectory;

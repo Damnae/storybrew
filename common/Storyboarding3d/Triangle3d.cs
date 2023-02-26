@@ -118,7 +118,7 @@ namespace StorybrewCommon.Storyboarding3d
                     if (Generator1.EndState != null) Generator1.EndState.Opacity = 0;
                 }
 
-                Generator0.Add(new CommandGenerator.State
+                Generator0.Add(new State
                 {
                     Time = time,
                     Position = position,
@@ -128,7 +128,7 @@ namespace StorybrewCommon.Storyboarding3d
                     Opacity = switchedEdge ? 0 : opacity,
                     Additive = Additive
                 });
-                Generator1.Add(new CommandGenerator.State
+                Generator1.Add(new State
                 {
                     Time = time,
                     Position = position,

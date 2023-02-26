@@ -14,7 +14,7 @@ namespace StorybrewCommon.OpenTKUtil
     /// The Vector2i structure is suitable for interoperation with unmanaged code requiring two consecutive integers.
     /// </remarks>
     [Serializable][StructLayout(LayoutKind.Sequential)]
-    public struct Vector2i : IEquatable<Vector2i> // Original: https://github.com/opentk/opentk/blob/master/src/OpenTK.Mathematics/Vector/Vector3i.cs
+    public struct Vector2i : IEquatable<Vector2i> // Original: https://github.com/opentk/opentk/blob/master/src/OpenTK.Mathematics/Vector/Vector2i.cs
     {
         /// <summary>
         /// The X component of the Vector2i.
@@ -563,7 +563,7 @@ namespace StorybrewCommon.OpenTKUtil
     /// </remarks>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vector3i : IEquatable<Vector3i>
+    public struct Vector3i : IEquatable<Vector3i> // Original: https://github.com/opentk/opentk/blob/master/src/OpenTK.Mathematics/Vector/Vector3i.cs
     {
         /// <summary>
         /// The X component of the Vector3i.
