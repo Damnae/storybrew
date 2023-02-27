@@ -33,6 +33,9 @@ namespace StorybrewCommon.Storyboarding3d
         ///<summary> Whether to fade sprites based on distance from the <see cref="Camera"/>. </summary>
         public bool UseDistanceFade = true;
 
+        ///<summary> If this value is not <see langword="null"/>, scales sprites based on this vector instead of distance from the <see cref="Camera"/>. </summary>
+        public Vector2? UseDefaultScale = null;
+
         ///<summary> A keyframed value representing this sprite's scale keyframes. </summary>
         public readonly KeyframedValue<Vector2> SpriteScale = new KeyframedValue<Vector2>(InterpolatingFunctions.Vector2, Vector2.One);
 
@@ -85,7 +88,7 @@ namespace StorybrewCommon.Storyboarding3d
             {
                 Time = time,
                 Position = screenPosition.Xy,
-                Scale = scale,
+                Scale = UseDefaultScale ?? scale,
                 Rotation = rotation,
                 Color = object3dState.Color,
                 Opacity = opacity,
