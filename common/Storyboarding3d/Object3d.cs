@@ -78,7 +78,7 @@ namespace StorybrewCommon.Storyboarding3d
         }
         public void DoTreeSprite(Action<OsbSprite> action)
         {
-            var sprites = (this as HasOsbSprites)?.Sprites;
+            var sprites = (this as HasOsbSprites).Sprites;
             if (sprites != null) foreach (var sprite in sprites) action(sprite);
             for (var i = 0; i < children.Count; i++) children[i].DoTreeSprite(action);
         }
