@@ -10,10 +10,14 @@ namespace StorybrewCommon.Storyboarding3d
     public interface HasOsbSprites
     {
         IEnumerable<OsbSprite> Sprites { get; }
+
+        ///<summary> Runs an action on this instance's base sprite/sprites. </summary>
+        void DoTreeSprite(Action<OsbSprite> action);
     }
     public class Sprite3d : Node3d, HasOsbSprites
     {
         OsbSprite sprite;
+        Action<OsbSprite> finalize;
 
         ///<summary> Gets this 3D sprite's list of <see cref="OsbSprite"/>s. </summary>
         public IEnumerable<OsbSprite> Sprites { get { yield return sprite; } }
@@ -46,6 +50,9 @@ namespace StorybrewCommon.Storyboarding3d
 
         ///<summary> Gets this sprite's <see cref="CommandGenerator"/>s. </summary>
         public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return gen; } }
+
+        ///<inheritdoc/>
+        public void DoTreeSprite(Action<OsbSprite> action = null) => finalize = action;
 
         public override void GenerateSprite(StoryboardSegment segment) => sprite = sprite ?? segment.CreateSprite(SpritePath, SpriteOrigin);
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
@@ -97,7 +104,10 @@ namespace StorybrewCommon.Storyboarding3d
             });
         }
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
-            => gen.GenerateCommands(sprite, action, startTime, endTime, timeOffset, loopable);
+        {
+            gen.GenerateCommands(sprite, action, startTime, endTime, timeOffset, loopable);
+            finalize?.Invoke(sprite);
+        }
     }
 
     ///<summary> Represents the rotation method for a 3D sprite. </summary>

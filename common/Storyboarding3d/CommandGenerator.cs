@@ -46,10 +46,10 @@ namespace StorybrewCommon.Storyboarding
         public double PositionTolerance = 1;
 
         ///<summary> The tolerance threshold for scaling keyframe simplification. </summary>
-        public double ScaleTolerance = .5;
+        public double ScaleTolerance = 1;
 
         ///<summary> The tolerance threshold for rotation keyframe simplification. </summary>
-        public double RotationTolerance = .1;
+        public double RotationTolerance = .005;
 
         ///<summary> The tolerance threshold for coloring keyframe simplification. </summary>
         public double ColorTolerance = 2;
@@ -153,8 +153,8 @@ namespace StorybrewCommon.Storyboarding
             if (wasVisible) commitKeyframes(imageSize);
             if (everVisible)
             {
-                if (action != null) action(() => convertToCommands(sprite, startTime, endTime, timeOffset, loopable, distFade), sprite);
-                else convertToCommands(sprite, startTime, endTime, timeOffset, loopable, distFade);
+                if (action is null) convertToCommands(sprite, startTime, endTime, timeOffset, loopable, distFade);
+                else action(() => convertToCommands(sprite, startTime, endTime, timeOffset, loopable, distFade), sprite);
             }
 
             clearKeyframes();

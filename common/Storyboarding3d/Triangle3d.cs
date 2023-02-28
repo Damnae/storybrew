@@ -10,6 +10,7 @@ namespace StorybrewCommon.Storyboarding3d
 #pragma warning disable CS1591
     public class Triangle3d : Node3d, HasOsbSprites
     {
+        Action<OsbSprite> finalize;
         OsbSprite sprite0, sprite1;
         public IEnumerable<OsbSprite> Sprites { get { yield return sprite0; yield return sprite1; } }
 
@@ -142,10 +143,15 @@ namespace StorybrewCommon.Storyboarding3d
                 break;
             }
         }
+
+        ///<inheritdoc/>
+        public void DoTreeSprite(Action<OsbSprite> action = null) => finalize = action;
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
             Generator0.GenerateCommands(sprite0, action, startTime, endTime, timeOffset, loopable);
             Generator1.GenerateCommands(sprite1, action, startTime, endTime, timeOffset, loopable);
+            finalize?.Invoke(sprite0);
+            finalize?.Invoke(sprite1);
         }
         static Vector2 project(Vector2 line1, Vector2 line2, Vector2 toProject)
         {

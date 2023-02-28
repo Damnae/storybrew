@@ -17,29 +17,21 @@ namespace StorybrewCommon.Storyboarding3d
         /// <summary> 
         /// Generates a 3D scene from <paramref name="startTime"/> to <paramref name="endTime"/> with given iteration period <paramref name="timeStep"/>.
         /// </summary>
-        public void Generate(Camera camera, StoryboardSegment segment, double startTime, double endTime, double timeStep, Action<OsbSprite> action = null)
+        public void Generate(Camera camera, StoryboardSegment segment, double startTime, double endTime, double timeStep)
         {
             Root.GenerateTreeSprite(segment);
             for (double time = startTime; time < endTime + 5; time += timeStep) Root.GenerateTreeStates(time, camera);
-            Root.GenerateTreeCommands((cmds, s) =>
-            {
-                cmds();
-                action?.Invoke(s);
-            });
+            Root.GenerateTreeCommands();
         }
 
         /// <summary> 
         /// Generates a 3D scene from <paramref name="startTime"/> to <paramref name="endTime"/> with an iteration period based on the beatmap's timing point and <paramref name="divisor"/>.
         /// </summary>
-        public void Generate(Camera camera, StoryboardSegment segment, double startTime, double endTime, Beatmap beatmap, int divisor = 4, Action<OsbSprite> action = null)
+        public void Generate(Camera camera, StoryboardSegment segment, double startTime, double endTime, Beatmap beatmap, int divisor = 4)
         {
             Root.GenerateTreeSprite(segment);
             beatmap.ForEachTick((int)startTime, (int)endTime, divisor, (t, time, b, tC) => Root.GenerateTreeStates(time, camera));
-            Root.GenerateTreeCommands((cmds, s) =>
-            {
-                cmds();
-                action?.Invoke(s);
-            });
+            Root.GenerateTreeCommands();
         }
         
         /// <summary> 

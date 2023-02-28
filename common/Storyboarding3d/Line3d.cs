@@ -10,7 +10,9 @@ namespace StorybrewCommon.Storyboarding3d
 #pragma warning disable CS1591
     public class Line3d : Node3d, HasOsbSprites
     {
+        Action<OsbSprite> finalize;
         OsbSprite sprite;
+
         public IEnumerable<OsbSprite> Sprites { get { yield return sprite; } }
         public string SpritePath;
         public OsbOrigin SpriteOrigin = OsbOrigin.CentreLeft;
@@ -65,12 +67,20 @@ namespace StorybrewCommon.Storyboarding3d
                 Additive = Additive
             });
         }
+
+        ///<inheritdoc/>
+        public void DoTreeSprite(Action<OsbSprite> action = null) => finalize = action;
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
-            => Generator.GenerateCommands(sprite, action, startTime, endTime, timeOffset, loopable);
+        {
+            Generator.GenerateCommands(sprite, action, startTime, endTime, timeOffset, loopable);
+            finalize?.Invoke(sprite);
+        }
     }
     public class Line3dEx : Node3d, HasOsbSprites
     {
-        OsbSprite spriteBody, spriteTopEdge, spriteBottomEdge, spriteStartCap, spriteEndCapEnd;
+        Action<OsbSprite> finalize;
+        OsbSprite spriteBody, spriteTopEdge, spriteBottomEdge, spriteStartCap, spriteEndCap;
+
         public IEnumerable<OsbSprite> Sprites
         {
             get
@@ -84,7 +94,7 @@ namespace StorybrewCommon.Storyboarding3d
                 if (SpritePathCap != null)
                 {
                     yield return spriteStartCap;
-                    yield return spriteEndCapEnd;
+                    yield return spriteEndCap;
                 }
             }
         }
@@ -131,7 +141,7 @@ namespace StorybrewCommon.Storyboarding3d
             if (SpritePathCap != null)
             {
                 spriteStartCap = spriteStartCap ?? segment.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreLeft : OsbOrigin.Centre);
-                spriteEndCapEnd = spriteEndCapEnd ?? segment.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreRight : OsbOrigin.Centre);
+                spriteEndCap = spriteEndCap ?? segment.CreateSprite(SpritePathCap, OrientedCaps ? OsbOrigin.CentreRight : OsbOrigin.Centre);
             }
         }
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
@@ -255,18 +265,26 @@ namespace StorybrewCommon.Storyboarding3d
                 });
             }
         }
+
+        ///<inheritdoc/>
+        public void DoTreeSprite(Action<OsbSprite> action = null) => finalize = action;
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
             GeneratorBody.GenerateCommands(spriteBody, action, startTime, endTime, timeOffset, loopable);
+            finalize?.Invoke(spriteBody);
             if (SpritePathEdge != null)
             {
                 GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, startTime, endTime, timeOffset, loopable);
                 GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, startTime, endTime, timeOffset, loopable);
+                finalize?.Invoke(spriteTopEdge);
+                finalize?.Invoke(spriteBottomEdge);
             }
             if (SpritePathCap != null)
             {
                 if (EnableStartCap) GeneratorStartCap.GenerateCommands(spriteStartCap, action, startTime, endTime, timeOffset, loopable);
-                if (EnableEndCap) GeneratorEndCap.GenerateCommands(spriteEndCapEnd, action, startTime, endTime, timeOffset, loopable);
+                if (EnableEndCap) GeneratorEndCap.GenerateCommands(spriteEndCap, action, startTime, endTime, timeOffset, loopable);
+                finalize?.Invoke(spriteStartCap);
+                finalize?.Invoke(spriteEndCap);
             }
         }
     }

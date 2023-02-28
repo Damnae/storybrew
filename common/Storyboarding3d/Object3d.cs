@@ -71,17 +71,6 @@ namespace StorybrewCommon.Storyboarding3d
             action?.Invoke(loop, s);
             s.EndGroup();
         }, startTime, endTime, offsetCommands ? -startTime : 0, true);
-        public void DoTree(Action<Object3d> action)
-        {
-            action(this);
-            for (var i = 0; i < children.Count; i++) children[i].DoTree(action);
-        }
-        public void DoTreeSprite(Action<OsbSprite> action)
-        {
-            var sprites = (this as HasOsbSprites).Sprites;
-            if (sprites != null) foreach (var sprite in sprites) action(sprite);
-            for (var i = 0; i < children.Count; i++) children[i].DoTreeSprite(action);
-        }
 
         public virtual void GenerateSprite(StoryboardSegment parentSegment) { }
         public virtual void GenerateStates(double time, CameraState cameraState, Object3dState object3dState) { }
