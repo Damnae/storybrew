@@ -7,8 +7,8 @@
     <TargetFramework>net481</TargetFramework>
     <Copyright>Copyright © Damnae 2016</Copyright>
     <UseWindowsForms>true</UseWindowsForms>
-    <Product>BrewLib</Product>
-	<Title>BrewLib</Title>
+    <Product>brewlib</Product>
+	<Title>brewlib</Title>
 	<Version>1.1</Version>
     <Company>storybrew</Company>
     <Platforms>AnyCPU;x86</Platforms>
@@ -49,7 +49,6 @@
     <PackageReference Include="ManagedBass.Fx" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management" />
   </ItemGroup>
 </Project>

@@ -114,7 +114,7 @@ namespace StorybrewCommon.Storyboarding
         ///<returns> <see langword="true"/> if any commands were generated, else returns <see langword="false"/>. </returns>
         public bool GenerateCommands(OsbSprite sprite, Box2 bounds, Action<Action, OsbSprite> action = null, double? startTime = null, double? endTime = null, double timeOffset = 0, bool loopable = false)
         {
-            State previousState = default;
+            State previousState = null;
             bool wasVisible = false, everVisible = false, stateAdded = false, distFade = false;
 
             var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.TexturePath);
@@ -209,15 +209,15 @@ namespace StorybrewCommon.Storyboarding
                 else sprite.Scale(s.Time, e.Time, s.Value.X, e.Value.X);
             }, Vector2.One, s => new Vector2((float)Math.Round(s.X, ScaleDecimals), (float)Math.Round(s.Y, ScaleDecimals)), startState, loopable: loopable);
 
-            finalRotations.ForEachPair((s, e) => sprite.Rotate(s.Time, e.Time, s.Value, e.Value), 0,
-                r => (float)Math.Round(r, RotationDecimals), startState, loopable: loopable);
+            finalRotations.ForEachPair((s, e) => sprite.Rotate(s.Time, e.Time, s.Value, e.Value), 
+                0, r => (float)Math.Round(r, RotationDecimals), startState, loopable: loopable);
 
             finalColors.ForEachPair((s, e) => sprite.Color(s.Time, e.Time, s.Value, e.Value), CommandColor.White,
                 c => CommandColor.FromRgb(c.R, c.G, c.B), startState, loopable: loopable);
 
             finalfades.ForEachPair((s, e) =>
             {
-                if (!((s.Time == sprite.CommandsStartTime && s.Time == e.Time && e.Value == 1 && distFade) ||
+                if (!((s.Time == sprite.CommandsStartTime && s.Time == e.Time && e.Value == 1) ||
                     (s.Time == sprite.CommandsEndTime && s.Time == e.Time && e.Value == 0)))
                 sprite.Fade(s.Time, e.Time, s.Value, e.Value);
             }, -1, o => (float)Math.Round(o, OpacityDecimals), startState, endState, loopable: loopable);

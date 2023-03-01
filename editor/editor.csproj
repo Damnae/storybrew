@@ -100,8 +100,8 @@
 		<ProjectReference Include="..\common\common.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="System.IO.Compression" />
 		<Reference Include="System.Runtime.Remoting" />
+		<Reference Include="System.ServiceModel" />
 	</ItemGroup>
 
 </Project>

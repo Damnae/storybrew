@@ -16,21 +16,21 @@
 		spacing: 10,
 		spacingHalf: 5,
 
-		colorText: [0.7, 0.7, 0.7],
-		colorTextSecondary: [0.5, 0.5, 0.5],
+		colorText: [0.7, 0.7, 0.775],
+		colorTextSecondary: [0.5, 0.5, 0.575],
 		colorTextHover: "White",
-		colorTextDisabled: [0.3, 0.3, 0.3],
+		colorTextDisabled: [0.3, 0.3, 0.35],
 
-		colorProgress: [0.3, 0.3, 0.3],
-		colorProgressHover: [0.7, 0.7, 0.7],
-		colorProgressDisabled: [0.1, 0.1, 0.1],
+		colorProgress: [0.3, 0.3, 0.4],
+		colorProgressHover: [0.7, 0.7, 0.8],
+		colorProgressDisabled: [0.1, 0.1, 0.175],
 
-		colorBg: [0.12, 0.12, 0.12],
-		colorBgElement: [0.067, 0.067, 0.067],
-		colorBgElementHover: [0.02, 0.02, 0.02],
-		colorTooltip: [0, 0, 0, 0.8],
+		colorBg: [0.12, 0.12, 0.22],
+		colorBgElement: [0.067, 0.067, 0.08],
+		colorBgElementHover: [0.02, 0.02, 0.03],
+		colorTooltip: [0, 0, 0.025, 0.8],
 		
 		colorGroupText: "White",
-		colorGroupBg: [0.3, 0.3, 0.3],
+		colorGroupBg: [0.3, 0.3, 0.4],
 	},
 }

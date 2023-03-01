@@ -310,7 +310,7 @@ namespace StorybrewCommon.Scripting
                     var value = config.GetValue(field.Name);
                     field.SetValue(this, value);
 
-                    _ = remainingFieldNames.Remove(field.Name);
+                    remainingFieldNames.Remove(field.Name);
                 }
                 catch (Exception e)
                 {

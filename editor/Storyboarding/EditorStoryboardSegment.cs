@@ -53,7 +53,7 @@ namespace StorybrewEditor.Storyboarding
             displayableObjects.Add(storyboardObject);
             return storyboardObject;
         }
-        public override OsbSprite CreateSprite(string path, OsbOrigin origin) => CreateSprite(path, origin, OsbSprite.DefaultPosition);
+        public override OsbSprite CreateSprite(string path, OsbOrigin origin = OsbOrigin.Centre) => CreateSprite(path, origin, OsbSprite.DefaultPosition);
 
         public override OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition)
         {

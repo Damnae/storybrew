@@ -392,7 +392,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Assemblies
 
-        static readonly List<string> defaultAssemblies = new List<string>
+        static readonly string[] defaultAssemblies = new string[]
         {
             "System.dll", "System.Core.dll", "System.Drawing.dll",
             "OpenTK.dll", Assembly.GetAssembly(typeof(Script)).Location

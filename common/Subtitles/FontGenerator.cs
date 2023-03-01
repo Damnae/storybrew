@@ -236,12 +236,7 @@ namespace StorybrewCommon.Subtitles
                         }
                         else Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
 
-                        if (File.Exists(bitmapPath))
-                        {
-                            // Prevent quality reduction for big font images. Small fonts are negligible for obvious reasons
-                            if (description.FontSize <= 150) BitmapHelper.Compress(bitmapPath, optimize);
-                            else BitmapHelper.LosslessCompress(bitmapPath, optimize);
-                        }
+                        if (File.Exists(bitmapPath)) BitmapHelper.Compress(bitmapPath, optimize);
                     }
                 }
             }

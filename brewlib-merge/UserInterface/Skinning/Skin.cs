@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Drawing;
 using Tiny;
 using Tiny.Formats.Json;
 
@@ -17,9 +18,7 @@ namespace BrewLib.UserInterface.Skinning
     public class Skin : IDisposable
     {
         public readonly TextureContainer TextureContainer;
-        public Func<string, Type> ResolveDrawableType;
-        public Func<string, Type> ResolveWidgetType;
-        public Func<string, Type> ResolveStyleType;
+        public Func<string, Type> ResolveDrawableType, ResolveWidgetType, ResolveStyleType;
 
         Dictionary<string, Drawable> drawables = new Dictionary<string, Drawable>();
         readonly Dictionary<Type, Dictionary<string, WidgetStyle>> stylesPerType = new Dictionary<Type, Dictionary<string, WidgetStyle>>();
@@ -42,7 +41,6 @@ namespace BrewLib.UserInterface.Skinning
             while (n != null)
             {
                 if (styles.TryGetValue(n, out WidgetStyle style)) return style;
-
                 n = getImplicitParentStyleName(n);
             }
 
@@ -322,8 +320,8 @@ namespace BrewLib.UserInterface.Skinning
             return null;
         }
 
-        static readonly System.Drawing.ColorConverter colorConverter = new System.Drawing.ColorConverter();
-        static readonly Dictionary<Type, Func<TinyToken, TinyObject, Skin, object>> fieldParsers = new Dictionary<Type, Func<TinyToken, TinyObject, Skin, object>>()
+        static readonly ColorConverter colorConverter = new ColorConverter();
+        static readonly Dictionary<Type, Func<TinyToken, TinyObject, Skin, object>> fieldParsers = new Dictionary<Type, Func<TinyToken, TinyObject, Skin, object>>
         {
             [typeof(string)] = (data, constants, skin) => data.Value<string>(),
             [typeof(float)] = (data, constants, skin) => data.Value<float>(),
@@ -346,7 +344,7 @@ namespace BrewLib.UserInterface.Skinning
                     var value = data.Value<string>();
                     if (value.StartsWith("#"))
                     {
-                        var color = (System.Drawing.Color)colorConverter.ConvertFromString(value);
+                        var color = (Color)colorConverter.ConvertFromString(value);
                         return new Color4(color.R, color.G, color.B, color.A);
                     }
 
@@ -354,23 +352,23 @@ namespace BrewLib.UserInterface.Skinning
                     if (colorMethod?.ReturnType == typeof(Color4)) return colorMethod.Invoke(null, null);
                 }
                 if (data is TinyArray tinyArray) switch (tinyArray.Count)
-                    {
-                        case 3: return new Color4(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants), 1f);
-                        default:
-                        case 4: return new Color4(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants), resolve<float>(tinyArray[3], constants));
-                    }
+                {
+                    case 3: return new Color4(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants), 1f);
+                    default:
+                    case 4: return new Color4(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants), resolve<float>(tinyArray[3], constants));
+                }
                 throw new InvalidDataException($"Incorrect color format: {data}");
             },
             [typeof(FourSide)] = (data, constants, skin) =>
             {
                 if (data is TinyArray tinyArray) switch (tinyArray.Count)
-                    {
-                        case 1: return new FourSide(resolve<float>(tinyArray[0], constants));
-                        case 2: return new FourSide(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants));
-                        case 3: return new FourSide(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants));
-                        default:
-                        case 4: return new FourSide(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants), resolve<float>(tinyArray[3], constants));
-                    }
+                {
+                    case 1: return new FourSide(resolve<float>(tinyArray[0], constants));
+                    case 2: return new FourSide(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants));
+                    case 3: return new FourSide(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants));
+                    default:
+                    case 4: return new FourSide(resolve<float>(tinyArray[0], constants), resolve<float>(tinyArray[1], constants), resolve<float>(tinyArray[2], constants), resolve<float>(tinyArray[3], constants));
+                }
                 throw new InvalidDataException($"Incorrect four side format: {data}");
             }
         };

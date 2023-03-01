@@ -79,9 +79,9 @@ namespace StorybrewEditor.Storyboarding
 
                 success = true;
             }
-            catch (IOException e)
+            catch (PipeException e)
             {
-                Debug.Print($"Script execution failed with IOException, reloading {BaseName} ({e.Message})");
+                Debug.Print($"Script execution failed with PipeException, reloading {BaseName} ({e.Message})");
                 changeStatus(EffectStatus.ReloadPending);
                 Program.Schedule(() =>
                 {
