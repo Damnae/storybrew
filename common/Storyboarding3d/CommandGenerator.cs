@@ -123,25 +123,25 @@ namespace StorybrewCommon.Storyboarding
             states.ForEach(state =>
             {
                 var time = state.Time + timeOffset;
-                var isVisible = state.IsVisible(imageSize, sprite.Origin, bounds);
+                var isVisible = state.IsVisible(imageSize, sprite.Origin, bounds, this);
 
-                if (isVisible) everVisible = true;
+                if (isVisible && everVisible != true) everVisible = true;
                 if (!wasVisible && isVisible)
                 {
                     if (!stateAdded && previousState != null) addKeyframes(previousState, loopable ? time : previousState.Time + timeOffset);
                     addKeyframes(state, time);
-                    stateAdded = true;
+                    if (stateAdded != true) stateAdded = true;
                 }
                 else if (wasVisible && !isVisible)
                 {
                     addKeyframes(state, time);
                     commitKeyframes(imageSize);
-                    stateAdded = true;
+                    if (stateAdded != true) stateAdded = true;
                 }
                 else if (isVisible)
                 {
                     addKeyframes(state, time);
-                    stateAdded = true;
+                    if (stateAdded != true) stateAdded = true;
                 }
                 else stateAdded = false;
 
@@ -288,13 +288,20 @@ namespace StorybrewCommon.Storyboarding
         /// Returns the visibility of the sprite in the current <see cref="State"/> based on its image size, <see cref="OsbOrigin"/>, and screen boundaries. 
         /// </summary>
         /// <returns> <see langword="true"/> if the sprite is within <paramref name="bounds"/>, else returns <see langword="false"/>. </returns>
-        public bool IsVisible(Vector2 imageSize, OsbOrigin origin, Box2 bounds)
+        public bool IsVisible(Vector2 imageSize, OsbOrigin origin, Box2 bounds, CommandGenerator generator = null)
         {
-            if (Additive && Color == CommandColor.Black || Opacity <= 0 || Scale.X == 0 || Scale.Y == 0) return false;
-            if (!bounds.Contains(Position))
+            if (Additive && Color == CommandColor.Black || 
+                (generator is null ? Opacity : Math.Round(Opacity, generator.OpacityDecimals)) <= 0 ||
+                (generator is null ? Opacity : Math.Round(Scale.X, generator.ScaleDecimals)) == 0 ||
+                (generator is null ? Opacity : Math.Round(Scale.Y, generator.ScaleDecimals)) == 0) 
+                return false;
+
+            if (!bounds.Contains(new Vector2(
+                generator is null ? Position.X : (float)Math.Round(Position.X, generator.PositionDecimals),
+                generator is null ? Position.Y : (float)Math.Round(Position.Y, generator.PositionDecimals))))
             {
-                var w = imageSize.X * Scale.X;
-                var h = imageSize.Y * Scale.Y;
+                var w = generator is null ? imageSize.X * Scale.X : (float)Math.Round(imageSize.X * Scale.X, generator.ScaleDecimals);
+                var h = generator is null ? imageSize.Y * Scale.Y : (float)Math.Round(imageSize.Y * Scale.Y, generator.ScaleDecimals);
                 Vector2 originVector;
 
                 switch (origin)

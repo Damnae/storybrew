@@ -23,8 +23,8 @@ namespace StorybrewEditor
     class Program
     {
         public const string Name = "storybrew editor", Repository = "Damnae/storybrew";
-        public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
-        public static string FullName => $"{Name} {Version} ({Repository})";
+        public static Version Version = Assembly.GetExecutingAssembly().GetName().Version;
+        public static string FullName = $"{Name} {Version} ({Repository})";
         public static string DiscordUrl = $"https://discord.gg/0qfFOucX93QDNVN7";
 
         public static AudioManager AudioManager { get; set; }
