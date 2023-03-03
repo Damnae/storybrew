@@ -292,7 +292,7 @@ namespace StorybrewCommon.Storyboarding
         {
             if (Additive && Color == CommandColor.Black || 
                 (generator is null ? Opacity : Math.Round(Opacity, generator.OpacityDecimals)) <= 0 ||
-                Scale.X == 0 || Scale.Y == 0
+                Scale.X == 0 || Scale.Y == 0)
                 return false;
 
             if (!bounds.Contains(Position))
