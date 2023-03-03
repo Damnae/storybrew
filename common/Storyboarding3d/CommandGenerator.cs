@@ -292,16 +292,13 @@ namespace StorybrewCommon.Storyboarding
         {
             if (Additive && Color == CommandColor.Black || 
                 (generator is null ? Opacity : Math.Round(Opacity, generator.OpacityDecimals)) <= 0 ||
-                (generator is null ? Opacity : Math.Round(Scale.X, generator.ScaleDecimals)) == 0 ||
-                (generator is null ? Opacity : Math.Round(Scale.Y, generator.ScaleDecimals)) == 0) 
+                Scale.X == 0 || Scale.Y == 0
                 return false;
 
-            if (!bounds.Contains(new Vector2(
-                generator is null ? Position.X : (float)Math.Round(Position.X, generator.PositionDecimals),
-                generator is null ? Position.Y : (float)Math.Round(Position.Y, generator.PositionDecimals))))
+            if (!bounds.Contains(Position))
             {
-                var w = generator is null ? imageSize.X * Scale.X : (float)Math.Round(imageSize.X * Scale.X, generator.ScaleDecimals);
-                var h = generator is null ? imageSize.Y * Scale.Y : (float)Math.Round(imageSize.Y * Scale.Y, generator.ScaleDecimals);
+                var w = imageSize.X * Scale.X;
+                var h = imageSize.Y * Scale.Y;
                 Vector2 originVector;
 
                 switch (origin)
