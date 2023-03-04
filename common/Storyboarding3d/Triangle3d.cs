@@ -4,6 +4,7 @@ using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace StorybrewCommon.Storyboarding3d
 {
@@ -22,7 +23,7 @@ namespace StorybrewCommon.Storyboarding3d
             Position1 = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3),
             Position2 = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
 
-        public readonly CommandGenerator Generator0 = new CommandGenerator(), Generator1 = new CommandGenerator();
+        readonly CommandGenerator Generator0 = new CommandGenerator(), Generator1 = new CommandGenerator();
         public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator0; yield return Generator1; } }
 
         int edgeIndex = 0;
@@ -80,7 +81,7 @@ namespace StorybrewCommon.Storyboarding3d
             for (var i = 0; i < 3; i++)
             {
                 var delta = vector2.Xy - vector0.Xy;
-                var deltaLength = delta.Length;
+                var deltaLength = Generator0.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
                 var normalizedDelta = delta / deltaLength;
 
                 var delta2 = vector1.Xy - vector0.Xy;

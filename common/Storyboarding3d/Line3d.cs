@@ -24,7 +24,8 @@ namespace StorybrewCommon.Storyboarding3d
             EndPosition = new KeyframedValue<Vector3>(InterpolatingFunctions.Vector3);
         public readonly KeyframedValue<float> Thickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
 
-        public readonly CommandGenerator Generator = new CommandGenerator();
+        readonly CommandGenerator Generator = new CommandGenerator();
+        public override IEnumerable<CommandGenerator> CommandGenerators { get { yield return Generator; } }
 
         public override void GenerateSprite(StoryboardSegment segment) => sprite = sprite ?? segment.CreateSprite(SpritePath, SpriteOrigin);
         public override void GenerateStates(double time, CameraState cameraState, Object3dState object3dState)
@@ -34,7 +35,7 @@ namespace StorybrewCommon.Storyboarding3d
             var endVector = cameraState.ToScreen(wvp, EndPosition.ValueAt(time));
 
             var delta = endVector.Xy - startVector.Xy;
-            var length = delta.Length;
+            var length = Generator.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
             if (length == 0) return;
 
             var angle = Math.Atan2(delta.Y, delta.X);
@@ -112,7 +113,7 @@ namespace StorybrewCommon.Storyboarding3d
             StartThickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1), 
             EndThickness = new KeyframedValue<float>(InterpolatingFunctions.Float, 1);
 
-        public readonly CommandGenerator 
+        readonly CommandGenerator 
             GeneratorBody = new CommandGenerator(), 
             GeneratorTopEdge = new CommandGenerator(), 
             GeneratorBottomEdge = new CommandGenerator(),
@@ -151,7 +152,7 @@ namespace StorybrewCommon.Storyboarding3d
             var endVector = cameraState.ToScreen(wvp, EndPosition.ValueAt(time));
 
             var delta = endVector.Xy - startVector.Xy;
-            var length = delta.Length;
+            var length = GeneratorBody.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
             if (length == 0) return;
 
             var angle = Math.Atan2(delta.Y, delta.X);

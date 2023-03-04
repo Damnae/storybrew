@@ -253,7 +253,7 @@ namespace StorybrewCommon.Storyboarding
     }
 
     ///<summary> Defines all of an <see cref="OsbSprite"/>'s states as a class. </summary>
-    public class State : IComparable<State>
+    public class State
     {
         ///<summary> Represents the base time, in milliseconds, of this state. </summary>
         public double Time;
@@ -295,7 +295,9 @@ namespace StorybrewCommon.Storyboarding
                 Scale.X == 0 || Scale.Y == 0)
                 return false;
 
-            if (!bounds.Contains(Position))
+            if (!bounds.Contains(new Vector2(
+                generator is null ? Position.X : (float)Math.Round(Position.X, generator.PositionDecimals),
+                generator is null ? Position.Y : (float)Math.Round(Position.Y, generator.PositionDecimals))))
             {
                 var w = imageSize.X * Scale.X;
                 var h = imageSize.Y * Scale.Y;
@@ -320,8 +322,5 @@ namespace StorybrewCommon.Storyboarding
             }
             return true;
         }
-
-        ///<inheritdoc/>
-        public int CompareTo(State other) => Math.Sign(Time - other.Time);
     }
 }
