@@ -36,7 +36,7 @@ namespace StorybrewCommon.Storyboarding3d
 
             var delta = endVector.Xy - startVector.Xy;
             var length = Generator.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
-            if (length == 0) return;
+            if (Math.Round(length, Generator.ScaleDecimals) == 0) return;
 
             var angle = Math.Atan2(delta.Y, delta.X);
             var rotation = InterpolatingFunctions.DoubleAngle(Generator.EndState?.Rotation ?? 0, angle, 1);

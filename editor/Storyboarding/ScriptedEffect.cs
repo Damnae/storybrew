@@ -40,7 +40,7 @@ namespace StorybrewEditor.Storyboarding
             this.multithreaded = multithreaded;
         }
 
-        ///<summary> Should only be called by <see cref="Project.QueueEffectUpdate(Effect)"/>. Doesn't run on the main thread. </summary>
+        ///<summary> Should only be called by <see cref="Project.QueueEffectUpdate"/>. Doesn't run on the main thread. </summary>
         public override void Update()
         {
             if (!scriptContainer.HasScript) return;
@@ -90,9 +90,8 @@ namespace StorybrewEditor.Storyboarding
                 });
                 return;
             }
-            catch (RemotingException e)
+            catch (RemotingException)
             {
-                Debug.Print($"Script execution failed with RemotingException, reloading {BaseName} ({e.Message})");
                 changeStatus(EffectStatus.ReloadPending);
                 Program.Schedule(() =>
                 {

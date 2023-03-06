@@ -43,6 +43,12 @@ namespace StorybrewEditor.Util
                         Path = directoryPath,
                         IncludeSubdirectories = false
                     });
+                    
+                    watcher.NotifyFilter = NotifyFilters.Attributes
+                        | NotifyFilters.DirectoryName
+                        | NotifyFilters.FileName
+                        | NotifyFilters.Security
+                        | NotifyFilters.Size;
 
                     watcher.Created += watcher_Changed;
                     watcher.Changed += watcher_Changed;
@@ -73,6 +79,12 @@ namespace StorybrewEditor.Util
                             Path = parentDirectoryPath,
                             IncludeSubdirectories = true
                         });
+
+                        watcher.NotifyFilter = NotifyFilters.Attributes
+                            | NotifyFilters.DirectoryName
+                            | NotifyFilters.FileName
+                            | NotifyFilters.Security
+                            | NotifyFilters.Size;
 
                         watcher.Created += watcher_Changed;
                         watcher.Changed += watcher_Changed;
