@@ -7,6 +7,8 @@ using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Util;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 
 namespace StorybrewCommon.Storyboarding
@@ -117,8 +119,9 @@ namespace StorybrewCommon.Storyboarding
             State previousState = null;
             bool wasVisible = false, everVisible = false, stateAdded = false, distFade = false;
 
-            var bitmap = StoryboardObjectGenerator.Current.GetMapsetBitmap(sprite.TexturePath);
-            var imageSize = new Vector2(bitmap.Width, bitmap.Height);
+            Vector2 imageSize;
+            using (var bitmap = new Bitmap(StoryboardObjectGenerator.Current.MapsetPath + "/" + sprite.TexturePath)) 
+                imageSize = new Vector2(bitmap.Width, bitmap.Height);
 
             states.ForEach(state =>
             {
