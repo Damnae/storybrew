@@ -172,81 +172,83 @@ namespace StorybrewCommon.Util
                 return result;
             }
         }
-        public static unsafe Rectangle? FindTransparencyBounds(Bitmap source)
+        public static Rectangle? FindTransparencyBounds(Bitmap source)
         {
             var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
-            var scan0 = (byte*)data.Scan0.ToPointer();
-
             int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
             var found = false;
 
-            for (var x = 0; x < data.Width; x++)
+            unsafe
             {
-                var stop = false;
+                var buf = (byte*)data.Scan0.ToPointer();
+                for (var x = 0; x < data.Width; x++)
+                {
+                    var stop = false;
+                    for (var y = 0; y < data.Height; y++)
+                    {
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha != 0)
+                        {
+                            xMin = x;
+                            stop = true;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (stop) break;
+                }
+
+                if (!found)
+                {
+                    source.UnlockBits(data);
+                    return null;
+                }
+
                 for (var y = 0; y < data.Height; y++)
                 {
-                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
-                    if (alpha != 0)
+                    var stop = false;
+                    for (var x = xMin; x < data.Width; x++)
                     {
-                        xMin = x;
-                        stop = true;
-                        found = true;
-                        break;
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha != 0)
+                        {
+                            yMin = y;
+                            stop = true;
+                            break;
+                        }
                     }
+                    if (stop) break;
                 }
-                if (stop) break;
-            }
-
-            if (!found)
-            {
-                source.UnlockBits(data);
-                return null;
-            }
-
-            for (var y = 0; y < data.Height; y++)
-            {
-                var stop = false;
-                for (var x = xMin; x < data.Width; x++)
+                for (var x = data.Width - 1; x >= xMin; x--)
                 {
-                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
-                    if (alpha != 0)
+                    var stop = false;
+                    for (var y = yMin; y < data.Height; y++)
                     {
-                        yMin = y;
-                        stop = true;
-                        break;
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha != 0)
+                        {
+                            xMax = x;
+                            stop = true;
+                            break;
+                        }
                     }
+                    if (stop) break;
                 }
-                if (stop) break;
-            }
-            for (var x = data.Width - 1; x >= xMin; x--)
-            {
-                var stop = false;
-                for (var y = yMin; y < data.Height; y++)
+                for (var y = data.Height - 1; y >= yMin; y--)
                 {
-                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
-                    if (alpha != 0)
+                    var stop = false;
+                    for (var x = xMin; x <= xMax; x++)
                     {
-                        xMax = x;
-                        stop = true;
-                        break;
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha != 0)
+                        {
+                            yMax = y;
+                            stop = true;
+                            break;
+                        }
                     }
+                    if (stop) break;
                 }
-                if (stop) break;
-            }
-            for (var y = data.Height - 1; y >= yMin; y--)
-            {
-                var stop = false;
-                for (var x = xMin; x <= xMax; x++)
-                {
-                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
-                    if (alpha != 0)
-                    {
-                        yMax = y;
-                        stop = true;
-                        break;
-                    }
-                }
-                if (stop) break;
             }
 
             source.UnlockBits(data);
