@@ -18,7 +18,7 @@ namespace StorybrewEditor.Scripting
             if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainerAppDomain<TScript>));
             try
             {
-                var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid().ToString()}.dll");
+                var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid()}.dll");
                 ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
 
                 workerProcess?.Dispose();
@@ -46,10 +46,7 @@ namespace StorybrewEditor.Scripting
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    workerProcess?.Dispose();
-                }
+                if (disposing) workerProcess?.Dispose();
                 workerProcess = null;
                 disposedValue = true;
             }

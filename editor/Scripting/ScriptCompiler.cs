@@ -96,17 +96,14 @@ namespace StorybrewEditor.Scripting
                 Path.GetFileName(outputPath),
                 trees.Keys,
                 references: references,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)
                     .WithPlatform(Platform.AnyCpu)
-                    .WithOptimizationLevel(OptimizationLevel.Debug)
+                    .WithOptimizationLevel(OptimizationLevel.Release)
                     .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default));
 
             using (var assemblyStream = File.Create(outputPath)) using (var symbolsStream = File.Create(symbolPath))
             {
-                var emitOptions = new EmitOptions(
-                    debugInformationFormat: DebugInformationFormat.PortablePdb,
-                    pdbFilePath: symbolPath);
-
+                var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: symbolPath);
                 var embeddedTexts = trees.Values.Select(k => EmbeddedText.FromSource(k.Key, k.Value));
                 var result = compilation.Emit(assemblyStream, symbolsStream, embeddedTexts: embeddedTexts, options: emitOptions);
 
@@ -121,7 +118,7 @@ namespace StorybrewEditor.Scripting
                     if (k.Location.SourceTree == null) return "";
                     if (trees.TryGetValue(k.Location.SourceTree, out var path)) return path.Key;
                     return "";
-                }).ToDictionary(k => k.Key, k => k.ToList());
+                }).ToDictionary(k => k.Key, k => k.ToHashSet());
 
                 var message = new StringBuilder("Compilation error\n\n");
                 foreach (var kvp in failureGroup)

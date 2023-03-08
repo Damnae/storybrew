@@ -9,6 +9,7 @@
 		<AppDesignerFolder>\</AppDesignerFolder>
 		<RootNamespace>StorybrewScripts</RootNamespace>
 		<AssemblyName>storyboard</AssemblyName>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
 		<TargetFrameworkProfile />
 	</PropertyGroup>
