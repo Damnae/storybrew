@@ -172,41 +172,43 @@ namespace StorybrewCommon.Util
                 return result;
             }
         }
-        public static Rectangle? FindTransparencyBounds(Bitmap source)
+        public static unsafe Rectangle? FindTransparencyBounds(Bitmap source)
         {
-            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            var buffer = new byte[data.Height * data.Stride];
-            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
-            source.UnlockBits(data);
+            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
+            var scan0 = (byte*)data.Scan0.ToPointer();
 
             int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
-            var foundPixel = false;
+            var found = false;
 
             for (var x = 0; x < data.Width; x++)
             {
                 var stop = false;
                 for (var y = 0; y < data.Height; y++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
                     if (alpha != 0)
                     {
                         xMin = x;
                         stop = true;
-                        foundPixel = true;
+                        found = true;
                         break;
                     }
                 }
                 if (stop) break;
             }
 
-            if (!foundPixel) return null;
+            if (!found)
+            {
+                source.UnlockBits(data);
+                return null;
+            }
 
             for (var y = 0; y < data.Height; y++)
             {
                 var stop = false;
                 for (var x = xMin; x < data.Width; x++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
                     if (alpha != 0)
                     {
                         yMin = y;
@@ -221,7 +223,7 @@ namespace StorybrewCommon.Util
                 var stop = false;
                 for (var y = yMin; y < data.Height; y++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
                     if (alpha != 0)
                     {
                         xMax = x;
@@ -236,7 +238,7 @@ namespace StorybrewCommon.Util
                 var stop = false;
                 for (var x = xMin; x <= xMax; x++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
+                    var alpha = *(scan0 + y * data.Stride + 4 * x + 3);
                     if (alpha != 0)
                     {
                         yMax = y;
@@ -246,6 +248,8 @@ namespace StorybrewCommon.Util
                 }
                 if (stop) break;
             }
+
+            source.UnlockBits(data);
 
             return Rectangle.Intersect(Rectangle.FromLTRB(xMin - 1, yMin - 1, xMax + 2, yMax + 2), new Rectangle(0, 0, source.Width, source.Height));
         }
