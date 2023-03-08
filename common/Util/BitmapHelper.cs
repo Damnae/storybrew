@@ -1,4 +1,4 @@
-﻿using ImageMagick;
+using ImageMagick;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -47,13 +47,13 @@ namespace StorybrewCommon.Util
             var kernel = new double[length, length];
             var total = 0d;
 
-            var scale = 1 / (2.0 * Math.PI * Math.Pow(weight, 2));
+            var scale = 1 / (2 * Math.PI * (weight * weight));
             for (var y = -radius; y <= radius; y++) for (var x = -radius; x <= radius; x++)
-                {
-                    var distance = (x * x + y * y) / (2 * weight * weight);
-                    var value = kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
-                    total += value;
-                }
+            {
+                var distance = (x * x + y * y) / (2 * weight * weight);
+                var value = kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
+                total += value;
+            }
 
             for (var y = 0; y < length; y++) for (var x = 0; x < length; x++) kernel[y, x] = kernel[y, x] / total;
             return kernel;
@@ -76,48 +76,48 @@ namespace StorybrewCommon.Util
                 var halfKernelHeight = kernelHeight >> 1;
 
                 for (var y = 0; y < height; y++) for (var x = 0; x < width; x++)
+                {
+                    var a = 0d;
+                    var r = 0d;
+                    var g = 0d;
+                    var b = 0d;
+
+                    for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
                     {
-                        var a = 0d;
-                        var r = 0d;
-                        var g = 0d;
-                        var b = 0d;
+                        var pixelX = kernelX + x;
+                        if (pixelX < 0) pixelX = 0;
+                        else if (pixelX >= width) pixelX = width - 1;
 
-                        for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
+                        for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
                         {
-                            var pixelX = kernelX + x;
-                            if (pixelX < 0) pixelX = 0;
-                            else if (pixelX >= width) pixelX = width - 1;
+                            var pixelY = kernelY + y;
+                            if (pixelY < 0) pixelY = 0;
+                            else if (pixelY >= height) pixelY = height - 1;
 
-                            for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
-                            {
-                                var pixelY = kernelY + y;
-                                if (pixelY < 0) pixelY = 0;
-                                else if (pixelY >= height) pixelY = height - 1;
-
-                                var col = pinnedSource.Data[pixelY * width + pixelX];
-                                var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
-                                a += ((col >> 24) & 0x000000FF) * k;
-                                r += ((col >> 16) & 0x000000FF) * k;
-                                g += ((col >> 8) & 0x000000FF) * k;
-                                b += ((col) & 0x000000FF) * k;
-                            }
+                            var col = pinnedSource.Data[pixelY * width + pixelX];
+                            var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
+                            a += ((col >> 24) & 0x000000FF) * k;
+                            r += ((col >> 16) & 0x000000FF) * k;
+                            g += ((col >> 8) & 0x000000FF) * k;
+                            b += ((col) & 0x000000FF) * k;
                         }
-
-                        var alphaInt = (int)a;
-                        var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
-                        if (alpha == 1) alpha = 0;
-
-                        var redInt = (int)r;
-                        var red = (byte)((redInt > 255) ? 255 : ((redInt < 0) ? 0 : redInt));
-
-                        var greenInt = (int)g;
-                        var green = (byte)((greenInt > 255) ? 255 : ((greenInt < 0) ? 0 : greenInt));
-
-                        var blueInt = (int)b;
-                        var blue = (byte)((blueInt > 255) ? 255 : ((blueInt < 0) ? 0 : blueInt));
-
-                        result.Data[index++] = (alpha << 24) | (red << 16) | (green << 8) | blue;
                     }
+
+                    var alphaInt = (int)a;
+                    var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
+                    if (alpha == 1) alpha = 0;
+
+                    var redInt = (int)r;
+                    var red = (byte)((redInt > 255) ? 255 : ((redInt < 0) ? 0 : redInt));
+
+                    var greenInt = (int)g;
+                    var green = (byte)((greenInt > 255) ? 255 : ((greenInt < 0) ? 0 : greenInt));
+
+                    var blueInt = (int)b;
+                    var blue = (byte)((blueInt > 255) ? 255 : ((blueInt < 0) ? 0 : blueInt));
+
+                    result.Data[index++] = (alpha << 24) | (red << 16) | (green << 8) | blue;
+                }
 
                 return result;
             }
@@ -142,32 +142,32 @@ namespace StorybrewCommon.Util
                 var colorRgb = (color.R << 16) | (color.G << 8) | color.B;
 
                 for (var y = 0; y < height; y++) for (var x = 0; x < width; x++)
+                {
+                    var a = 0d;
+
+                    for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
                     {
-                        var a = 0d;
+                        var pixelX = kernelX + x;
+                        if (pixelX < 0) pixelX = 0;
+                        else if (pixelX >= width) pixelX = width - 1;
 
-                        for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
+                        for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
                         {
-                            var pixelX = kernelX + x;
-                            if (pixelX < 0) pixelX = 0;
-                            else if (pixelX >= width) pixelX = width - 1;
+                            var pixelY = kernelY + y;
+                            if (pixelY < 0) pixelY = 0;
+                            else if (pixelY >= height) pixelY = height - 1;
 
-                            for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
-                            {
-                                var pixelY = kernelY + y;
-                                if (pixelY < 0) pixelY = 0;
-                                else if (pixelY >= height) pixelY = height - 1;
-
-                                var col = pinnedSource.Data[pixelY * width + pixelX];
-                                var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
-                                a += ((col >> 24) & 0x000000FF) * k;
-                            }
+                            var col = pinnedSource.Data[pixelY * width + pixelX];
+                            var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
+                            a += ((col >> 24) & 0x000000FF) * k;
                         }
-
-                        var alphaInt = (int)a;
-                        var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
-
-                        result.Data[index++] = (alpha << 24) | colorRgb;
                     }
+
+                    var alphaInt = (int)a;
+                    var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
+
+                    result.Data[index++] = (alpha << 24) | colorRgb;
+                }
 
                 return result;
             }
