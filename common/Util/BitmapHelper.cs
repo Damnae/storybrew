@@ -7,39 +7,51 @@ using System.Runtime.InteropServices;
 namespace StorybrewCommon.Util
 {
 #pragma warning disable CS1591
+    ///<summary> Provides static methods for <see cref="Bitmap"/> manipulation. </summary>
     public static class BitmapHelper
     {
         public static PinnedBitmap Blur(Bitmap source, int radius, double power) => Convolute(source, CalculateGaussianKernel(radius, power));
 
+        /// <summary> 
+        /// Losslessly compresses a given image file. 
+        /// If <paramref name="optimize"/> is <see langword="true"/>, performs a heavier compression on the image. 
+        /// </summary>
+        /// <returns> 
+        /// <see langword="true"/> if the compression was successful, else returns <see langword="false"/>. 
+        /// </returns>
         public static bool LosslessCompress(string filePath, bool optimize = false)
         {
             var opt = new ImageOptimizer { OptimalCompression = optimize };
-            bool success;
             try
             {
-                success = opt.LosslessCompress(filePath);
+                opt.LosslessCompress(filePath);
             }
             catch
             {
                 return false;
             }
-
-            return success;
+            return true;
         }
+        
+        /// <summary> 
+        /// Compresses a given image file. A small quality deduction may occur.
+        /// If <paramref name="optimize"/> is <see langword="true"/>, performs a heavier compression on the image. 
+        /// </summary>
+        /// <returns> 
+        /// <see langword="true"/> if the compression was successful, else returns <see langword="false"/>. 
+        /// </returns>
         public static bool Compress(string filePath, bool optimize = false)
         {
             var opt = new ImageOptimizer { OptimalCompression = optimize };
-            bool success;
             try
             {
-                success = opt.Compress(filePath);
+                opt.Compress(filePath);
             }
             catch
             {
                 return false;
             }
-
-            return success;
+            return true;
         }
         public static double[,] CalculateGaussianKernel(int radius, double weight)
         {
@@ -172,15 +184,19 @@ namespace StorybrewCommon.Util
                 return result;
             }
         }
+        
+        /// <summary> 
+        /// Returns whether or not the given <see cref="Bitmap"/> is fully transparent.
+        /// </summary>
         public static bool IsFullyTransparent(Bitmap source)
         {
             var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
             unsafe
             {
                 var buf = (byte*)data.Scan0.ToPointer();
-                for (var y = 0; y < source.Height; y++)
+                for (var y = 0; y < data.Height; y++)
                 {
-                    for (var x = 0; x < source.Width; x++)
+                    for (var x = 0; x < data.Width; x++)
                     {
                         var alpha = *buf;
                         if (alpha != 0)
@@ -197,6 +213,10 @@ namespace StorybrewCommon.Util
             source.UnlockBits(data);
             return true;
         }
+        
+        /// <summary> 
+        /// Returns the trimmed rectangular bounds surrounding the non-transparent area of the given <see cref="Bitmap"/>.
+        /// </summary>
         public static Rectangle FindTransparencyBounds(Bitmap source)
         {
             var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
