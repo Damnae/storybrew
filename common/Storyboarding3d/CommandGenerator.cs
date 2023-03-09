@@ -120,8 +120,8 @@ namespace StorybrewCommon.Storyboarding
             bool wasVisible = false, everVisible = false, stateAdded = false, distFade = false;
 
             Vector2 imageSize;
-            using (var bitmap = new Bitmap(StoryboardObjectGenerator.Current.MapsetPath + "/" + sprite.TexturePath)) 
-                imageSize = new Vector2(bitmap.Width, bitmap.Height);
+            using (var stream = File.OpenRead(StoryboardObjectGenerator.Current.MapsetPath + "/" + sprite.TexturePath))
+            using (var source = Image.FromStream(stream, false, false)) imageSize = new Vector2(source.Width, source.Height);
 
             states.ForEach(state =>
             {

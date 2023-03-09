@@ -81,7 +81,7 @@ namespace StorybrewCommon.Scripting
         Bitmap getBitmap(string path, string alternatePath, bool watch)
         {
             path = Path.GetFullPath(path);
-            if (!bitmaps.TryGetValue(path, out Bitmap bitmap))
+            if (!bitmaps.TryGetValue(path, out Bitmap bitmap)) using (var stream = File.OpenRead(path))
             {
                 if (watch) context.AddDependency(path);
 
@@ -92,14 +92,14 @@ namespace StorybrewCommon.Scripting
 
                     try
                     {
-                        bitmaps.Add(path, bitmap = Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(alternatePath)));
+                        bitmaps.Add(path, bitmap = Util.Misc.WithRetries(() => (Bitmap)Image.FromStream(stream)));
                     }
                     catch (FileNotFoundException e)
                     {
                         throw new FileNotFoundException(path, e);
                     }
                 }
-                else bitmaps.Add(path, bitmap = Util.Misc.WithRetries(() => (Bitmap)Image.FromFile(path)));
+                else bitmaps.Add(path, bitmap = Util.Misc.WithRetries(() => (Bitmap)Image.FromStream(stream)));
             }
             return bitmap;
         }
@@ -114,7 +114,7 @@ namespace StorybrewCommon.Scripting
         {
             path = Path.GetFullPath(path);
             if (watch) context.AddDependency(path);
-            return Util.Misc.WithRetries(() => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+            return Util.Misc.WithRetries(() => File.OpenRead(path));
         }
 
         #endregion

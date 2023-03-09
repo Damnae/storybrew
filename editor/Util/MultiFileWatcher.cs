@@ -47,7 +47,7 @@ namespace StorybrewEditor.Util
                     watcher.NotifyFilter = NotifyFilters.Attributes
                         | NotifyFilters.DirectoryName
                         | NotifyFilters.FileName
-                        | NotifyFilters.Security
+                        | NotifyFilters.LastWrite
                         | NotifyFilters.Size;
 
                     watcher.Created += watcher_Changed;
@@ -83,7 +83,7 @@ namespace StorybrewEditor.Util
                         watcher.NotifyFilter = NotifyFilters.Attributes
                             | NotifyFilters.DirectoryName
                             | NotifyFilters.FileName
-                            | NotifyFilters.Security
+                            | NotifyFilters.LastWrite
                             | NotifyFilters.Size;
 
                         watcher.Created += watcher_Changed;
@@ -111,7 +111,7 @@ namespace StorybrewEditor.Util
         void watcher_Changed(object sender, FileSystemEventArgs e)
         {
             Trace.WriteLine($"File {e.ChangeType.ToString().ToLowerInvariant()}: {e.FullPath}");
-            scheduler.Schedule(e.FullPath, (key) =>
+            scheduler.Schedule(e.FullPath, key =>
             {
                 if (disposed) return;
 
