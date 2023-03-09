@@ -220,17 +220,16 @@ namespace StorybrewCommon.Subtitles
                             }
                         }
 
-                        var bounds = description.TrimTransparency ? BitmapHelper.FindTransparencyBounds(bitmap) : null;
-                        if (bounds != null && bounds != new Rectangle(0, 0, bitmap.Width, bitmap.Height))
+                        var bounds = description.TrimTransparency ? BitmapHelper.FindTransparencyBounds(bitmap) : Rectangle.Empty;
+                        if (bounds != Rectangle.Empty && bounds != new Rectangle(0, 0, bitmap.Width, bitmap.Height))
                         {
-                            var trimBounds = bounds.Value;
-                            using (var trimmedBitmap = new Bitmap(trimBounds.Width, trimBounds.Height))
+                            using (var trimmedBitmap = new Bitmap(bounds.Width, bounds.Height))
                             {
-                                offsetX += trimBounds.Left;
-                                offsetY += trimBounds.Top;
+                                offsetX += bounds.Left;
+                                offsetY += bounds.Top;
                                 width = trimmedBitmap.Width;
                                 height = trimmedBitmap.Height;
-                                using (var trimGraphics = Graphics.FromImage(trimmedBitmap)) trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
+                                using (var trimGraphics = Graphics.FromImage(trimmedBitmap)) trimGraphics.DrawImage(bitmap, 0, 0, bounds, GraphicsUnit.Pixel);
                                 Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
                             }
                         }

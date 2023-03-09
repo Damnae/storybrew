@@ -172,7 +172,32 @@ namespace StorybrewCommon.Util
                 return result;
             }
         }
-        public static Rectangle? FindTransparencyBounds(Bitmap source)
+        public static bool IsFullyTransparent(Bitmap source)
+        {
+            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
+            unsafe
+            {
+                var buf = (byte*)data.Scan0.ToPointer();
+                for (var y = 0; y < source.Height; y++)
+                {
+                    for (var x = 0; x < source.Width; x++)
+                    {
+                        var alpha = *buf;
+                        if (alpha != 0)
+                        {
+                            source.UnlockBits(data);
+                            return false;
+                        }
+                        buf += 4;
+                    }
+                    buf += data.Stride - source.Width * 4;
+                }
+            }
+
+            source.UnlockBits(data);
+            return true;
+        }
+        public static Rectangle FindTransparencyBounds(Bitmap source)
         {
             var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
             int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
@@ -187,7 +212,7 @@ namespace StorybrewCommon.Util
                     for (var y = 0; y < data.Height; y++)
                     {
                         var alpha = *(buf + y * data.Stride + 4 * x + 3);
-                        if (alpha != 0)
+                        if (alpha > 0)
                         {
                             xMin = x;
                             stop = true;
@@ -201,7 +226,7 @@ namespace StorybrewCommon.Util
                 if (!found)
                 {
                     source.UnlockBits(data);
-                    return null;
+                    return Rectangle.Empty;
                 }
 
                 for (var y = 0; y < data.Height; y++)
@@ -210,7 +235,7 @@ namespace StorybrewCommon.Util
                     for (var x = xMin; x < data.Width; x++)
                     {
                         var alpha = *(buf + y * data.Stride + 4 * x + 3);
-                        if (alpha != 0)
+                        if (alpha > 0)
                         {
                             yMin = y;
                             stop = true;
@@ -225,7 +250,7 @@ namespace StorybrewCommon.Util
                     for (var y = yMin; y < data.Height; y++)
                     {
                         var alpha = *(buf + y * data.Stride + 4 * x + 3);
-                        if (alpha != 0)
+                        if (alpha > 0)
                         {
                             xMax = x;
                             stop = true;
@@ -240,7 +265,7 @@ namespace StorybrewCommon.Util
                     for (var x = xMin; x <= xMax; x++)
                     {
                         var alpha = *(buf + y * data.Stride + 4 * x + 3);
-                        if (alpha != 0)
+                        if (alpha > 0)
                         {
                             yMax = y;
                             stop = true;
