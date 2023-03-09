@@ -96,10 +96,9 @@ namespace StorybrewEditor.Scripting
                 Path.GetFileName(outputPath),
                 trees.Keys,
                 references: references,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)
-                    .WithPlatform(Platform.AnyCpu)
-                    .WithOptimizationLevel(OptimizationLevel.Release)
-                    .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default));
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
+                    allowUnsafe: true, platform: Platform.AnyCpu, optimizationLevel: 
+                    OptimizationLevel.Release, assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
             using (var assemblyStream = File.Create(outputPath)) using (var symbolsStream = File.Create(symbolPath))
             {
