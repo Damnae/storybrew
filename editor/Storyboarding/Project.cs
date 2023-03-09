@@ -395,7 +395,7 @@ namespace StorybrewEditor.Storyboarding
         static readonly string[] defaultAssemblies = new string[]
         {
             "System.dll", "System.Core.dll", "System.Drawing.dll",
-            "OpenTK.dll", Assembly.GetAssembly(typeof(Script)).Location
+            "OpenTK.dll", "BrewLib.dll", Assembly.GetAssembly(typeof(Script)).Location
         };
         public static IEnumerable<string> DefaultAssemblies => defaultAssemblies;
 

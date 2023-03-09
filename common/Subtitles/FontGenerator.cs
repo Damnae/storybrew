@@ -12,7 +12,6 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using Tiny;
-using BitmapHelper = StorybrewCommon.Util.BitmapHelper;
 
 namespace StorybrewCommon.Subtitles
 {

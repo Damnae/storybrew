@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using static System.Drawing.Graphics;
+using ImageMagick;
 
 namespace BrewLib.Util
 {
@@ -11,6 +12,32 @@ namespace BrewLib.Util
         public static PinnedBitmap Blur(Bitmap source, int radius, double power)
             => Convolute(source, CalculateGaussianKernel(radius, power));
 
+        public static bool LosslessCompress(string filePath, bool optimize = false)
+        {
+            var opt = new ImageOptimizer { OptimalCompression = optimize };
+            try
+            {
+                opt.LosslessCompress(filePath);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+        public static bool Compress(string filePath, bool optimize = false)
+        {
+            var opt = new ImageOptimizer { OptimalCompression = optimize };
+            try
+            {
+                opt.Compress(filePath);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
         public static PinnedBitmap Premultiply(Bitmap source)
         {
             var result = PinnedBitmap.FromBitmap(source);
@@ -39,18 +66,17 @@ namespace BrewLib.Util
         {
             var length = radius * 2 + 1;
             var kernel = new double[length, length];
-            var total = .0;
+            var total = 0d;
 
-            var scale = 1.0 / (2.0 * Math.PI * Math.Pow(weight, 2));
+            var scale = 1 / (2 * Math.PI * (weight * weight));
             for (var y = -radius; y <= radius; y++) for (var x = -radius; x <= radius; x++)
-                {
-                    var distance = (x * x + y * y) / (2 * weight * weight);
-                    var value = kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
-                    total += value;
-                }
+            {
+                var distance = (x * x + y * y) / (2 * weight * weight);
+                var value = kernel[y + radius, x + radius] = scale * Math.Exp(-distance);
+                total += value;
+            }
 
             for (var y = 0; y < length; y++) for (var x = 0; x < length; x++) kernel[y, x] = kernel[y, x] / total;
-
             return kernel;
         }
         public static PinnedBitmap Convolute(Bitmap source, double[,] kernel)
@@ -71,48 +97,48 @@ namespace BrewLib.Util
                 var halfKernelHeight = kernelHeight >> 1;
 
                 for (var y = 0; y < height; y++) for (var x = 0; x < width; x++)
+                {
+                    var a = 0d;
+                    var r = 0d;
+                    var g = 0d;
+                    var b = 0d;
+
+                    for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
                     {
-                        var a = .0;
-                        var r = .0;
-                        var g = .0;
-                        var b = .0;
+                        var pixelX = kernelX + x;
+                        if (pixelX < 0) pixelX = 0;
+                        else if (pixelX >= width) pixelX = width - 1;
 
-                        for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
+                        for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
                         {
-                            var pixelX = kernelX + x;
-                            if (pixelX < 0) pixelX = 0;
-                            else if (pixelX >= width) pixelX = width - 1;
+                            var pixelY = kernelY + y;
+                            if (pixelY < 0) pixelY = 0;
+                            else if (pixelY >= height) pixelY = height - 1;
 
-                            for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
-                            {
-                                var pixelY = kernelY + y;
-                                if (pixelY < 0) pixelY = 0;
-                                else if (pixelY >= height) pixelY = height - 1;
-
-                                var col = pinnedSource.Data[pixelY * width + pixelX];
-                                var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
-                                a += ((col >> 24) & 0x000000FF) * k;
-                                r += ((col >> 16) & 0x000000FF) * k;
-                                g += ((col >> 8) & 0x000000FF) * k;
-                                b += ((col) & 0x000000FF) * k;
-                            }
+                            var col = pinnedSource.Data[pixelY * width + pixelX];
+                            var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
+                            a += ((col >> 24) & 0x000000FF) * k;
+                            r += ((col >> 16) & 0x000000FF) * k;
+                            g += ((col >> 8) & 0x000000FF) * k;
+                            b += ((col) & 0x000000FF) * k;
                         }
-
-                        var alphaInt = (int)a;
-                        var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
-                        if (alpha == 1) alpha = 0;
-
-                        var redInt = (int)r;
-                        var red = (byte)((redInt > 255) ? 255 : ((redInt < 0) ? 0 : redInt));
-
-                        var greenInt = (int)g;
-                        var green = (byte)((greenInt > 255) ? 255 : ((greenInt < 0) ? 0 : greenInt));
-
-                        var blueInt = (int)b;
-                        var blue = (byte)((blueInt > 255) ? 255 : ((blueInt < 0) ? 0 : blueInt));
-
-                        result.Data[index++] = (alpha << 24) | (red << 16) | (green << 8) | blue;
                     }
+
+                    var alphaInt = (int)a;
+                    var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
+                    if (alpha == 1) alpha = 0;
+
+                    var redInt = (int)r;
+                    var red = (byte)((redInt > 255) ? 255 : ((redInt < 0) ? 0 : redInt));
+
+                    var greenInt = (int)g;
+                    var green = (byte)((greenInt > 255) ? 255 : ((greenInt < 0) ? 0 : greenInt));
+
+                    var blueInt = (int)b;
+                    var blue = (byte)((blueInt > 255) ? 255 : ((blueInt < 0) ? 0 : blueInt));
+
+                    result.Data[index++] = (alpha << 24) | (red << 16) | (green << 8) | blue;
+                }
 
                 return result;
             }
@@ -137,110 +163,141 @@ namespace BrewLib.Util
                 var colorRgb = (color.R << 16) | (color.G << 8) | color.B;
 
                 for (var y = 0; y < height; y++) for (var x = 0; x < width; x++)
+                {
+                    var a = 0d;
+
+                    for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
                     {
-                        var a = .0;
+                        var pixelX = kernelX + x;
+                        if (pixelX < 0) pixelX = 0;
+                        else if (pixelX >= width) pixelX = width - 1;
 
-                        for (var kernelX = -halfKernelWidth; kernelX <= halfKernelWidth; kernelX++)
+                        for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
                         {
-                            var pixelX = kernelX + x;
-                            if (pixelX < 0) pixelX = 0;
-                            else if (pixelX >= width) pixelX = width - 1;
+                            var pixelY = kernelY + y;
+                            if (pixelY < 0) pixelY = 0;
+                            else if (pixelY >= height) pixelY = height - 1;
 
-                            for (var kernelY = -halfKernelHeight; kernelY <= halfKernelHeight; kernelY++)
-                            {
-                                var pixelY = kernelY + y;
-                                if (pixelY < 0) pixelY = 0;
-                                else if (pixelY >= height) pixelY = height - 1;
-
-                                var col = pinnedSource.Data[pixelY * width + pixelX];
-                                var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
-                                a += ((col >> 24) & 0x000000FF) * k;
-                            }
+                            var col = pinnedSource.Data[pixelY * width + pixelX];
+                            var k = kernel[kernelY + halfKernelWidth, kernelX + halfKernelHeight];
+                            a += ((col >> 24) & 0x000000FF) * k;
                         }
-
-                        var alphaInt = (int)a;
-                        var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
-
-                        result.Data[index++] = (alpha << 24) | colorRgb;
                     }
+
+                    var alphaInt = (int)a;
+                    var alpha = (byte)((alphaInt > 255) ? 255 : ((alphaInt < 0) ? 0 : alphaInt));
+
+                    result.Data[index++] = (alpha << 24) | colorRgb;
+                }
 
                 return result;
             }
         }
-        public static Rectangle? FindTransparencyBounds(Bitmap source)
+        public static bool IsFullyTransparent(Bitmap source)
         {
-            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            var buffer = new byte[data.Height * data.Stride];
-            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
-            source.UnlockBits(data);
-
-            int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
-            var foundPixel = false;
-
-            for (var x = 0; x < data.Width; x++)
+            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
+            unsafe
             {
-                var stop = false;
+                var buf = (byte*)data.Scan0.ToPointer();
                 for (var y = 0; y < data.Height; y++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
-                    if (alpha != 0)
+                    for (var x = 0; x < data.Width; x++)
                     {
-                        xMin = x;
-                        stop = true;
-                        foundPixel = true;
-                        break;
+                        var alpha = *buf;
+                        if (alpha != 0)
+                        {
+                            source.UnlockBits(data);
+                            return false;
+                        }
+                        buf += 4;
                     }
+                    buf += data.Stride - source.Width * 4;
                 }
-                if (stop) break;
             }
 
-            if (!foundPixel) return null;
+            source.UnlockBits(data);
+            return true;
+        }
+        public static Rectangle FindTransparencyBounds(Bitmap source)
+        {
+            var data = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), (ImageLockMode)1, (PixelFormat)2498570);
+            int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
+            var found = false;
 
-            for (var y = 0; y < data.Height; y++)
+            unsafe
             {
-                var stop = false;
-                for (var x = xMin; x < data.Width; x++)
+                var buf = (byte*)data.Scan0.ToPointer();
+                for (var x = 0; x < data.Width; x++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
-                    if (alpha != 0)
+                    var stop = false;
+                    for (var y = 0; y < data.Height; y++)
                     {
-                        yMin = y;
-                        stop = true;
-                        break;
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha > 0)
+                        {
+                            xMin = x;
+                            stop = true;
+                            found = true;
+                            break;
+                        }
                     }
+                    if (stop) break;
                 }
-                if (stop) break;
-            }
-            for (var x = data.Width - 1; x >= xMin; x--)
-            {
-                var stop = false;
-                for (var y = yMin; y < data.Height; y++)
+
+                if (!found)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
-                    if (alpha != 0)
-                    {
-                        xMax = x;
-                        stop = true;
-                        break;
-                    }
+                    source.UnlockBits(data);
+                    return Rectangle.Empty;
                 }
-                if (stop) break;
-            }
-            for (var y = data.Height - 1; y >= yMin; y--)
-            {
-                var stop = false;
-                for (var x = xMin; x <= xMax; x++)
+
+                for (var y = 0; y < data.Height; y++)
                 {
-                    var alpha = buffer[y * data.Stride + 4 * x + 3];
-                    if (alpha != 0)
+                    var stop = false;
+                    for (var x = xMin; x < data.Width; x++)
                     {
-                        yMax = y;
-                        stop = true;
-                        break;
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha > 0)
+                        {
+                            yMin = y;
+                            stop = true;
+                            break;
+                        }
                     }
+                    if (stop) break;
                 }
-                if (stop) break;
+                for (var x = data.Width - 1; x >= xMin; x--)
+                {
+                    var stop = false;
+                    for (var y = yMin; y < data.Height; y++)
+                    {
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha > 0)
+                        {
+                            xMax = x;
+                            stop = true;
+                            break;
+                        }
+                    }
+                    if (stop) break;
+                }
+                for (var y = data.Height - 1; y >= yMin; y--)
+                {
+                    var stop = false;
+                    for (var x = xMin; x <= xMax; x++)
+                    {
+                        var alpha = *(buf + y * data.Stride + 4 * x + 3);
+                        if (alpha > 0)
+                        {
+                            yMax = y;
+                            stop = true;
+                            break;
+                        }
+                    }
+                    if (stop) break;
+                }
             }
+
+            source.UnlockBits(data);
 
             return Rectangle.Intersect(Rectangle.FromLTRB(xMin - 1, yMin - 1, xMax + 2, yMax + 2), new Rectangle(0, 0, source.Width, source.Height));
         }

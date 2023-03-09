@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<AppDesignerFolder>\</AppDesignerFolder>
@@ -12,15 +11,18 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
-
+	<PropertyGroup>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<BaseOutputPath>..\..\cache\bin\</BaseOutputPath>
+		<BaseIntermediateOutputPath>..\..\cache\obj\</BaseIntermediateOutputPath>
+	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Output|AnyCPU' ">
 		<PlatformTarget>AnyCPU;x86</PlatformTarget>
 		<Optimize>true</Optimize>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<BaseOutputPath>\</BaseOutputPath>
-		<BaseIntermediateOutputPath>..\..\cache\obj\</BaseIntermediateOutputPath>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<Reference Include="OpenTK">
 			<HintPath>..\..\OpenTK.dll</HintPath>
@@ -31,9 +33,5 @@
 		<Reference Include="StorybrewCommon">
 			<HintPath>..\..\StorybrewCommon.dll</HintPath>
 		</Reference>
-		<Reference Include="Magick.NET-Q8-AnyCPU">
-			<HintPath>..\..\Magick.NET-Q8-AnyCPU.dll</HintPath>
-		</Reference>
 	</ItemGroup>
-
 </Project>

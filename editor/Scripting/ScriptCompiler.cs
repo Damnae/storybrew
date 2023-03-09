@@ -102,7 +102,7 @@ namespace StorybrewEditor.Scripting
 
             using (var assemblyStream = File.Create(outputPath)) using (var symbolsStream = File.Create(symbolPath))
             {
-                var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: symbolPath);
+                var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.Pdb, pdbFilePath: symbolPath);
                 var embeddedTexts = trees.Values.Select(k => EmbeddedText.FromSource(k.Key, k.Value));
                 var result = compilation.Emit(assemblyStream, symbolsStream, embeddedTexts: embeddedTexts, options: emitOptions);
 
