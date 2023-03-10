@@ -81,7 +81,7 @@ namespace StorybrewCommon.Storyboarding3d
             for (var i = 0; i < 3; i++)
             {
                 var delta = vector2.Xy - vector0.Xy;
-                var deltaLength = Generator0.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
+                var deltaLength = delta.Length;
                 var normalizedDelta = delta / deltaLength;
 
                 var delta2 = vector1.Xy - vector0.Xy;

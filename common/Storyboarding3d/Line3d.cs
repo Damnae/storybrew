@@ -4,6 +4,7 @@ using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace StorybrewCommon.Storyboarding3d
 {
@@ -35,7 +36,7 @@ namespace StorybrewCommon.Storyboarding3d
             var endVector = cameraState.ToScreen(wvp, EndPosition.ValueAt(time));
 
             var delta = endVector.Xy - startVector.Xy;
-            var length = Generator.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
+            var length = delta.Length;
             if (Math.Round(length, Generator.ScaleDecimals) == 0) return;
 
             var angle = Math.Atan2(delta.Y, delta.X);
@@ -152,7 +153,7 @@ namespace StorybrewCommon.Storyboarding3d
             var endVector = cameraState.ToScreen(wvp, EndPosition.ValueAt(time));
 
             var delta = endVector.Xy - startVector.Xy;
-            var length = GeneratorBody.ScaleDecimals > 4 ? delta.Length : 1 / MathHelper.InverseSqrtFast(delta.LengthSquared);
+            var length = delta.Length;
             if (length == 0) return;
 
             var angle = Math.Atan2(delta.Y, delta.X);
