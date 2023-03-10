@@ -1,37 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<AppDesignerFolder>\</AppDesignerFolder>
-		<TargetFramework>net481</TargetFramework>
-		<Configurations>Output</Configurations>
-		<RootNamespace>StorybrewScripts</RootNamespace>
-		<AssemblyName>storyboard</AssemblyName>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Platforms>AnyCPU;x86</Platforms>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-	</PropertyGroup>
-	<PropertyGroup>
-		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-		<BaseOutputPath>..\..\cache\bin\</BaseOutputPath>
-		<BaseIntermediateOutputPath>..\..\cache\obj\</BaseIntermediateOutputPath>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Output|AnyCPU' ">
-		<PlatformTarget>AnyCPU;x86</PlatformTarget>
-		<Optimize>true</Optimize>
-	</PropertyGroup>
-	<ItemGroup>
-		<Reference Include="OpenTK">
-			<HintPath>..\..\OpenTK.dll</HintPath>
-		</Reference>
-		<Reference Include="BrewLib">
-			<HintPath>..\..\BrewLib.dll</HintPath>
-		</Reference>
-		<Reference Include="StorybrewCommon">
-			<HintPath>..\..\StorybrewCommon.dll</HintPath>
-		</Reference>
-	</ItemGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net481</TargetFramework>
+    <Configurations>Output</Configurations>
+    <RootNamespace>StorybrewScripts</RootNamespace>
+    <AssemblyName>storyboard</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>AnyCPU;x86</Platforms>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseOutputPath>..\..\cache\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>..\..\cache\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Output|AnyCPU' ">
+    <PlatformTarget>AnyCPU;x86</PlatformTarget>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\..\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="BrewLib">
+      <HintPath>..\..\BrewLib.dll</HintPath>
+    </Reference>
+    <Reference Include="StorybrewCommon">
+      <HintPath>..\..\StorybrewCommon.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
