@@ -162,16 +162,6 @@ namespace StorybrewEditor.Scripting
                     document.Load(stream);
 
                 var xmlns = document.DocumentElement.GetAttribute("xmlns");
-                var compileGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.GetFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
-                {
-                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
-
-                    var compileNode = document.CreateElement("Compile", xmlns);
-                    compileNode.SetAttribute("Include", relativePath);
-                    compileGroup.AppendChild(compileNode);
-                }
 
                 var referencedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
                 document.DocumentElement.AppendChild(referencedAssembliesGroup);
