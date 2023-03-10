@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <RootNamespace>scripts</RootNamespace>
@@ -10,7 +11,9 @@
     <Copyright>Copyright © Damnae 2016</Copyright>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\common\common.csproj" />
   </ItemGroup>
+
 </Project>

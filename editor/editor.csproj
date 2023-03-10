@@ -1,91 +1,99 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>editor</RootNamespace>
-    <AssemblyName>StorybrewEditor</AssemblyName>
-    <UseWindowsForms>true</UseWindowsForms>
-    <TargetFramework>net481</TargetFramework>
-    <Platforms>AnyCPU;x86</Platforms>
-    <Version>1.89</Version>
+  	<OutputType>WinExe</OutputType>
+  	<RootNamespace>StorybrewEditor</RootNamespace>
+  	<AssemblyName>StorybrewEditor</AssemblyName>
+  	<UseWindowsForms>true</UseWindowsForms>
+  	<TargetFramework>net481</TargetFramework>
+  	<Platforms>AnyCPU;x86</Platforms>
+  	<Version>1.89</Version>
   </PropertyGroup>
+
   <Target Name="NuGetXmls" AfterTargets="ResolveReferences">
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)OpenTK.xml')" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)'!='' and Exists('%(RootDir)%(Directory)OpenTK.xml')" />
-    </ItemGroup>
+  	<ItemGroup>
+    <ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)OpenTK.xml')" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)'!='' and Exists('%(RootDir)%(Directory)OpenTK.xml')" />
+  	</ItemGroup>
   </Target>
   <Target Name="DeleteUnusedDLLs" AfterTargets="Build">
-    <Delete Files="$(OutDir)\System.Buffers.dll" />
-    <Delete Files="$(OutDir)\System.Text.Encoding.CodePages.dll" />
-    <Delete Files="$(OutDir)\System.Threading.Tasks.Extensions.dll" />
+  	<Delete Files="$(OutDir)\System.Buffers.dll" />
+  	<Delete Files="$(OutDir)\System.Text.Encoding.CodePages.dll" />
+  	<Delete Files="$(OutDir)\System.Threading.Tasks.Extensions.dll" />
   </Target>
+
   <PropertyGroup>
-    <StartupObject>StorybrewEditor.Program</StartupObject>
+  	<StartupObject>StorybrewEditor.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
-    <Authors>storybrew</Authors>
-    <Product>storybrew editor</Product>
-    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
-    <Title>storybrew editor</Title>
-    <Copyright>Copyright © Damnae 2016</Copyright>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  	<ApplicationIcon>icon.ico</ApplicationIcon>
+  	<Authors>storybrew</Authors>
+  	<Product>storybrew editor</Product>
+  	<AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+  	<Title>storybrew editor</Title>
+  	<Copyright>Copyright © Damnae 2016</Copyright>
+  	<PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <DebugType>embedded</DebugType>
-    <Optimize>true</Optimize>
+  	<DebugType>embedded</DebugType>
+  	<Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <DebugType>embedded</DebugType>
-    <Optimize>true</Optimize>
+  	<DebugType>embedded</DebugType>
+  	<Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
+  	<Optimize>True</Optimize>
+  	<DebugType>embedded</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-    <Optimize>True</Optimize>
+  	<DebugType>embedded</DebugType>
+  	<Optimize>True</Optimize>
   </PropertyGroup>
+
   <ItemGroup>
-    <None Include="App.config" />
-    <EmbeddedResource Include="Resources\FontAwesome.ttf" />
-    <EmbeddedResource Include="Resources\Roboto-Light.ttf" />
-    <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
-    <EmbeddedResource Include="Resources\ui-rounded-borders-opt.json" />
-    <EmbeddedResource Include="Resources\ui-line-opt.json" />
-    <EmbeddedResource Include="Resources\ui-stripes-opt.json" />
-    <EmbeddedResource Include="Resources\skin_styles.json" />
-    <EmbeddedResource Include="Resources\skin_drawables_debug.json" />
-    <EmbeddedResource Include="Resources\skin_drawables.json" />
-    <EmbeddedResource Include="Resources\skin_constants.json" />
-    <EmbeddedResource Include="Resources\skin.json" />
+  	<None Include="App.config" />
+  	<EmbeddedResource Include="Resources\FontAwesome.ttf" />
+  	<EmbeddedResource Include="Resources\Roboto-Light.ttf" />
+  	<EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
+  	<EmbeddedResource Include="Resources\ui-rounded-borders-opt.json" />
+  	<EmbeddedResource Include="Resources\ui-line-opt.json" />
+  	<EmbeddedResource Include="Resources\ui-stripes-opt.json" />
+  	<EmbeddedResource Include="Resources\skin_styles.json" />
+  	<EmbeddedResource Include="Resources\skin_drawables_debug.json" />
+  	<EmbeddedResource Include="Resources\skin_drawables.json" />
+  	<EmbeddedResource Include="Resources\skin_constants.json" />
+  	<EmbeddedResource Include="Resources\skin.json" />
 	<EmbeddedResource Include="Resources\scripttemplate.csx" />
-	<EmbeddedResource Include="icon.ico" />
-    <EmbeddedResource Include="Resources\project\scripts.csproj" SubType="Designer" />
-	<EmbeddedResource Include="Resources\project\storyboard.sln" />
-	<EmbeddedResource Include="Resources\ui-line.png" />
-	<EmbeddedResource Include="Resources\ui-stripes.png" />
-	<EmbeddedResource Include="Resources\ui-rounded-borders.png" />
+  	<EmbeddedResource Include="icon.ico" />
+  	<EmbeddedResource Include="Resources\project\scripts.csproj" SubType="Designer" />
+  	<EmbeddedResource Include="Resources\project\storyboard.sln" />
+  	<EmbeddedResource Include="Resources\ui-line.png" />
+  	<EmbeddedResource Include="Resources\ui-stripes.png" />
+  	<EmbeddedResource Include="Resources\ui-rounded-borders.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+  	<BootstrapperPackage Include=".NETFramework,Version=v4.8.1">
+    <Visible>False</Visible>
+    <ProductName>Microsoft .NET Framework 4.8.1 %28x86 and x64%29</ProductName>
+    <Install>true</Install>
+  	</BootstrapperPackage>
+  </ItemGroup>
+
+  <ItemGroup>
+  	<PackageReference Include="Damnae.Tiny" Version="1.1.0" />
+  	<PackageReference Include="ManagedBass" Version="3.1.1" />
+  	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
+  	<PackageReference Include="OpenTK" Version="3.3.3" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.8.1">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.8.1 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
+  	<ProjectReference Include="..\brewlib-merge\brewlib.csproj" />
+  	<ProjectReference Include="..\common\common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Damnae.Tiny" Version="1.1.0" />
-    <PackageReference Include="ManagedBass" Version="3.1.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
-    <PackageReference Include="OpenTK" Version="3.3.3" />
+  	<Reference Include="System.Runtime.Remoting" />
+  	<Reference Include="System.ServiceModel" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\brewlib-merge\brewlib.csproj" />
-    <ProjectReference Include="..\common\common.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.ServiceModel" />
-  </ItemGroup>
+
 </Project>

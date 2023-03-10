@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <RootNamespace>brewlib</RootNamespace>
@@ -7,12 +8,13 @@
     <Copyright>Copyright © Damnae 2016</Copyright>
     <UseWindowsForms>true</UseWindowsForms>
     <Product>brewlib</Product>
-	<Title>brewlib</Title>
-	<Version>1.1</Version>
+    <Title>brewlib</Title>
+    <Version>1.1</Version>
     <Company>storybrew</Company>
     <Platforms>AnyCPU;x86</Platforms>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
@@ -29,6 +31,7 @@
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
+
   <ItemGroup>
     <Content Include="bass.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -37,6 +40,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Damnae.Tiny" Version="1.1.0" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="12.3.0" />
@@ -47,4 +51,5 @@
   <ItemGroup>
     <Reference Include="System.Management" />
   </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <RootNamespace>common</RootNamespace>
@@ -7,12 +8,13 @@
     <TargetFramework>net481</TargetFramework>
     <Company>storybrew</Company>
     <Product>storybrew common</Product>
-	<Title>storybrew common</Title>
+    <Title>storybrew common</Title>
     <Copyright>Copyright © Damnae 2016</Copyright>
     <Version>1.1</Version>
     <Platforms>AnyCPU;x86</Platforms>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
@@ -29,11 +31,14 @@
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Damnae.Tiny" Version="1.1.0" />
     <PackageReference Include="OpenTK" Version="3.3.3" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\brewlib-merge\brewlib.csproj" />
   </ItemGroup>
+
 </Project>
