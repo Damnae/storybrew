@@ -73,8 +73,12 @@ namespace StorybrewCommon.Storyboarding3d
         public void DoTreeSprite(Action<OsbSprite> action = null) => finalize = action;
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
+            if (finalize != null)
+            {
+                Action<Action, OsbSprite> action2 = (createCommands, sprite) => finalize(sprite);
+                action += action2;
+            }
             Generator.GenerateCommands(sprite, action, startTime, endTime, timeOffset, loopable);
-            finalize?.Invoke(sprite);
         }
     }
     public class Line3dEx : Node3d, HasOsbSprites
@@ -271,21 +275,22 @@ namespace StorybrewCommon.Storyboarding3d
         public void DoTreeSprite(Action<OsbSprite> action = null) => finalize = action;
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
+            if (finalize != null)
+            {
+                Action<Action, OsbSprite> action2 = (createCommands, sprite) => finalize(sprite);
+                action += action2;
+            }
+            
             GeneratorBody.GenerateCommands(spriteBody, action, startTime, endTime, timeOffset, loopable);
-            finalize?.Invoke(spriteBody);
             if (SpritePathEdge != null)
             {
                 GeneratorTopEdge.GenerateCommands(spriteTopEdge, action, startTime, endTime, timeOffset, loopable);
                 GeneratorBottomEdge.GenerateCommands(spriteBottomEdge, action, startTime, endTime, timeOffset, loopable);
-                finalize?.Invoke(spriteTopEdge);
-                finalize?.Invoke(spriteBottomEdge);
             }
             if (SpritePathCap != null)
             {
                 if (EnableStartCap) GeneratorStartCap.GenerateCommands(spriteStartCap, action, startTime, endTime, timeOffset, loopable);
                 if (EnableEndCap) GeneratorEndCap.GenerateCommands(spriteEndCap, action, startTime, endTime, timeOffset, loopable);
-                finalize?.Invoke(spriteStartCap);
-                finalize?.Invoke(spriteEndCap);
             }
         }
     }
