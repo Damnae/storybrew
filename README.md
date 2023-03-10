@@ -1,6 +1,6 @@
-﻿# Changes
+# Changes
 * update to new Roslyn version and script compiler
-* port to .NET Framework 4.8
+* port to .NET Framework 4.8.1
 * code formatting and optimization
 * change project to SDK-style
 * merge BrewLib to this project
