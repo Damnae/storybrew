@@ -105,8 +105,12 @@ namespace StorybrewCommon.Storyboarding3d
         }
         public override void GenerateCommands(Action<Action, OsbSprite> action, double? startTime, double? endTime, double timeOffset, bool loopable)
         {
+            if (finalize != null)
+            {
+                Action<Action, OsbSprite> action2 = (createCommands, sprite) => finalize(sprite);
+                action += action2;
+            }
             gen.GenerateCommands(sprite, action, startTime, endTime, timeOffset, loopable);
-            finalize?.Invoke(sprite);
         }
     }
 
