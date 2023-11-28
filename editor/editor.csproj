@@ -1,218 +1,39 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
-  <Import Project="..\packages\Microsoft.Net.Compilers.2.10.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.2.10.0\build\Microsoft.Net.Compilers.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FF59AEEA-C133-4BF8-8A0B-620A3C99022B}</ProjectGuid>
+    <TargetFramework>net472</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StorybrewEditor</RootNamespace>
     <AssemblyName>StorybrewEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>StorybrewEditor.Program</StartupObject>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Title>storybrew editor</Title>
+    <Copyright>Copyright © Damnae 2016</Copyright>
+    <AssemblyVersion>1.91.$([System.Convert]::ToInt16($([MSBuild]::Subtract( $([MSBuild]::Divide( $([System.DateTime]::UtcNow.Ticks) , 864000000000)) , 730119)) )).$([System.Convert]::ToInt16($([MSBuild]::Divide( $([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds) , 2)) ))</AssemblyVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Build|AnyCPU'">
     <OutputPath>bin\Build\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
+    <StartArguments>build</StartArguments>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Tiny, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Damnae.Tiny.1.1.0\lib\net452\Tiny.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builder.cs" />
-    <Compile Include="Mapset\BeatmapLoadingException.cs" />
-    <Compile Include="Mapset\EditorBeatmap.cs" />
-    <Compile Include="Mapset\MapsetManager.cs" />
-    <Compile Include="Editor.cs" />
-    <Compile Include="Processes\RemoteProcessWorkerContainer.cs" />
-    <Compile Include="Processes\RemoteProcessWorker.cs" />
-    <Compile Include="Scripting\ScriptContainer.cs" />
-    <Compile Include="Scripting\ScriptContainerBase.cs" />
-    <Compile Include="Scripting\ScriptContainerProcess.cs" />
-    <Compile Include="Scripting\ScriptProvider.cs" />
-    <Compile Include="Processes\ProcessWorker.cs" />
-    <Compile Include="Storyboarding\EditorOsbSample.cs" />
-    <Compile Include="Storyboarding\EditorStoryboardSegment.cs" />
-    <Compile Include="Storyboarding\EventObject.cs" />
-    <Compile Include="ScreenLayers\ReferencedAssemblyConfig.cs" />
-    <Compile Include="Storyboarding\FrameStats.cs" />
-    <Compile Include="Storyboarding\HasPostProcess.cs" />
-    <Compile Include="UserInterface\Components\SettingsMenu.cs" />
-    <Compile Include="UserInterface\HsbColorPicker.cs" />
-    <Compile Include="UserInterface\Selectbox.cs" />
-    <Compile Include="UserInterface\Skinning\Styles\ColorPickerStyle.cs" />
-    <Compile Include="UserInterface\Skinning\Styles\SelectboxStyle.cs" />
-    <Compile Include="UserInterface\Vector3Picker.cs" />
-    <Compile Include="UserInterface\Vector2Picker.cs" />
-    <Compile Include="Util\ThrottledActionScheduler.cs" />
-    <Compile Include="Util\MultiFileWatcher.cs" />
-    <None Include="OpenTK.dll.config" />
-    <EmbeddedResource Include="Resources\scripttemplate.csx" />
-    <Compile Include="ScreenLayers\UpdateMenu.cs" />
-    <Compile Include="ScreenLayers\Util\ContextMenu.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="Storyboarding\EditorOsbAnimation.cs" />
-    <Compile Include="Storyboarding\LayerManager.cs" />
-    <Compile Include="Updater.cs" />
-    <Compile Include="UserInterface\Drawables\StoryboardDrawable.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScreenLayers\Util\LoadingScreen.cs" />
-    <Compile Include="ScreenLayers\NewProjectMenu.cs" />
-    <Compile Include="ScreenLayers\StartMenu.cs" />
-    <Compile Include="ScreenLayers\ProjectMenu.cs" />
-    <Compile Include="ScreenLayers\Util\PromptBox.cs" />
-    <Compile Include="ScreenLayers\Util\MessageBox.cs" />
-    <Compile Include="ScreenLayers\UiScreenLayer.cs" />
-    <Compile Include="Storyboarding\EditorGeneratorContext.cs" />
-    <Compile Include="Scripting\ScriptCompilationException.cs" />
-    <Compile Include="Scripting\ScriptLoadingException.cs" />
-    <Compile Include="Scripting\ScriptContainerAppDomain.cs" />
-    <Compile Include="Scripting\ScriptCompiler.cs" />
-    <Compile Include="Scripting\ScriptManager.cs" />
-    <Compile Include="Storyboarding\DisplayableObject.cs" />
-    <Compile Include="Storyboarding\EditorOsbSprite.cs" />
-    <Compile Include="Storyboarding\EditorStoryboardLayer.cs" />
-    <Compile Include="Storyboarding\Effect.cs" />
-    <Compile Include="Storyboarding\Project.cs" />
-    <Compile Include="Storyboarding\ScriptedEffect.cs" />
-    <Compile Include="UserInterface\Components\EffectConfigUi.cs" />
-    <Compile Include="UserInterface\Components\LayerList.cs" />
-    <Compile Include="UserInterface\Components\EffectList.cs" />
-    <Compile Include="UserInterface\PathSelector.cs" />
-    <Compile Include="UserInterface\Skinning\Styles\PathSelectorStyle.cs" />
-    <Compile Include="UserInterface\TimelineSlider.cs" />
-    <Compile Include="Util\AsyncActionQueue.cs" />
-    <Compile Include="ScreenLayers\ScreenLayerManagerExtensions.cs" />
-    <Compile Include="Util\OsuHelper.cs" />
-    <Compile Include="Util\NetHelper.cs" />
-    <EmbeddedResource Include="Resources\project\vscode_settings.json" />
-    <EmbeddedResource Include="Resources\ui-stripes-opt.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <EmbeddedResource Include="Resources\FontAwesome.ttf" />
-    <EmbeddedResource Include="Resources\Roboto-Light.ttf" />
-    <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
-    <EmbeddedResource Include="Resources\ui-rounded-borders-opt.json" />
-    <EmbeddedResource Include="Resources\ui-line-opt.json" />
-    <EmbeddedResource Include="Resources\skin_styles.json" />
-    <EmbeddedResource Include="Resources\skin_drawables_debug.json" />
-    <EmbeddedResource Include="Resources\skin_drawables.json" />
-    <EmbeddedResource Include="Resources\skin_constants.json" />
-    <EmbeddedResource Include="Resources\skin.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\brewlib\brewlib.csproj">
-      <Project>{a4f7cc21-b769-424b-ab59-89e93d781762}</Project>
-      <Name>brewlib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\common\common.csproj">
-      <Project>{f0edccec-4b64-4ce8-801f-1377e3384dc4}</Project>
-      <Name>common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*" />
     <EmbeddedResource Include="icon.ico" />
-    <EmbeddedResource Include="Resources\project\scripts.csproj">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\project\storyboard.sln" />
-    <EmbeddedResource Include="Resources\ui-line.png" />
-    <EmbeddedResource Include="Resources\ui-rounded-borders.png" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
+    <ProjectReference Include="..\brewlib\brewlib.csproj" />
+    <ProjectReference Include="..\common\common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ui-stripes.png" />
+    <PackageReference Include="Damnae.Tiny" Version="1.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.10.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.10.0\build\Microsoft.Net.Compilers.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

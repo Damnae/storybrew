@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <MSBuildProjectExtensionsPath>..\..\cache\obj</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>
