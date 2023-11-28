@@ -56,16 +56,16 @@ namespace StorybrewEditor
                 addFile(archive, mainExecutablePath, appDirectory);
                 addFile(archive, "StorybrewEditor.exe.config", appDirectory);
                 foreach (var path in Directory.EnumerateFiles(appDirectory, "*.dll", SearchOption.TopDirectoryOnly))
+                {
+                    string[] excludeDlls = { "System.Buffers.dll", "System.Diagnostics.DiagnosticSource.dll", "System.Text.Encoding.CodePages.dll", "System.Threading.Tasks.Extensions.dll" };
+                    if (excludeDlls.Contains(Path.GetFileName(path))) continue;
                     addFile(archive, path, appDirectory);
+                }
 
-                // Roslyn (white-listed, most files seem useless)
-                addFile(archive, "roslyn/csc.exe", appDirectory);
-                addFile(archive, "roslyn/csc.exe.config", appDirectory);
-                addFile(archive, "roslyn/csc.rsp", appDirectory);
-                addFile(archive, "roslyn/Microsoft.CodeAnalysis.CSharp.dll", appDirectory);
-                addFile(archive, "roslyn/Microsoft.CodeAnalysis.dll", appDirectory);
-                addFile(archive, "roslyn/System.Collections.Immutable.dll", appDirectory);
-                addFile(archive, "roslyn/System.Reflection.Metadata.dll", appDirectory);
+                foreach (var path in Directory.EnumerateFiles(Path.Combine(appDirectory, "x86"), "*.dll", SearchOption.TopDirectoryOnly))
+                    addFile(archive, path, appDirectory);
+                foreach (var path in Directory.EnumerateFiles(Path.Combine(appDirectory, "x64"), "*.dll", SearchOption.TopDirectoryOnly))
+                    addFile(archive, path, appDirectory);
 
                 // Scripts
                 foreach (var path in Directory.EnumerateFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))

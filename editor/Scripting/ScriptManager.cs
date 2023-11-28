@@ -176,14 +176,12 @@ namespace StorybrewEditor.Scripting
 
             var slnPath = Path.Combine(ScriptsPath, "storyboard.sln");
             File.WriteAllBytes(slnPath, resourceContainer.GetBytes("project/storyboard.sln", ResourceSource.Embedded | ResourceSource.Relative));
+            var buildPropsPath = Path.Combine(ScriptsPath, "Directory.Build.props");
+            File.WriteAllBytes(buildPropsPath, resourceContainer.GetBytes("project/Directory.Build.props", ResourceSource.Embedded | ResourceSource.Relative));
 
             var vsCodePath = Path.Combine(ScriptsPath, ".vscode");
             if (!Directory.Exists(vsCodePath))
                 Directory.CreateDirectory(vsCodePath);
-
-            var vsCodeSettingsPath = Path.Combine(vsCodePath, "settings.json");
-            if (!File.Exists(vsCodeSettingsPath))
-                File.WriteAllBytes(vsCodeSettingsPath, resourceContainer.GetBytes("project/vscode_settings.json", ResourceSource.Embedded | ResourceSource.Relative));
 
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
             var document = new XmlDocument() { PreserveWhitespace = false, };
@@ -192,32 +190,21 @@ namespace StorybrewEditor.Scripting
                 using (var stream = resourceContainer.GetStream("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative))
                     document.Load(stream);
 
-                var xmlns = document.DocumentElement.GetAttribute("xmlns");
-                var compileGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
-                {
-                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
-
-                    var compileNode = document.CreateElement("Compile", xmlns);
-                    compileNode.SetAttribute("Include", relativePath);
-                    compileGroup.AppendChild(compileNode);
-                }
-
-                var referencedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(referencedAssembliesGroup);
+                var referencedAssembliesGroup = document.CreateElement("ItemGroup");
                 var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultAssemblies.Contains(e));
                 foreach (var path in importedAssemblies)
                 {
                     var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
 
-                    var compileNode = document.CreateElement("Reference", xmlns);
+                    var compileNode = document.CreateElement("Reference");
                     compileNode.SetAttribute("Include", AssemblyName.GetAssemblyName(path).Name);
-                    var hintPath = document.CreateElement("HintPath", xmlns);
+                    var hintPath = document.CreateElement("HintPath");
                     hintPath.AppendChild(document.CreateTextNode(relativePath));
                     compileNode.AppendChild(hintPath);
                     referencedAssembliesGroup.AppendChild(compileNode);
                 }
+                if (!referencedAssembliesGroup.IsEmpty)
+                    document.DocumentElement.AppendChild(referencedAssembliesGroup);
                 document.Save(csProjPath);
             }
             catch (Exception e)
