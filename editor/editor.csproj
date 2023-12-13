@@ -9,7 +9,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Title>storybrew editor</Title>
     <Copyright>Copyright © Damnae 2016</Copyright>
-    <AssemblyVersion>1.91.$([System.Convert]::ToInt16($([MSBuild]::Subtract( $([MSBuild]::Divide( $([System.DateTime]::UtcNow.Ticks) , 864000000000)) , 730119)) )).$([System.Convert]::ToInt16($([MSBuild]::Divide( $([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds) , 2)) ))</AssemblyVersion>
+    <AssemblyVersion>1.91.$([System.Convert]::ToUInt16($([MSBuild]::Subtract( $([MSBuild]::Divide( $([System.DateTime]::UtcNow.Ticks) , 864000000000)) , 730119)) )).$([System.Convert]::ToUInt16($([MSBuild]::Divide( $([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds) , 2)) ))</AssemblyVersion>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
