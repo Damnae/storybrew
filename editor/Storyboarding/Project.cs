@@ -457,11 +457,11 @@ namespace StorybrewEditor.Storyboarding
 
         private static readonly List<string> defaultAssemblies = new List<string>()
         {
-            "System.dll",
-            "System.Core.dll",
-            "System.Drawing.dll",
-            "OpenTK.dll",
-            Assembly.GetAssembly(typeof(Script)).Location,
+            typeof(object).Assembly.Location, // mscorlib
+            typeof(System.Linq.Enumerable).Assembly.Location, // System.Core
+            typeof(System.Drawing.Point).Assembly.Location, // System.Drawing
+            typeof(OpenTK.Vector2).Assembly.Location, // OpenTK
+            typeof(StorybrewCommon.Scripting.Script).Assembly.Location, // StorybrewCommon
         };
         public static IEnumerable<string> DefaultAssemblies => defaultAssemblies;
 

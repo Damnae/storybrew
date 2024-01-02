@@ -78,6 +78,15 @@ namespace StorybrewEditor
 
         private static void updateData(string destinationFolder, Version fromVersion)
         {
+            void TryDeleteFile(string filePath)
+            {
+                if (File.Exists(filePath))
+                {
+                    Trace.WriteLine($"Removing {filePath}");
+                    Misc.WithRetries(() => File.Delete(filePath), canThrow: false);
+                }
+            }
+
             var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
             if (fromVersion < new Version(1, 53)) settings.UseRoslyn.Set(true);
             if (fromVersion < new Version(1, 70)) settings.Volume.Set(Math.Pow(settings.Volume, 1 / 4f));
@@ -85,16 +94,24 @@ namespace StorybrewEditor
 
             if (fromVersion < new Version(1, 57))
             {
-                var dllPath = Path.Combine(destinationFolder, "ManagedBass.PInvoke.dll");
-                if (File.Exists(dllPath))
-                {
-                    Trace.WriteLine($"Removing {dllPath}");
-                    Misc.WithRetries(() => File.Delete(dllPath), canThrow: false);
-                }
+                TryDeleteFile(Path.Combine(destinationFolder, "ManagedBass.PInvoke.dll"));
             }
             if (fromVersion < new Version(1, 65))
             {
                 var oldRoslynFolder = Path.Combine(destinationFolder, "bin");
+                if (Directory.Exists(oldRoslynFolder))
+                {
+                    Trace.WriteLine($"Removing {oldRoslynFolder}");
+                    Misc.WithRetries(() => Directory.Delete(oldRoslynFolder, true), canThrow: false);
+                }
+            }
+            if (fromVersion <= new Version(1, 89))
+            {
+                TryDeleteFile(Path.Combine(destinationFolder, "bass.dll"));
+                TryDeleteFile(Path.Combine(destinationFolder, "bass_fx.dll"));
+                TryDeleteFile(Path.Combine(destinationFolder, "Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll"));
+                TryDeleteFile(Path.Combine(destinationFolder, "System.ValueTuple.dll"));
+                var oldRoslynFolder = Path.Combine(destinationFolder, "roslyn");
                 if (Directory.Exists(oldRoslynFolder))
                 {
                     Trace.WriteLine($"Removing {oldRoslynFolder}");
