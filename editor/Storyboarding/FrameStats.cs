@@ -11,7 +11,7 @@ namespace StorybrewEditor.Storyboarding
         public bool OverlappedCommands;
         public float ScreenFill;
 
-        public double GpuMemoryFrameMb => GpuPixelsFrame / 1024.0 / 1024.0;
+        public double GpuMemoryFrameMb => GpuPixelsFrame / 1024.0 / 1024.0 * 4.0;
         public ulong GpuPixelsFrame;
         public HashSet<string> LoadedPaths = new HashSet<string>();
     }
