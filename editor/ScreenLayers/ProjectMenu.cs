@@ -598,6 +598,13 @@ namespace StorybrewEditor.ScreenLayers
             if (project.FrameStats.ScreenFill > 5)
                 warnings += $"⚠ {project.FrameStats.ScreenFill:0}x Screen Fill\n";
 
+            var frameGpuMemory = project.FrameStats.GpuMemoryFrameMb;
+            if (frameGpuMemory >= 1)
+                warnings += $"⚠ {frameGpuMemory:0.0}MB Texture Mem. (Frame)\n";
+            var totalGpuMemory = project.TextureContainer.UncompressedMemoryUseMb;
+            if (totalGpuMemory >= 1)
+                warnings += $"⚠ {totalGpuMemory:0.0}MB Texture Mem. (Total)\n";
+
             return warnings.TrimEnd('\n');
         }
 
