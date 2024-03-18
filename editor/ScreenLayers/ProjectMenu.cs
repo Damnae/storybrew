@@ -590,20 +590,20 @@ namespace StorybrewEditor.ScreenLayers
                 unusedCommandCount >= 20000)
                 warnings += $"⚠ {unusedCommandCount:n0} ({unusedCommandFactor:0%}) Commands on Hidden Sprites\n";
 
-            if (project.FrameStats.OverlappedCommands)
-                warnings += $"⚠ Overlapped Commands\n";
-            if (project.FrameStats.IncompatibleCommands)
-                warnings += $"⚠ Incompatible Commands\n";
-
             if (project.FrameStats.ScreenFill > 5)
                 warnings += $"⚠ {project.FrameStats.ScreenFill:0}x Screen Fill\n";
 
             var frameGpuMemory = project.FrameStats.GpuMemoryFrameMb;
-            if (frameGpuMemory >= 1)
+            if (frameGpuMemory >= 32)
                 warnings += $"⚠ {frameGpuMemory:0.0}MB Texture Mem. (Frame)\n";
             var totalGpuMemory = project.TextureContainer.UncompressedMemoryUseMb;
-            if (totalGpuMemory >= 1)
+            if (totalGpuMemory >= 256)
                 warnings += $"⚠ {totalGpuMemory:0.0}MB Texture Mem. (Total)\n";
+
+            if (project.FrameStats.OverlappedCommands)
+                warnings += $"⚠ Overlapped Commands\n";
+            if (project.FrameStats.IncompatibleCommands)
+                warnings += $"⚠ Incompatible Commands\n";
 
             return warnings.TrimEnd('\n');
         }

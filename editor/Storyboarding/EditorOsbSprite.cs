@@ -95,8 +95,12 @@ namespace StorybrewEditor.Storyboarding
                     frameStats.ScreenFill += Math.Min(OsuHitObject.WidescreenStoryboardArea, intersectionArea) / OsuHitObject.WidescreenStoryboardArea;
                 }
 
-                if (frameStats.LoadedPaths.Add(fullPath))
-                    frameStats.GpuPixelsFrame += (ulong)texture.Size.X * (ulong)texture.Size.Y;
+                if (frameStats.LastTexture != fullPath)
+                {
+                    frameStats.LastTexture = fullPath;
+                    if (frameStats.LoadedPaths.Add(fullPath))
+                        frameStats.GpuPixelsFrame += (ulong)texture.Size.X * (ulong)texture.Size.Y;
+                }
             }
 
             var boundsScaling = bounds.Height / 480;
