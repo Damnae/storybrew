@@ -5,6 +5,7 @@ namespace StorybrewEditor.Storyboarding
     public class FrameStats
     {
         public string LastTexture;
+        public bool LastBlendingMode;
         public HashSet<string> LoadedPaths = new HashSet<string>();
 
         public int SpriteCount;

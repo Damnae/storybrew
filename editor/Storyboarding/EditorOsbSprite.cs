@@ -30,7 +30,6 @@ namespace StorybrewEditor.Storyboarding
         public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats, OsbSprite sprite)
         {
             var time = project.DisplayTime * 1000;
-
             if (sprite.TexturePath == null || !sprite.IsActive(time)) return;
 
             if (frameStats != null)
@@ -102,6 +101,11 @@ namespace StorybrewEditor.Storyboarding
 
                     if (frameStats.LoadedPaths.Add(fullPath))
                         frameStats.GpuPixelsFrame += (ulong)texture.Size.X * (ulong)texture.Size.Y;
+                }
+                else if (frameStats.LastBlendingMode != additive)
+                {
+                    frameStats.LastBlendingMode = additive;
+                    frameStats.Batches++;
                 }
             }
 
