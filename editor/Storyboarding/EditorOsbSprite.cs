@@ -98,6 +98,8 @@ namespace StorybrewEditor.Storyboarding
                 if (frameStats.LastTexture != fullPath)
                 {
                     frameStats.LastTexture = fullPath;
+                    frameStats.Batches++;
+
                     if (frameStats.LoadedPaths.Add(fullPath))
                         frameStats.GpuPixelsFrame += (ulong)texture.Size.X * (ulong)texture.Size.Y;
                 }

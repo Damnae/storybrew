@@ -8,6 +8,8 @@ namespace StorybrewEditor.Storyboarding
         public HashSet<string> LoadedPaths = new HashSet<string>();
 
         public int SpriteCount;
+        public int Batches;
+
         public int CommandCount;
         public int EffectiveCommandCount;
         public bool IncompatibleCommands;
