@@ -90,12 +90,6 @@ namespace StorybrewEditor.Storyboarding
             segment = new EditorStoryboardSegment(effect, this);
         }
 
-        public int GetActiveSpriteCount(double time)
-            => Visible ? segment.GetActiveSpriteCount(time) : 0;
-
-        public int GetCommandCost(double time)
-            => Visible ? segment.GetCommandCost(time) : 0;
-
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
             => segment.CreateSprite(path, origin, initialPosition);
 

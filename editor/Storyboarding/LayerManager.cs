@@ -197,12 +197,6 @@ namespace StorybrewEditor.Storyboarding
                 layer.TriggerEvents(startTime, endTime);
         }
 
-        public int GetActiveSpriteCount(double time)
-            => layers.Sum(l => l.GetActiveSpriteCount(time));
-
-        public int GetCommandCost(double time)
-            => layers.Sum(l => l.GetCommandCost(time));
-
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, FrameStats frameStats)
         {
             foreach (var layer in Layers)

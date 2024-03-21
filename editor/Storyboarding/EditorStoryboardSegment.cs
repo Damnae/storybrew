@@ -43,15 +43,6 @@ namespace StorybrewEditor.Storyboarding
             Layer = layer;
         }
 
-        public int GetActiveSpriteCount(double time)
-            => storyboardObjects.Count(o => (o as OsbSprite)?.IsActive(time) ?? false);
-
-        public int GetCommandCost(double time)
-            => storyboardObjects
-                .Select(o => o as OsbSprite)
-                .Where(s => s?.IsActive(time) ?? false)
-                .Sum(s => s.CommandCost);
-
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
         {
             var storyboardObject = new EditorOsbSprite()
