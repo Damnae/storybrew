@@ -5,6 +5,7 @@ using OpenTK;
 using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -34,6 +35,8 @@ namespace StorybrewEditor.Storyboarding
         private readonly List<EventObject> eventObjects = new List<EventObject>();
         private readonly List<EditorStoryboardSegment> segments = new List<EditorStoryboardSegment>();
 
+        private List<DisplayableObject>[] displayableBuckets;
+
         public EditorStoryboardSegment(Effect effect, EditorStoryboardLayer layer)
         {
             Effect = effect;
@@ -59,6 +62,7 @@ namespace StorybrewEditor.Storyboarding
             };
             storyboardObjects.Add(storyboardObject);
             displayableObjects.Add(storyboardObject);
+            displayableBuckets = null;
             return storyboardObject;
         }
 
@@ -78,6 +82,7 @@ namespace StorybrewEditor.Storyboarding
             };
             storyboardObjects.Add(storyboardObject);
             displayableObjects.Add(storyboardObject);
+            displayableBuckets = null;
             return storyboardObject;
         }
 
@@ -102,6 +107,7 @@ namespace StorybrewEditor.Storyboarding
             var segment = new EditorStoryboardSegment(Effect, Layer);
             storyboardObjects.Add(segment);
             displayableObjects.Add(segment);
+            displayableBuckets = null;
             segments.Add(segment);
             return segment;
         }
@@ -110,7 +116,10 @@ namespace StorybrewEditor.Storyboarding
         {
             storyboardObjects.Remove(storyboardObject);
             if (storyboardObject is DisplayableObject displayableObject)
+            {
                 displayableObjects.Remove(displayableObject);
+                displayableBuckets = null;
+            }
             if (storyboardObject is EventObject eventObject)
                 eventObjects.Remove(eventObject);
             if (storyboardObject is EditorStoryboardSegment segment)
@@ -134,8 +143,43 @@ namespace StorybrewEditor.Storyboarding
             if (Layer.Highlight || Effect.Highlight)
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
-            foreach (var displayableObject in displayableObjects)
-                displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+            if (displayableObjects.Count < 1000)
+            {
+                foreach (var displayableObject in displayableObjects)
+                    displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+            }
+            else
+            {
+                var bucketLength = 10000;
+                var segmentDuration = EndTime - StartTime;
+
+                var bucketCount = Math.Max(1, (int)Math.Ceiling(segmentDuration / bucketLength));
+                var currentBucketIndex = (int)((displayTime - StartTime) / bucketLength);
+
+                if (displayableBuckets == null)
+                {
+                    Debug.Print($"Creating {bucketCount} display buckets for {displayableObjects.Count} sprites");
+                    displayableBuckets = new List<DisplayableObject>[bucketCount];
+                }
+
+                var currentBucket = displayableBuckets[currentBucketIndex];
+                if (currentBucket == null)
+                {
+                    var bucketStartTime = StartTime + currentBucketIndex * bucketLength;
+                    var bucketEndTime = StartTime + (currentBucketIndex + 1) * bucketLength;
+                    displayableBuckets[currentBucketIndex] = currentBucket = new List<DisplayableObject>();
+
+                    foreach (var displayableObject in displayableObjects)
+                        if (displayableObject.StartTime <= bucketEndTime && bucketStartTime <= displayableObject.EndTime)
+                        {
+                            currentBucket.Add(displayableObject);
+                            displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+                        }
+                }
+                else
+                    foreach (var displayableObject in currentBucket)
+                        displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+            }
         }
 
         public void PostProcess()
@@ -156,6 +200,7 @@ namespace StorybrewEditor.Storyboarding
                 startTime = Math.Min(startTime, sbo.StartTime);
                 endTime = Math.Max(endTime, sbo.EndTime);
             }
+            displayableBuckets = null;
         }
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)
