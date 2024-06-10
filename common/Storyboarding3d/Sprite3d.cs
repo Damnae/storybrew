@@ -10,7 +10,7 @@ namespace StorybrewCommon.Storyboarding3d
 {
     public class Sprite3d : Node3d, HasOsbSprites
     {
-        public OsbSprite sprite;
+        private OsbSprite sprite;
         public IEnumerable<OsbSprite> Sprites { get { yield return sprite; } }
 
         public string SpritePath;
