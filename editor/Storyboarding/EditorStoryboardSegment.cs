@@ -14,6 +14,7 @@ namespace StorybrewEditor.Storyboarding
     {
         public Effect Effect { get; }
         public EditorStoryboardLayer Layer { get; }
+        public override string Identifier { get; }
 
         private double startTime;
         public override double StartTime => startTime;
@@ -23,6 +24,10 @@ namespace StorybrewEditor.Storyboarding
 
         public bool Highlight;
 
+        public override Vector2 Origin { get; set; }
+        public override Vector2 Position { get; set; }
+        public override double Rotation { get; set; }
+        public override double Scale { get; set; } = 1f;
         public override bool ReverseDepth { get; set; }
 
         public event ChangedHandler OnChanged;
@@ -36,10 +41,11 @@ namespace StorybrewEditor.Storyboarding
 
         private List<DisplayableObject>[] displayableBuckets;
 
-        public EditorStoryboardSegment(Effect effect, EditorStoryboardLayer layer)
+        public EditorStoryboardSegment(Effect effect, EditorStoryboardLayer layer, string identifier = null)
         {
             Effect = effect;
             Layer = layer;
+            Identifier = identifier;
         }
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
@@ -92,13 +98,41 @@ namespace StorybrewEditor.Storyboarding
             return storyboardObject;
         }
 
-        public override StoryboardSegment CreateSegment()
+        private readonly Dictionary<string, EditorStoryboardSegment> namedSegments = new Dictionary<string, EditorStoryboardSegment>();
+        public override IEnumerable<StoryboardSegment> NamedSegments => namedSegments.Values;
+
+        public override StoryboardSegment CreateSegment(string identifier = null)
         {
-            var segment = new EditorStoryboardSegment(Effect, Layer);
-            storyboardObjects.Add(segment);
-            displayableObjects.Add(segment);
-            displayableBuckets = null;
-            segments.Add(segment);
+            if (identifier != null)
+            {
+                var originalName = identifier;
+                var count = 0;
+                while (namedSegments.ContainsKey(identifier))
+                {
+                    count++;
+                    identifier = $"{originalName}#{count}";
+                }
+            }
+            return getSegment(identifier);
+        }
+        public override StoryboardSegment GetSegment(string identifier) => getSegment(identifier);
+
+        private StoryboardSegment getSegment(string identifier = null)
+        {
+            if (identifier != null && Identifier == null)
+                throw new InvalidOperationException($"Cannot add a named segment to a segment that isn't named ({identifier})");
+
+            if (identifier == null || !namedSegments.TryGetValue(identifier, out var segment))
+            {
+                segment = new EditorStoryboardSegment(Effect, Layer, identifier);
+                storyboardObjects.Add(segment);
+                displayableObjects.Add(segment);
+                displayableBuckets = null;
+                segments.Add(segment);
+
+                if (identifier != null)
+                    namedSegments.Add(identifier, segment);
+            }
             return segment;
         }
 
@@ -113,7 +147,11 @@ namespace StorybrewEditor.Storyboarding
             if (storyboardObject is EventObject eventObject)
                 eventObjects.Remove(eventObject);
             if (storyboardObject is EditorStoryboardSegment segment)
+            {
                 segments.Remove(segment);
+                if (segment.Identifier != null)
+                    namedSegments.Remove(segment.Identifier);
+            }
         }
 
         public void TriggerEvents(double fromTime, double toTime)
@@ -124,7 +162,7 @@ namespace StorybrewEditor.Storyboarding
             segments.ForEach(s => s.TriggerEvents(fromTime, toTime));
         }
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, StoryboardTransform transform, Project project, FrameStats frameStats)
         {
             var displayTime = project.DisplayTime * 1000;
             if (displayTime < StartTime || EndTime < displayTime)
@@ -133,10 +171,11 @@ namespace StorybrewEditor.Storyboarding
             if (Layer.Highlight || Effect.Highlight)
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
+            var localTransform = new StoryboardTransform(transform, Origin, Position, Rotation, (float)Scale);
             if (displayableObjects.Count < 1000)
             {
                 foreach (var displayableObject in displayableObjects)
-                    displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+                    displayableObject.Draw(drawContext, camera, bounds, opacity, localTransform, project, frameStats);
             }
             else
             {
@@ -163,12 +202,12 @@ namespace StorybrewEditor.Storyboarding
                         if (displayableObject.StartTime <= bucketEndTime && bucketStartTime <= displayableObject.EndTime)
                         {
                             currentBucket.Add(displayableObject);
-                            displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+                            displayableObject.Draw(drawContext, camera, bounds, opacity, localTransform, project, frameStats);
                         }
                 }
                 else
                     foreach (var displayableObject in currentBucket)
-                        displayableObject.Draw(drawContext, camera, bounds, opacity, project, frameStats);
+                        displayableObject.Draw(drawContext, camera, bounds, opacity, localTransform, project, frameStats);
             }
         }
 
@@ -193,10 +232,11 @@ namespace StorybrewEditor.Storyboarding
             displayableBuckets = null;
         }
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform transform)
         {
+            var localTransform = new StoryboardTransform(transform, Origin, Position, Rotation, (float)Scale);
             foreach (var sbo in storyboardObjects)
-                sbo.WriteOsb(writer, exportSettings, osbLayer);
+                sbo.WriteOsb(writer, exportSettings, osbLayer, localTransform);
         }
 
         public int CalculateSize(OsbLayer osbLayer)
@@ -210,7 +250,7 @@ namespace StorybrewEditor.Storyboarding
             using (var writer = new StreamWriter(stream, Project.Encoding))
             {
                 foreach (var sbo in storyboardObjects)
-                    sbo.WriteOsb(writer, exportSettings, osbLayer);
+                    sbo.WriteOsb(writer, exportSettings, osbLayer, null);
 
                 return (int)stream.Length;
             }

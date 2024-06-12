@@ -47,7 +47,7 @@ namespace StorybrewCommon.Storyboarding
             OsbLayer = layer;
         }
 
-        public void WriteOsb()
+        public void WriteOsb(StoryboardTransform transform)
         {
             if (ExportSettings.OptimiseSprites && osbSprite.CommandSplitThreshold > 0 && osbSprite.CommandCount > osbSprite.CommandSplitThreshold && IsFragmentable())
             {
@@ -58,10 +58,10 @@ namespace StorybrewCommon.Storyboarding
                 {
                     var segment = getNextSegment(fragmentationTimes, commands);
                     var sprite = CreateSprite(segment);
-                    writeOsbSprite(sprite);
+                    writeOsbSprite(sprite, transform);
                 }
             }
-            else writeOsbSprite(osbSprite);
+            else writeOsbSprite(osbSprite, transform);
         }
 
         protected virtual OsbSprite CreateSprite(List<IFragmentableCommand> segment)
@@ -79,22 +79,36 @@ namespace StorybrewCommon.Storyboarding
             return sprite;
         }
 
-        private void writeOsbSprite(OsbSprite sprite)
+        private void writeOsbSprite(OsbSprite sprite, StoryboardTransform transform)
         {
-            WriteHeader(sprite);
+            WriteHeader(sprite, transform);
             foreach (var command in sprite.Commands)
-                command.WriteOsb(TextWriter, ExportSettings, 1);
+                command.WriteOsb(TextWriter, ExportSettings, transform, 1);
         }
 
-        protected virtual void WriteHeader(OsbSprite sprite)
+        protected virtual void WriteHeader(OsbSprite sprite, StoryboardTransform transform)
         {
-            TextWriter.Write($"Sprite,{OsbLayer},{sprite.Origin},\"{sprite.TexturePath.Trim()}\"");
+            TextWriter.Write($"Sprite");
+            WriteHeaderCommon(sprite, transform);
+            TextWriter.WriteLine();
+        }
+
+        protected virtual void WriteHeaderCommon(OsbSprite sprite, StoryboardTransform transform)
+        {
+            TextWriter.Write($",{OsbLayer},{sprite.Origin},\"{sprite.TexturePath.Trim()}\"");
+            
+            var transformedInitialPosition = transform == null ?
+                sprite.InitialPosition :
+                sprite.HasMoveXYCommands ? 
+                    transform.ApplyToPositionXY(sprite.InitialPosition) : 
+                    transform.ApplyToPosition(sprite.InitialPosition);
+
             if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
-                TextWriter.Write($",{sprite.InitialPosition.X.ToString(ExportSettings.NumberFormat)}");
+                TextWriter.Write($",{transformedInitialPosition.X.ToString(ExportSettings.NumberFormat)}");
             else TextWriter.Write($",0");
             if (!moveTimeline.HasCommands && !moveYTimeline.HasCommands)
-                TextWriter.WriteLine($",{sprite.InitialPosition.Y.ToString(ExportSettings.NumberFormat)}");
-            else TextWriter.WriteLine($",0");
+                TextWriter.Write($",{transformedInitialPosition.Y.ToString(ExportSettings.NumberFormat)}");
+            else TextWriter.Write($",0");
         }
 
         protected virtual bool IsFragmentable()

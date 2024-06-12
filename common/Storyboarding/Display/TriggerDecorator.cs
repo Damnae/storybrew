@@ -60,7 +60,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public int CompareTo(ICommand other)
             => CommandComparer.CompareCommands(this, other);
 
-        public void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
+        public void WriteOsb(TextWriter writer, ExportSettings exportSettings, StoryboardTransform transform, int indentation)
         {
             throw new InvalidOperationException();
         }

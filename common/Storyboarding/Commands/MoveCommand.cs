@@ -9,6 +9,9 @@ namespace StorybrewCommon.Storyboarding.Commands
         {
         }
 
+        public override CommandPosition GetTransformedStartValue(StoryboardTransform transform) => transform.ApplyToPosition(StartValue);
+        public override CommandPosition GetTransformedEndValue(StoryboardTransform transform) => transform.ApplyToPosition(EndValue);
+
         public override CommandPosition ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 

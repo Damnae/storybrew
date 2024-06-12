@@ -165,6 +165,7 @@
     <Compile Include="Storyboarding\Util\OsbSpritePool.cs" />
     <Compile Include="Storyboarding\Util\OsbSpritePools.cs" />
     <Compile Include="Subtitles\SubtitleSet.cs" />
+    <Compile Include="Util\Affine2.cs" />
     <Compile Include="Util\BitmapHelper.cs" />
     <Compile Include="Util\Box2Extensions.cs" />
     <Compile Include="Util\Misc.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Util\OrientedBoundingBox.cs" />
     <Compile Include="Util\ObjectSerializer.cs" />
     <Compile Include="Util\Pool.cs" />
+    <Compile Include="Storyboarding\StoryboardTransform.cs" />
     <Compile Include="Util\StreamReaderExtensions.cs" />
     <Compile Include="Util\VectorHelper.cs" />
   </ItemGroup>

@@ -4,6 +4,7 @@ using BrewLib.Util;
 using OpenTK;
 using StorybrewCommon.Storyboarding;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace StorybrewEditor.Storyboarding
@@ -68,6 +69,27 @@ namespace StorybrewEditor.Storyboarding
         private double endTime;
         public override double EndTime => endTime;
 
+        public override Vector2 Origin
+        {
+            get => segment.Origin;
+            set => segment.Origin = value;
+        }
+        public override Vector2 Position
+        {
+            get => segment.Position;
+            set => segment.Position = value;
+        }
+        public override double Rotation
+        {
+            get => segment.Rotation;
+            set => segment.Rotation = value;
+        }
+        public override double Scale
+        {
+            get => segment.Scale;
+            set => segment.Scale = value;
+        }
+
         public override bool ReverseDepth
         {
             get => segment.ReverseDepth;
@@ -87,7 +109,7 @@ namespace StorybrewEditor.Storyboarding
         public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
         {
             Effect = effect;
-            segment = new EditorStoryboardSegment(effect, this);
+            segment = new EditorStoryboardSegment(effect, this, "Root");
         }
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)
@@ -105,8 +127,9 @@ namespace StorybrewEditor.Storyboarding
         public override OsbSample CreateSample(string path, double time, double volume)
             => segment.CreateSample(path, time, volume);
 
-        public override StoryboardSegment CreateSegment()
-            => segment.CreateSegment();
+        public override IEnumerable<StoryboardSegment> NamedSegments => segment.NamedSegments;
+        public override StoryboardSegment CreateSegment(string identifier = null) => segment.CreateSegment(identifier);
+        public override StoryboardSegment GetSegment(string identifier) => segment.GetSegment(identifier);
 
         public override void Discard(StoryboardObject storyboardObject)
             => segment.Discard(storyboardObject);
@@ -124,7 +147,7 @@ namespace StorybrewEditor.Storyboarding
             if (!Visible)
                 return;
 
-            segment.Draw(drawContext, camera, bounds, opacity, Effect.Project, frameStats);
+            segment.Draw(drawContext, camera, bounds, opacity, null, Effect.Project, frameStats);
         }
 
         public void PostProcess()
@@ -143,10 +166,10 @@ namespace StorybrewEditor.Storyboarding
         }
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings)
-            => WriteOsb(writer, exportSettings, osbLayer);
+            => WriteOsb(writer, exportSettings, osbLayer, null);
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer) 
-            => segment.WriteOsb(writer, exportSettings, osbLayer);
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform) 
+            => segment.WriteOsb(writer, exportSettings, osbLayer, transform);
 
         public void CopySettings(EditorStoryboardLayer other, bool copyGuid = false)
         {

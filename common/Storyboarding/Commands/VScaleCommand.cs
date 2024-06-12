@@ -9,6 +9,9 @@ namespace StorybrewCommon.Storyboarding.Commands
         {
         }
 
+        public override CommandScale GetTransformedStartValue(StoryboardTransform transform) => transform.ApplyToScale(StartValue);
+        public override CommandScale GetTransformedEndValue(StoryboardTransform transform) => transform.ApplyToScale(EndValue);
+
         public override CommandScale ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 

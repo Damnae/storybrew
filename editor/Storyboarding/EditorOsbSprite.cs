@@ -18,8 +18,8 @@ namespace StorybrewEditor.Storyboarding
         public readonly static RenderStates AlphaBlendStates = new RenderStates();
         public readonly static RenderStates AdditiveStates = new RenderStates() { BlendingFactor = new BlendingFactorState(BlendingMode.Additive), };
 
-        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats)
-            => Draw(drawContext, camera, bounds, opacity, project, frameStats, this);
+        public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, StoryboardTransform transform, Project project, FrameStats frameStats)
+            => Draw(drawContext, camera, bounds, opacity, transform, project, frameStats, this);
 
         public void PostProcess()
         {
@@ -27,7 +27,7 @@ namespace StorybrewEditor.Storyboarding
                 EndGroup();
         }
 
-        public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, Project project, FrameStats frameStats, OsbSprite sprite)
+        public static void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, StoryboardTransform transform, Project project, FrameStats frameStats, OsbSprite sprite)
         {
             var time = project.DisplayTime * 1000;
             if (sprite.TexturePath == null || !sprite.IsActive(time)) return;
@@ -75,6 +75,17 @@ namespace StorybrewEditor.Storyboarding
             var additive = sprite.AdditiveAt(time);
 
             var origin = GetOriginVector(sprite.Origin, texture.Width, texture.Height);
+
+            if (transform != null)
+            {
+                if (sprite.HasMoveXYCommands)
+                    position = transform.ApplyToPositionXY(position); 
+                else position = transform.ApplyToPosition(position);
+                if (sprite.HasRotateCommands)
+                    rotation = transform.ApplyToRotation(rotation);
+                if (sprite.HasScalingCommands)
+                    scale = transform.ApplyToScale(scale);
+            }
 
             if (frameStats != null)
             {

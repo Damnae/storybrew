@@ -31,6 +31,9 @@ namespace StorybrewCommon.Storyboarding.Commands
             EndValue = endValue;
         }
 
+        public virtual TValue GetTransformedStartValue(StoryboardTransform transform) => StartValue;
+        public virtual TValue GetTransformedEndValue(StoryboardTransform transform) => EndValue;
+
         public void Offset(double offset)
         {
             StartTime += offset;
@@ -66,12 +69,15 @@ namespace StorybrewCommon.Storyboarding.Commands
         public int CompareTo(ICommand other)
             => CommandComparer.CompareCommands(this, other);
 
-        public virtual string ToOsbString(ExportSettings exportSettings)
+        public virtual string ToOsbString(ExportSettings exportSettings, StoryboardTransform transform)
         {
             var startTimeString = (exportSettings.UseFloatForTime ? StartTime : (int)StartTime).ToString(exportSettings.NumberFormat);
             var endTimeString = (exportSettings.UseFloatForTime ? EndTime : (int)EndTime).ToString(exportSettings.NumberFormat);
-            var startValueString = StartValue.ToOsbString(exportSettings);
-            var endValueString = (ExportEndValue ? EndValue : StartValue).ToOsbString(exportSettings);
+
+            var tranformedStartValue = transform != null ? GetTransformedStartValue(transform) : StartValue;
+            var tranformedEndValue = transform != null ? GetTransformedEndValue(transform) : EndValue;
+            var startValueString = tranformedStartValue.ToOsbString(exportSettings);
+            var endValueString = (ExportEndValue ? tranformedEndValue : tranformedStartValue).ToOsbString(exportSettings);
 
             if (startTimeString == endTimeString)
                 endTimeString = string.Empty;
@@ -89,10 +95,10 @@ namespace StorybrewCommon.Storyboarding.Commands
             return result;
         }
 
-        public virtual void WriteOsb(TextWriter writer, ExportSettings exportSettings, int indentation)
-            => writer.WriteLine(new string(' ', indentation) + ToOsbString(exportSettings));
+        public virtual void WriteOsb(TextWriter writer, ExportSettings exportSettings, StoryboardTransform transform, int indentation)
+            => writer.WriteLine(new string(' ', indentation) + ToOsbString(exportSettings, transform));
 
         public override string ToString()
-            => ToOsbString(ExportSettings.Default);
+            => ToOsbString(ExportSettings.Default, null);
     }
 }

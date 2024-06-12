@@ -68,14 +68,17 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
-        protected override void WriteHeader(OsbSprite sprite)
+        protected override void WriteHeader(OsbSprite sprite, StoryboardTransform transform)
         {
             if (sprite is OsbAnimation animation)
             {
                 var frameDelay = animation.FrameDelay;
-                TextWriter.WriteLine($"Animation,{OsbLayer},{animation.Origin},\"{animation.TexturePath.Trim()}\",{animation.InitialPosition.X.ToString(ExportSettings.NumberFormat)},{animation.InitialPosition.Y.ToString(ExportSettings.NumberFormat)},{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
+
+                TextWriter.Write($"Animation");
+                WriteHeaderCommon(sprite, transform);
+                TextWriter.WriteLine($",{animation.FrameCount},{frameDelay.ToString(ExportSettings.NumberFormat)},{animation.LoopType}");
             }
-            else base.WriteHeader(sprite);
+            else base.WriteHeader(sprite, transform);
         }
 
         protected override HashSet<int> GetFragmentationTimes(IEnumerable<IFragmentableCommand> fragmentableCommands)

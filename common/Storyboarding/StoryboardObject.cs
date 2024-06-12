@@ -8,6 +8,6 @@ namespace StorybrewCommon.Storyboarding
         public abstract double StartTime { get; }
         public abstract double EndTime { get; }
 
-        public abstract void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer);
+        public abstract void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform);
     }
 }

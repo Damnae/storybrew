@@ -9,6 +9,9 @@ namespace StorybrewCommon.Storyboarding.Commands
         {
         }
 
+        public override CommandDecimal GetTransformedStartValue(StoryboardTransform transform) => transform.ApplyToRotation(StartValue);
+        public override CommandDecimal GetTransformedEndValue(StoryboardTransform transform) => transform.ApplyToRotation(EndValue);
+
         public override CommandDecimal ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 

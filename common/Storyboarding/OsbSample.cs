@@ -22,7 +22,7 @@ namespace StorybrewCommon.Storyboarding
         public override double StartTime => Time;
         public override double EndTime => Time;
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
             => writer.WriteLine($"Sample,{((int)Time).ToString(exportSettings.NumberFormat)},{layer},\"{AudioPath.Trim()}\",{((int)Volume).ToString(exportSettings.NumberFormat)}");
     }
 }

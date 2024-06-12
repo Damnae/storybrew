@@ -10,6 +10,9 @@ namespace StorybrewCommon.Storyboarding.Commands
         {
         }
 
+        public override CommandDecimal GetTransformedStartValue(StoryboardTransform transform) => transform.ApplyToScale(StartValue);
+        public override CommandDecimal GetTransformedEndValue(StoryboardTransform transform) => transform.ApplyToScale(EndValue);
+
         // Scale commands cannot return a negative size
         public override CommandDecimal ValueAtProgress(double progress)
             => Math.Max(0, StartValue + (EndValue - StartValue) * progress);

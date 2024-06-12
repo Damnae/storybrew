@@ -77,6 +77,10 @@ namespace StorybrewCommon.Storyboarding
             flipHTimeline.HasOverlap ||
             flipVTimeline.HasOverlap;
 
+        public bool HasRotateCommands => rotateTimeline.HasCommands;
+        public bool HasScalingCommands => scaleTimeline.HasCommands || scaleVecTimeline.HasCommands;
+        public bool HasMoveXYCommands => moveXTimeline.HasCommands || moveYTimeline.HasCommands;
+
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
         {
@@ -336,7 +340,7 @@ namespace StorybrewCommon.Storyboarding
         public override double StartTime => CommandsStartTime;
         public override double EndTime => CommandsEndTime;
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
         {
             if (CommandCount == 0)
                 return;
@@ -350,7 +354,7 @@ namespace StorybrewCommon.Storyboarding
                                                                       fadeTimeline,
                                                                       colorTimeline,
                                                                       writer, exportSettings, layer);
-            osbSpriteWriter.WriteOsb();
+            osbSpriteWriter.WriteOsb(transform);
         }
 
         public static bool InScreenBounds(Vector2 position, Vector2 size, float rotation, Vector2 origin)
