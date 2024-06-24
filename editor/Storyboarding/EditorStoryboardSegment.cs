@@ -106,7 +106,7 @@ namespace StorybrewEditor.Storyboarding
             if (identifier != null)
             {
                 var originalName = identifier;
-                var count = 0;
+                var count = 1;
                 while (namedSegments.ContainsKey(identifier))
                 {
                     count++;
