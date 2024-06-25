@@ -5,6 +5,7 @@ using BrewLib.Util;
 using OpenTK;
 using OpenTK.Input;
 using StorybrewCommon.Mapset;
+using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;
@@ -57,6 +58,7 @@ namespace StorybrewEditor.ScreenLayers
         private SettingsMenu settingsMenu;
 
         private EffectConfigUi effectConfigUi;
+        private PlacementUi placementUi;
 
         private AudioStream audio;
         private TimeSourceExtender timeSource;
@@ -85,6 +87,15 @@ namespace StorybrewEditor.ScreenLayers
                 AnchorTarget = WidgetManager.Root,
                 AnchorFrom = BoxAlignment.Centre,
                 AnchorTo = BoxAlignment.Centre,
+                Children = new Widget[]
+                {
+                    placementUi = new PlacementUi(WidgetManager)
+                    {
+                        Displayed = false,
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                    },
+                },
             });
 
             WidgetManager.Root.Add(bottomLeftLayout = new LinearLayout(WidgetManager)
@@ -223,6 +234,15 @@ namespace StorybrewEditor.ScreenLayers
                 Displayed = false,
             });
             effectConfigUi.OnDisplayedChanged += (sender, e) => resizeStoryboard();
+            effectConfigUi.OnSegmentPreselect += segment =>
+            {
+                if (segment != null)
+                    timeline.Highlight(segment.StartTime, segment.EndTime);
+                else timeline.ClearHighlight();
+            };
+            effectConfigUi.OnSegmentSelected += segment => timeline.Value = (float)segment.StartTime / 1000;
+            effectConfigUi.OnStartPlacement += effectConfigUi_OnStartPlacement;
+            effectConfigUi.OnResetPlacement += effectConfigUi_OnResetPlacement;
 
             WidgetManager.Root.Add(effectsList = new EffectList(WidgetManager, project, effectConfigUi)
             {
@@ -637,6 +657,7 @@ namespace StorybrewEditor.ScreenLayers
             }
             else mainStoryboardContainer.Offset = Vector2.Zero;
             mainStoryboardContainer.Size = fitButton.Checked ? new Vector2(parentSize.X, (parentSize.X * 9) / 16) : parentSize;
+            placementUi.Size = mainStoryboardContainer.Size;
         }
 
         private void resizeTimeline()
@@ -721,9 +742,27 @@ namespace StorybrewEditor.ScreenLayers
             }
         }
 
+        private void effectConfigUi_OnStartPlacement(StoryboardSegment segment)
+        {
+            placementUi.Displayed = true;
+            placementUi.Segment = segment;
+        }
+
+        private void effectConfigUi_OnResetPlacement(StoryboardSegment segment)
+        {
+            var editorSegment = segment.AsEditorSegment();
+            editorSegment.PlacementPosition = Vector2.Zero;
+            editorSegment.PlacementRotation = 0f;
+            editorSegment.PlacementScale = 1f;
+
+            placementUi.Displayed = true;
+            placementUi.Segment = segment;
+        }
+
         #region IDisposable Support
 
         private bool disposedValue = false;
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

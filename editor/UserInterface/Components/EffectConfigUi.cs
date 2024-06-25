@@ -38,12 +38,14 @@ namespace StorybrewEditor.UserInterface.Components
                 {
                     effect.OnChanged -= Effect_OnChanged;
                     effect.OnConfigFieldsChanged -= Effect_OnConfigFieldsChanged;
+                    effect.OnLayersChanged -= Effect_OnLayersChanged;
                 }
                 effect = value;
                 if (effect != null)
                 {
                     effect.OnChanged += Effect_OnChanged;
                     effect.OnConfigFieldsChanged += Effect_OnConfigFieldsChanged;
+                    effect.OnLayersChanged += Effect_OnLayersChanged;
                 }
 
                 updateEffect();
@@ -51,6 +53,12 @@ namespace StorybrewEditor.UserInterface.Components
             }
         }
 
+        public event Action<StoryboardSegment> OnSegmentPreselect;
+        public event Action<StoryboardSegment> OnSegmentSelected;
+
+        public event Action<StoryboardSegment> OnStartPlacement;
+        public event Action<StoryboardSegment> OnResetPlacement;
+        
         public EffectConfigUi(WidgetManager manager) : base(manager)
         {
             Button copyButton, pasteButton, closeButton;
@@ -136,11 +144,12 @@ namespace StorybrewEditor.UserInterface.Components
 
         private void Effect_OnChanged(object sender, EventArgs e) => updateEffect();
         private void Effect_OnConfigFieldsChanged(object sender, EventArgs e) => updateFields();
+        private void Effect_OnLayersChanged(object sender, EventArgs e) => updateFields();
 
         private void updateEffect()
         {
             if (effect == null) return;
-            titleLabel.Text = $"Configuration: {effect.Name} ({effect.BaseName})";
+            titleLabel.Text = string.IsNullOrWhiteSpace(effect.Name) ? effect.BaseName : effect.Name;
         }
 
         private void updateFields()
@@ -191,6 +200,78 @@ namespace StorybrewEditor.UserInterface.Components
                     },
                 });
             }
+
+            configFieldsLayout.Add(new Label(Manager)
+            {
+                StyleName = "listGroup",
+                Text = "Layers",
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
+            });
+            foreach (var layer in effect.Project.LayerManager.Layers.Where(l => l.Effect == effect))
+                buildSegmentEditor(layer);
+        }
+
+        private void buildSegmentEditor(StoryboardSegment segment, int depth = 0)
+        {
+            Widget segmentWidget;
+            Button editButton;
+            configFieldsLayout.Add(segmentWidget = new LinearLayout(Manager)
+            {
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
+                Horizontal = true,
+                Fill = true,
+                Children = new Widget[]
+                {
+                    editButton = new Button(Manager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Arrows,
+                        Tooltip = "Move",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
+                    new Label(Manager)
+                    {
+                        StyleName = "listItem",
+                        Text = new string(' ', depth * 2) + (string.IsNullOrWhiteSpace(segment.Identifier) ? "(Unnamed)": segment.Identifier),
+                        AnchorFrom = BoxAlignment.TopLeft,
+                        AnchorTo = BoxAlignment.TopLeft,
+                        Tooltip = $"Segment {segment.Identifier}",
+                    },
+                },
+            });
+
+            segmentWidget.OnHovered += (evt, e) =>
+            {
+                OnSegmentPreselect?.Invoke(e.Hovered ? segment : null);
+            };
+            var handledClick = false;
+            segmentWidget.OnClickDown += (evt, e) =>
+            {
+                handledClick = true;
+                return true;
+            };
+            segmentWidget.OnClickUp += (evt, e) =>
+            {
+                if (handledClick && (evt.RelatedTarget == segmentWidget || evt.RelatedTarget.HasAncestor(segmentWidget)))
+                    OnSegmentSelected?.Invoke(segment);
+
+                handledClick = false;
+            };
+
+            editButton.OnClick += (sender, e) =>
+            {
+                if (e == OpenTK.Input.MouseButton.Left)
+                    OnStartPlacement?.Invoke(segment);
+                else if (e == OpenTK.Input.MouseButton.Right)
+                    OnResetPlacement?.Invoke(segment);
+            };
+
+            foreach (var childSegment in segment.NamedSegments)
+                buildSegmentEditor(childSegment, depth + 1);
         }
 
         private Widget buildFieldEditor(EffectConfig.ConfigField field)

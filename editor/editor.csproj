@@ -100,7 +100,10 @@
     <Compile Include="ScreenLayers\ReferencedAssemblyConfig.cs" />
     <Compile Include="Storyboarding\FrameStats.cs" />
     <Compile Include="Storyboarding\HasPostProcess.cs" />
+    <Compile Include="Storyboarding\StoryboardSegmentExtensions.cs" />
+    <Compile Include="UserInterface\Components\PlacementUi.cs" />
     <Compile Include="UserInterface\Components\SettingsMenu.cs" />
+    <Compile Include="UserInterface\Drawables\PlacementDrawable.cs" />
     <Compile Include="UserInterface\HsbColorPicker.cs" />
     <Compile Include="UserInterface\Selectbox.cs" />
     <Compile Include="UserInterface\Skinning\Styles\ColorPickerStyle.cs" />

@@ -100,6 +100,8 @@ namespace StorybrewEditor.Storyboarding
 
         public int EstimatedSize { get; private set; }
 
+        public EditorStoryboardSegment InternalSegment => segment;
+
         public event ChangedHandler OnChanged;
         protected void RaiseChanged(string propertyName)
             => EventHelper.InvokeStrict(() => OnChanged, d => ((ChangedHandler)d)(this, new ChangedEventArgs(propertyName)));
@@ -109,7 +111,7 @@ namespace StorybrewEditor.Storyboarding
         public EditorStoryboardLayer(string identifier, Effect effect) : base(identifier)
         {
             Effect = effect;
-            segment = new EditorStoryboardSegment(effect, this, "Root");
+            segment = new EditorStoryboardSegment(effect, this, null, "Root");
         }
 
         public override OsbSprite CreateSprite(string path, OsbOrigin origin, Vector2 initialPosition)

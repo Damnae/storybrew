@@ -53,6 +53,10 @@ namespace StorybrewEditor.Storyboarding
         protected void RaiseConfigFieldsChanged()
             => OnConfigFieldsChanged?.Invoke(this, EventArgs.Empty);
 
+        public event EventHandler OnLayersChanged;
+        protected void RaiseLayersChanged()
+            => OnLayersChanged?.Invoke(this, EventArgs.Empty);
+
         public Effect(Project project)
         {
             Project = project;
