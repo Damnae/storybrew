@@ -115,8 +115,12 @@ namespace StorybrewEditor.ScreenLayers
 
             newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
             openProjectButton.OnClick += (sender, e) => Manager.ShowOpenProject();
-            wikiButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
-            discordButton.OnClick += (sender, e) => Process.Start(Program.DiscordUrl);
+            wikiButton.OnClick += (sender, e) => Process.Start(new ProcessStartInfo()
+            {
+                FileName = $"https://github.com/{Program.Repository}/wiki",
+                UseShellExecute = true
+            });
+            discordButton.OnClick += (sender, e) => Process.Start(new ProcessStartInfo() { FileName = Program.DiscordUrl, UseShellExecute = true });
             closeButton.OnClick += (sender, e) => Exit();
             checkLatestVersion();
         }

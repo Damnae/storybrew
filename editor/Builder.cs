@@ -41,7 +41,7 @@ namespace StorybrewEditor
             }
 
             Trace.WriteLine($"\nOpening {appDirectory}");
-            Process.Start(appDirectory);
+            Process.Start(new ProcessStartInfo() { FileName = appDirectory, UseShellExecute = true });
         }
 
         private static void buildReleaseZip(string archiveName, string appDirectory)

@@ -19,7 +19,7 @@ namespace StorybrewEditor
         private static readonly Version readOnlyVersion = new Version(1, 8);
 
         public static void OpenLastestReleasePage()
-            => Process.Start($"https://github.com/{Program.Repository}/releases/latest");
+            => Process.Start(new ProcessStartInfo() { FileName = $"https://github.com/{Program.Repository}/releases/latest", UseShellExecute = true });
 
         public static void Update(string destinationFolder, Version fromVersion)
         {
