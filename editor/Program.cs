@@ -490,7 +490,7 @@ namespace StorybrewEditor
                         StackTrace trace = null;
                         try
                         {
-                            trace = new StackTrace(mainThread, true);
+                            trace = new StackTrace(true);
                             action(new Exception(trace.ToString()));
                         }
                         catch (ThreadStateException e)

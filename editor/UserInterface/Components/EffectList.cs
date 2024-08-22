@@ -364,6 +364,7 @@ namespace StorybrewEditor.UserInterface.Components
                         FileName = path,
                         Arguments = arguments,
                         WindowStyle = Program.Settings.VerboseVsCode ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden,
+                        UseShellExecute = true
                     });
                     return;
                 }

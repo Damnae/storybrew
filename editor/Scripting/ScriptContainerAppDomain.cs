@@ -3,15 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Security;
-using System.Security.Permissions;
+using System.Reflection;
+using System.Runtime.Loader;
 
 namespace StorybrewEditor.Scripting
 {
     public class ScriptContainerAppDomain<TScript> : ScriptContainerBase<TScript>
         where TScript : Script
     {
-        private AppDomain appDomain;
+        private AssemblyLoadContext assemblyLoadContext;
+        private Assembly scriptAssembly;
 
         public ScriptContainerAppDomain(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
             : base(manager, scriptTypeName, mainSourcePath, libraryFolder, compiledScriptsPath, referencedAssemblies)
@@ -24,46 +25,40 @@ namespace StorybrewEditor.Scripting
 
             try
             {
-                var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid().ToString()}.dll");
+                var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid()}.dll");
                 ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
 
-                var setup = new AppDomainSetup()
-                {
-                    ApplicationName = $"{Name} {Id}",
-                    ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                    DisallowCodeDownload = true,
-                    DisallowPublisherPolicy = true,
-                    DisallowBindingRedirects = true,
-                };
+                // Create a new AssemblyLoadContext for isolation
+                var contextName = $"{Name} {Id}";
+                Debug.Print($"{nameof(Scripting)}: Creating AssemblyLoadContext {contextName}");
+                var assemblyLoadContext = new AssemblyLoadContext(contextName, isCollectible: true);
 
-                var permissions = new PermissionSet(PermissionState.Unrestricted);
-
-                Debug.Print($"{nameof(Scripting)}: Loading domain {setup.ApplicationName}");
-                var scriptDomain = AppDomain.CreateDomain(setup.ApplicationName, null, setup, permissions);
-
-                ScriptProvider<TScript> scriptProvider;
                 try
                 {
-                    var scriptProviderHandle = Activator.CreateInstanceFrom(scriptDomain,
-                        typeof(ScriptProvider<TScript>).Assembly.ManifestModule.FullyQualifiedName,
-                        typeof(ScriptProvider<TScript>).FullName);
-                    scriptProvider = (ScriptProvider<TScript>)scriptProviderHandle.Unwrap();
-                    scriptProvider.Initialize(assemblyPath, ScriptTypeName);
+                    // Load the assembly into the new context
+                    var scriptAssembly = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+
+                    // Create an instance of ScriptProvider<TScript> within the new context
+                    ScriptProvider<TScript> provider = new ScriptProvider<TScript>();
+                    provider.Initialize(assemblyPath, ScriptTypeName);
+
+                    // Unload the previous context
+                    if (this.assemblyLoadContext != null)
+                    {
+                        Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {this.assemblyLoadContext.Name}");
+                        this.assemblyLoadContext.Unload();
+                    }
+
+                    this.assemblyLoadContext = assemblyLoadContext;
+                    this.scriptAssembly = scriptAssembly;
+
+                    return provider;
                 }
                 catch
                 {
-                    AppDomain.Unload(scriptDomain);
+                    assemblyLoadContext.Unload();
                     throw;
                 }
-
-                if (appDomain != null)
-                {
-                    Debug.Print($"{nameof(Scripting)}: Unloading domain {appDomain.FriendlyName}");
-                    AppDomain.Unload(appDomain);
-                }
-                appDomain = scriptDomain;
-
-                return scriptProvider;
             }
             catch (ScriptCompilationException)
             {
@@ -84,12 +79,22 @@ namespace StorybrewEditor.Scripting
             {
                 if (disposing)
                 {
+                    // Dispose of managed resources if necessary
                 }
-                if (appDomain != null) AppDomain.Unload(appDomain);
-                appDomain = null;
+
+                // Unload the AssemblyLoadContext
+                if (assemblyLoadContext != null)
+                {
+                    Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
+                    assemblyLoadContext.Unload();
+                }
+
+                assemblyLoadContext = null;
+                scriptAssembly = null;
                 disposedValue = true;
+
+                base.Dispose(disposing);
             }
-            base.Dispose(disposing);
         }
 
         #endregion

@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Reflection;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Ipc;
 using System.Threading;
 
 namespace StorybrewEditor.Processes
 {
     public class RemoteProcessWorkerContainer : IDisposable
     {
-        private IChannel channel;
+        private NamedPipeClientStream pipeClient;
         private Process process;
 
         public RemoteProcessWorker Worker { get; private set; }
@@ -19,24 +17,14 @@ namespace StorybrewEditor.Processes
         public RemoteProcessWorkerContainer()
         {
             var identifier = $"{Guid.NewGuid().ToString()}";
-            var workerUrl = $"ipc://sbrew-worker-{identifier}/worker";
+            var pipeName = $"sbrew-worker-{identifier}";
 
-            channel = new IpcChannel(
-                new Hashtable()
-                {
-                    ["name"] = $"sbrew-{identifier}",
-                    ["portName"] = $"sbrew-{identifier}",
-                },
-                new BinaryClientFormatterSinkProvider(),
-                null
-            );
-            ChannelServices.RegisterChannel(channel, false);
-
-            startProcess(identifier);
-            Worker = retrieveWorker(workerUrl);
+            pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+            StartProcess(identifier);
+            Worker = RetrieveWorker();
         }
 
-        private void startProcess(string identifier)
+        private void StartProcess(string identifier)
         {
             var executablePath = Assembly.GetExecutingAssembly().Location;
             var workingDirectory = Path.GetDirectoryName(executablePath);
@@ -50,22 +38,26 @@ namespace StorybrewEditor.Processes
             process.Start();
         }
 
-        private RemoteProcessWorker retrieveWorker(string workerUrl)
+        private RemoteProcessWorker RetrieveWorker()
         {
             while (true)
             {
-                Thread.Sleep(250);
                 try
                 {
-                    Trace.WriteLine($"Retrieving {workerUrl}");
-                    var worker = (RemoteProcessWorker)Activator.GetObject(typeof(RemoteProcessWorker), workerUrl);
-                    worker.CheckIpc();
-                    return worker;
+                    Trace.WriteLine($"Connecting to pipe");
+                    pipeClient.Connect(5000); // Timeout in milliseconds
+                    return new RemoteProcessWorker(pipeClient);
+                }
+                catch (TimeoutException)
+                {
+                    Trace.WriteLine($"Timed out connecting to pipe");
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine($"Couldn't start ipc: {e}");
+                    Trace.WriteLine($"Couldn't connect to pipe: {e}");
                 }
+
+                Thread.Sleep(250);
             }
         }
 
@@ -81,7 +73,7 @@ namespace StorybrewEditor.Processes
                 {
                     try
                     {
-                        Worker.Dispose();
+                        Worker?.Dispose();
                     }
                     catch (Exception e)
                     {
@@ -89,11 +81,11 @@ namespace StorybrewEditor.Processes
                     }
                     if (!process.WaitForExit(3000))
                         process.Kill();
-                    ChannelServices.UnregisterChannel(channel);
+                    pipeClient?.Dispose();
                 }
                 Worker = null;
                 process = null;
-                channel = null;
+                pipeClient = null;
                 disposedValue = true;
             }
         }

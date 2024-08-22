@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Ipc;
-using System.Runtime.Serialization.Formatters;
+using System.IO.Pipes;
 using System.Threading;
 
 namespace StorybrewEditor.Processes
@@ -16,28 +13,19 @@ namespace StorybrewEditor.Processes
         {
             //if (!Debugger.IsAttached) Debugger.Launch();
 
-            Trace.WriteLine($"channel: {identifier}");
+            Trace.WriteLine($"pipe name: {identifier}");
             try
             {
-                var name = $"sbrew-worker-{identifier}";
-                var channel = new IpcServerChannel(name, name, new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+                var pipeName = $"sbrew-worker-{identifier}";
+                var serverPipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
 
-                ChannelServices.RegisterChannel(channel, false);
-                try
-                {
-                    RemotingConfiguration.RegisterWellKnownServiceType(typeof(RemoteProcessWorker), "worker", WellKnownObjectMode.Singleton);
-                    Trace.WriteLine($"ready\n");
+                Trace.WriteLine($"ready\n");
 
-                    while (!exit)
-                    {
-                        Program.RunScheduledTasks();
-                        Thread.Sleep(100);
-                    }
-                }
-                finally
+                while (!exit)
                 {
-                    Trace.WriteLine($"unregistering channel");
-                    ChannelServices.UnregisterChannel(channel);
+                    // Simulate running scheduled tasks
+                    Program.RunScheduledTasks();
+                    Thread.Sleep(100);
                 }
             }
             catch (Exception e)

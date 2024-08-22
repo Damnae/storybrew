@@ -83,9 +83,9 @@ namespace StorybrewEditor.Storyboarding
 
                 success = true;
             }
-            catch (RemotingException e)
+            catch (Exception ex) when (ex is IOException or TimeoutException or ObjectDisposedException)
             {
-                Debug.Print($"Script execution failed with RemotingException, reloading {BaseName} ({e.Message})");
+                Debug.Print($"Script execution failed with RemotingException, reloading {BaseName} ({ex.Message})");
                 changeStatus(EffectStatus.ReloadPending);
                 Program.Schedule(() =>
                 {

@@ -2,14 +2,26 @@
 using StorybrewEditor.Scripting;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
+using System.Threading;
 
 namespace StorybrewEditor.Processes
 {
-    public class RemoteProcessWorker : MarshalByRefObject, IDisposable
+    public class RemoteProcessWorker : IDisposable
     {
+        private readonly NamedPipeClientStream _pipeClient;
+        private bool _disposed;
+
+        public RemoteProcessWorker(NamedPipeClientStream pipeClient)
+        {
+            _pipeClient = pipeClient;
+        }
+
         public void CheckIpc()
         {
             Trace.WriteLine("CheckIpc");
+            // Add code to check the pipe connection if needed
         }
 
         public ScriptProvider<TScript> CreateScriptProvider<TScript>()
@@ -21,22 +33,22 @@ namespace StorybrewEditor.Processes
 
         #region IDisposable Support
 
-        private bool disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposed)
             {
                 if (disposing)
                 {
-                    ProcessWorker.Exit();
+                    _pipeClient?.Dispose();
                 }
-                disposedValue = true;
+                _disposed = true;
             }
         }
 
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion
