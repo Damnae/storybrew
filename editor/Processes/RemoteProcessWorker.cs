@@ -21,14 +21,13 @@ namespace StorybrewEditor.Processes
         public void CheckIpc()
         {
             Trace.WriteLine("CheckIpc");
-            // Add code to check the pipe connection if needed
         }
 
-        public ScriptProvider<TScript> CreateScriptProvider<TScript>()
+        public ScriptProvider<TScript> CreateScriptProvider<TScript>(Type type)
             where TScript : Script
         {
             Trace.WriteLine("GetScriptProvider");
-            return new ScriptProvider<TScript>();
+            return new ScriptProvider<TScript>(type);
         }
 
         #region IDisposable Support

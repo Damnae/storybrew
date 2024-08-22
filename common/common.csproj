@@ -5,7 +5,7 @@
     <RootNamespace>StorybrewCommon</RootNamespace>
     <AssemblyName>StorybrewCommon</AssemblyName>
     <OutputType>Library</OutputType>
-    <Platforms>AnyCPU</Platforms>
+    <Platforms>AnyCPU;x64</Platforms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

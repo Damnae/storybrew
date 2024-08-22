@@ -3,6 +3,7 @@ using StorybrewEditor.Processes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace StorybrewEditor.Scripting
 {
@@ -18,7 +19,7 @@ namespace StorybrewEditor.Scripting
 
         protected override ScriptProvider<TScript> LoadScript()
         {
-            if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainerAppDomain<TScript>));
+            if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainerAppLoadContext<TScript>));
 
             try
             {
@@ -28,10 +29,7 @@ namespace StorybrewEditor.Scripting
                 workerProcess?.Dispose();
                 workerProcess = new RemoteProcessWorkerContainer();
 
-                var scriptProvider = workerProcess.Worker.CreateScriptProvider<TScript>();
-                scriptProvider.Initialize(assemblyPath, ScriptTypeName);
-
-                return scriptProvider;
+                return workerProcess.Worker.CreateScriptProvider<TScript>(Assembly.LoadFrom(assemblyPath).GetType(ScriptTypeName));
             }
             catch (ScriptCompilationException)
             {
@@ -51,9 +49,8 @@ namespace StorybrewEditor.Scripting
             if (!disposedValue)
             {
                 if (disposing)
-                {
                     workerProcess?.Dispose();
-                }
+
                 workerProcess = null;
                 disposedValue = true;
             }

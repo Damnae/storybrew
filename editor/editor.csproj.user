@@ -3,4 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Build|AnyCPU'">
     <StartArguments>build</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Build|x64'">
+    <StartArguments>build</StartArguments>
+  </PropertyGroup>
 </Project>

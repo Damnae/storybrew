@@ -10,10 +10,9 @@ namespace StorybrewEditor.Scripting
         private readonly string identifier = Guid.NewGuid().ToString();
         private Type type;
 
-        public void Initialize(string assemblyPath, string typeName)
+        public ScriptProvider(Type type)
         {
-            var assembly = Assembly.LoadFrom(assemblyPath);
-            type = assembly.GetType(typeName, true, true);
+            this.type = type;
         }
 
         public TScript CreateScript()

@@ -10,9 +10,18 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>True</UseWindowsForms>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>false</Optimize>
     <DebugSymbols>true</DebugSymbols>
@@ -27,7 +36,21 @@
     <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Build|AnyCPU'">
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <OutputPath>bin\Build\</OutputPath>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Build|x64'">
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <OutputPath>bin\Build\</OutputPath>
