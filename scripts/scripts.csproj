@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>StorybrewScripts</RootNamespace>
     <AssemblyName>StorybrewScripts</AssemblyName>
-    <Nullable>enable</Nullable> <!-- Optional, but recommended for modern .NET projects -->
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- NuGet package references can be added here -->
     <PackageReference Include="OpenTK" Version="2.0.0" />
   </ItemGroup>
 
