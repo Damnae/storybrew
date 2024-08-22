@@ -17,10 +17,5 @@ namespace StorybrewCommon.Scripting
                 identifier = value;
             }
         }
-
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
     }
 }
