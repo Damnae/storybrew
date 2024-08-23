@@ -54,18 +54,9 @@ namespace StorybrewEditor
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Create))
             {
                 addFile(archive, mainExecutablePath, appDirectory);
-                addFile(archive, "StorybrewEditor.exe.config", appDirectory);
+                addFile(archive, "StorybrewEditor.runtimeconfig.json", appDirectory);
                 foreach (var path in Directory.EnumerateFiles(appDirectory, "*.dll", SearchOption.TopDirectoryOnly))
                     addFile(archive, path, appDirectory);
-
-                // Roslyn (white-listed, most files seem useless)
-                addFile(archive, "roslyn/csc.exe", appDirectory);
-                addFile(archive, "roslyn/csc.exe.config", appDirectory);
-                addFile(archive, "roslyn/csc.rsp", appDirectory);
-                addFile(archive, "roslyn/Microsoft.CodeAnalysis.CSharp.dll", appDirectory);
-                addFile(archive, "roslyn/Microsoft.CodeAnalysis.dll", appDirectory);
-                addFile(archive, "roslyn/System.Collections.Immutable.dll", appDirectory);
-                addFile(archive, "roslyn/System.Reflection.Metadata.dll", appDirectory);
 
                 // Scripts
                 foreach (var path in Directory.EnumerateFiles(scriptsDirectory, "*.cs", SearchOption.TopDirectoryOnly))

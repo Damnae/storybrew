@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "editor": {
+      "commandName": "Project",
+      "commandLineArgs": "build"
+    }
+  }
+}
