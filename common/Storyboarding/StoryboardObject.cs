@@ -3,7 +3,7 @@ using System.IO;
 
 namespace StorybrewCommon.Storyboarding
 {
-    public abstract class StoryboardObject : MarshalByRefObject
+    public abstract class StoryboardObject
     {
         public abstract double StartTime { get; }
         public abstract double EndTime { get; }

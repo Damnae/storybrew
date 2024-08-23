@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace StorybrewCommon.Animations
 {
-    public class KeyframedValue<TValue> : MarshalByRefObject, IEnumerable<Keyframe<TValue>>
+    public class KeyframedValue<TValue> : IEnumerable<Keyframe<TValue>>
     {
         private List<Keyframe<TValue>> keyframes = new List<Keyframe<TValue>>();
         private readonly Func<TValue, TValue, double, TValue> interpolate;

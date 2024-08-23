@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public abstract class CommandGroup : MarshalByRefObject, ICommand
+    public abstract class CommandGroup : ICommand
     {
         private bool ended;
 
