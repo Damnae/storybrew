@@ -18,12 +18,12 @@ namespace StorybrewEditor.Scripting
 
         public string CompiledScriptsPath { get; }
 
-        private ScriptProvider<TScript> scriptProvider;
-
         private volatile int currentVersion = 0;
         private volatile int targetVersion = 1;
 
         private AssemblyLoadContext assemblyLoadContext;
+        private Type scriptType;
+        private string scriptIdentifier;
 
         public string Name
         {
@@ -72,7 +72,7 @@ namespace StorybrewEditor.Scripting
         /// <summary>
         /// Returns false when Script would return null.
         /// </summary>
-        public bool HasScript => scriptProvider != null || currentVersion != targetVersion;
+        public bool HasScript => scriptType != null || currentVersion != targetVersion;
 
         public event EventHandler OnScriptChanged;
 
@@ -93,9 +93,49 @@ namespace StorybrewEditor.Scripting
             if (currentVersion < localTargetVersion)
             {
                 currentVersion = localTargetVersion;
-                scriptProvider = LoadScript();
+
+                if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainer<TScript>));
+
+                try
+                {
+                    if (assemblyLoadContext != null)
+                    {
+                        Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
+                        assemblyLoadContext.Unload();
+                    }
+
+                    var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid()}.dll");
+                    ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
+
+                    var contextName = $"{Name} {Id}";
+                    Debug.Print($"{nameof(Scripting)}: Creating AssemblyLoadContext {contextName}");
+                    assemblyLoadContext = new AssemblyLoadContext(contextName, isCollectible: true);
+
+                    try
+                    {
+                        scriptType = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath).GetType(ScriptTypeName);
+                        scriptIdentifier = Guid.NewGuid().ToString(); ;
+                    }
+                    catch
+                    {
+                        Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
+                        assemblyLoadContext.Unload();
+                        throw;
+                    }
+                }
+                catch (ScriptCompilationException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw CreateScriptLoadingException(e);
+                }
             }
-            return scriptProvider.CreateScript();
+
+            TScript script = (TScript)Activator.CreateInstance(scriptType);
+            script.Identifier = scriptIdentifier;
+            return script;
         }
 
         public void ReloadScript()
@@ -113,47 +153,6 @@ namespace StorybrewEditor.Scripting
 
             if (targetVersion > initialTargetVersion)
                 OnScriptChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        private ScriptProvider<TScript> LoadScript()
-        {
-            if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainer<TScript>));
-
-            try
-            {
-                if (assemblyLoadContext != null)
-                {
-                    Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
-                    assemblyLoadContext.Unload();
-                }
-
-                var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid()}.dll");
-                ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
-
-                var contextName = $"{Name} {Id}";
-                Debug.Print($"{nameof(Scripting)}: Creating AssemblyLoadContext {contextName}");
-                assemblyLoadContext = new AssemblyLoadContext(contextName, isCollectible: true);
-
-                try
-                {
-                    var assembly = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
-                    return new ScriptProvider<TScript>(assembly.GetType(ScriptTypeName));
-                }
-                catch
-                {
-                    Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
-                    assemblyLoadContext.Unload();
-                    throw;
-                }
-            }
-            catch (ScriptCompilationException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw CreateScriptLoadingException(e);
-            }
         }
 
         protected ScriptLoadingException CreateScriptLoadingException(Exception e)
@@ -179,7 +178,7 @@ namespace StorybrewEditor.Scripting
                 }
 
                 assemblyLoadContext = null;
-                scriptProvider = null;
+                scriptType = null;
                 disposedValue = true;
             }
         }
