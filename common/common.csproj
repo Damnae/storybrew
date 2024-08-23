@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>StorybrewCommon</AssemblyName>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Configurations>Debug;Release</Configurations>
