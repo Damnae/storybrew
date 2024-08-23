@@ -455,14 +455,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Assemblies
 
-        private static readonly List<string> defaultAssemblies = new List<string>()
-        {
-            "System.dll",
-            "System.Core.dll",
-            "System.Drawing.dll",
-            "OpenTK.dll",
-            Assembly.GetAssembly(typeof(Script)).Location,
-        };
+        private static readonly List<string> defaultAssemblies = AppDomain.CurrentDomain.GetAssemblies().Distinct().Where(x => !x.IsDynamic).Select(x => x.Location).ToList();
         public static IEnumerable<string> DefaultAssemblies => defaultAssemblies;
 
         private List<string> importedAssemblies = new List<string>();

@@ -47,17 +47,7 @@ namespace StorybrewEditor.Scripting
         {
             var syntaxTrees = sourcePaths.Select(path => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(path), path: path)).ToArray();
 
-            // Gather all assemblies from the current AppDomain
-            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             var references = new List<MetadataReference>();
-
-            foreach (var assembly in loadedAssemblies)
-            {
-                if (assembly.IsDynamic || assembly.Location == string.Empty)
-                    continue;
-
-                references.Add(MetadataReference.CreateFromFile(assembly.Location));
-            }
 
             foreach (var assembly in referencedAssemblies)
             {
