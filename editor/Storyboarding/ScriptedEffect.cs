@@ -83,17 +83,6 @@ namespace StorybrewEditor.Storyboarding
 
                 success = true;
             }
-            catch (Exception ex) when (ex is TimeoutException or ObjectDisposedException)
-            {
-                Debug.Print($"Script execution failed with {ex.GetType().Name}, reloading {BaseName} ({ex.Message})");
-                changeStatus(EffectStatus.ReloadPending);
-                Program.Schedule(() =>
-                {
-                    if (Project.IsDisposed) return;
-                    scriptContainer.ReloadScript();
-                });
-                return;
-            }
             catch (ScriptCompilationException e)
             {
                 Debug.Print($"Script compilation failed for {BaseName}\n{e.Message}");
