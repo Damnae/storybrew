@@ -4,7 +4,6 @@ using BrewLib.Util;
 using Microsoft.Win32;
 using OpenTK;
 using OpenTK.Graphics;
-using StorybrewEditor.Processes;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
@@ -66,12 +65,6 @@ namespace StorybrewEditor
                 case "build":
                     setupLogging(null, "build.log");
                     Builder.Build();
-                    return true;
-                case "worker":
-                    if (args.Length < 2) return false;
-                    setupLogging(null, $"worker-{DateTime.UtcNow:yyyyMMddHHmmssfff}.log");
-                    enableScheduling();
-                    ProcessWorker.Run(args[1]);
                     return true;
             }
             return false;
