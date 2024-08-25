@@ -95,7 +95,7 @@ namespace StorybrewEditor
             Process.Start(new ProcessStartInfo(executablePath, $"update \"{updateTestPath}\" {previousVersion}")
             {
                 WorkingDirectory = updateFolderPath,
-            });
+            }).WaitForExit();
         }
 
         private static void addFile(ZipArchive archive, string path, string sourceDirectory, string targetPath = null)
@@ -120,8 +120,7 @@ namespace StorybrewEditor
             Trace.WriteLine($"  Adding {path} -> {entryName}");
             archive.CreateEntryFromFile(path, entryName, CompressionLevel.Optimal);
 
-            var pathExtension = Path.GetExtension(path);
-            if (pathExtension == ".exe" || pathExtension == ".dll")
+            if (Path.GetExtension(path) == ".dll")
             {
                 var pdbPath = Path.Combine(Path.GetDirectoryName(path), $"{Path.GetFileNameWithoutExtension(path)}.pdb");
                 if (File.Exists(pdbPath))

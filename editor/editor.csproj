@@ -10,6 +10,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>True</UseWindowsForms>
     <Configurations>Debug;Release;Build</Configurations>
+    <Title>storybrew editor</Title>
+    <Copyright>Copyright © Damnae 2024</Copyright>
+    <Product>storybrew editor</Product>
+    <AssemblyVersion>1.92.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,8 +49,8 @@
     <EmbeddedResource Include="icon.ico" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Build'">
-    <Exec Command="&quot;$(OutputPath)$(TargetName).exe&quot; build" />
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Build'">
+    <Exec Command="cd &quot;$(OutDir)&quot; &amp;&amp; &quot;$(TargetName).exe&quot; build" />
   </Target>
 
 </Project>
