@@ -10,7 +10,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+        <Reference Include="System.Drawing.Common">
+            <HintPath>..\..\System.Drawing.Common.dll</HintPath>
+        </Reference>
         <Reference Include="OpenTK">
             <HintPath>..\..\OpenTK.dll</HintPath>
         </Reference>

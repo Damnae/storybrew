@@ -4,6 +4,7 @@ using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
+using Microsoft.VisualBasic.Devices;
 using OpenTK;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
@@ -17,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Tiny;
@@ -455,7 +457,28 @@ namespace StorybrewEditor.Storyboarding
 
         #region Assemblies
 
-        private static readonly List<string> defaultAssemblies = AppDomain.CurrentDomain.GetAssemblies().Distinct().Where(x => !x.IsDynamic).Select(x => x.Location).ToList();
+        private static string getRuntimeRefDirectory()
+        {
+            // C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.5 => C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.5\ref\net8.0
+            return Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "..", "..", "..",
+                "packs",
+                "Microsoft.NETCore.App.Ref",
+                RuntimeEnvironment.GetSystemVersion().TrimStart('v'), // eg. 8.0.5
+                "ref",
+                "net" + RuntimeEnvironment.GetSystemVersion().Substring(1, 3) // eg. net8.0
+            );
+        }
+
+        private static readonly string[] netRuntimeAssemblies =
+            Directory.GetFiles(getRuntimeRefDirectory(), "*.dll")
+            .Where(x =>  !Path.GetFileName(x).EndsWith(".Native.dll")).ToArray();
+
+        private static readonly List<string> defaultAssemblies = new List<string>()
+        {
+            typeof(System.Drawing.Bitmap).Assembly.Location, // System.Drawing.Common.dll
+            typeof(OpenTK.Toolkit).Assembly.Location, // OpenTK.dll
+            typeof(StorybrewCommon.Scripting.Script).Assembly.Location // StorybrewCommon.dll
+        }.Concat(netRuntimeAssemblies).ToList();
         public static IEnumerable<string> DefaultAssemblies => defaultAssemblies;
 
         private List<string> importedAssemblies = new List<string>();
