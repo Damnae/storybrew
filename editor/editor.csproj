@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\scripttemplate.csx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
     <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.11.0">
@@ -35,6 +39,7 @@
     <EmbeddedResource Include="Resources\FontAwesome.ttf" />
     <EmbeddedResource Include="Resources\Roboto-Light.ttf" />
     <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
+    <EmbeddedResource Include="Resources\scripttemplate.csx" />
     <EmbeddedResource Include="Resources\ui-stripes.png" />
     <EmbeddedResource Include="Resources\ui-rounded-borders.png" />
     <EmbeddedResource Include="Resources\project\scripts.csproj" />
