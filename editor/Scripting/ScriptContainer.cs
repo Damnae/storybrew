@@ -114,7 +114,7 @@ namespace StorybrewEditor.Scripting
                     try
                     {
                         scriptType = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath).GetType(ScriptTypeName);
-                        scriptIdentifier = Guid.NewGuid().ToString(); ;
+                        scriptIdentifier = Guid.NewGuid().ToString();
                     }
                     catch
                     {
