@@ -1,10 +1,13 @@
 ﻿using BrewLib.UserInterface;
 using BrewLib.Util;
+using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Tiny;
 using Tiny.Formats.Json;
 
@@ -113,8 +116,22 @@ namespace StorybrewEditor.ScreenLayers
                 },
             });
 
-            newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
-            openProjectButton.OnClick += (sender, e) => Manager.ShowOpenProject();
+            var sdkPath = Project.GetRuntimeRefDirectory();
+            if (Directory.Exists(sdkPath))
+            {
+                newProjectButton.OnClick += (sender, e) => Manager.Add(new NewProjectMenu());
+                openProjectButton.OnClick += (sender, e) => Manager.ShowOpenProject();
+            }
+            else
+            {
+                newProjectButton.Disabled = true;
+                openProjectButton.Disabled = true;
+
+                Trace.WriteLine($".NET SDK {RuntimeEnvironment.GetSystemVersion()} not found at {sdkPath},\n from {RuntimeEnvironment.GetRuntimeDirectory()}");
+                Manager.ShowMessage($".NET SDK {RuntimeEnvironment.GetSystemVersion()} is required, do you want to install it?",
+                    () => Process.Start(new ProcessStartInfo() { FileName = "https://dotnet.microsoft.com/en-us/download/dotnet/8.0", UseShellExecute = true }), true);
+            }
+
             wikiButton.OnClick += (sender, e) => Process.Start(new ProcessStartInfo()
             {
                 FileName = $"https://github.com/{Program.Repository}/wiki",

@@ -455,7 +455,7 @@ namespace StorybrewEditor.Storyboarding
 
         #region Assemblies
 
-        private static string getRuntimeRefDirectory()
+        public static string GetRuntimeRefDirectory()
         {
             // C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.5 => C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.5\ref\net8.0
             return Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "..", "..", "..",
@@ -468,7 +468,7 @@ namespace StorybrewEditor.Storyboarding
         }
 
         private static readonly string[] netRuntimeAssemblies =
-            Directory.GetFiles(getRuntimeRefDirectory(), "*.dll")
+            Directory.GetFiles(GetRuntimeRefDirectory(), "*.dll")
             .Where(x =>  !Path.GetFileName(x).EndsWith(".Native.dll")).ToArray();
 
         private static readonly List<string> defaultAssemblies = new List<string>()

@@ -13,11 +13,19 @@
     <Title>storybrew editor</Title>
     <Copyright>Copyright © Damnae 2024</Copyright>
     <Product>storybrew editor</Product>
-    <AssemblyVersion>1.92.0</AssemblyVersion>
+    <AssemblyVersion>1.92.*</AssemblyVersion>
+    <Nullable>disable</Nullable>
+    <Deterministic>False</Deterministic>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Build|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="Resources\scripttemplate.csx" />
+    <None Remove="Resources\ui-line.png" />
+    <None Remove="Resources\ui-stripes-opt.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +48,8 @@
     <EmbeddedResource Include="Resources\Roboto-Light.ttf" />
     <EmbeddedResource Include="Resources\Roboto-Regular.ttf" />
     <EmbeddedResource Include="Resources\scripttemplate.csx" />
+    <EmbeddedResource Include="Resources\ui-line.png" />
+    <EmbeddedResource Include="Resources\ui-stripes-opt.json" />
     <EmbeddedResource Include="Resources\ui-stripes.png" />
     <EmbeddedResource Include="Resources\ui-rounded-borders.png" />
     <EmbeddedResource Include="Resources\project\scripts.csproj" />

@@ -14,6 +14,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -390,6 +391,8 @@ namespace StorybrewEditor
 
             AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(e.Exception, exceptionPath, null, false);
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError((Exception)e.ExceptionObject, crashPath, "crash", true);
+
+            Trace.WriteLine($"CLR {Environment.Version} / {RuntimeEnvironment.GetRuntimeDirectory()}\n");
         }
 
         private static void logError(Exception e, string filename, string reportType, bool show)
