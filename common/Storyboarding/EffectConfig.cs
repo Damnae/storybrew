@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace StorybrewCommon.Storyboarding
 {
-    public class EffectConfig : MarshalByRefObject
+    public class EffectConfig
     {
         private readonly Dictionary<string, ConfigField> fields = new Dictionary<string, ConfigField>();
 

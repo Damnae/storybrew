@@ -20,7 +20,8 @@ namespace StorybrewCommon.Scripting
 {
     public abstract class StoryboardObjectGenerator : Script
     {
-        public static StoryboardObjectGenerator Current { get; private set; }
+        [ThreadStatic]
+        public static StoryboardObjectGenerator Current;
 
         private List<ConfigurableField> configurableFields;
         private GeneratorContext context;
@@ -393,6 +394,7 @@ namespace StorybrewCommon.Scripting
         public void Generate(GeneratorContext context)
         {
             if (Current != null) throw new InvalidOperationException("A script is already running in this domain");
+
             try
             {
                 this.context = context;

@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace StorybrewCommon.Animations
 {
-    public class KeyframedValue<TValue> : MarshalByRefObject, IEnumerable<Keyframe<TValue>>
+    public class KeyframedValue<TValue> : IEnumerable<Keyframe<TValue>>
     {
         private List<Keyframe<TValue>> keyframes = new List<Keyframe<TValue>>();
         private readonly Func<TValue, TValue, double, TValue> interpolate;
@@ -272,7 +272,7 @@ namespace StorybrewCommon.Animations
                 var middle = new Vector2((float)middleKeyframe.Time, getComponent(middleKeyframe.Value));
                 var end = new Vector2((float)endKeyframe.Time, getComponent(endKeyframe.Value));
 
-                var area = Math.Abs(.5 * (start.X * end.Y + end.X * middle.Y + middle.X * start.Y - end.X * start.Y - middle.X * end.Y - start.X * middle.Y));
+                var area = 0.5 * Math.Abs(start.X * (middle.Y - end.Y) + middle.X * (end.Y - start.Y) + end.X * (start.Y - middle.Y));
                 var bottom = Math.Sqrt(Math.Pow(start.X - end.X, 2) + Math.Pow(start.Y - end.Y, 2));
                 return area / bottom * 2;
             });

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace StorybrewEditor.Util
@@ -263,7 +264,9 @@ namespace StorybrewEditor.Util
                 if (!localThread.Join(millisecondsTimeout))
                 {
                     Trace.WriteLine($"Aborting thread {localThread.Name}.");
-                    localThread.Abort();
+                    IntPtr handle = Native.OpenThread(0x0001, false, (uint)localThread.ManagedThreadId);
+                    Native.TerminateThread(handle, 1);
+                    Native.CloseHandle(handle);
                 }
             }
         }

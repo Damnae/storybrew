@@ -83,17 +83,6 @@ namespace StorybrewEditor.Storyboarding
 
                 success = true;
             }
-            catch (RemotingException e)
-            {
-                Debug.Print($"Script execution failed with RemotingException, reloading {BaseName} ({e.Message})");
-                changeStatus(EffectStatus.ReloadPending);
-                Program.Schedule(() =>
-                {
-                    if (Project.IsDisposed) return;
-                    scriptContainer.ReloadScript();
-                });
-                return;
-            }
             catch (ScriptCompilationException e)
             {
                 Debug.Print($"Script compilation failed for {BaseName}\n{e.Message}");

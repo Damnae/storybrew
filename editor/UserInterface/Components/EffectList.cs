@@ -364,6 +364,7 @@ namespace StorybrewEditor.UserInterface.Components
                         FileName = path,
                         Arguments = arguments,
                         WindowStyle = Program.Settings.VerboseVsCode ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden,
+                        UseShellExecute = true
                     });
                     return;
                 }
@@ -373,7 +374,7 @@ namespace StorybrewEditor.UserInterface.Components
                 }
             }
             Manager.ScreenLayerManager.ShowMessage($"Visual Studio Code could not be found, do you want to install it?\n(You may have to restart after installing)",
-                    () => Process.Start("https://code.visualstudio.com/"), true);
+                    () => Process.Start(new ProcessStartInfo() { FileName = "https://code.visualstudio.com/", UseShellExecute = true }), true);
         }
 
         private static string getEffectDetails(Effect effect)

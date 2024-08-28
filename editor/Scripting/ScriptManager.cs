@@ -102,8 +102,7 @@ namespace StorybrewEditor.Scripting
                 }
             }
 
-            scriptContainer = new ScriptContainerAppDomain<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
-            //scriptContainer = new ScriptContainerProcess<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
+            scriptContainer = new ScriptContainer<TScript>(this, scriptTypeName, sourcePath, scriptsLibraryPath, compiledScriptsPath, referencedAssemblies);
             scriptContainers.Add(scriptName, scriptContainer);
             return scriptContainer;
         }
@@ -181,49 +180,8 @@ namespace StorybrewEditor.Scripting
             if (!Directory.Exists(vsCodePath))
                 Directory.CreateDirectory(vsCodePath);
 
-            var vsCodeSettingsPath = Path.Combine(vsCodePath, "settings.json");
-            if (!File.Exists(vsCodeSettingsPath))
-                File.WriteAllBytes(vsCodeSettingsPath, resourceContainer.GetBytes("project/vscode_settings.json", ResourceSource.Embedded | ResourceSource.Relative));
-
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
-            var document = new XmlDocument() { PreserveWhitespace = false, };
-            try
-            {
-                using (var stream = resourceContainer.GetStream("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative))
-                    document.Load(stream);
-
-                var xmlns = document.DocumentElement.GetAttribute("xmlns");
-                var compileGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(compileGroup);
-                foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
-                {
-                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
-
-                    var compileNode = document.CreateElement("Compile", xmlns);
-                    compileNode.SetAttribute("Include", relativePath);
-                    compileGroup.AppendChild(compileNode);
-                }
-
-                var referencedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
-                document.DocumentElement.AppendChild(referencedAssembliesGroup);
-                var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultAssemblies.Contains(e));
-                foreach (var path in importedAssemblies)
-                {
-                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
-
-                    var compileNode = document.CreateElement("Reference", xmlns);
-                    compileNode.SetAttribute("Include", AssemblyName.GetAssemblyName(path).Name);
-                    var hintPath = document.CreateElement("HintPath", xmlns);
-                    hintPath.AppendChild(document.CreateTextNode(relativePath));
-                    compileNode.AppendChild(hintPath);
-                    referencedAssembliesGroup.AppendChild(compileNode);
-                }
-                document.Save(csProjPath);
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine($"Failed to update scripts.csproj: {e}");
-            }
+            File.WriteAllBytes(csProjPath, resourceContainer.GetBytes("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative));
         }
 
         #region IDisposable Support
