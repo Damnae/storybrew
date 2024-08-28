@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace StorybrewCommon.Util
+﻿namespace StorybrewCommon.Util
 {
     public sealed class Pool<T> where T : class
     {

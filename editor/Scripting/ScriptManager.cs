@@ -1,15 +1,10 @@
 ﻿using BrewLib.Data;
-using BrewLib.Util;
 using StorybrewCommon.Scripting;
-using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Xml;
 
 namespace StorybrewEditor.Scripting
 {

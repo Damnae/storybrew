@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace StorybrewCommon.Mapset
+﻿namespace StorybrewCommon.Mapset
 {
     public static class BeatmapExtensions
     {

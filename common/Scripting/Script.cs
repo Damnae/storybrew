@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Scripting
+﻿namespace StorybrewCommon.Scripting
 {
     /// <summary>
     /// Base class for all scripts

@@ -1,8 +1,5 @@
 ﻿using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding.CommandValues;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {

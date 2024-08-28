@@ -1,5 +1,4 @@
 ﻿using StorybrewCommon.Storyboarding;
-using System;
 
 namespace StorybrewCommon.Animations
 {

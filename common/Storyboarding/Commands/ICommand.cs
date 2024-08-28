@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace StorybrewCommon.Storyboarding.Commands
 {
     public interface ICommand : IComparable<ICommand>

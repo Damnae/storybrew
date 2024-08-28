@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using StorybrewCommon.Util;
-using System;
 
 namespace StorybrewCommon.Storyboarding
 {

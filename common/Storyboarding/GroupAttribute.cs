@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Storyboarding
+﻿namespace StorybrewCommon.Storyboarding
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class GroupAttribute : Attribute

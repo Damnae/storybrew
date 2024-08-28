@@ -1,7 +1,5 @@
 ﻿using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace StorybrewCommon.Storyboarding.Display

@@ -4,7 +4,6 @@ using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Remoting;
 
 namespace StorybrewEditor.Storyboarding
 {

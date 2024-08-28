@@ -1,6 +1,4 @@
-﻿using System;
-using StorybrewCommon.Mapset;
-using System.Collections.Generic;
+﻿using StorybrewCommon.Mapset;
 
 namespace StorybrewCommon.Storyboarding
 {

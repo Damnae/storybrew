@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Util
+﻿namespace StorybrewCommon.Util
 {
     public static class Misc
     {

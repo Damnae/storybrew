@@ -1,5 +1,4 @@
-﻿using System.IO;
-using StorybrewCommon.Storyboarding.CommandValues;
+﻿using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
 
 namespace StorybrewCommon.Storyboarding

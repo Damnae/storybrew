@@ -1,8 +1,6 @@
 using OpenTK;
 using OpenTK.Graphics;
-using System;
 using System.Drawing;
-using System.IO;
 
 namespace StorybrewCommon.Storyboarding.CommandValues
 {

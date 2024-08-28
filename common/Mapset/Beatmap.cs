@@ -1,6 +1,4 @@
 ﻿using OpenTK.Graphics;
-using System;
-using System.Collections.Generic;
 
 namespace StorybrewCommon.Mapset
 {

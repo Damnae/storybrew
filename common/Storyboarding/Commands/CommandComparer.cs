@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace StorybrewCommon.Storyboarding.Commands
+﻿namespace StorybrewCommon.Storyboarding.Commands
 {
     public class CommandComparer : Comparer<ICommand>
     {

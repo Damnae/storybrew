@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace StorybrewCommon.Storyboarding
+﻿namespace StorybrewCommon.Storyboarding
 {
     public abstract class StoryboardObject
     {

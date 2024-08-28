@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Storyboarding.Util
+﻿namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbAnimationPool : OsbSpritePool
     {

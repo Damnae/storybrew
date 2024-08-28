@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using StorybrewCommon.Storyboarding.CommandValues;
-using System;
 
 namespace StorybrewCommon.Animations
 {

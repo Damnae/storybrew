@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace StorybrewCommon.Storyboarding
+﻿namespace StorybrewCommon.Storyboarding
 {
     public class OsbSample : StoryboardObject
     {

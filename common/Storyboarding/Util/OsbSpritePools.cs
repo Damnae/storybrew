@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace StorybrewCommon.Storyboarding.Util
+﻿namespace StorybrewCommon.Storyboarding.Util
 {
     public class OsbSpritePools : IDisposable
     {

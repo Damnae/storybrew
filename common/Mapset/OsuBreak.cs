@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Mapset
+﻿namespace StorybrewCommon.Mapset
 {
     [Serializable]
     public class OsuBreak
