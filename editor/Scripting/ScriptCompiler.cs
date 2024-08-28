@@ -11,21 +11,18 @@ namespace StorybrewEditor.Scripting
 {
     public class ScriptCompiler
     {
-        private static int nextId;
-
         public static void Compile(string[] sourcePaths, string outputPath, IEnumerable<string> referencedAssemblies)
         {
             Debug.Print($"{nameof(Scripting)}: Compiling {string.Join(", ", sourcePaths)}");
 
             var syntaxTrees = sourcePaths.Select(path => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(path), path: path)).ToArray();
-
             var references = new List<MetadataReference>();
 
             foreach (var assembly in referencedAssemblies)
                 if (File.Exists(assembly))
                     references.Add(MetadataReference.CreateFromFile(assembly));
 
-                    var compilation = CSharpCompilation.Create(
+            var compilation = CSharpCompilation.Create(
                 assemblyName: Path.GetFileNameWithoutExtension(outputPath),
                 syntaxTrees: syntaxTrees,
                 references: references,
@@ -33,9 +30,7 @@ namespace StorybrewEditor.Scripting
 
             EmitResult result;
             using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
                 result = compilation.Emit(stream);
-            }
 
             if (!result.Success)
             {
