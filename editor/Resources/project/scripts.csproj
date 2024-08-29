@@ -5,7 +5,7 @@
         <TargetFramework>net8.0-windows</TargetFramework>
         <RootNamespace>storyboard</RootNamespace>
         <AssemblyName>storyboard</AssemblyName>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <Optimize>true</Optimize>
     </PropertyGroup>
 

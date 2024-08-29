@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
