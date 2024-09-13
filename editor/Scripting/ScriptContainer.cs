@@ -114,6 +114,9 @@ namespace StorybrewEditor.Scripting
                     try
                     {
                         scriptType = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath).GetType(ScriptTypeName);
+                        if (scriptType == null)
+                            throw new TypeLoadException($"Type {ScriptTypeName} was not found in assembly");
+
                         scriptIdentifier = Guid.NewGuid().ToString();
                     }
                     catch
@@ -133,7 +136,7 @@ namespace StorybrewEditor.Scripting
                 }
             }
 
-            TScript script = (TScript)Activator.CreateInstance(scriptType);
+            var script = (TScript)Activator.CreateInstance(scriptType);
             script.Identifier = scriptIdentifier;
             return script;
         }
