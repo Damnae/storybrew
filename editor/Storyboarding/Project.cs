@@ -268,6 +268,9 @@ namespace StorybrewEditor.Storyboarding
 
         private void effect_OnChanged(object sender, EventArgs e)
         {
+            if (IsDisposed)
+                return;
+
             Changed = true;
 
             refreshEffectsStatus();
