@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Animations
+﻿namespace StorybrewCommon.Animations
 {
     public struct Keyframe<TValue> : IComparable<Keyframe<TValue>>
     {

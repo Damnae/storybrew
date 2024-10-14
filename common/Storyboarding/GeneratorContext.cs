@@ -1,10 +1,8 @@
-﻿using System;
-using StorybrewCommon.Mapset;
-using System.Collections.Generic;
+﻿using StorybrewCommon.Mapset;
 
 namespace StorybrewCommon.Storyboarding
 {
-    public abstract class GeneratorContext : MarshalByRefObject
+    public abstract class GeneratorContext
     {
         public abstract string ProjectPath { get; }
         public abstract string ProjectAssetPath { get; }

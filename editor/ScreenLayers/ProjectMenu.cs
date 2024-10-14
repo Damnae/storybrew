@@ -388,14 +388,14 @@ namespace StorybrewEditor.ScreenLayers
             {
                 var path = Path.GetFullPath(project.ProjectFolderPath);
                 if (Directory.Exists(path))
-                    Process.Start(path);
+                    Process.Start(new ProcessStartInfo() { FileName = path, UseShellExecute = true });
             };
             mapsetFolderButton.OnClick += (sender, e) =>
             {
                 var path = Path.GetFullPath(project.MapsetPath);
                 if (e == MouseButton.Right || !Directory.Exists(path))
                     changeMapsetFolder();
-                else Process.Start(path);
+                else Process.Start(new ProcessStartInfo() { FileName = path, UseShellExecute = true });
             };
             saveButton.OnClick += (sender, e) => saveProject();
             exportButton.OnClick += (sender, e) =>

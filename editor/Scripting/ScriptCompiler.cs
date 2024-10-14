@@ -1,94 +1,78 @@
-﻿using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
-using System;
-using System.CodeDom.Compiler;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace StorybrewEditor.Scripting
 {
-    public class ScriptCompiler : MarshalByRefObject
+    public class ScriptCompiler
     {
-        private static int nextId;
-
         public static void Compile(string[] sourcePaths, string outputPath, IEnumerable<string> referencedAssemblies)
         {
-            var setup = new AppDomainSetup()
-            {
-                ApplicationName = $"ScriptCompiler {nextId++}",
-                ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-            };
-
             Debug.Print($"{nameof(Scripting)}: Compiling {string.Join(", ", sourcePaths)}");
-            var compilerDomain = AppDomain.CreateDomain(setup.ApplicationName, null, setup);
-            try
+
+            var syntaxTrees = sourcePaths.Select(path => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(path), path: path)).ToArray();
+            var references = new List<MetadataReference>();
+
+            foreach (var assembly in referencedAssemblies)
+                if (File.Exists(assembly))
+                    references.Add(MetadataReference.CreateFromFile(assembly));
+
+            var compilation = CSharpCompilation.Create(
+                assemblyName: Path.GetFileNameWithoutExtension(outputPath),
+                syntaxTrees: syntaxTrees,
+                references: references,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            EmitResult result;
+            using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                result = compilation.Emit(stream);
+
+            if (!result.Success)
             {
-                var compiler = (ScriptCompiler)compilerDomain.CreateInstanceFromAndUnwrap(
-                    typeof(ScriptCompiler).Assembly.ManifestModule.FullyQualifiedName,
-                    typeof(ScriptCompiler).FullName);
+                var diagnostics = result.Diagnostics
+                    .Where(diag => diag.Severity == DiagnosticSeverity.Error);
 
-                compiler.compile(sourcePaths, outputPath, Program.Settings.UseRoslyn, referencedAssemblies);
-            }
-            finally
-            {
-                AppDomain.Unload(compilerDomain);
-            }
-        }
-
-        private void compile(string[] sourcePaths, string outputPath, bool useRoslyn, IEnumerable<string> referencedAssemblies)
-        {
-            var parameters = new CompilerParameters()
-            {
-                GenerateExecutable = false,
-                GenerateInMemory = false,
-                OutputAssembly = outputPath,
-                IncludeDebugInformation = true,
-            };
-
-            foreach (var referencedAssembly in referencedAssemblies)
-                parameters.ReferencedAssemblies.Add(referencedAssembly);
-
-            using (var codeProvider = useRoslyn ? new CSharpCodeProvider() : CodeDomProvider.CreateProvider("csharp"))
-            {
-                var results = codeProvider.CompileAssemblyFromFile(parameters, sourcePaths);
-
-                var errors = results.Errors;
-                if (errors.Count > 0)
+                var sourceLines = new Dictionary<string, string[]>();
+                foreach (var sourcePath in sourcePaths)
                 {
-                    var sourceLines = new Dictionary<string, string[]>();
                     try
                     {
-                        foreach (var sourcePath in sourcePaths)
-                            sourceLines[Path.GetFullPath(sourcePath)] = File.ReadAllText(sourcePath).Split('\n');
+                        sourceLines[Path.GetFullPath(sourcePath)] = File.ReadAllText(sourcePath).Split('\n');
                     }
-                    catch
+                    catch { }
+                }
+
+                var message = new StringBuilder("Compilation error\n\n");
+                foreach (var diagnostic in diagnostics)
+                {
+                    if (diagnostic.Location == Location.None)
                     {
+                        message.AppendLine($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+                        continue;
                     }
 
-                    var message = new StringBuilder("Compilation error\n\n");
-                    for (var i = 0; i < errors.Count; i++)
+                    var lineSpan = diagnostic.Location.GetLineSpan();
+                    var filePath = lineSpan.Path;
+                    var linePosition = lineSpan.StartLinePosition.Line + 1;
+                    try
                     {
-                        var error = errors[i];
-                        if (!string.IsNullOrWhiteSpace(error.FileName))
+                        var lineContent = sourceLines.ContainsKey(filePath) ? sourceLines[filePath].ElementAtOrDefault(linePosition - 1) : string.Empty;
+
+                        message.AppendLine($"{filePath}, line {linePosition}: {diagnostic.GetMessage()}");
+                        if (!string.IsNullOrWhiteSpace(lineContent))
                         {
-                            message.AppendLine($"{error.FileName}, line {error.Line}: {error.ErrorText}");
-                            if (i == errors.Count - 1 || error.Line != errors[i + 1].Line)
-                            {
-                                try
-                                {
-                                    var filename = Path.GetFullPath(error.FileName);
-                                    message.AppendLine(sourceLines[filename][error.Line - 1]);
-                                }
-                                catch
-                                {
-                                }
-                            }
+                            message.AppendLine(lineContent);
                         }
-                        else message.AppendLine(error.ErrorText);
                     }
-                    throw new ScriptCompilationException(message.ToString());
+                    catch { }
                 }
+
+                throw new ScriptCompilationException(message.ToString());
             }
         }
     }

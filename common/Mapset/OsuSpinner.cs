@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using System;
 using System.Globalization;
 
 namespace StorybrewCommon.Mapset

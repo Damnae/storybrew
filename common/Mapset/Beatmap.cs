@@ -1,10 +1,8 @@
 ﻿using OpenTK.Graphics;
-using System;
-using System.Collections.Generic;
 
 namespace StorybrewCommon.Mapset
 {
-    public abstract class Beatmap : MarshalByRefObject
+    public abstract class Beatmap
     {
         /// <summary>
         /// In milliseconds

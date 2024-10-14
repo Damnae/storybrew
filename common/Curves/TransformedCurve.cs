@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using System;
 
 namespace StorybrewCommon.Curves
 {

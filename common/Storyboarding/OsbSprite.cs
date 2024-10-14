@@ -4,10 +4,6 @@ using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
 using StorybrewCommon.Util;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace StorybrewCommon.Storyboarding
 {

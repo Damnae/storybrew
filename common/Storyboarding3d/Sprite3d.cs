@@ -3,8 +3,6 @@ using OpenTK;
 using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
-using System;
-using System.Collections.Generic;
 
 namespace StorybrewCommon.Storyboarding3d
 {

@@ -5,9 +5,6 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace StorybrewCommon.Storyboarding3d
 {

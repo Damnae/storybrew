@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace StorybrewCommon.Subtitles
+﻿namespace StorybrewCommon.Subtitles
 {
     public class SubtitleSet
     {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Storyboarding
+﻿namespace StorybrewCommon.Storyboarding
 {
     public class OsbAnimation : OsbSprite
     {

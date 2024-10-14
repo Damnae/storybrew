@@ -91,7 +91,11 @@ namespace StorybrewEditor.UserInterface.Components
                 },
             });
 
-            helpButton.OnClick += (sender, e) => Process.Start($"https://github.com/{Program.Repository}/wiki");
+            helpButton.OnClick += (sender, e) => Process.Start(new ProcessStartInfo() 
+            { 
+                FileName = $"https://github.com/{Program.Repository}/wiki",
+                UseShellExecute = true
+            });
             referencedAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new ReferencedAssemblyConfig(project));
             dimSlider.OnValueChanged += (sender, e) =>
             {

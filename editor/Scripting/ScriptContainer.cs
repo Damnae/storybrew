@@ -1,21 +1,196 @@
 ﻿using StorybrewCommon.Scripting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.Loader;
 
 namespace StorybrewEditor.Scripting
 {
-    public interface ScriptContainer<TScript> : IDisposable
+    public class ScriptContainer<TScript>
         where TScript : Script
     {
-        string Name { get; }
-        string ScriptTypeName { get; }
-        string MainSourcePath { get; }
-        IEnumerable<string> ReferencedAssemblies { get; set; }
-        bool HasScript { get; }
+        private static int nextId;
+        public readonly int Id = nextId++;
 
-        event EventHandler OnScriptChanged;
+        private readonly ScriptManager<TScript> manager;
 
-        TScript CreateScript();
-        void ReloadScript();
+        public string CompiledScriptsPath { get; }
+
+        private volatile int currentVersion = 0;
+        private volatile int targetVersion = 1;
+
+        private AssemblyLoadContext assemblyLoadContext;
+        private Type scriptType;
+        private string scriptIdentifier;
+
+        public string Name
+        {
+            get
+            {
+                var name = ScriptTypeName;
+                if (name.Contains("."))
+                    name = name.Substring(name.LastIndexOf('.') + 1);
+                return name;
+            }
+        }
+
+        public string ScriptTypeName { get; }
+
+        public string MainSourcePath { get; }
+
+        public string LibraryFolder { get; }
+
+        public string[] SourcePaths
+        {
+            get
+            {
+                if (LibraryFolder == null || !Directory.Exists(LibraryFolder))
+                    return new[] { MainSourcePath };
+
+                return Directory.GetFiles(LibraryFolder, "*.cs", SearchOption.AllDirectories)
+                    .Concat(new[] { MainSourcePath }).ToArray();
+            }
+        }
+
+        private List<string> referencedAssemblies = new List<string>();
+        public IEnumerable<string> ReferencedAssemblies
+        {
+            get { return referencedAssemblies; }
+            set
+            {
+                var newReferencedAssemblies = new List<string>(value);
+                if (newReferencedAssemblies.Count == referencedAssemblies.Count && newReferencedAssemblies.All(ass => referencedAssemblies.Contains(ass)))
+                    return;
+
+                referencedAssemblies = newReferencedAssemblies;
+                ReloadScript();
+            }
+        }
+
+        /// <summary>
+        /// Returns false when Script would return null.
+        /// </summary>
+        public bool HasScript => scriptType != null || currentVersion != targetVersion;
+
+        public event EventHandler OnScriptChanged;
+
+        public ScriptContainer(ScriptManager<TScript> manager, string scriptTypeName, string mainSourcePath, string libraryFolder, string compiledScriptsPath, IEnumerable<string> referencedAssemblies)
+        {
+            this.manager = manager;
+            ScriptTypeName = scriptTypeName;
+            MainSourcePath = mainSourcePath;
+            LibraryFolder = libraryFolder;
+            CompiledScriptsPath = compiledScriptsPath;
+
+            ReferencedAssemblies = referencedAssemblies;
+        }
+
+        public TScript CreateScript()
+        {
+            var localTargetVersion = targetVersion;
+            if (currentVersion < localTargetVersion)
+            {
+                currentVersion = localTargetVersion;
+
+                if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainer<TScript>));
+
+                try
+                {
+                    if (assemblyLoadContext != null)
+                    {
+                        Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
+                        assemblyLoadContext.Unload();
+                    }
+
+                    var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid()}.dll");
+                    ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
+
+                    var contextName = $"{Name} {Id}";
+                    Debug.Print($"{nameof(Scripting)}: Creating AssemblyLoadContext {contextName}");
+                    assemblyLoadContext = new AssemblyLoadContext(contextName, isCollectible: true);
+
+                    try
+                    {
+                        scriptType = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath).GetType(ScriptTypeName);
+                        if (scriptType == null)
+                            throw new TypeLoadException($"Type {ScriptTypeName} was not found in assembly");
+
+                        scriptIdentifier = Guid.NewGuid().ToString();
+                    }
+                    catch
+                    {
+                        Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
+                        assemblyLoadContext.Unload();
+                        throw;
+                    }
+                }
+                catch (ScriptCompilationException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw CreateScriptLoadingException(e);
+                }
+            }
+
+            var script = (TScript)Activator.CreateInstance(scriptType);
+            script.Identifier = scriptIdentifier;
+            return script;
+        }
+
+        public void ReloadScript()
+        {
+            var initialTargetVersion = targetVersion;
+
+            int localCurrentVersion;
+            do
+            {
+                localCurrentVersion = currentVersion;
+                if (targetVersion <= localCurrentVersion)
+                    targetVersion = localCurrentVersion + 1;
+            }
+            while (currentVersion != localCurrentVersion);
+
+            if (targetVersion > initialTargetVersion)
+                OnScriptChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected ScriptLoadingException CreateScriptLoadingException(Exception e)
+        {
+            var details = "";
+            if (e is TypeLoadException)
+                details = "Make sure the script's class name is the same as the file name.\n";
+
+            return new ScriptLoadingException($"{ScriptTypeName} failed to load.\n{details}\n{e}");
+        }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (assemblyLoadContext != null)
+                {
+                    Debug.Print($"{nameof(Scripting)}: Unloading AssemblyLoadContext {assemblyLoadContext.Name}");
+                    assemblyLoadContext.Unload();
+                }
+
+                assemblyLoadContext = null;
+                scriptType = null;
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

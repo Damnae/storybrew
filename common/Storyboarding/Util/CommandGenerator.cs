@@ -6,9 +6,6 @@ using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace StorybrewCommon.Storyboarding.Util
 {

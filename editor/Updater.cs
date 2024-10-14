@@ -19,7 +19,7 @@ namespace StorybrewEditor
         private static readonly Version readOnlyVersion = new Version(1, 8);
 
         public static void OpenLastestReleasePage()
-            => Process.Start($"https://github.com/{Program.Repository}/releases/latest");
+            => Process.Start(new ProcessStartInfo() { FileName = $"https://github.com/{Program.Repository}/releases/latest", UseShellExecute = true });
 
         public static void Update(string destinationFolder, Version fromVersion)
         {
@@ -52,7 +52,7 @@ namespace StorybrewEditor
 
             // Start the updated process
             var relativeProcessPath = PathHelper.GetRelativePath(sourceFolder, updaterPath);
-            var processPath = Path.Combine(destinationFolder, relativeProcessPath);
+            var processPath = Path.Combine(destinationFolder, Path.GetFileNameWithoutExtension(relativeProcessPath) + ".exe");
 
             Trace.WriteLine($"\nUpdate complete, starting {processPath}");
             Process.Start(new ProcessStartInfo()
@@ -79,7 +79,6 @@ namespace StorybrewEditor
         private static void updateData(string destinationFolder, Version fromVersion)
         {
             var settings = new Settings(Path.Combine(destinationFolder, Settings.DefaultPath));
-            if (fromVersion < new Version(1, 53)) settings.UseRoslyn.Set(true);
             if (fromVersion < new Version(1, 70)) settings.Volume.Set(Math.Pow(settings.Volume, 1 / 4f));
             settings.Save();
 
@@ -99,6 +98,31 @@ namespace StorybrewEditor
                 {
                     Trace.WriteLine($"Removing {oldRoslynFolder}");
                     Misc.WithRetries(() => Directory.Delete(oldRoslynFolder, true), canThrow: false);
+                }
+            }
+            if (fromVersion < new Version(1, 92))
+            {
+                var newRoslynFolder = Path.Combine(destinationFolder, "roslyn");
+                if (Directory.Exists(newRoslynFolder))
+                {
+                    Trace.WriteLine($"Removing {newRoslynFolder}");
+                    Misc.WithRetries(() => Directory.Delete(newRoslynFolder, true), canThrow: false);
+                }
+
+                var filesToRemove = new[] 
+                { 
+                    "Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll",
+                    "StorybrewEditor.exe.config",
+                    "System.ValueTuple.dll",
+                };
+                foreach (var fileName in filesToRemove)
+                {
+                    var path = Path.Combine(destinationFolder, fileName);
+                    if (File.Exists(path))
+                    {
+                        Trace.WriteLine($"Removing {path}");
+                        Misc.WithRetries(() => File.Delete(path), canThrow: false);
+                    }
                 }
             }
         }

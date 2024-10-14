@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StorybrewCommon.Storyboarding.CommandValues
+﻿namespace StorybrewCommon.Storyboarding.CommandValues
 {
     [Serializable]
     public struct CommandParameter : CommandValue

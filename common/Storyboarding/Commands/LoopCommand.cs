@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace StorybrewCommon.Storyboarding.Commands
+﻿namespace StorybrewCommon.Storyboarding.Commands
 {
     public class LoopCommand : CommandGroup, IFragmentableCommand
     {

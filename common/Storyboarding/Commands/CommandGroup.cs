@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace StorybrewCommon.Storyboarding.Commands
+﻿namespace StorybrewCommon.Storyboarding.Commands
 {
-    public abstract class CommandGroup : MarshalByRefObject, ICommand
+    public abstract class CommandGroup : ICommand
     {
         private bool ended;
 
