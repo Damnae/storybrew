@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -392,7 +393,10 @@ namespace StorybrewEditor
             AppDomain.CurrentDomain.FirstChanceException += (sender, e) => logError(e.Exception, exceptionPath, null, false);
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => logError((Exception)e.ExceptionObject, crashPath, "crash", true);
 
-            Trace.WriteLine($"CLR {Environment.Version} / {RuntimeEnvironment.GetRuntimeDirectory()}\n");
+            Trace.WriteLine($"CLR {Environment.Version} / {RuntimeEnvironment.GetRuntimeDirectory()}");
+            foreach (var p in Environment.GetEnvironmentVariable("path").Split(';').Where(p => p.Contains("\\dotnet\\")))
+                Trace.WriteLine($"  dotnet path {p}");
+            Trace.WriteLine("");
         }
 
         private static void logError(Exception e, string filename, string reportType, bool show)
