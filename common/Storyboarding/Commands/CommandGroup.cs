@@ -6,11 +6,10 @@
 
         public double StartTime { get; set; }
         public virtual double EndTime { get; set; }
-        public virtual bool Active => true;
         public int Cost => commands.Sum(c => c.Cost);
 
         private readonly List<ICommand> commands = new List<ICommand>();
-        public IEnumerable<ICommand> Commands => commands;
+        public IReadOnlyList<ICommand> Commands => commands;
 
         public double CommandsStartTime
         {

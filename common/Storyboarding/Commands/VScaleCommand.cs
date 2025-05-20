@@ -4,8 +4,10 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public class VScaleCommand : Command<CommandScale>
     {
-        public VScaleCommand(OsbEasing easing, double startTime, double endTime, CommandScale startValue, CommandScale endValue)
-            : base("V", easing, startTime, endTime, startValue, endValue)
+        public override string Identifier => "V"; 
+
+        public VScaleCommand(OsbEasing easing, double startTime, double endTime, in CommandScale startValue, in CommandScale endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 
@@ -15,7 +17,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public override CommandScale ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 
-        public override CommandScale Midpoint(Command<CommandScale> endCommand, double progress)
+        public override CommandScale Midpoint(in Command<CommandScale> endCommand, double progress)
             => new CommandScale(StartValue.X + (endCommand.EndValue.X - StartValue.X) * progress, StartValue.Y + (endCommand.EndValue.Y - StartValue.Y) * progress);
 
         public override IFragmentableCommand GetFragment(double startTime, double endTime)

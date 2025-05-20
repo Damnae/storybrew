@@ -1,32 +1,35 @@
 ﻿using StorybrewCommon.Animations;
 using StorybrewCommon.Storyboarding.CommandValues;
+using StorybrewCommon.Storyboarding.Display;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
     public abstract class Command<TValue> : ITypedCommand<TValue>, IFragmentableCommand, IOffsetable
-        where TValue : CommandValue
+        where TValue : struct, CommandValue
     {
-        public string Identifier { get; set; }
+        public abstract string Identifier { get; }
+
         public OsbEasing Easing { get; set; }
         public double StartTime { get; set; }
         public double EndTime { get; set; }
-        public double Duration => EndTime - StartTime;
         public TValue StartValue { get; set; }
         public TValue EndValue { get; set; }
+
+        public double Duration => EndTime - StartTime;
         public virtual bool MaintainValue => true;
         public virtual bool ExportEndValue => true;
-        public bool Active => true;
         public int Cost => 1;
 
-        protected Command(string identifier, OsbEasing easing, double startTime, double endTime, TValue startValue, TValue endValue)
+        protected Command(OsbEasing easing, double startTime, double endTime, in TValue startValue, in TValue endValue)
         {
-            Identifier = identifier;
             Easing = easing;
             StartTime = startTime;
             EndTime = endTime;
             StartValue = startValue;
             EndValue = endValue;
         }
+
+        public CommandResult<TValue> AsResult(double timeOffset) => new(this, timeOffset);
 
         public virtual TValue GetTransformedStartValue(StoryboardTransform transform) => StartValue;
         public virtual TValue GetTransformedEndValue(StoryboardTransform transform) => EndValue;
@@ -48,7 +51,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         }
 
         public abstract TValue ValueAtProgress(double progress);
-        public abstract TValue Midpoint(Command<TValue> endCommand, double progress);
+        public abstract TValue Midpoint(in Command<TValue> endCommand, double progress);
 
         public bool IsFragmentable => StartTime == EndTime || Easing == OsbEasing.None;
 

@@ -4,8 +4,10 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public class MoveCommand : Command<CommandPosition>
     {
-        public MoveCommand(OsbEasing easing, double startTime, double endTime, CommandPosition startValue, CommandPosition endValue)
-            : base("M", easing, startTime, endTime, startValue, endValue)
+        public override string Identifier => "M";
+
+        public MoveCommand(OsbEasing easing, double startTime, double endTime, in CommandPosition startValue, in CommandPosition endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 
@@ -15,7 +17,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public override CommandPosition ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 
-        public override CommandPosition Midpoint(Command<CommandPosition> endCommand, double progress)
+        public override CommandPosition Midpoint(in Command<CommandPosition> endCommand, double progress)
             => new CommandPosition(StartValue.X + (endCommand.EndValue.X - StartValue.X) * progress, StartValue.Y + (endCommand.EndValue.Y - StartValue.Y) * progress);
 
         public override IFragmentableCommand GetFragment(double startTime, double endTime)

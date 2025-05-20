@@ -1,7 +1,7 @@
 namespace StorybrewCommon.Storyboarding.CommandValues
 {
     [Serializable]
-    public struct CommandDecimal : CommandValue, IEquatable<CommandDecimal>
+    public readonly struct CommandDecimal : CommandValue, IEquatable<CommandDecimal>
     {
         private readonly double value;
 

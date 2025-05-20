@@ -4,7 +4,6 @@
     {
         public string TriggerName { get; set; }
         public int Group { get; set; }
-        public override bool Active => false;
 
         public TriggerCommand(string triggerName, double startTime, double endTime, int group = 0)
         {

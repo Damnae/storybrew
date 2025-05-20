@@ -7,14 +7,14 @@ namespace StorybrewCommon.Storyboarding
     public class OsbAnimationWriter : OsbSpriteWriter
     {
         private readonly OsbAnimation osbAnimation;
-        public OsbAnimationWriter(OsbAnimation osbAnimation, AnimatedValue<CommandPosition> moveTimeline,
-                                                             AnimatedValue<CommandDecimal> moveXTimeline,
-                                                             AnimatedValue<CommandDecimal> moveYTimeline,
-                                                             AnimatedValue<CommandDecimal> scaleTimeline,
-                                                             AnimatedValue<CommandScale> scaleVecTimeline,
-                                                             AnimatedValue<CommandDecimal> rotateTimeline,
-                                                             AnimatedValue<CommandDecimal> fadeTimeline,
-                                                             AnimatedValue<CommandColor> colorTimeline,
+        public OsbAnimationWriter(OsbAnimation osbAnimation, CommandTimeline<CommandPosition> moveTimeline,
+                                                             CommandTimeline<CommandDecimal> moveXTimeline,
+                                                             CommandTimeline<CommandDecimal> moveYTimeline,
+                                                             CommandTimeline<CommandDecimal> scaleTimeline,
+                                                             CommandTimeline<CommandScale> scaleVecTimeline,
+                                                             CommandTimeline<CommandDecimal> rotateTimeline,
+                                                             CommandTimeline<CommandDecimal> fadeTimeline,
+                                                             CommandTimeline<CommandColor> colorTimeline,
                                                              TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
                                         : base(osbAnimation, moveTimeline,
                                                              moveXTimeline,

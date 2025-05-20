@@ -4,15 +4,17 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public class FadeCommand : Command<CommandDecimal>
     {
-        public FadeCommand(OsbEasing easing, double startTime, double endTime, CommandDecimal startValue, CommandDecimal endValue)
-            : base("F", easing, startTime, endTime, startValue, endValue)
+        public override string Identifier => "F";
+
+        public FadeCommand(OsbEasing easing, double startTime, double endTime, in CommandDecimal startValue, in CommandDecimal endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 
         public override CommandDecimal ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 
-        public override CommandDecimal Midpoint(Command<CommandDecimal> endCommand, double progress)
+        public override CommandDecimal Midpoint(in Command<CommandDecimal> endCommand, double progress)
             => StartValue + (endCommand.EndValue - StartValue) * progress;
 
         public override IFragmentableCommand GetFragment(double startTime, double endTime)

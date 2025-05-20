@@ -4,8 +4,10 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public class RotateCommand : Command<CommandDecimal>
     {
-        public RotateCommand(OsbEasing easing, double startTime, double endTime, CommandDecimal startValue, CommandDecimal endValue)
-            : base("R", easing, startTime, endTime, startValue, endValue)
+        public override string Identifier => "R";
+        
+        public RotateCommand(OsbEasing easing, double startTime, double endTime, in CommandDecimal startValue, in CommandDecimal endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 
@@ -15,7 +17,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public override CommandDecimal ValueAtProgress(double progress)
             => StartValue + (EndValue - StartValue) * progress;
 
-        public override CommandDecimal Midpoint(Command<CommandDecimal> endCommand, double progress)
+        public override CommandDecimal Midpoint(in Command<CommandDecimal> endCommand, double progress)
             => StartValue + (endCommand.EndValue - StartValue) * progress;
 
         public override IFragmentableCommand GetFragment(double startTime, double endTime)

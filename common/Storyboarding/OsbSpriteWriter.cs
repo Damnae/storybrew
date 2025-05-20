@@ -7,26 +7,26 @@ namespace StorybrewCommon.Storyboarding
     public class OsbSpriteWriter
     {
         private readonly OsbSprite osbSprite;
-        private readonly AnimatedValue<CommandPosition> moveTimeline;
-        private readonly AnimatedValue<CommandDecimal> moveXTimeline;
-        private readonly AnimatedValue<CommandDecimal> moveYTimeline;
-        private readonly AnimatedValue<CommandDecimal> scaleTimeline;
-        private readonly AnimatedValue<CommandScale> scaleVecTimeline;
-        private readonly AnimatedValue<CommandDecimal> rotateTimeline;
-        private readonly AnimatedValue<CommandDecimal> fadeTimeline;
-        private readonly AnimatedValue<CommandColor> colorTimeline;
+        private readonly CommandTimeline<CommandPosition> moveTimeline;
+        private readonly CommandTimeline<CommandDecimal> moveXTimeline;
+        private readonly CommandTimeline<CommandDecimal> moveYTimeline;
+        private readonly CommandTimeline<CommandDecimal> scaleTimeline;
+        private readonly CommandTimeline<CommandScale> scaleVecTimeline;
+        private readonly CommandTimeline<CommandDecimal> rotateTimeline;
+        private readonly CommandTimeline<CommandDecimal> fadeTimeline;
+        private readonly CommandTimeline<CommandColor> colorTimeline;
         protected readonly TextWriter TextWriter;
         protected readonly ExportSettings ExportSettings;
         protected readonly OsbLayer OsbLayer;
 
-        public OsbSpriteWriter(OsbSprite osbSprite, AnimatedValue<CommandPosition> moveTimeline,
-                                                    AnimatedValue<CommandDecimal> moveXTimeline,
-                                                    AnimatedValue<CommandDecimal> moveYTimeline,
-                                                    AnimatedValue<CommandDecimal> scaleTimeline,
-                                                    AnimatedValue<CommandScale> scaleVecTimeline,
-                                                    AnimatedValue<CommandDecimal> rotateTimeline,
-                                                    AnimatedValue<CommandDecimal> fadeTimeline,
-                                                    AnimatedValue<CommandColor> colorTimeline,
+        public OsbSpriteWriter(OsbSprite osbSprite, CommandTimeline<CommandPosition> moveTimeline,
+                                                    CommandTimeline<CommandDecimal> moveXTimeline,
+                                                    CommandTimeline<CommandDecimal> moveYTimeline,
+                                                    CommandTimeline<CommandDecimal> scaleTimeline,
+                                                    CommandTimeline<CommandScale> scaleVecTimeline,
+                                                    CommandTimeline<CommandDecimal> rotateTimeline,
+                                                    CommandTimeline<CommandDecimal> fadeTimeline,
+                                                    CommandTimeline<CommandColor> colorTimeline,
                                                     TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             this.osbSprite = osbSprite;

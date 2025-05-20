@@ -3,7 +3,7 @@ using OpenTK;
 namespace StorybrewCommon.Storyboarding.CommandValues
 {
     [Serializable]
-    public struct CommandPosition : CommandValue, IEquatable<CommandPosition>
+    public readonly struct CommandPosition : CommandValue, IEquatable<CommandPosition>
     {
         private readonly CommandDecimal x;
         private readonly CommandDecimal y;

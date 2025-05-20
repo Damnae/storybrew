@@ -3,9 +3,9 @@ using OpenTK;
 namespace StorybrewCommon.Storyboarding.CommandValues
 {
     [Serializable]
-    public struct CommandScale : CommandValue, IEquatable<CommandScale>
+    public readonly struct CommandScale : CommandValue, IEquatable<CommandScale>
     {
-        public static CommandScale One = new CommandScale(1, 1);
+        public readonly static CommandScale One = new CommandScale(1, 1);
 
         private readonly CommandDecimal x;
         private readonly CommandDecimal y;

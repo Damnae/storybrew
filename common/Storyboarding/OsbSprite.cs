@@ -104,7 +104,6 @@ namespace StorybrewCommon.Storyboarding
             clearStartEndTimes();
             foreach (var command in commands)
             {
-                if (!command.Active) continue;
                 commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
                 commandsEndTime = Math.Max(commandsEndTime, command.EndTime);
             }
@@ -118,7 +117,7 @@ namespace StorybrewCommon.Storyboarding
 
         public OsbSprite()
         {
-            initializeDisplayValueBuilders();
+            initializeDisplayTimelines();
             InitialPosition = DefaultPosition;
         }
 
@@ -187,7 +186,7 @@ namespace StorybrewCommon.Storyboarding
         {
             var loopCommand = new LoopCommand(startTime, loopCount);
             addCommand(loopCommand);
-            startDisplayLoop(loopCommand);
+            startDisplayGroup(loopCommand);
             return loopCommand;
         }
 
@@ -195,7 +194,7 @@ namespace StorybrewCommon.Storyboarding
         {
             var triggerCommand = new TriggerCommand(triggerName, startTime, endTime, group);
             addCommand(triggerCommand);
-            startDisplayTrigger(triggerCommand);
+            startDisplayGroup(triggerCommand);
             return triggerCommand;
         }
 
@@ -204,13 +203,12 @@ namespace StorybrewCommon.Storyboarding
             currentCommandGroup.EndGroup();
             currentCommandGroup = null;
 
-            endDisplayComposites();
+            endDisplayGroup();
         }
 
         private void addCommand(ICommand command)
         {
-            var commandGroup = command as CommandGroup;
-            if (commandGroup != null)
+            if (command is CommandGroup commandGroup)
             {
                 currentCommandGroup = commandGroup;
                 commands.Add(commandGroup);
@@ -265,19 +263,19 @@ namespace StorybrewCommon.Storyboarding
 
         #region Display 
 
-        private readonly List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>> displayValueBuilders = new List<KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>>();
+        private readonly List<(Predicate<ICommand> Condition, CommandTimeline Timeline)> displayTimelines = [];
 
-        private readonly AnimatedValue<CommandPosition> moveTimeline = new AnimatedValue<CommandPosition>();
-        private readonly AnimatedValue<CommandDecimal> moveXTimeline = new AnimatedValue<CommandDecimal>();
-        private readonly AnimatedValue<CommandDecimal> moveYTimeline = new AnimatedValue<CommandDecimal>();
-        private readonly AnimatedValue<CommandDecimal> scaleTimeline = new AnimatedValue<CommandDecimal>(1);
-        private readonly AnimatedValue<CommandScale> scaleVecTimeline = new AnimatedValue<CommandScale>(Vector2.One);
-        private readonly AnimatedValue<CommandDecimal> rotateTimeline = new AnimatedValue<CommandDecimal>();
-        private readonly AnimatedValue<CommandDecimal> fadeTimeline = new AnimatedValue<CommandDecimal>(1);
-        private readonly AnimatedValue<CommandColor> colorTimeline = new AnimatedValue<CommandColor>(CommandColor.FromRgb(255, 255, 255));
-        private readonly AnimatedValue<CommandParameter> additiveTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None);
-        private readonly AnimatedValue<CommandParameter> flipHTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None);
-        private readonly AnimatedValue<CommandParameter> flipVTimeline = new AnimatedValue<CommandParameter>(CommandParameter.None);
+        private readonly CommandTimeline<CommandPosition> moveTimeline = new();
+        private readonly CommandTimeline<CommandDecimal> moveXTimeline = new();
+        private readonly CommandTimeline<CommandDecimal> moveYTimeline = new();
+        private readonly CommandTimeline<CommandDecimal> scaleTimeline = new(1);
+        private readonly CommandTimeline<CommandScale> scaleVecTimeline = new(Vector2.One);
+        private readonly CommandTimeline<CommandDecimal> rotateTimeline = new();
+        private readonly CommandTimeline<CommandDecimal> fadeTimeline = new(1);
+        private readonly CommandTimeline<CommandColor> colorTimeline = new(CommandColor.FromRgb(255, 255, 255));
+        private readonly CommandTimeline<CommandParameter> additiveTimeline = new(CommandParameter.None);
+        private readonly CommandTimeline<CommandParameter> flipHTimeline = new(CommandParameter.None);
+        private readonly CommandTimeline<CommandParameter> flipVTimeline = new(CommandParameter.None);
 
         public CommandPosition PositionAt(double time) => moveTimeline.HasCommands ? moveTimeline.ValueAtTime(time) : new CommandPosition(moveXTimeline.ValueAtTime(time), moveYTimeline.ValueAtTime(time));
         public CommandScale ScaleAt(double time) => scaleVecTimeline.HasCommands ? scaleVecTimeline.ValueAtTime(time) : new CommandScale(scaleTimeline.ValueAtTime(time));
@@ -288,44 +286,44 @@ namespace StorybrewCommon.Storyboarding
         public CommandParameter FlipHAt(double time) => flipHTimeline.ValueAtTime(time);
         public CommandParameter FlipVAt(double time) => flipVTimeline.ValueAtTime(time);
 
-        private void initializeDisplayValueBuilders()
+        private void initializeDisplayTimelines()
         {
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveCommand, new AnimatedValueBuilder<CommandPosition>(moveTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveXCommand, new AnimatedValueBuilder<CommandDecimal>(moveXTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is MoveYCommand, new AnimatedValueBuilder<CommandDecimal>(moveYTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ScaleCommand, new AnimatedValueBuilder<CommandDecimal>(scaleTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is VScaleCommand, new AnimatedValueBuilder<CommandScale>(scaleVecTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is RotateCommand, new AnimatedValueBuilder<CommandDecimal>(rotateTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is FadeCommand, new AnimatedValueBuilder<CommandDecimal>(fadeTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => c is ColorCommand, new AnimatedValueBuilder<CommandColor>(colorTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.AdditiveBlending, new AnimatedValueBuilder<CommandParameter>(additiveTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipHorizontal, new AnimatedValueBuilder<CommandParameter>(flipHTimeline)));
-            displayValueBuilders.Add(new KeyValuePair<Predicate<ICommand>, IAnimatedValueBuilder>((c) => (c as ParameterCommand)?.StartValue.Type == ParameterType.FlipVertical, new AnimatedValueBuilder<CommandParameter>(flipVTimeline)));
+            displayTimelines.Add(new(c => c is MoveCommand, moveTimeline));
+            displayTimelines.Add(new(c => c is MoveXCommand, moveXTimeline));
+            displayTimelines.Add(new(c => c is MoveYCommand, moveYTimeline));
+            displayTimelines.Add(new(c => c is ScaleCommand, scaleTimeline));
+            displayTimelines.Add(new(c => c is VScaleCommand, scaleVecTimeline));
+            displayTimelines.Add(new(c => c is RotateCommand, rotateTimeline));
+            displayTimelines.Add(new(c => c is FadeCommand, fadeTimeline));
+            displayTimelines.Add(new(c => c is ColorCommand, colorTimeline));
+            displayTimelines.Add(new(c => c is ParameterCommand { StartValue.Type: ParameterType.AdditiveBlending }, additiveTimeline));
+            displayTimelines.Add(new(c => c is ParameterCommand { StartValue.Type: ParameterType.FlipHorizontal }, flipHTimeline));
+            displayTimelines.Add(new(c => c is ParameterCommand { StartValue.Type: ParameterType.FlipVertical }, flipVTimeline));
         }
 
         private void addDisplayCommand(ICommand command)
         {
-            foreach (var builders in displayValueBuilders)
-                if (builders.Key(command))
-                    builders.Value.Add(command);
+            foreach (var (checkCondition, timeline) in displayTimelines)
+                if (checkCondition(command))
+                    timeline.Add(command);
         }
 
-        private void startDisplayLoop(LoopCommand loopCommand)
+        private void startDisplayGroup(LoopCommand loopCommand)
         {
-            foreach (var builders in displayValueBuilders)
-                builders.Value.StartDisplayLoop(loopCommand);
+            foreach (var (_, timeline) in displayTimelines)
+                timeline.StartGroup(loopCommand);
         }
 
-        private void startDisplayTrigger(TriggerCommand triggerCommand)
+        private void startDisplayGroup(TriggerCommand triggerCommand)
         {
-            foreach (var builders in displayValueBuilders)
-                builders.Value.StartDisplayTrigger(triggerCommand);
+            foreach (var (_, timeline) in displayTimelines)
+                timeline.StartGroup(triggerCommand);
         }
 
-        private void endDisplayComposites()
+        private void endDisplayGroup()
         {
-            foreach (var builders in displayValueBuilders)
-                builders.Value.EndDisplayComposite();
+            foreach (var (_, timeline) in displayTimelines)
+                timeline.EndGroup();
         }
 
         #endregion

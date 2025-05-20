@@ -1,7 +1,7 @@
 ﻿namespace StorybrewCommon.Storyboarding.CommandValues
 {
     [Serializable]
-    public struct CommandParameter : CommandValue
+    public readonly struct CommandParameter : CommandValue
     {
         public static readonly CommandParameter None = new CommandParameter(ParameterType.None);
         public static readonly CommandParameter FlipHorizontal = new CommandParameter(ParameterType.FlipHorizontal);
@@ -24,6 +24,22 @@
                 case ParameterType.AdditiveBlending: return "A";
                 default: throw new InvalidOperationException(Type.ToString());
             }
+        }
+        
+        public bool Equals(CommandParameter other)
+            => Type == other.Type;
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+
+            return obj is CommandParameter && Equals((CommandParameter)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)Type;
         }
 
         public override string ToString() => ToOsbString(ExportSettings.Default);

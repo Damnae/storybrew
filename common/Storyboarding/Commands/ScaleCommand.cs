@@ -4,8 +4,10 @@ namespace StorybrewCommon.Storyboarding.Commands
 {
     public class ScaleCommand : Command<CommandDecimal>
     {
-        public ScaleCommand(OsbEasing easing, double startTime, double endTime, CommandDecimal startValue, CommandDecimal endValue)
-            : base("S", easing, startTime, endTime, startValue, endValue)
+        public override string Identifier => "S";
+
+        public ScaleCommand(OsbEasing easing, double startTime, double endTime, in CommandDecimal startValue, in CommandDecimal endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 
@@ -16,7 +18,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         public override CommandDecimal ValueAtProgress(double progress)
             => Math.Max(0, StartValue + (EndValue - StartValue) * progress);
 
-        public override CommandDecimal Midpoint(Command<CommandDecimal> endCommand, double progress)
+        public override CommandDecimal Midpoint(in Command<CommandDecimal> endCommand, double progress)
             => StartValue + (endCommand.EndValue - StartValue) * progress;
 
         public override IFragmentableCommand GetFragment(double startTime, double endTime)

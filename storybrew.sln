@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "scripts", "scripts\scripts.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "editor", "editor\editor.csproj", "{FF59AEEA-C133-4BF8-8A0B-620A3C99022B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "brewlib", "brewlib\brewlib.csproj", "{A4F7CC21-B769-424B-AB59-89E93D781762}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "brewlib", "brewlib\brewlib.csproj", "{A4F7CC21-B769-424B-AB59-89E93D781762}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A318C17F-97F1-46DF-9405-A441A4B10715}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

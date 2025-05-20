@@ -5,7 +5,7 @@ using System.Drawing;
 namespace StorybrewCommon.Storyboarding.CommandValues
 {
     [Serializable]
-    public struct CommandColor : CommandValue, IEquatable<CommandColor>
+    public readonly struct CommandColor : CommandValue, IEquatable<CommandColor>
     {
         public static readonly CommandColor White = new CommandColor(1, 1, 1);
 
@@ -56,10 +56,7 @@ namespace StorybrewCommon.Storyboarding.CommandValues
 
         public override int GetHashCode()
         {
-            var hashCode = r.GetHashCode();
-            hashCode = (hashCode * 397) ^ g.GetHashCode();
-            hashCode = (hashCode * 397) ^ b.GetHashCode();
-            return hashCode;
+            return HashCode.Combine(r, g, b);
         }
 
         public string ToOsbString(ExportSettings exportSettings)

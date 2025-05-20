@@ -5,14 +5,14 @@ namespace StorybrewCommon.Storyboarding
 {
     public class OsbWriterFactory
     {
-        public static OsbSpriteWriter CreateWriter(OsbSprite osbSprite, AnimatedValue<CommandPosition> moveTimeline,
-                                                                        AnimatedValue<CommandDecimal> moveXTimeline,
-                                                                        AnimatedValue<CommandDecimal> moveYTimeline,
-                                                                        AnimatedValue<CommandDecimal> scaleTimeline,
-                                                                        AnimatedValue<CommandScale> scaleVecTimeline,
-                                                                        AnimatedValue<CommandDecimal> rotateTimeline,
-                                                                        AnimatedValue<CommandDecimal> fadeTimeline,
-                                                                        AnimatedValue<CommandColor> colorTimeline,
+        public static OsbSpriteWriter CreateWriter(OsbSprite osbSprite, CommandTimeline<CommandPosition> moveTimeline,
+                                                                        CommandTimeline<CommandDecimal> moveXTimeline,
+                                                                        CommandTimeline<CommandDecimal> moveYTimeline,
+                                                                        CommandTimeline<CommandDecimal> scaleTimeline,
+                                                                        CommandTimeline<CommandScale> scaleVecTimeline,
+                                                                        CommandTimeline<CommandDecimal> rotateTimeline,
+                                                                        CommandTimeline<CommandDecimal> fadeTimeline,
+                                                                        CommandTimeline<CommandColor> colorTimeline,
                                                                         TextWriter writer, ExportSettings exportSettings, OsbLayer layer)
         {
             if (osbSprite is OsbAnimation osbAnimation)
