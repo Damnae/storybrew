@@ -12,14 +12,19 @@ namespace StorybrewCommon.Storyboarding.Display
         public bool HasOverlap { get; private set; }
 
         /// <summary>
-        /// The command that takes effect before this channel starts
+        /// The command that takes effect before this channel starts;
+        /// Because of loops and triggers, StartResult is more useful
         /// </summary>
         public ITypedCommand<TValue> StartCommand => commands.Count > 0 ? commands[0] : null;
-        
+
         /// <summary>
-        /// The command that takes effect after this channel ends
+        /// The command that takes effect after this channel ends;
+        /// Because of loops and triggers, EndResult is more useful
         /// </summary>
-        public ITypedCommand<TValue> EndCommand { get; private set; }
+        public ITypedCommand<TValue> EndCommand => commands.Count > 0 ? commands[^1] : null;
+
+        public virtual CommandResult<TValue> StartResult => StartCommand.AsResult();
+        public virtual CommandResult<TValue> EndResult => EndCommand.AsResult();
 
         public void Add(ITypedCommand<TValue> command)
         {
@@ -29,9 +34,10 @@ namespace StorybrewCommon.Storyboarding.Display
             findCommandIndex(command.StartTime, out int index);
             while (index < commands.Count)
             {
-                if (commands[index].CompareTo(command) < 0)
-                    index++;
-                else break;
+                if (commands[index].CompareTo(command) > 0)
+                    break;
+
+                index++;
             }
 
             HasOverlap |=
@@ -39,10 +45,6 @@ namespace StorybrewCommon.Storyboarding.Display
                 (index < commands.Count && (int)Math.Round(commands[index].StartTime) < (int)Math.Round(command.EndTime));
 
             commands.Insert(index, command);
-
-            // Because of possible overlap, the end command is not always the last command in the list
-            if (EndCommand == null || EndCommand.EndTime <= command.EndTime)
-                EndCommand = command;
         }
 
         public ITypedCommand<TValue> CommandAtTime(double time)
@@ -53,14 +55,22 @@ namespace StorybrewCommon.Storyboarding.Display
             if (!findCommandIndex(time, out int index) && index > 0)
                 index--;
 
-            // In case of overlapping commands, the command that started first has priority
             if (HasOverlap)
+            {
+                // The earliest command that started before this one and hasn't ended yet has priority
                 for (var i = 0; i < index; i++)
-                    if (time < commands[i].EndTime)
+                    if (commands[i].StartTime <= commands[index].StartTime && time <= commands[i].EndTime)
                     {
                         index = i;
                         break;
                     }
+            }
+            else if (index > 0 && (int)Math.Round(time) == (int)Math.Round(commands[index - 1].EndTime))
+            {
+                // Even with no overlap, the previous command might still be active
+                // due to its end time being the same as this commands' start time
+                index--;
+            }
 
             return commands[index];
         }

@@ -7,6 +7,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Configurations>Debug;Release</Configurations>
+    <RootNamespace>StorybrewCommon</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

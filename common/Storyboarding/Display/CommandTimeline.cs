@@ -21,6 +21,9 @@ namespace StorybrewCommon.Storyboarding.Display
         public bool HasCommands => channels.Count > 0;
         public bool HasOverlap => channels.Any(c => c.HasOverlap);
 
+        public CommandResult<TValue> StartResult => channels.Select(c => c.StartResult).MinBy(r => r.StartTime);
+        public CommandResult<TValue> EndResult => channels.Select(c => c.EndResult).MaxBy(r => r.EndTime);
+
         private readonly List<CommandChannel<TValue>> channels = [];
 
         private CommandChannel<TValue> defaultChannel;
@@ -58,9 +61,6 @@ namespace StorybrewCommon.Storyboarding.Display
             currentChannel = loopChannel;
             groupEndAction = () =>
             {
-                if (loop.CommandsStartTime != 0)
-                    throw new InvalidOperationException($"Commands in a loop must start at 0ms, but start at {loop.CommandsStartTime}ms");
-
                 loopChannel.LoopCount = loop.LoopCount;
                 loopChannel.LoopStartTime = loop.StartTime;
                 loopChannel.LoopDuration = loop.CommandsDuration;
@@ -76,8 +76,8 @@ namespace StorybrewCommon.Storyboarding.Display
             currentChannel = triggerChannel;
             groupEndAction = () =>
             {
-                triggerChannel.Active = false;
-                triggerChannel.TriggerTime = trigger.StartTime;
+                triggerChannel.ListenStartTime = trigger.StartTime;
+                triggerChannel.ListenEndTime = trigger.EndTime;
             };
         }
 

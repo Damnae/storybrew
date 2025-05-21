@@ -12,6 +12,9 @@ namespace StorybrewCommon.Storyboarding.Display
         public readonly double StartTime;
         public readonly double EndTime;
 
+        public TValue StartValue => command.StartValue;
+        public TValue EndValue => command.EndValue;
+
         public CommandResult(Command<TValue> command, double timeOffset)
         {
             this.command = command;
