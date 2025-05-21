@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# IDE0008: Use explicit type
+csharp_style_var_when_type_is_apparent = false
+
+# IDE0290: Use primary constructor
+csharp_style_prefer_primary_constructors = false:suggestion
