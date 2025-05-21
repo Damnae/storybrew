@@ -5,6 +5,7 @@ using BrewLib.Graphics.Textures;
 using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
@@ -35,15 +36,21 @@ namespace StorybrewEditor.Storyboarding
             if (frameStats != null)
             {
                 frameStats.SpriteCount++;
+                if (!sprite.ShouldBeActive(time))
+                    frameStats.ProlongedSpriteCount++;
                 frameStats.CommandCount += sprite.CommandCost;
                 frameStats.IncompatibleCommands |= sprite.HasIncompatibleCommands;
                 frameStats.OverlappedCommands |= sprite.HasOverlappedCommands;
             }
 
+            var forceVisible = !sprite.ShouldBeActive(time) && Keyboard.GetState().IsKeyDown(Key.AltLeft);
+
             var fade = sprite.OpacityAt(time);
+            if (forceVisible) fade = .5f;
             if (fade < 0.00001f) return;
 
             var scale = (Vector2)sprite.ScaleAt(time);
+            if (forceVisible) scale = new Vector2(Math.Max(1f, scale.X), Math.Max(1f, scale.Y));
             if (scale.X == 0 || scale.Y == 0) return;
             if (sprite.FlipHAt(time)) scale.X = -scale.X;
             if (sprite.FlipVAt(time)) scale.Y = -scale.Y;

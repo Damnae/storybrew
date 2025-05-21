@@ -578,6 +578,10 @@ namespace StorybrewEditor.ScreenLayers
             if (activeSpriteCount >= 1500)
                 warnings += $"⚠ {activeSpriteCount:n0} Sprites\n";
 
+            var prolongedSpriteCount = project.FrameStats.ProlongedSpriteCount;
+            if (prolongedSpriteCount >= 1)
+                warnings += $"⚠ {prolongedSpriteCount:n0} Prolonged Sprites\n";
+
             var batches = project.FrameStats.Batches;
             if (batches >= 500)
                 warnings += $"⚠ {batches:0} Batches\n";

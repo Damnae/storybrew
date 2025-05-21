@@ -14,6 +14,7 @@ namespace StorybrewCommon.Storyboarding
         private readonly List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
         public bool InGroup => currentCommandGroup != null;
+        public bool HasTrigger;
 
         /// <summary>
         /// If this sprite contains more than CommandSplitThreshold commands, they will be split between multiple sprites.
@@ -53,7 +54,6 @@ namespace StorybrewCommon.Storyboarding
 
         public IEnumerable<ICommand> Commands => commands;
         public int CommandCount => commands.Count;
-
         public int CommandCost => commands.Sum(c => c.Cost);
 
         public bool HasIncompatibleCommands =>
@@ -99,20 +99,81 @@ namespace StorybrewCommon.Storyboarding
             }
         }
 
+        private double displayStartTime = double.MinValue;
+        public double DisplayStartTime
+        {
+            get
+            {
+                if (displayStartTime == double.MinValue)
+                    refreshStartEndTimes();
+                return displayStartTime;
+            }
+        }
+
+        private double displayEndTime = double.MaxValue;
+        public double DisplayEndTime
+        {
+            get
+            {
+                if (displayEndTime == double.MaxValue)
+                    refreshStartEndTimes();
+                return displayEndTime;
+            }
+        }
+
         private void refreshStartEndTimes()
         {
             clearStartEndTimes();
+
             foreach (var command in commands)
             {
                 commandsStartTime = Math.Min(commandsStartTime, command.StartTime);
                 commandsEndTime = Math.Max(commandsEndTime, command.EndTime);
             }
+
+            if (!HasTrigger)
+            {
+                if (fadeTimeline.HasCommands)
+                {
+                    var start = fadeTimeline.StartResult;
+                    if (start.StartValue == 0)
+                        displayStartTime = Math.Max(displayStartTime, start.StartTime);
+
+                    var end = fadeTimeline.EndResult;
+                    if (end.EndValue == 0)
+                        displayEndTime = Math.Min(displayEndTime, end.EndTime);
+                }
+                if (scaleTimeline.HasCommands)
+                {
+                    var start = scaleTimeline.StartResult;
+                    if (start.StartValue == 0)
+                        displayStartTime = Math.Max(displayStartTime, start.StartTime);
+
+                    var end = scaleTimeline.EndResult;
+                    if (end.EndValue == 0)
+                        displayEndTime = Math.Min(displayEndTime, end.EndTime);
+                }
+                if (scaleVecTimeline.HasCommands)
+                {
+                    var start = scaleVecTimeline.StartResult;
+                    if (start.StartValue.X <= 0 || start.StartValue.Y <= 0)
+                        displayStartTime = Math.Max(displayStartTime, start.StartTime);
+
+                    var end = scaleVecTimeline.EndResult;
+                    if (end.EndValue.X <= 0 || end.EndValue.Y <= 0)
+                        displayEndTime = Math.Min(displayEndTime, end.EndTime);
+                }
+            }
+            displayStartTime = Math.Max(displayStartTime, commandsStartTime);
+            displayEndTime = Math.Min(displayEndTime, commandsEndTime);
         }
 
         private void clearStartEndTimes()
         {
             commandsStartTime = double.MaxValue;
             commandsEndTime = double.MinValue;
+            displayStartTime = double.MinValue;
+            displayEndTime = double.MaxValue;
         }
 
         public OsbSprite()
@@ -195,6 +256,7 @@ namespace StorybrewCommon.Storyboarding
             var triggerCommand = new TriggerCommand(triggerName, startTime, endTime, group);
             addCommand(triggerCommand);
             startDisplayGroup(triggerCommand);
+            HasTrigger = true;
             return triggerCommand;
         }
 
@@ -328,8 +390,8 @@ namespace StorybrewCommon.Storyboarding
 
         #endregion
 
-        public bool IsActive(double time)
-            => CommandsStartTime <= time && time <= CommandsEndTime;
+        public bool IsActive(double time) => CommandsStartTime <= time && time <= CommandsEndTime;
+        public bool ShouldBeActive(double time) => DisplayStartTime <= time && time <= DisplayEndTime;
 
         public override double StartTime => CommandsStartTime;
         public override double EndTime => CommandsEndTime;

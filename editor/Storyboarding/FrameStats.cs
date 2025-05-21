@@ -9,6 +9,7 @@ namespace StorybrewEditor.Storyboarding
         public HashSet<string> LoadedPaths = new HashSet<string>();
 
         public int SpriteCount;
+        public int ProlongedSpriteCount;
         public int Batches;
 
         public int CommandCount;
