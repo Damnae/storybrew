@@ -150,6 +150,7 @@ namespace Test
         {
             var sprite = new OsbSprite();
 
+            // first command in file order has priority
             sprite.MoveX(0, 1000, 100, 200);
             sprite.MoveX(0, 1000, -100, -200);
 

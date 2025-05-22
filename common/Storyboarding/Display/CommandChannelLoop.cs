@@ -22,6 +22,7 @@ namespace StorybrewCommon.Storyboarding.Display
             
             if (time < LoopStartTime)
             {
+                // Before loop start
                 result = StartResult;
                 return true;
             }
@@ -29,6 +30,7 @@ namespace StorybrewCommon.Storyboarding.Display
             var loopTime = time - LoopStartTime;
             if (loopTime >= LoopCount * LoopDuration)
             {
+                // Past loop end
                 result = EndResult;
                 return true;
             }

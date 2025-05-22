@@ -86,18 +86,13 @@ namespace StorybrewCommon.Storyboarding.Display
             if (groupEndAction == null)
                 return;
 
-            var actionSnapshot = groupEndAction;
-            var channelSnapshot = currentChannel;
-            groupEndAction = null;
-
-            currentChannel = defaultChannel;
-
-            // The groupEndAction can throw, the group must be properly ended before it runs
-            if (channelSnapshot.Commands.Count > 0)
+            if (currentChannel.Commands.Count > 0)
             {
-                actionSnapshot();
-                channels.Add(channelSnapshot);
+                groupEndAction();
+                channels.Add(currentChannel);
             }
+            currentChannel = defaultChannel;
+            groupEndAction = null;
         }
 
         public TValue ValueAtTime(double time)
@@ -124,7 +119,7 @@ namespace StorybrewCommon.Storyboarding.Display
                         break;
 
                     case ResultState.CommandInPresent:
-                        // Only an active command starting earlier can take over (the state doesn't change)
+                        // Only a present command starting earlier can take over (the state doesn't change)
                         if (channelState == ResultState.CommandInPresent && channelResult.StartTime < currentResult.StartTime)
                             currentResult = channelResult;
                         break;
