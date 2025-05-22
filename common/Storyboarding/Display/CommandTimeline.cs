@@ -22,7 +22,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public bool HasOverlap => channels.Any(c => c.HasOverlap);
 
         public CommandResult<TValue> StartResult => channels.Select(c => c.StartResult).MinBy(r => r.StartTime);
-        public CommandResult<TValue> EndResult => channels.Select(c => c.EndResult).MaxBy(r => r.EndTime);
+        public CommandResult<TValue> EndResult => channels.Select(c => c.EndResult).MaxBy(r => r.StartTime);
 
         private readonly List<CommandChannel<TValue>> channels = [];
 
