@@ -1,6 +1,5 @@
 ﻿using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
-using System.Diagnostics;
 
 namespace StorybrewCommon.Storyboarding.Display
 {
@@ -29,7 +28,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public void Add(ITypedCommand<TValue> command)
         {
             if (command.EndTime < command.StartTime)
-                Debug.Print($"'{command}' ends before it starts");
+                throw new InvalidDataException($"'{command}' ends before it starts");
 
             findCommandIndex(command.StartTime, out int index);
             while (index < commands.Count)

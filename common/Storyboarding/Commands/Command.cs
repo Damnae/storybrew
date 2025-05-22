@@ -23,10 +23,22 @@ namespace StorybrewCommon.Storyboarding.Commands
         protected Command(OsbEasing easing, double startTime, double endTime, in TValue startValue, in TValue endValue)
         {
             Easing = easing;
-            StartTime = startTime;
-            EndTime = endTime;
-            StartValue = startValue;
-            EndValue = endValue;
+            if (startTime <= endTime)
+            {
+                StartTime = startTime;
+                EndTime = endTime;
+                StartValue = startValue;
+                EndValue = endValue;
+            }
+            else
+            {
+                // command ends before it start:
+                // clamp its end time to its start time
+                StartTime = startTime;
+                EndTime = startTime;
+                StartValue = startValue;
+                EndValue = endValue;
+            }
         }
 
         public CommandResult<TValue> AsResult(double timeOffset) => new(this, timeOffset);
