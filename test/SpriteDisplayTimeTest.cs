@@ -3,7 +3,7 @@ using StorybrewCommon.Storyboarding;
 namespace Test
 {
     [TestClass]
-    public class CommandDisplayTimeTest
+    public class SpriteDisplayTimeTest
     {
         [TestMethod]
         public void TestSimpleFade()

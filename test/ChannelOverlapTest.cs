@@ -3,10 +3,10 @@ using StorybrewCommon.Storyboarding;
 namespace Test
 {
     [TestClass]
-    public class CommandTimelineTest
+    public class ChannelOverlapTest
     {
         [TestMethod]
-        public void TestChannelOverlap()
+        public void TestPartialOverlaps()
         {
             var sprite = new OsbSprite();
 

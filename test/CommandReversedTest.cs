@@ -3,7 +3,7 @@ using StorybrewCommon.Storyboarding;
 namespace Test
 {
     [TestClass]
-    public class ReversedCommandTest
+    public class CommandReversedTest
     {
         [TestMethod]
         public void TestSimpleReversedCommand()
