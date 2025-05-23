@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -57,12 +58,18 @@ namespace StorybrewEditor.Storyboarding
 
         public override bool Multithreaded { get; set; }
 
+        private readonly CancellationToken cncellationToken;
+        public override CancellationToken CancellationToken => cncellationToken;
+
         private readonly StringBuilder log = new StringBuilder();
         public string Log => log.ToString();
 
         public List<EditorStoryboardLayer> EditorLayers = new List<EditorStoryboardLayer>();
 
-        public EditorGeneratorContext(Effect effect, string projectPath, string projectAssetPath, string mapsetPath, EditorBeatmap beatmap, IEnumerable<EditorBeatmap> beatmaps, MultiFileWatcher watcher)
+        public EditorGeneratorContext(Effect effect, 
+            string projectPath, string projectAssetPath, string mapsetPath, 
+            EditorBeatmap beatmap, IEnumerable<EditorBeatmap> beatmaps, 
+            CancellationToken cancellationToken, MultiFileWatcher watcher)
         {
             this.projectPath = projectPath;
             this.projectAssetPath = projectAssetPath;
@@ -70,6 +77,7 @@ namespace StorybrewEditor.Storyboarding
             this.effect = effect;
             this.beatmap = beatmap;
             this.beatmaps = beatmaps;
+            this.cncellationToken = cancellationToken;
             this.watcher = watcher;
         }
 

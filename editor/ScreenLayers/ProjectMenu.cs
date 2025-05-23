@@ -656,7 +656,7 @@ namespace StorybrewEditor.ScreenLayers
                 project.StopEffectUpdates();
                 Manager.AsyncLoading("Stopping effect updates", () =>
                 {
-                    project.CancelEffectUpdates(true);
+                    project.AbortEffectUpdates(true);
                     Program.Schedule(() => Manager.GetContext<Editor>().Restart());
                 });
             });

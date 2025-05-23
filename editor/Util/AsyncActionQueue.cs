@@ -47,10 +47,10 @@ namespace StorybrewEditor.Util
                 actionRunners.Add(new ActionRunner(context, $"{threadName} #{i + 1}"));
         }
 
-        public void Queue(T target, Action<T> action, bool mustRunAlone = false)
+        public void Queue(T target, Action<T, CancellationTokenSource> action, bool mustRunAlone = false)
             => Queue(target, null, action, mustRunAlone);
 
-        public void Queue(T target, string uniqueKey, Action<T> action, bool mustRunAlone = false)
+        public void Queue(T target, string uniqueKey, Action<T, CancellationTokenSource> action, bool mustRunAlone = false)
         {
             if (disposedValue) throw new ObjectDisposedException(nameof(AsyncActionQueue<T>));
 
@@ -73,10 +73,14 @@ namespace StorybrewEditor.Util
             }
         }
 
-        public void CancelQueuedActions(bool stopThreads)
+        public void AbortQueuedActions(bool stopThreads)
         {
             lock (context.Queue)
+            {
+                foreach (var actionContainer in context.Queue)
+                    actionContainer.CancellationTokenSource.Cancel();
                 context.Queue.Clear();
+            }
 
             if (stopThreads)
             {
@@ -97,7 +101,7 @@ namespace StorybrewEditor.Util
                 if (disposing)
                 {
                     context.Enabled = false;
-                    CancelQueuedActions(true);
+                    AbortQueuedActions(true);
                 }
                 disposedValue = true;
             }
@@ -114,8 +118,10 @@ namespace StorybrewEditor.Util
         {
             public T Target;
             public string UniqueKey;
-            public Action<T> Action;
+            public Action<T, CancellationTokenSource> Action;
             public bool MustRunAlone;
+
+            public readonly CancellationTokenSource CancellationTokenSource = new();
         }
 
         private class ActionQueueContext
@@ -222,7 +228,7 @@ namespace StorybrewEditor.Util
 
                             try
                             {
-                                task.Action.Invoke(task.Target);
+                                task.Action.Invoke(task.Target, task.CancellationTokenSource);
                             }
                             catch (Exception e)
                             {

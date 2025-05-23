@@ -207,10 +207,10 @@ namespace StorybrewEditor.Storyboarding
         private AsyncActionQueue<Effect> effectUpdateQueue = new AsyncActionQueue<Effect>("Effect Updates", false, Program.Settings.EffectThreads);
         public void QueueEffectUpdate(Effect effect)
         {
-            effectUpdateQueue.Queue(effect, effect.Path, (e) => e.Update(), effect.Multithreaded);
+            effectUpdateQueue.Queue(effect, effect.Path, (e, cts) => e.Update(cts), effect.Multithreaded);
             refreshEffectsStatus();
         }
-        public void CancelEffectUpdates(bool stopThreads) => effectUpdateQueue.CancelQueuedActions(stopThreads);
+        public void AbortEffectUpdates(bool stopThreads) => effectUpdateQueue.AbortQueuedActions(stopThreads);
         public void StopEffectUpdates()
         {
             allowEffectUpdates = false;

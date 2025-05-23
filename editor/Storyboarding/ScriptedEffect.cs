@@ -4,6 +4,7 @@ using StorybrewEditor.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -43,7 +44,7 @@ namespace StorybrewEditor.Storyboarding
         /// Should only be called by Project.QueueEffectUpdate(Effect).
         /// Doesn't run on the main thread.
         /// </summary>
-        public override void Update()
+        public override void Update(CancellationTokenSource cancellationTokenSource)
         {
             if (!scriptContainer.HasScript) return;
 
@@ -54,7 +55,10 @@ namespace StorybrewEditor.Storyboarding
                 Refresh();
             };
 
-            var context = new EditorGeneratorContext(this, Project.ProjectFolderPath, Project.ProjectAssetFolderPath, Project.MapsetPath, Project.MainBeatmap, Project.MapsetManager.Beatmaps, newDependencyWatcher);
+            var context = new EditorGeneratorContext(this, 
+                Project.ProjectFolderPath, Project.ProjectAssetFolderPath, 
+                Project.MapsetPath, Project.MainBeatmap, Project.MapsetManager.Beatmaps,
+                cancellationTokenSource.Token, newDependencyWatcher);
             var success = false;
             try
             {
@@ -77,6 +81,7 @@ namespace StorybrewEditor.Storyboarding
 
                 changeStatus(EffectStatus.Updating);
                 script.Generate(context);
+
                 foreach (var layer in context.EditorLayers)
                     layer.PostProcess();
 

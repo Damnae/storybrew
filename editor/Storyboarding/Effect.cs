@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -108,7 +109,7 @@ namespace StorybrewEditor.Storyboarding
         /// Should only be called by Project.QueueEffectUpdate(Effect).
         /// Doesn't run on the main thread.
         /// </summary>
-        public abstract void Update();
+        public abstract void Update(CancellationTokenSource cancellationTokenSource);
 
         private void refreshLayerNames()
         {

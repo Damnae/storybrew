@@ -20,5 +20,6 @@ namespace StorybrewCommon.Storyboarding
         public abstract float GetFftFrequency(string path = null);
 
         public abstract bool Multithreaded { get; set; }
+        public abstract CancellationToken CancellationToken { get; }
     }
 }
