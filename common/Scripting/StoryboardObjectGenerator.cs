@@ -28,6 +28,8 @@ namespace StorybrewCommon.Scripting
         /// </summary>
         public virtual bool Multithreaded => false;
 
+        public CancellationToken CancellationToken => context.CancellationToken;
+
         /// <summary>
         /// Creates or retrieves a layer. 
         /// The identifier will be shown in the editor as "Effect name (Identifier)". 
