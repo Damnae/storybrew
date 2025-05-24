@@ -303,6 +303,7 @@ namespace StorybrewEditor.Storyboarding
 
                     case EffectStatus.Initializing:
                     case EffectStatus.Ready:
+                    case EffectStatus.UpdateCanceled:
                         break;
                 }
             }

@@ -27,6 +27,8 @@ namespace StorybrewEditor.Storyboarding
         private bool multithreaded;
         public override bool Multithreaded => multithreaded;
 
+        private CancellationTokenSource cancellationTokenSource;
+
         private bool beatmapDependant = true;
         public override bool BeatmapDependant => beatmapDependant;
 
@@ -55,15 +57,21 @@ namespace StorybrewEditor.Storyboarding
                 Refresh();
             };
 
-            var context = new EditorGeneratorContext(this, 
-                Project.ProjectFolderPath, Project.ProjectAssetFolderPath, 
+            var context = new EditorGeneratorContext(this,
+                Project.ProjectFolderPath, Project.ProjectAssetFolderPath,
                 Project.MapsetPath, Project.MainBeatmap, Project.MapsetManager.Beatmaps,
                 cancellationTokenSource.Token, newDependencyWatcher);
             var success = false;
             try
             {
+                Program.RunMainThread(() => this.cancellationTokenSource = cancellationTokenSource);
+
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
                 changeStatus(EffectStatus.Loading);
                 var script = scriptContainer.CreateScript();
+
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
                 changeStatus(EffectStatus.Configuring);
                 Program.RunMainThread(() =>
@@ -79,8 +87,12 @@ namespace StorybrewEditor.Storyboarding
                     else script.ApplyConfiguration(Config);
                 });
 
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
                 changeStatus(EffectStatus.Updating);
                 script.Generate(context);
+
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
                 foreach (var layer in context.EditorLayers)
                     layer.PostProcess();
@@ -101,6 +113,18 @@ namespace StorybrewEditor.Storyboarding
             }
             catch (Exception e)
             {
+                var inner = e;
+                while (inner != null)
+                {
+                    if (inner is OperationCanceledException)
+                    {
+                        Debug.Print($"Script operation canceled for {BaseName}");
+                        changeStatus(EffectStatus.UpdateCanceled);
+                        return;
+                    }
+                    inner = e.InnerException;
+                }
+
                 changeStatus(EffectStatus.ExecutionFailed, getExecutionFailedMessage(e), context.Log);
                 return;
             }
@@ -140,6 +164,11 @@ namespace StorybrewEditor.Storyboarding
             });
         }
 
+        public override void CancelUpdate()
+        {
+            cancellationTokenSource?.Cancel();
+        }
+
         private void scriptContainer_OnScriptChanged(object sender, EventArgs e)
             => Refresh();
 
@@ -155,6 +184,7 @@ namespace StorybrewEditor.Storyboarding
                         case EffectStatus.CompilationFailed:
                         case EffectStatus.LoadingFailed:
                         case EffectStatus.ExecutionFailed:
+                        case EffectStatus.UpdateCanceled:
                             break;
                         default:
                             Debug.Print($"{BaseName}'s {this.status} status took {duration}ms");

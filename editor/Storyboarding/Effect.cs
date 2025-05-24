@@ -111,6 +111,11 @@ namespace StorybrewEditor.Storyboarding
         /// </summary>
         public abstract void Update(CancellationTokenSource cancellationTokenSource);
 
+        /// <summary>
+        /// Attempts to cancel the current update
+        /// </summary>
+        public abstract void CancelUpdate();
+
         private void refreshLayerNames()
         {
             foreach (var layer in layers)
@@ -163,5 +168,6 @@ namespace StorybrewEditor.Storyboarding
         CompilationFailed,
         LoadingFailed,
         ExecutionFailed,
+        UpdateCanceled,
     }
 }
