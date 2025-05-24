@@ -114,7 +114,7 @@ namespace StorybrewEditor.UserInterface.Components
         private Widget createEffectWidget(Effect effect)
         {
             Label nameLabel, detailsLabel;
-            Button renameButton, cancelButton, statusButton, configButton, editButton, removeButton;
+            Button renameButton, statusButton, configButton, editButton, removeButton;
 
             var effectWidget = new LinearLayout(Manager)
             {
@@ -155,14 +155,6 @@ namespace StorybrewEditor.UserInterface.Components
                             },
                         },
                     },
-                    cancelButton = new Button(Manager)
-                    {
-                        StyleName = "icon",
-                        AnchorFrom = BoxAlignment.Centre,
-                        AnchorTo = BoxAlignment.Centre,
-                        CanGrow = false,
-                        Displayed = false,
-                    },
                     statusButton = new Button(Manager)
                     {
                         StyleName = "icon",
@@ -202,7 +194,6 @@ namespace StorybrewEditor.UserInterface.Components
                 },
             };
 
-            updateCancelButton(cancelButton, effect);
             updateStatusButton(statusButton, effect);
 
             var ef = effect;
@@ -212,8 +203,6 @@ namespace StorybrewEditor.UserInterface.Components
             {
                 nameLabel.Text = ef.Name;
                 detailsLabel.Text = getEffectDetails(ef);
-
-                updateCancelButton(cancelButton, ef);
                 updateStatusButton(statusButton, ef);
             };
             effectWidget.OnHovered += (evt, e) =>
@@ -240,7 +229,7 @@ namespace StorybrewEditor.UserInterface.Components
                 ef.OnChanged -= changedHandler;
             };
 
-            cancelButton.OnClick += (sender, e) =>
+            statusButton.OnClick += (sender, e) =>
             {
                 switch (effect.Status)
                 {
@@ -249,13 +238,15 @@ namespace StorybrewEditor.UserInterface.Components
                     case EffectStatus.Updating:
                         ef.CancelUpdate();
                         break;
-                    default:
+                    case EffectStatus.UpdateCanceled:
                         ef.Refresh();
-                        cancelButton.Disabled = true;
+                        statusButton.Disabled = true;
+                        break;
+                    default:
+                        Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status} (v{Program.Version})\n\n{ef.StatusMessage}");
                         break;
                 }
             };
-            statusButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowMessage($"Status: {ef.Status} (v{Program.Version})\n\n{ef.StatusMessage}");
             renameButton.OnClick += (sender, e) => Manager.ScreenLayerManager.ShowPrompt("Effect name", $"Pick a new name for {ef.Name}", ef.Name, (newName) =>
             {
                 ef.Name = newName;
@@ -276,35 +267,9 @@ namespace StorybrewEditor.UserInterface.Components
             return effectWidget;
         }
 
-        private static void updateCancelButton(Button button, Effect effect)
-        {
-            switch (effect.Status)
-            {
-                case EffectStatus.Loading:
-                case EffectStatus.Configuring:
-                case EffectStatus.Updating:
-                    button.Icon = IconFont.Eject;
-                    button.Tooltip = "Cancel";
-                    button.Disabled = false;
-                    button.Displayed = true;
-                    break;
-                case EffectStatus.UpdateCanceled:
-                    button.Icon = IconFont.Refresh;
-                    button.Tooltip = "Refresh";
-                    button.Disabled = false;
-                    button.Displayed = true;
-                    break;
-                default:
-                    button.Disabled = true;
-                    button.Displayed = false;
-                    break;
-            }
-        }
-
         private static void updateStatusButton(Button button, Effect effect)
         {
             button.Disabled = string.IsNullOrWhiteSpace(effect.StatusMessage);
-            button.Displayed = effect.Status != EffectStatus.Ready && effect.Status != EffectStatus.UpdateCanceled || !button.Disabled;
             button.Tooltip = effect.Status.ToString();
             switch (effect.Status)
             {
@@ -312,10 +277,10 @@ namespace StorybrewEditor.UserInterface.Components
                 case EffectStatus.Configuring:
                 case EffectStatus.Updating:
                     button.Icon = IconFont.Spinner;
-                    button.Disabled = true;
+                    button.Tooltip += ", click to cancel";
+                    button.Disabled = false;
                     break;
                 case EffectStatus.ReloadPending:
-                case EffectStatus.UpdateCanceled:
                     button.Icon = IconFont.ChainBroken;
                     button.Disabled = true;
                     break;
@@ -324,11 +289,17 @@ namespace StorybrewEditor.UserInterface.Components
                 case EffectStatus.ExecutionFailed:
                     button.Icon = IconFont.Bug;
                     break;
+                case EffectStatus.UpdateCanceled:
+                    button.Icon = IconFont.Refresh;
+                    button.Tooltip = "Refresh";
+                    button.Disabled = false;
+                    break;
                 case EffectStatus.Ready:
                     button.Icon = IconFont.Leaf;
                     button.Tooltip = "Open log";
                     break;
             }
+            button.Displayed = effect.Status != EffectStatus.Ready || !button.Disabled;
         }
 
         private void createScript(string name)
