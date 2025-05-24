@@ -62,6 +62,8 @@ namespace StorybrewScripts
             var layer = GetLayer("");
             for (var i = 0; i < ParticleCount; i++)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var spawnAngle = Random(Math.PI * 2);
                 var spawnDistance = (float)(SpawnSpread * Math.Sqrt(Random(1f)));
 

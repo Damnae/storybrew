@@ -21,6 +21,8 @@ namespace StorybrewScripts
             var hitobjectLayer = GetLayer("");
             foreach (var hitobject in Beatmap.HitObjects)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 if ((StartTime != 0 || EndTime != 0) &&
                     (hitobject.StartTime < StartTime - 5 || EndTime - 5 <= hitobject.StartTime))
                     continue;

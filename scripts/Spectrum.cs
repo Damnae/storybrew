@@ -55,6 +55,8 @@ namespace StorybrewScripts
             var fftOffset = fftTimeStep * 0.2;
             for (var time = (double)StartTime; time < EndTime; time += fftTimeStep)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var fft = GetFft(time + fftOffset, BarCount, null, FftEasing, FrequencyCutOff);
                 for (var i = 0; i < BarCount; i++)
                 {
@@ -69,6 +71,8 @@ namespace StorybrewScripts
             var barWidth = Width / BarCount;
             for (var i = 0; i < BarCount; i++)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var keyframes = heightKeyframes[i];
                 keyframes.Simplify1dKeyframes(Tolerance, h => h);
 

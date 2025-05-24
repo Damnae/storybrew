@@ -111,6 +111,8 @@ namespace StorybrewScripts
         {
             foreach (var line in subtitles.Lines)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var texture = font.GetTexture(line.Text);
                 var position = new Vector2(320 - texture.BaseWidth * FontScale * 0.5f, SubtitleY)
                     + texture.OffsetFor(Origin) * FontScale;
@@ -127,6 +129,8 @@ namespace StorybrewScripts
         {
             foreach (var subtitleLine in subtitles.Lines)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var letterY = SubtitleY;
                 foreach (var line in subtitleLine.Text.Split('\n'))
                 {

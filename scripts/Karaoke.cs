@@ -107,6 +107,8 @@ namespace StorybrewScripts
             var layer = GetLayer(layerName);
             foreach (var subtitleLine in subtitles.Lines)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var letterY = SubtitleY;
                 foreach (var line in subtitleLine.Text.Split('\n'))
                 {

@@ -47,6 +47,8 @@ namespace StorybrewScripts
             var inCommandGroup = false;
             reader.ParseSectionLines(line =>
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 if (line.StartsWith("//")) return;
 
                 var depth = 0;
