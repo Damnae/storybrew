@@ -24,6 +24,9 @@ namespace StorybrewCommon.Storyboarding.Display
             EndTime = command.EndTime + timeOffset;
         }
 
+        public bool IsBefore(CommandResult<TValue> other)
+            => StartTime < other.StartTime || StartTime == other.StartTime && EndTime < other.EndTime;
+
         public TValue ValueAtTime(double time)
             => command.ValueAtTime(time - timeOffset);
 

@@ -120,13 +120,13 @@ namespace StorybrewCommon.Storyboarding.Display
 
                     case ResultState.CommandInPresent:
                         // Only a present command starting earlier can take over (the state doesn't change)
-                        if (channelState == ResultState.CommandInPresent && channelResult.StartTime < currentResult.StartTime)
+                        if (channelState == ResultState.CommandInPresent && channelResult.IsBefore(currentResult))
                             currentResult = channelResult;
                         break;
 
                     case ResultState.CommandInFuture:
                         // Any previous or current command can take over; a future command that starts earlier can also take over
-                        if (channelState != ResultState.CommandInFuture || channelState == ResultState.CommandInFuture && channelResult.StartTime < currentResult.StartTime)
+                        if (channelState != ResultState.CommandInFuture || channelState == ResultState.CommandInFuture && channelResult.IsBefore(currentResult))
                         {
                             currentResult = channelResult;
                             currentState = channelState;
@@ -135,7 +135,7 @@ namespace StorybrewCommon.Storyboarding.Display
 
                     case ResultState.CommandInPast:
                         // An active command or a command ending later can take over
-                        if (channelState == ResultState.CommandInPresent || channelState == ResultState.CommandInPast && currentResult.EndTime < channelResult.EndTime)
+                        if (channelState == ResultState.CommandInPresent || channelState == ResultState.CommandInPast && currentResult.IsBefore(channelResult))
                         {
                             currentResult = channelResult;
                             currentState = channelState;
