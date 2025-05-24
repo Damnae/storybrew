@@ -8,8 +8,8 @@ namespace StorybrewEditor.Util
 {
     public class AsyncActionQueue<T> : IDisposable
     {
-        private readonly ActionQueueContext context = new ActionQueueContext();
-        private readonly List<ActionRunner> actionRunners = new List<ActionRunner>();
+        private readonly ActionQueueContext context = new();
+        private readonly List<ActionRunner> actionRunners = [];
         private readonly bool allowDuplicates;
 
         public delegate void ActionFailedEventHandler(T target, Exception e);
@@ -75,10 +75,14 @@ namespace StorybrewEditor.Util
 
         public void AbortQueuedActions(bool stopThreads)
         {
+            var cancellationTokens = new List<CancellationTokenSource>();
             lock (context.Queue)
             {
                 foreach (var actionContainer in context.Queue)
+                {
                     actionContainer.CancellationTokenSource.Cancel();
+                    cancellationTokens.Add(actionContainer.CancellationTokenSource);
+                }
                 context.Queue.Clear();
             }
 
@@ -89,6 +93,9 @@ namespace StorybrewEditor.Util
                 foreach (var r in actionRunners)
                     r.JoinOrAbort(Math.Max(1000, 5000 - (int)sw.ElapsedMilliseconds));
             }
+
+            foreach (var cancellationToken in cancellationTokens)
+                cancellationToken.Dispose();
         }
 
         #region IDisposable Support
