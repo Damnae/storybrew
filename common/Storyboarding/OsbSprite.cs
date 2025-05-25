@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics.Drawables;
+using OpenTK;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
@@ -18,7 +19,7 @@ namespace StorybrewCommon.Storyboarding
 
         /// <summary>
         /// If this sprite contains more than CommandSplitThreshold commands, they will be split between multiple sprites.
-        /// Does not apply when the sprite has triggers.
+        /// Does not apply when the sprite has triggers. No currently implemented.
         /// </summary>
         public int CommandSplitThreshold = 0;
 
@@ -401,16 +402,32 @@ namespace StorybrewCommon.Storyboarding
             if (CommandCount == 0)
                 return;
 
-            var osbSpriteWriter = OsbWriterFactory.CreateWriter(this, moveTimeline,
-                                                                      moveXTimeline,
-                                                                      moveYTimeline,
-                                                                      scaleTimeline,
-                                                                      scaleVecTimeline,
-                                                                      rotateTimeline,
-                                                                      fadeTimeline,
-                                                                      colorTimeline,
-                                                                      writer, exportSettings, layer);
-            osbSpriteWriter.WriteOsb(transform);
+            WriteHeader(writer, exportSettings, layer, transform);
+            foreach (var command in Commands)
+                command.WriteOsb(writer, exportSettings, transform, 1);
+        }
+
+        protected virtual void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
+        {
+            writer.Write("Sprite,");
+            WriteHeaderCommon(writer, exportSettings, layer, transform);
+            writer.WriteLine();
+        }
+
+        protected virtual void WriteHeaderCommon(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
+        {
+            var transformedInitialPosition = transform == null ? InitialPosition :
+                HasMoveXYCommands ?
+                    transform.ApplyToPositionXY(InitialPosition) :
+                    transform.ApplyToPosition(InitialPosition);
+
+            writer.Write($"{layer},{Origin},\"{TexturePath.Trim()}\"");
+            if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
+                writer.Write($",{transformedInitialPosition.X.ToString(exportSettings.NumberFormat)}");
+            else writer.Write($",0");
+            if (!moveTimeline.HasCommands && !moveYTimeline.HasCommands)
+                writer.Write($",{transformedInitialPosition.Y.ToString(exportSettings.NumberFormat)}");
+            else writer.Write($",0");
         }
 
         public static bool InScreenBounds(Vector2 position, Vector2 size, float rotation, Vector2 origin)

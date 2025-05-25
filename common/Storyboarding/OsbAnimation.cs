@@ -30,5 +30,12 @@
             }
             return Math.Max(0, (int)frame);
         }
+
+        protected override void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
+        {
+            writer.Write("Animation,");
+            WriteHeaderCommon(writer, exportSettings, layer, transform);
+            writer.WriteLine($",{FrameCount},{FrameDelay.ToString(exportSettings.NumberFormat)},{LoopType}");
+        }
     }
 }

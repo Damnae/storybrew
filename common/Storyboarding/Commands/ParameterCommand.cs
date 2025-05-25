@@ -20,11 +20,5 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public override CommandParameter Midpoint(in Command<CommandParameter> endCommand, double progress)
             => StartValue;
-
-        public override IFragmentableCommand GetFragment(double startTime, double endTime)
-        {
-            var startValue = ValueAtTime(startTime);
-            return new ParameterCommand(Easing, startTime, endTime, startValue);
-        }
     }
 }

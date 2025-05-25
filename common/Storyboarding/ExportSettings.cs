@@ -16,11 +16,6 @@ namespace StorybrewCommon.Storyboarding
         /// </summary>
         public bool UseFloatForTime = false;
 
-        /// <summary>
-        /// Enables optimisation for OsbSprites that have a MaxCommandCount > 0
-        /// </summary>
-        public bool OptimiseSprites = true;
-
         public readonly NumberFormatInfo NumberFormat = new CultureInfo(@"en-US", false).NumberFormat;
     }
 }

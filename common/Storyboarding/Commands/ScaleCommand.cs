@@ -20,17 +20,5 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public override CommandDecimal Midpoint(in Command<CommandDecimal> endCommand, double progress)
             => StartValue + (endCommand.EndValue - StartValue) * progress;
-
-        public override IFragmentableCommand GetFragment(double startTime, double endTime)
-        {
-            // Cannot fragment a command that has includes a negative size
-            if (IsFragmentable && StartValue >= 0 && EndValue >= 0)
-            {
-                var startValue = ValueAtTime(startTime);
-                var endValue = ValueAtTime(endTime);
-                return new ScaleCommand(Easing, startTime, endTime, startValue, endValue);
-            }
-            return this;
-        }
     }
 }

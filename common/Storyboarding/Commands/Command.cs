@@ -4,7 +4,7 @@ using StorybrewCommon.Storyboarding.Display;
 
 namespace StorybrewCommon.Storyboarding.Commands
 {
-    public abstract class Command<TValue> : ITypedCommand<TValue>, IFragmentableCommand, IOffsetable
+    public abstract class Command<TValue> : ITypedCommand<TValue>, IOffsetable
         where TValue : struct, CommandValue
     {
         public abstract string Identifier { get; }
@@ -64,19 +64,6 @@ namespace StorybrewCommon.Storyboarding.Commands
 
         public abstract TValue ValueAtProgress(double progress);
         public abstract TValue Midpoint(in Command<TValue> endCommand, double progress);
-
-        public bool IsFragmentable => StartTime == EndTime || Easing == OsbEasing.None;
-
-        public abstract IFragmentableCommand GetFragment(double startTime, double endTime);
-
-        public IEnumerable<int> GetNonFragmentableTimes()
-        {
-            var nonFragmentableTimes = new HashSet<int>();
-            if (!IsFragmentable)
-                nonFragmentableTimes.UnionWith(Enumerable.Range((int)StartTime + 1, (int)(EndTime - StartTime - 1)));
-
-            return nonFragmentableTimes;
-        }
 
         public int CompareTo(ICommand other)
             => CommandComparer.CompareCommands(this, other);
