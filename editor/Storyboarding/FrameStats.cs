@@ -16,6 +16,8 @@ namespace StorybrewEditor.Storyboarding
         public int EffectiveCommandCount;
         public bool IncompatibleCommands;
         public bool OverlappedCommands;
+        public HashSet<string> OverlappedScriptNames = new HashSet<string>();
+        public HashSet<string> IncompatibleScriptNames = new HashSet<string>();
 
         public float ScreenFill;
         public ulong GpuPixelsFrame;
