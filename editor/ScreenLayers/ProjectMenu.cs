@@ -578,10 +578,6 @@ namespace StorybrewEditor.ScreenLayers
             if (activeSpriteCount >= 1500)
                 warnings += $"⚠ {activeSpriteCount:n0} Sprites\n";
 
-            var prolongedSpriteCount = project.FrameStats.ProlongedSpriteCount;
-            if (prolongedSpriteCount >= 1)
-                warnings += $"⚠ {prolongedSpriteCount:n0} Prolonged Sprites\n";
-
             var batches = project.FrameStats.Batches;
             if (batches >= 500)
                 warnings += $"⚠ {batches:0} Batches\n";
@@ -596,7 +592,14 @@ namespace StorybrewEditor.ScreenLayers
             if ((unusedCommandCount >= 5000 && unusedCommandFactor > .5f) ||
                 (unusedCommandCount >= 10000 && unusedCommandFactor > .2f) ||
                 unusedCommandCount >= 20000)
+            {
                 warnings += $"⚠ {unusedCommandCount:n0} ({unusedCommandFactor:0%}) Commands on Hidden Sprites\n";
+
+                var prolongedCommandCount = project.FrameStats.ProlongedCommands;
+                var prolongedCommandFactor = (float)prolongedCommandCount / unusedCommandCount;
+                if (prolongedCommandCount > 0 && prolongedCommandFactor > .1f)
+                    warnings += $"⚠ {prolongedCommandCount:n0} ({prolongedCommandFactor:0%}) on Prolonged Sprites\n";
+            }
 
             if (project.FrameStats.ScreenFill > 5)
                 warnings += $"⚠ {project.FrameStats.ScreenFill:0}x Screen Fill\n";

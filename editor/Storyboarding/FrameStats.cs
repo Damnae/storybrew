@@ -6,14 +6,14 @@ namespace StorybrewEditor.Storyboarding
     {
         public string LastTexture;
         public bool LastBlendingMode;
-        public HashSet<string> LoadedPaths = new HashSet<string>();
+        public HashSet<string> LoadedPaths = new();
 
         public int SpriteCount;
-        public int ProlongedSpriteCount;
         public int Batches;
 
         public int CommandCount;
         public int EffectiveCommandCount;
+        public int ProlongedCommands;
         public bool IncompatibleCommands;
         public bool OverlappedCommands;
 

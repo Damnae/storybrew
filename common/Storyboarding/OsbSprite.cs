@@ -392,7 +392,7 @@ namespace StorybrewCommon.Storyboarding
         #endregion
 
         public bool IsActive(double time) => CommandsStartTime <= time && time <= CommandsEndTime;
-        public bool ShouldBeActive(double time) => DisplayStartTime <= time && time <= DisplayEndTime;
+        public bool InDisplayInterval(double time) => DisplayStartTime <= time && time <= DisplayEndTime;
 
         public override double StartTime => CommandsStartTime;
         public override double EndTime => CommandsEndTime;
