@@ -28,6 +28,10 @@ namespace StorybrewCommon.Scripting
         /// </summary>
         public virtual bool Multithreaded => false;
 
+        /// <summary>
+        /// Place <c>CancellationToken.ThrowIfCancellationRequested();</c> in long loops of your script, to allow interrupting it from the editor.
+        /// CancellationToken must also be passed to Parallel loops to allow their cancellation.
+        /// </summary>
         public CancellationToken CancellationToken => context.CancellationToken;
 
         /// <summary>
