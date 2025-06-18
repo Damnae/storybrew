@@ -101,7 +101,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void TestOverlap()
+        public void TestStartEndOverlap()
         {
             var sprite = new OsbSprite();
 
@@ -110,9 +110,6 @@ namespace Test
             sprite.Fade(250, 500, 0, 1);
             sprite.Fade(500, 750, 1, .5);
             sprite.Fade(600, 700, 1, 0);
-
-            // this test fails because the 3rd command is the end command, so its end time is used (700)
-            // but because of the overlap, it doesn't apply 0 opacity until the 2nd command ends at 750
 
             Assert.IsTrue(sprite.HasOverlappedCommands);
 
@@ -135,8 +132,6 @@ namespace Test
             sprite.Fade(500, 600, 1, 0);
             sprite.Fade(600, 800, 0, 0);
 
-            // this test fails because 0 to 0 commands aren't ignored, they're the start and end commands
-
             Assert.IsFalse(sprite.HasOverlappedCommands);
 
             Assert.AreEqual(0, sprite.CommandsStartTime);
@@ -152,18 +147,18 @@ namespace Test
             var sprite = new OsbSprite();
 
             sprite.StartLoopGroup(0, 2);
-            sprite.MoveX(0, 2500, 1, 0);
+            sprite.MoveX(0, 2500, 100, 0);
             sprite.Scale(0, 500, 0, 1);
             sprite.Scale(1000, 2000, 1, 0);
             sprite.EndGroup();
 
             Assert.IsFalse(sprite.HasOverlappedCommands);
 
-            Assert.AreEqual(0, sprite.CommandsStartTime, "CommandsStartTime");
-            Assert.AreEqual(0 + 2500 * 2, sprite.CommandsEndTime, "CommandsEndTime");
+            Assert.AreEqual(0, sprite.CommandsStartTime);
+            Assert.AreEqual(0 + 2500 * 2, sprite.CommandsEndTime);
 
-            Assert.AreEqual(0, sprite.DisplayStartTime, "DisplayStartTime");
-            Assert.AreEqual(0 + 2500 + 2000, sprite.DisplayEndTime, "DisplayEndTime");
+            Assert.AreEqual(0, sprite.DisplayStartTime);
+            Assert.AreEqual(0 + 2500 + 2000, sprite.DisplayEndTime);
         }
     }
 }

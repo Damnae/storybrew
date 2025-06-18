@@ -136,33 +136,33 @@ namespace StorybrewCommon.Storyboarding
             {
                 if (fadeTimeline.HasCommands)
                 {
-                    var start = fadeTimeline.StartResult;
-                    if (start.StartValue == 0)
-                        displayStartTime = Math.Max(displayStartTime, start.StartTime);
+                    bool isZero(CommandDecimal value) => value == .0;
+                    bool isNoOp(CommandDecimal startValue, CommandDecimal endValue) => startValue == .0 && endValue == .0;
 
-                    var end = fadeTimeline.EndResult;
-                    if (end.EndValue == 0)
-                        displayEndTime = Math.Min(displayEndTime, end.EndTime);
+                    if (fadeTimeline.FindStartEdge(isZero, isNoOp, out var startEdge))
+                        displayStartTime = Math.Max(displayStartTime, startEdge);
+                    if (fadeTimeline.FindEndEdge(isZero, isNoOp, out var endEdge))
+                        displayEndTime = Math.Min(displayEndTime, endEdge);
                 }
                 if (scaleTimeline.HasCommands)
                 {
-                    var start = scaleTimeline.StartResult;
-                    if (start.StartValue == 0)
-                        displayStartTime = Math.Max(displayStartTime, start.StartTime);
+                    bool isZero(CommandDecimal value) => value == .0;
+                    bool isNoOp(CommandDecimal startValue, CommandDecimal endValue) => startValue == .0 && endValue == .0;
 
-                    var end = scaleTimeline.EndResult;
-                    if (end.EndValue == 0)
-                        displayEndTime = Math.Min(displayEndTime, end.EndTime);
+                    if (scaleTimeline.FindStartEdge(isZero, isNoOp, out var startEdge))
+                        displayStartTime = Math.Max(displayStartTime, startEdge);
+                    if (scaleTimeline.FindEndEdge(isZero, isNoOp, out var endEdge))
+                        displayEndTime = Math.Min(displayEndTime, endEdge);
                 }
                 if (scaleVecTimeline.HasCommands)
                 {
-                    var start = scaleVecTimeline.StartResult;
-                    if (start.StartValue.X <= 0 || start.StartValue.Y <= 0)
-                        displayStartTime = Math.Max(displayStartTime, start.StartTime);
+                    bool isZero(CommandScale value) => value.X == .0 || value.Y == .0;
+                    bool isNoOp(CommandScale startValue, CommandScale endValue) => startValue.X == .0 && endValue.X == .0 || startValue.Y == .0 && endValue.Y == .0;
 
-                    var end = scaleVecTimeline.EndResult;
-                    if (end.EndValue.X <= 0 || end.EndValue.Y <= 0)
-                        displayEndTime = Math.Min(displayEndTime, end.EndTime);
+                    if (scaleVecTimeline.FindStartEdge(isZero, isNoOp, out var startEdge))
+                        displayStartTime = Math.Max(displayStartTime, startEdge);
+                    if (scaleVecTimeline.FindEndEdge(isZero, isNoOp, out var endEdge))
+                        displayEndTime = Math.Min(displayEndTime, endEdge);
                 }
             }
             displayStartTime = Math.Max(displayStartTime, commandsStartTime);

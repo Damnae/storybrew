@@ -11,8 +11,17 @@ namespace StorybrewCommon.Storyboarding.Display
         public bool Active = false;
         public double TriggerTime = 0;
 
-        public override CommandResult<TValue> StartResult => StartCommand.AsResult(TriggerTime);
-        public override CommandResult<TValue> EndResult => EndCommand.AsResult(TriggerTime);
+        public override IEnumerable<CommandResult<TValue>> CommandResults
+        {
+            get
+            {
+                if (!Active)
+                    yield break;
+
+                foreach (var command in Commands)
+                    yield return command.AsResult(TriggerTime);
+            }
+        }
 
         public override bool ResultAtTime(double time, out CommandResult<TValue> result)
         {

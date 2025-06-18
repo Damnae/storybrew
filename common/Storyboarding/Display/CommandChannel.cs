@@ -10,20 +10,7 @@ namespace StorybrewCommon.Storyboarding.Display
         public IReadOnlyList<ITypedCommand<TValue>> Commands => commands;
         public bool HasOverlap { get; private set; }
 
-        /// <summary>
-        /// The command that takes effect before this channel starts;
-        /// Because of loops and triggers, StartResult is more useful
-        /// </summary>
-        public ITypedCommand<TValue> StartCommand => commands.Count > 0 ? commands[0] : null;
-
-        /// <summary>
-        /// The command that takes effect after this channel ends;
-        /// Because of loops and triggers, EndResult is more useful
-        /// </summary>
-        public ITypedCommand<TValue> EndCommand => commands.Count > 0 ? commands[^1] : null;
-
-        public virtual CommandResult<TValue> StartResult => StartCommand.AsResult();
-        public virtual CommandResult<TValue> EndResult => EndCommand.AsResult();
+        public virtual IEnumerable<CommandResult<TValue>> CommandResults => commands.Select(c => c.AsResult());
 
         public void Add(ITypedCommand<TValue> command)
         {

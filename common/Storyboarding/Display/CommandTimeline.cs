@@ -21,9 +21,6 @@ namespace StorybrewCommon.Storyboarding.Display
         public bool HasCommands => channels.Count > 0;
         public bool HasOverlap => channels.Any(c => c.HasOverlap);
 
-        public CommandResult<TValue> StartResult => channels.Select(c => c.StartResult).MinBy(r => r.StartTime);
-        public CommandResult<TValue> EndResult => channels.Select(c => c.EndResult).MaxBy(r => r.StartTime);
-
         private readonly List<CommandChannel<TValue>> channels = [];
 
         private CommandChannel<TValue> defaultChannel;
@@ -149,6 +146,47 @@ namespace StorybrewCommon.Storyboarding.Display
                 ResultState.NoCommand => DefaultValue,
                 _ => currentResult.ValueAtTime(time),
             };
+        }
+
+        public bool FindStartEdge(Func<TValue, bool> isZero, Func<TValue, TValue, bool> isNoOp, out double startEdge)
+        {
+            startEdge = double.MaxValue;
+            foreach (var result in channels.SelectMany(c => c.CommandResults).OrderBy(c => c.StartTime))
+            {
+                if (isNoOp(result.StartValue, result.EndValue))
+                    continue;
+
+                if (isZero(result.StartValue))
+                {
+                    startEdge = double.Min(startEdge, result.StartTime);
+                    return true;
+                }
+                break;
+            }
+            return false;
+        }
+
+        public bool FindEndEdge(Func<TValue, bool> isZero, Func<TValue, TValue, bool> isNoOp, out double endEdge)
+        {
+            endEdge = double.MinValue;
+            foreach (var result in channels.SelectMany(c => c.CommandResults).OrderByDescending(c => c.StartTime))
+            {
+                if (endEdge == double.MinValue)
+                {
+                    if (isNoOp(result.StartValue, result.EndValue))
+                        continue;
+
+                    if (isZero(result.EndValue))
+                        endEdge = double.Max(endEdge, result.EndTime);
+                    else return false;
+                }
+                else
+                {
+                    // While we've found an end edge, an ealier overlapping command may delay it
+                    endEdge = double.Max(endEdge, result.EndTime);
+                }
+            }
+            return endEdge != double.MinValue;
         }
 
         private enum ResultState

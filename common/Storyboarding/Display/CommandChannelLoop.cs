@@ -9,8 +9,15 @@ namespace StorybrewCommon.Storyboarding.Display
         public double LoopStartTime = 0;
         public double LoopDuration = 0;
 
-        public override CommandResult<TValue> StartResult => StartCommand.AsResult(LoopStartTime);
-        public override CommandResult<TValue> EndResult => EndCommand.AsResult(LoopStartTime + (LoopCount - 1) * LoopDuration);
+        public override IEnumerable<CommandResult<TValue>> CommandResults
+        {
+            get
+            {
+                for (var loopIndex = 0; loopIndex < LoopCount; loopIndex++)
+                    foreach (var command in Commands)
+                        yield return command.AsResult(LoopStartTime + loopIndex * LoopDuration);
+            }
+        }
 
         public override bool ResultAtTime(double time, out CommandResult<TValue> result)
         {
@@ -23,7 +30,7 @@ namespace StorybrewCommon.Storyboarding.Display
             if (time < LoopStartTime)
             {
                 // Before loop start
-                result = StartResult;
+                result = Commands[0].AsResult(LoopStartTime);
                 return true;
             }
 
@@ -31,7 +38,7 @@ namespace StorybrewCommon.Storyboarding.Display
             if (loopTime >= LoopCount * LoopDuration)
             {
                 // Past loop end
-                result = EndResult;
+                result = Commands[^1].AsResult(LoopStartTime + (LoopCount - 1) * LoopDuration);
                 return true;
             }
 
@@ -45,10 +52,10 @@ namespace StorybrewCommon.Storyboarding.Display
             var loopNumber = (int)(loopTime / LoopDuration);
             loopTime %= LoopDuration;
 
-            if (loopTime <= StartCommand.StartTime)
+            if (loopTime <= Commands[0].StartTime)
             {
                 // Before the first command in the loop, the last command from the previous loop takes effect
-                result = EndCommand.AsResult(LoopStartTime + (loopNumber - 1) * LoopDuration);
+                result = Commands[^1].AsResult(LoopStartTime + (loopNumber - 1) * LoopDuration);
                 return true;
             }
 
