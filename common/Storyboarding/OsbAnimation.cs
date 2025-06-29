@@ -31,6 +31,13 @@
             return Math.Max(0, (int)frame);
         }
 
+        public IEnumerable<double> GetAnimationRepeatTimes()
+        {
+            var delay = FrameDelay * FrameCount;
+            for (var t = CommandsStartTime; t < CommandsEndTime - delay; t += delay)
+                yield return t;
+        }
+
         protected override void WriteHeader(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
         {
             writer.Write("Animation,");

@@ -11,6 +11,8 @@ namespace StorybrewCommon.Storyboarding.Commands
         {
         }
 
+        public override bool IsFragmentableAt(double time) => base.IsFragmentableAt(time) && StartValue >= 0 && EndValue >= 0;
+
         public override CommandDecimal GetTransformedStartValue(StoryboardTransform transform) => transform.ApplyToScale(StartValue);
         public override CommandDecimal GetTransformedEndValue(StoryboardTransform transform) => transform.ApplyToScale(EndValue);
 

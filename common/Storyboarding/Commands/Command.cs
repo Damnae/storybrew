@@ -41,6 +41,8 @@ namespace StorybrewCommon.Storyboarding.Commands
             }
         }
 
+        public virtual bool IsFragmentableAt(double time) => Easing == OsbEasing.None;
+
         public CommandResult<TValue> AsResult(double timeOffset) => new(this, timeOffset);
 
         public virtual TValue GetTransformedStartValue(StoryboardTransform transform) => StartValue;

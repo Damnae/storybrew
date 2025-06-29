@@ -13,6 +13,8 @@
             Group = group;
         }
 
+        public override bool IsFragmentableAt(double time) => false;
+
         protected override string GetCommandGroupHeader(ExportSettings exportSettings)
             => $"T,{TriggerName},{((int)StartTime).ToString(exportSettings.NumberFormat)},{((int)EndTime).ToString(exportSettings.NumberFormat)},{Group.ToString(exportSettings.NumberFormat)}";
     }

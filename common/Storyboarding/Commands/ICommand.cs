@@ -6,6 +6,7 @@ namespace StorybrewCommon.Storyboarding.Commands
         double EndTime { get; }
         int Cost { get; }
 
+        bool IsFragmentableAt(double time);
         void WriteOsb(TextWriter writer, ExportSettings exportSettings, StoryboardTransform transform, int indentation);
     }
 }

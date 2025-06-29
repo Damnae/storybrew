@@ -1,4 +1,7 @@
-﻿namespace StorybrewCommon.Storyboarding.Commands
+﻿
+using System.Diagnostics;
+
+namespace StorybrewCommon.Storyboarding.Commands
 {
     public class LoopCommand : CommandGroup
     {
@@ -9,7 +12,7 @@
             {
                 return StartTime + (CommandsEndTime * LoopCount);
             }
-            set
+            protected set
             {
                 LoopCount = (int)Math.Floor((value - StartTime) / CommandsEndTime);
             }
@@ -32,6 +35,15 @@
                     (command as IOffsetable).Offset(-commandsStartTime);
             }
             base.EndGroup();
+        }
+
+        public override bool IsFragmentableAt(double time)
+        {
+            Debug.Assert(CommandsStartTime == 0);
+            for (var i = 1; i < LoopCount - 1; i++)
+                if (time == StartTime + i * CommandsEndTime)
+                    return true;
+            return false;
         }
 
         protected override string GetCommandGroupHeader(ExportSettings exportSettings)

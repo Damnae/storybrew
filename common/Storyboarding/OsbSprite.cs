@@ -1,5 +1,4 @@
-﻿using BrewLib.Graphics.Drawables;
-using OpenTK;
+﻿using OpenTK;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
@@ -15,11 +14,10 @@ namespace StorybrewCommon.Storyboarding
         private readonly List<ICommand> commands = new List<ICommand>();
         private CommandGroup currentCommandGroup;
         public bool InGroup => currentCommandGroup != null;
-        public bool HasTrigger;
+        public bool HasTrigger { get; private set; }
 
         /// <summary>
         /// If this sprite contains more than CommandSplitThreshold commands, they will be split between multiple sprites.
-        /// Does not apply when the sprite has triggers. No currently implemented.
         /// </summary>
         public int CommandSplitThreshold = 0;
 
@@ -76,6 +74,7 @@ namespace StorybrewCommon.Storyboarding
 
         public bool HasRotateCommands => rotateTimeline.HasCommands;
         public bool HasScalingCommands => scaleTimeline.HasCommands || scaleVecTimeline.HasCommands;
+        public bool HasScaleVecCommands => scaleVecTimeline.HasCommands;
         public bool HasMoveXYCommands => moveXTimeline.HasCommands || moveYTimeline.HasCommands;
 
         private double commandsStartTime = double.MaxValue;
@@ -237,6 +236,7 @@ namespace StorybrewCommon.Storyboarding
         public void ColorHsb(double time, double hue, double saturation, double brightness) => ColorHsb(OsbEasing.None, time, time, hue, saturation, brightness, hue, saturation, brightness);
 
         public void Parameter(OsbEasing easing, double startTime, double endTime, CommandParameter parameter) => addCommand(new ParameterCommand(easing, startTime, endTime, parameter));
+        public void Parameter(double startTime, double endTime, CommandParameter parameter) => Parameter(OsbEasing.None, startTime, endTime, parameter);
         public void FlipH(double startTime, double endTime) => Parameter(OsbEasing.None, startTime, endTime, CommandParameter.FlipHorizontal);
         public void FlipH(double time) => FlipH(time, time);
         public void FlipV(double startTime, double endTime) => Parameter(OsbEasing.None, startTime, endTime, CommandParameter.FlipVertical);
@@ -287,36 +287,36 @@ namespace StorybrewCommon.Storyboarding
             clearStartEndTimes();
         }
 
-        public void AddCommand(ICommand command)
+        public void AddCommand(ICommand command, double offset = 0)
         {
             if (command is ColorCommand colorCommand)
-                Color(colorCommand.Easing, colorCommand.StartTime, colorCommand.EndTime, colorCommand.StartValue, colorCommand.EndValue);
+                Color(colorCommand.Easing, colorCommand.StartTime + offset, colorCommand.EndTime + offset, colorCommand.StartValue, colorCommand.EndValue);
             else if (command is FadeCommand fadeCommand)
-                Fade(fadeCommand.Easing, fadeCommand.StartTime, fadeCommand.EndTime, fadeCommand.StartValue, fadeCommand.EndValue);
+                Fade(fadeCommand.Easing, fadeCommand.StartTime + offset, fadeCommand.EndTime + offset, fadeCommand.StartValue, fadeCommand.EndValue);
             else if (command is ScaleCommand scaleCommand)
-                Scale(scaleCommand.Easing, scaleCommand.StartTime, scaleCommand.EndTime, scaleCommand.StartValue, scaleCommand.EndValue);
+                Scale(scaleCommand.Easing, scaleCommand.StartTime + offset, scaleCommand.EndTime + offset, scaleCommand.StartValue, scaleCommand.EndValue);
             else if (command is VScaleCommand vScaleCommand)
-                ScaleVec(vScaleCommand.Easing, vScaleCommand.StartTime, vScaleCommand.EndTime, vScaleCommand.StartValue, vScaleCommand.EndValue);
+                ScaleVec(vScaleCommand.Easing, vScaleCommand.StartTime + offset, vScaleCommand.EndTime + offset, vScaleCommand.StartValue, vScaleCommand.EndValue);
             else if (command is ParameterCommand parameterCommand)
-                Parameter(parameterCommand.Easing, parameterCommand.StartTime, parameterCommand.EndTime, parameterCommand.StartValue);
+                Parameter(parameterCommand.Easing, parameterCommand.StartTime + offset, parameterCommand.EndTime + offset, parameterCommand.StartValue);
             else if (command is MoveCommand moveCommand)
-                Move(moveCommand.Easing, moveCommand.StartTime, moveCommand.EndTime, moveCommand.StartValue, moveCommand.EndValue);
+                Move(moveCommand.Easing, moveCommand.StartTime + offset, moveCommand.EndTime + offset, moveCommand.StartValue, moveCommand.EndValue);
             else if (command is MoveXCommand moveXCommand)
-                MoveX(moveXCommand.Easing, moveXCommand.StartTime, moveXCommand.EndTime, moveXCommand.StartValue, moveXCommand.EndValue);
+                MoveX(moveXCommand.Easing, moveXCommand.StartTime + offset, moveXCommand.EndTime + offset, moveXCommand.StartValue, moveXCommand.EndValue);
             else if (command is MoveYCommand moveYCommand)
-                MoveY(moveYCommand.Easing, moveYCommand.StartTime, moveYCommand.EndTime, moveYCommand.StartValue, moveYCommand.EndValue);
+                MoveY(moveYCommand.Easing, moveYCommand.StartTime + offset, moveYCommand.EndTime + offset, moveYCommand.StartValue, moveYCommand.EndValue);
             else if (command is RotateCommand rotateCommand)
-                Rotate(rotateCommand.Easing, rotateCommand.StartTime, rotateCommand.EndTime, rotateCommand.StartValue, rotateCommand.EndValue);
+                Rotate(rotateCommand.Easing, rotateCommand.StartTime + offset, rotateCommand.EndTime + offset, rotateCommand.StartValue, rotateCommand.EndValue);
             else if (command is LoopCommand loopCommand)
             {
-                StartLoopGroup(loopCommand.StartTime, loopCommand.LoopCount);
+                StartLoopGroup(loopCommand.StartTime + offset, loopCommand.LoopCount);
                 foreach (var cmd in loopCommand.Commands)
                     AddCommand(cmd);
                 EndGroup();
             }
             else if (command is TriggerCommand triggerCommand)
             {
-                StartTriggerGroup(triggerCommand.TriggerName, triggerCommand.StartTime, triggerCommand.EndTime, triggerCommand.Group);
+                StartTriggerGroup(triggerCommand.TriggerName, triggerCommand.StartTime + offset, triggerCommand.EndTime + offset, triggerCommand.Group);
                 foreach (var cmd in triggerCommand.Commands)
                     AddCommand(cmd);
                 EndGroup();

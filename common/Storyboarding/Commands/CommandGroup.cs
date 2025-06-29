@@ -4,8 +4,8 @@
     {
         private bool ended;
 
-        public double StartTime { get; set; }
-        public virtual double EndTime { get; set; }
+        public double StartTime { get; protected set; }
+        public virtual double EndTime { get; protected set; }
         public int Cost => commands.Sum(c => c.Cost);
 
         private readonly List<ICommand> commands = new List<ICommand>();
@@ -74,6 +74,7 @@
                 command.WriteOsb(writer, exportSettings, transform, indentation + 1);
         }
 
+        public abstract bool IsFragmentableAt(double time);
         protected abstract string GetCommandGroupHeader(ExportSettings exportSettings);
 
         public override string ToString()
