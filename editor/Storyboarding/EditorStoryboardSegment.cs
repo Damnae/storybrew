@@ -55,6 +55,7 @@ namespace StorybrewEditor.Storyboarding
                 TexturePath = path,
                 Origin = origin,
                 InitialPosition = initialPosition,
+                ScriptName = Effect.BaseName
             };
             storyboardObjects.Add(storyboardObject);
             displayableObjects.Add(storyboardObject);
@@ -75,6 +76,7 @@ namespace StorybrewEditor.Storyboarding
                 FrameDelay = frameDelay,
                 LoopType = loopType,
                 InitialPosition = initialPosition,
+                ScriptName = Effect.BaseName
             };
             storyboardObjects.Add(storyboardObject);
             displayableObjects.Add(storyboardObject);
