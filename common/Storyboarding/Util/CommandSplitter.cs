@@ -8,8 +8,9 @@ namespace StorybrewCommon.Storyboarding.Util
     {
         public static void Split(OsbSprite sprite, StoryboardSegment segment)
         {
-            Split(sprite, segment.CreateSprite, segment.CreateAnimation).ToArray();
-            segment.Discard(sprite);
+            var sprites = Split(sprite, segment.CreateSprite, segment.CreateAnimation).ToArray();
+            if (!sprites.Contains(sprite))
+                segment.Discard(sprite);
         }
 
         public static IEnumerable<OsbSprite> Split(OsbSprite sprite) =>
