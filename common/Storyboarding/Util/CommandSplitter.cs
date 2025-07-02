@@ -6,14 +6,14 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public static class CommandSplitter
     {
-        public static void Split(OsbSprite sprite, StoryboardSegment segment, int commandSplitThreshold)
+        public static void Split(OsbSprite sprite, StoryboardSegment segment, int commandSplitThreshold, CancellationToken token)
         {
-            var sprites = Split(sprite, segment.CreateSprite, segment.CreateAnimation, commandSplitThreshold).ToArray();
+            var sprites = Split(sprite, segment.CreateSprite, segment.CreateAnimation, commandSplitThreshold, token).ToArray();
             if (!sprites.Contains(sprite))
                 segment.Discard(sprite);
         }
 
-        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, int commandSplitThreshold) =>
+        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, int commandSplitThreshold, CancellationToken token) =>
             Split(sprite,
                 (path, origin, initialPosition) => new OsbSprite
                 {
@@ -30,12 +30,12 @@ namespace StorybrewCommon.Storyboarding.Util
                     LoopType = loopType,
                     InitialPosition = initialPosition,
                 },
-            commandSplitThreshold);
+            commandSplitThreshold, token);
 
         public delegate OsbSprite CreateSpriteDelegate(string path, OsbOrigin origin, Vector2 initialPosition);
         public delegate OsbSprite CreateAnimationDelegate(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition);
 
-        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, CreateSpriteDelegate createSprite, CreateAnimationDelegate createAnimation, int commandSplitThreshold)
+        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, CreateSpriteDelegate createSprite, CreateAnimationDelegate createAnimation, int commandSplitThreshold, CancellationToken token)
         {
             if (sprite.HasIncompatibleCommands || sprite.HasTrigger || sprite.CommandCost < commandSplitThreshold)
             {
@@ -44,7 +44,7 @@ namespace StorybrewCommon.Storyboarding.Util
             }
 
             var candidateFragmentTimes = getFragmentationTimes(sprite)
-                .Where(t => canFragmentCommandsAt(sprite, t))
+                .Where(t => canFragmentCommandsAt(sprite, t, token))
                 .Order()
                 .ToArray();
 
@@ -61,6 +61,8 @@ namespace StorybrewCommon.Storyboarding.Util
 
             for (var i = 1; i < segmentTimes.Length; i++)
             {
+                token.ThrowIfCancellationRequested();
+
                 var segmentStart = segmentTimes[i - 1];
                 var segmentEnd = segmentTimes[i];
 
@@ -226,11 +228,13 @@ namespace StorybrewCommon.Storyboarding.Util
                 segmentSprite.FlipV(segmentStart);
         }
 
-        private static bool canFragmentCommandsAt(OsbSprite sprite, double time)
+        private static bool canFragmentCommandsAt(OsbSprite sprite, double time, CancellationToken token)
         {
             var duringCommandTypes = new HashSet<Type>();
             foreach (var command in sprite.Commands)
             {
+                token.ThrowIfCancellationRequested();
+
                 if (time <= command.StartTime || command.EndTime <= time)
                     continue;
 

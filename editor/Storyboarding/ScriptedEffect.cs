@@ -95,7 +95,7 @@ namespace StorybrewEditor.Storyboarding
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
                 foreach (var layer in context.EditorLayers)
-                    layer.PostProcess();
+                    layer.PostProcess(cancellationTokenSource.Token);
 
                 success = true;
             }

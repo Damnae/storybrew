@@ -6,6 +6,7 @@ using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -150,7 +151,7 @@ namespace StorybrewEditor.Storyboarding
             segment.Draw(drawContext, camera, bounds, opacity, null, Effect.Project, frameStats);
         }
 
-        public void PostProcess()
+        public void PostProcess(CancellationToken token)
         {
             segment.PostProcess();
 
@@ -162,14 +163,14 @@ namespace StorybrewEditor.Storyboarding
             if (endTime == double.MinValue)
                 endTime = 0;
 
-            EstimatedSize = segment.CalculateSize(osbLayer);
+            EstimatedSize = segment.CalculateSize(osbLayer, token);
         }
 
-        public void WriteOsb(TextWriter writer, ExportSettings exportSettings)
-            => WriteOsb(writer, exportSettings, osbLayer, null);
+        public void WriteOsb(TextWriter writer, ExportSettings exportSettings, CancellationToken token = default)
+            => WriteOsb(writer, exportSettings, osbLayer, null, token);
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform) 
-            => segment.WriteOsb(writer, exportSettings, osbLayer, transform);
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform, CancellationToken token = default)
+            => segment.WriteOsb(writer, exportSettings, osbLayer, transform, token);
 
         public void CopySettings(EditorStoryboardLayer other, bool copyGuid = false)
         {

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -232,14 +233,17 @@ namespace StorybrewEditor.Storyboarding
             displayableBuckets = null;
         }
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform transform)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform transform, CancellationToken token = default)
         {
             var localTransform = new StoryboardTransform(transform, Origin, Position, Rotation, (float)Scale);
             foreach (var sbo in storyboardObjects)
-                sbo.WriteOsb(writer, exportSettings, osbLayer, localTransform);
+            {
+                token.ThrowIfCancellationRequested();
+                sbo.WriteOsb(writer, exportSettings, osbLayer, localTransform, token);
+            }
         }
 
-        public int CalculateSize(OsbLayer osbLayer)
+        public int CalculateSize(OsbLayer osbLayer, CancellationToken token = default)
         {
             var exportSettings = ExportSettings.SizeCalculation;
 
@@ -247,7 +251,10 @@ namespace StorybrewEditor.Storyboarding
             using (var writer = new StreamWriter(stream, Project.Encoding))
             {
                 foreach (var sbo in storyboardObjects)
-                    sbo.WriteOsb(writer, exportSettings, osbLayer, null);
+                {
+                    token.ThrowIfCancellationRequested();
+                    sbo.WriteOsb(writer, exportSettings, osbLayer, null, token);
+                }
 
                 return (int)stream.Length;
             }

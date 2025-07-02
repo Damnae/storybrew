@@ -398,15 +398,15 @@ namespace StorybrewCommon.Storyboarding
         public override double StartTime => CommandsStartTime;
         public override double EndTime => CommandsEndTime;
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform, CancellationToken token = default)
         {
             if (CommandCount == 0)
                 return;
 
             if (exportSettings.OptimiseSprites && CommandSplitThreshold > 0 && CommandCount > CommandSplitThreshold)
             {
-                foreach (var sprite in CommandSplitter.Split(this, CommandSplitThreshold))
-                    sprite.WriteOsb(writer, exportSettings, layer, transform);
+                foreach (var sprite in CommandSplitter.Split(this, CommandSplitThreshold, token))
+                    sprite.WriteOsb(writer, exportSettings, layer, transform, token);
                 return;
             }
 

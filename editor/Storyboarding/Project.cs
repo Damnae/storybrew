@@ -473,7 +473,7 @@ namespace StorybrewEditor.Storyboarding
 
         private static readonly string[] netRuntimeAssemblies =
             Directory.GetFiles(GetRuntimeRefDirectory(), "*.dll")
-            .Where(x =>  !Path.GetFileName(x).EndsWith(".Native.dll")).ToArray();
+            .Where(x => !Path.GetFileName(x).EndsWith(".Native.dll")).ToArray();
 
         private static readonly List<string> defaultAssemblies = new List<string>()
         {

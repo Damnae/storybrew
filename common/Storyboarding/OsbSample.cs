@@ -20,7 +20,7 @@
         public override double StartTime => Time;
         public override double EndTime => Time;
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform, CancellationToken token = default)
             => writer.WriteLine($"Sample,{((int)Time).ToString(exportSettings.NumberFormat)},{layer},\"{AudioPath.Trim()}\",{((int)Volume).ToString(exportSettings.NumberFormat)}");
     }
 }
