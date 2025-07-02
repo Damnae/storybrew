@@ -6,14 +6,14 @@ namespace StorybrewCommon.Storyboarding.Util
 {
     public static class CommandSplitter
     {
-        public static void Split(OsbSprite sprite, StoryboardSegment segment)
+        public static void Split(OsbSprite sprite, StoryboardSegment segment, int commandSplitThreshold)
         {
-            var sprites = Split(sprite, segment.CreateSprite, segment.CreateAnimation).ToArray();
+            var sprites = Split(sprite, segment.CreateSprite, segment.CreateAnimation, commandSplitThreshold).ToArray();
             if (!sprites.Contains(sprite))
                 segment.Discard(sprite);
         }
 
-        public static IEnumerable<OsbSprite> Split(OsbSprite sprite) =>
+        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, int commandSplitThreshold) =>
             Split(sprite,
                 (path, origin, initialPosition) => new OsbSprite
                 {
@@ -29,15 +29,14 @@ namespace StorybrewCommon.Storyboarding.Util
                     FrameDelay = frameDelay,
                     LoopType = loopType,
                     InitialPosition = initialPosition,
-                }
-            );
+                },
+            commandSplitThreshold);
 
         public delegate OsbSprite CreateSpriteDelegate(string path, OsbOrigin origin, Vector2 initialPosition);
         public delegate OsbSprite CreateAnimationDelegate(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin, Vector2 initialPosition);
 
-        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, CreateSpriteDelegate createSprite, CreateAnimationDelegate createAnimation)
+        public static IEnumerable<OsbSprite> Split(OsbSprite sprite, CreateSpriteDelegate createSprite, CreateAnimationDelegate createAnimation, int commandSplitThreshold)
         {
-            var commandSplitThreshold = sprite.CommandSplitThreshold;
             if (sprite.HasIncompatibleCommands || sprite.HasTrigger || sprite.CommandCost < commandSplitThreshold)
             {
                 yield return sprite;

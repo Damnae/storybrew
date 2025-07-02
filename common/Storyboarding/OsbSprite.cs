@@ -3,6 +3,7 @@ using StorybrewCommon.Mapset;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
+using StorybrewCommon.Storyboarding.Util;
 using StorybrewCommon.Util;
 
 namespace StorybrewCommon.Storyboarding
@@ -401,6 +402,13 @@ namespace StorybrewCommon.Storyboarding
         {
             if (CommandCount == 0)
                 return;
+
+            if (exportSettings.OptimiseSprites && CommandSplitThreshold > 0 && CommandCount > CommandSplitThreshold)
+            {
+                foreach (var sprite in CommandSplitter.Split(this, CommandSplitThreshold))
+                    sprite.WriteOsb(writer, exportSettings, layer, transform);
+                return;
+            }
 
             WriteHeader(writer, exportSettings, layer, transform);
             foreach (var command in Commands)

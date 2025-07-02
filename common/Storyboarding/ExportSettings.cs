@@ -4,7 +4,8 @@ namespace StorybrewCommon.Storyboarding
 {
     public class ExportSettings
     {
-        public static readonly ExportSettings Default = new ExportSettings();
+        public static readonly ExportSettings Default = new();
+        public static readonly ExportSettings SizeCalculation = new() { OptimiseSprites = false, };
 
         /// <summary>
         /// Not compatible with Fallback!
@@ -15,6 +16,8 @@ namespace StorybrewCommon.Storyboarding
         /// Not compatible with Stable!
         /// </summary>
         public bool UseFloatForTime = false;
+
+        public bool OptimiseSprites = true;
 
         public readonly NumberFormatInfo NumberFormat = new CultureInfo(@"en-US", false).NumberFormat;
     }

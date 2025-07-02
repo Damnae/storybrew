@@ -241,7 +241,7 @@ namespace StorybrewEditor.Storyboarding
 
         public int CalculateSize(OsbLayer osbLayer)
         {
-            var exportSettings = ExportSettings.Default;
+            var exportSettings = ExportSettings.SizeCalculation;
 
             using (var stream = new ByteCounterStream())
             using (var writer = new StreamWriter(stream, Project.Encoding))
