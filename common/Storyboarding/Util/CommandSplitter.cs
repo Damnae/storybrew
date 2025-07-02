@@ -106,6 +106,7 @@ namespace StorybrewCommon.Storyboarding.Util
 
                 var startTime = Math.Clamp(command.StartTime, segmentStart, segmentEnd);
                 var endTime = Math.Clamp(command.EndTime, segmentStart, segmentEnd);
+
                 switch (command)
                 {
                     case MoveCommand moveCommand:
@@ -228,12 +229,29 @@ namespace StorybrewCommon.Storyboarding.Util
 
         private static bool canFragmentCommandsAt(OsbSprite sprite, double time)
         {
+            var duringCommandTypes = new HashSet<Type>();
             foreach (var command in sprite.Commands)
             {
                 if (time <= command.StartTime || command.EndTime <= time)
                     continue;
 
                 if (!command.IsFragmentableAt(time))
+                    return false;
+
+                // Overlapping commands cannot be fragmented
+                if (command is LoopCommand loop)
+                {
+                    var loopTime = (time - loop.StartTime) % loop.CommandsDuration;
+                    foreach (var loopCommand in loop.Commands)
+                    {
+                        if (loopTime <= loopCommand.StartTime || loopCommand.EndTime <= loopTime)
+                            continue;
+
+                        if (!duringCommandTypes.Add(loopCommand.GetType()))
+                            return false;
+                    }
+                }
+                else if (!duringCommandTypes.Add(command.GetType()))
                     return false;
             }
             return true;
