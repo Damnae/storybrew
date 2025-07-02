@@ -109,31 +109,31 @@ namespace StorybrewCommon.Storyboarding.Util
                 switch (command)
                 {
                     case MoveCommand moveCommand:
-                        segmentSprite.Move(startTime, endTime, moveCommand.ValueAtTime(startTime), moveCommand.ValueAtTime(endTime));
+                        segmentSprite.Move(moveCommand.Easing, startTime, endTime, moveCommand.ValueAtTime(startTime), moveCommand.ValueAtTime(endTime));
                         break;
                     case MoveXCommand moveXCommand:
-                        segmentSprite.MoveX(startTime, endTime, moveXCommand.ValueAtTime(startTime), moveXCommand.ValueAtTime(endTime));
+                        segmentSprite.MoveX(moveXCommand.Easing, startTime, endTime, moveXCommand.ValueAtTime(startTime), moveXCommand.ValueAtTime(endTime));
                         break;
                     case MoveYCommand moveYCommand:
-                        segmentSprite.MoveY(startTime, endTime, moveYCommand.ValueAtTime(startTime), moveYCommand.ValueAtTime(endTime));
+                        segmentSprite.MoveY(moveYCommand.Easing, startTime, endTime, moveYCommand.ValueAtTime(startTime), moveYCommand.ValueAtTime(endTime));
                         break;
                     case ScaleCommand scaleCommand:
-                        segmentSprite.Scale(startTime, endTime, scaleCommand.ValueAtTime(startTime), scaleCommand.ValueAtTime(endTime));
+                        segmentSprite.Scale(scaleCommand.Easing, startTime, endTime, scaleCommand.ValueAtTime(startTime), scaleCommand.ValueAtTime(endTime));
                         break;
                     case VScaleCommand scaleVecCommand:
-                        segmentSprite.ScaleVec(startTime, endTime, scaleVecCommand.ValueAtTime(startTime), scaleVecCommand.ValueAtTime(endTime));
+                        segmentSprite.ScaleVec(scaleVecCommand.Easing, startTime, endTime, scaleVecCommand.ValueAtTime(startTime), scaleVecCommand.ValueAtTime(endTime));
                         break;
                     case RotateCommand rotateCommand:
-                        segmentSprite.Rotate(startTime, endTime, rotateCommand.ValueAtTime(startTime), rotateCommand.ValueAtTime(endTime));
+                        segmentSprite.Rotate(rotateCommand.Easing, startTime, endTime, rotateCommand.ValueAtTime(startTime), rotateCommand.ValueAtTime(endTime));
                         break;
                     case FadeCommand fadeCommand:
-                        segmentSprite.Fade(startTime, endTime, fadeCommand.ValueAtTime(startTime), fadeCommand.ValueAtTime(endTime));
+                        segmentSprite.Fade(fadeCommand.Easing, startTime, endTime, fadeCommand.ValueAtTime(startTime), fadeCommand.ValueAtTime(endTime));
                         break;
                     case ColorCommand colorCommand:
-                        segmentSprite.Color(startTime, endTime, colorCommand.ValueAtTime(startTime), colorCommand.ValueAtTime(endTime));
+                        segmentSprite.Color(colorCommand.Easing, startTime, endTime, colorCommand.ValueAtTime(startTime), colorCommand.ValueAtTime(endTime));
                         break;
                     case ParameterCommand parameterCommand:
-                        segmentSprite.Parameter(startTime, endTime, parameterCommand.StartValue);
+                        segmentSprite.Parameter(parameterCommand.Easing, startTime, endTime, parameterCommand.StartValue);
                         break;
                     case LoopCommand loopCommand:
                         if (loopCommand.StartTime < startTime || endTime < loopCommand.EndTime)
