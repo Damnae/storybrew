@@ -88,9 +88,10 @@ namespace StorybrewCommon.Storyboarding.Util
             for (var i = 1; i < idealSegmentCount; i++)
             {
                 var idealTime = startTime + i * idealSegmentDuration;
-                times.Add(candidates.MinBy(candidate => Math.Abs(candidate - idealTime)));
+                var time = candidates.MinBy(candidate => Math.Abs(candidate - idealTime));
+                if (times.Add(time))
+                    yield return time;
             }
-            return times;
         }
 
         private static void transferCommands(OsbSprite sprite, OsbSprite segmentSprite, double segmentStart, double segmentEnd)
