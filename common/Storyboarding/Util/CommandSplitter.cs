@@ -81,21 +81,16 @@ namespace StorybrewCommon.Storyboarding.Util
             }
         }
 
-        private static IEnumerable<double> pickFragmentTimes(double[] candidates, int idealSegmentCount, double startTime, double endTime, bool pickByDuration = true)
+        private static IEnumerable<double> pickFragmentTimes(double[] candidates, int idealSegmentCount, double startTime, double endTime)
         {
-            if (pickByDuration)
+            var times = new HashSet<double>();
+            var idealSegmentDuration = (endTime - startTime) / idealSegmentCount;
+            for (var i = 1; i < idealSegmentCount; i++)
             {
-                var duration = endTime - startTime;
-                var idealSegmentDuration = duration / idealSegmentCount;
-
-                return Enumerable.Range(1, idealSegmentCount - 1)
-                    .Select(i => candidates.Last(t => t <= startTime + i * idealSegmentDuration))
-                    .Distinct();
+                var idealTime = startTime + i * idealSegmentDuration;
+                times.Add(candidates.MinBy(candidate => Math.Abs(candidate - idealTime)));
             }
-
-            var segmentLength = (candidates.Length + 1) / idealSegmentCount;
-            return Enumerable.Range(1, idealSegmentCount - 1)
-                .Select(i => candidates[i * segmentLength - 1]);
+            return times;
         }
 
         private static void transferCommands(OsbSprite sprite, OsbSprite segmentSprite, double segmentStart, double segmentEnd)
