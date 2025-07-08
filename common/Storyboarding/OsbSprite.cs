@@ -405,8 +405,11 @@ namespace StorybrewCommon.Storyboarding
 
             if (exportSettings.OptimiseSprites && CommandSplitThreshold > 0 && CommandCount > CommandSplitThreshold)
             {
+                var splitSettings = exportSettings.Clone();
+                splitSettings.OptimiseSprites = false;
+
                 foreach (var sprite in CommandSplitter.Split(this, CommandSplitThreshold, token))
-                    sprite.WriteOsb(writer, exportSettings, layer, transform, token);
+                    sprite.WriteOsb(writer, splitSettings, layer, transform, token);
                 return;
             }
 

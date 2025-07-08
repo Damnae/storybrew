@@ -11,7 +11,7 @@ namespace StorybrewCommon.Storyboarding
         /// Not compatible with Fallback!
         /// </summary>
         public bool UseFloatForMove = true;
-        
+
         /// <summary>
         /// Not compatible with Stable!
         /// </summary>
@@ -20,5 +20,12 @@ namespace StorybrewCommon.Storyboarding
         public bool OptimiseSprites = true;
 
         public readonly NumberFormatInfo NumberFormat = new CultureInfo(@"en-US", false).NumberFormat;
+
+        public ExportSettings Clone() => new()
+        {
+            UseFloatForMove = UseFloatForMove,
+            UseFloatForTime = UseFloatForTime,
+            OptimiseSprites = OptimiseSprites,
+        };
     }
 }
