@@ -612,9 +612,16 @@ namespace StorybrewEditor.ScreenLayers
                 warnings += $"⚠ {totalGpuMemory:0.0}MB Texture Mem. (Total)\n";
 
             if (project.FrameStats.OverlappedCommands)
-                warnings += $"⚠ Overlapped Commands\n";
+            {
+                var scriptList = string.Join(", ", project.FrameStats.OverlappedScriptNames);
+                warnings += $"⚠ Overlapped Commands in: {scriptList}\n";
+            }
+
             if (project.FrameStats.IncompatibleCommands)
-                warnings += $"⚠ Incompatible Commands\n";
+            {
+                var scriptList = string.Join(", ", project.FrameStats.IncompatibleScriptNames);
+                warnings += $"⚠ Incompatible Commands in: {scriptList}\n";
+            }
 
             return warnings.TrimEnd('\n');
         }

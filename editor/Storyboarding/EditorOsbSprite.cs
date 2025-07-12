@@ -18,6 +18,7 @@ namespace StorybrewEditor.Storyboarding
     {
         public readonly static RenderStates AlphaBlendStates = new RenderStates();
         public readonly static RenderStates AdditiveStates = new RenderStates() { BlendingFactor = new BlendingFactorState(BlendingMode.Additive), };
+        public string ScriptName { get; set; }
 
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity, StoryboardTransform transform, Project project, FrameStats frameStats)
             => Draw(drawContext, camera, bounds, opacity, transform, project, frameStats, this);
@@ -39,8 +40,22 @@ namespace StorybrewEditor.Storyboarding
                 if (!sprite.InDisplayInterval(time))
                     frameStats.ProlongedCommands += sprite.CommandCost;
                 frameStats.CommandCount += sprite.CommandCost;
-                frameStats.IncompatibleCommands |= sprite.HasIncompatibleCommands;
-                frameStats.OverlappedCommands |= sprite.HasOverlappedCommands;
+
+                if (sprite.HasOverlappedCommands)
+                {
+                    frameStats.OverlappedCommands = true;
+                    var editorSprite = sprite as EditorOsbSprite;
+                    if (editorSprite != null && !string.IsNullOrEmpty(editorSprite.ScriptName))
+                        frameStats.OverlappedScriptNames.Add(editorSprite.ScriptName);
+                }
+
+                if (sprite.HasIncompatibleCommands)
+                {
+                    frameStats.IncompatibleCommands = true;
+                    var editorSprite = sprite as EditorOsbSprite;
+                    if (editorSprite != null && !string.IsNullOrEmpty(editorSprite.ScriptName))
+                        frameStats.IncompatibleScriptNames.Add(editorSprite.ScriptName);
+                }
             }
 
             var forceVisible = !sprite.InDisplayInterval(time) && Keyboard.GetState().IsKeyDown(Key.AltLeft);
