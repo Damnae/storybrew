@@ -113,8 +113,9 @@ namespace StorybrewEditor.Storyboarding
             }
             catch (Exception e)
             {
+                var depth = 0;
                 var inner = e;
-                while (inner != null)
+                while (inner != null && depth < 16)
                 {
                     if (inner is OperationCanceledException)
                     {
@@ -122,7 +123,11 @@ namespace StorybrewEditor.Storyboarding
                         changeStatus(EffectStatus.UpdateCanceled);
                         return;
                     }
+                    else if (inner == e.InnerException)
+                        break;
+
                     inner = e.InnerException;
+                    depth++;
                 }
 
                 changeStatus(EffectStatus.ExecutionFailed, getExecutionFailedMessage(e), context.Log);
