@@ -357,13 +357,19 @@ namespace StorybrewEditor.UserInterface.Components
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft VS Code", "bin", "code"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code", "bin", "code"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft VS Code Insiders", "bin", "code-insiders"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code Insiders", "bin", "code-insiders")
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft VS Code Insiders", "bin", "code-insiders"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "VSCodium", "bin", "codium"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "VSCodium", "bin", "codium"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "VSCodium Insiders", "bin", "codium-insiders"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "VSCodium Insiders", "bin", "codium-insiders")
             };
             foreach (var path in Environment.GetEnvironmentVariable("path").Split(';'))
                 if (PathHelper.IsValidPath(path))
                 {
                     paths.Add(Path.Combine(path, "code"));
                     paths.Add(Path.Combine(path, "code-insiders"));
+                    paths.Add(Path.Combine(path, "codium"));
+                    paths.Add(Path.Combine(path, "codium-insiders"));
                 }
                 else Trace.WriteLine($"Invalid path in environment variables: {path}");
 
