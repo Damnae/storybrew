@@ -1,10 +1,15 @@
 ﻿using BrewLib.Data;
+using BrewLib.Util;
 using StorybrewCommon.Scripting;
+using StorybrewEditor.Storyboarding;
 using StorybrewEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Xml;
 
 namespace StorybrewEditor.Scripting
 {
@@ -176,7 +181,62 @@ namespace StorybrewEditor.Scripting
                 Directory.CreateDirectory(vsCodePath);
 
             var csProjPath = Path.Combine(ScriptsPath, "scripts.csproj");
-            File.WriteAllBytes(csProjPath, resourceContainer.GetBytes("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative));
+            var document = new XmlDocument() { PreserveWhitespace = false, };
+            try
+            {
+                using (var stream = resourceContainer.GetStream("project/scripts.csproj", ResourceSource.Embedded | ResourceSource.Relative))
+                {
+                    
+                    document.Load(stream);
+                }
+
+                var xmlns = document.DocumentElement.GetAttribute("xmlns");
+                //var compileGroup = document.CreateElement("ItemGroup", xmlns);
+                //document.DocumentElement.AppendChild(compileGroup);
+                //foreach (var path in Directory.EnumerateFiles(ScriptsPath, "*.cs", SearchOption.AllDirectories))
+                //{
+                //    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
+
+                //    var compileNode = document.CreateElement("Compile", xmlns);
+                //    compileNode.SetAttribute("Include", relativePath);
+                //    compileGroup.AppendChild(compileNode);
+                //}
+
+                var referencedAssembliesGroup = document.CreateElement("ItemGroup", xmlns);
+                document.DocumentElement.AppendChild(referencedAssembliesGroup);
+                var importedAssemblies = referencedAssemblies.Where(e => !Project.DefaultAssemblies.Contains(e));
+                foreach (var path in importedAssemblies)
+                {
+                    //Trace.WriteLine($"{path} is being imported");
+                    var relativePath = PathHelper.GetRelativePath(ScriptsPath, path);
+
+                    var compileNode = document.CreateElement("Reference", xmlns);
+
+                    AssemblyName importedAssembly = AssemblyName.GetAssemblyName(path);
+                    Trace.Assert(importedAssembly != null);
+
+                    compileNode.SetAttribute("Include", importedAssembly.Name);
+                    //var hintPath = document.CreateElement("HintPath", xmlns);
+                    //hintPath.AppendChild(document.CreateTextNode(@$"..\..\{relativePath}"));
+                    //compileNode.AppendChild(hintPath);
+
+                    var hintPath = document.CreateElement("HintPath", xmlns);
+                    hintPath.AppendChild(document.CreateTextNode(@$"{relativePath}"));
+                    compileNode.AppendChild(hintPath);
+
+                    //hintPath = document.CreateElement("HintPath", xmlns);
+                    //hintPath.AppendChild(document.CreateTextNode(@$"{path}"));
+                    //compileNode.AppendChild(hintPath);
+
+                    referencedAssembliesGroup.AppendChild(compileNode);
+                }
+                document.Save(csProjPath);
+            }
+            catch (Exception e)
+            {
+                Trace.Fail($"Failed to update scripts.csproj: {e}");
+                //Trace.WriteLine($"Failed to update scripts.csproj: {e}");
+            }
         }
 
         #region IDisposable Support

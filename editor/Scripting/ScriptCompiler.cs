@@ -1,10 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using Microsoft.VisualBasic.ApplicationServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace StorybrewEditor.Scripting
@@ -15,22 +19,34 @@ namespace StorybrewEditor.Scripting
         {
             Debug.Print($"{nameof(Scripting)}: Compiling {string.Join(", ", sourcePaths)}");
 
-            var syntaxTrees = sourcePaths.Select(path => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(path), path: path)).ToArray();
+            var syntaxTrees = sourcePaths.Select(path => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(path), path: path));
             var references = new List<MetadataReference>();
 
             foreach (var assembly in referencedAssemblies)
                 if (File.Exists(assembly))
-                    references.Add(MetadataReference.CreateFromFile(assembly));
+                {
 
+                        
+                    //binarie: I have no idea why loading the assembly directly works
+                    //i think maybe the editor needs to have the assembly stored in memory to correctly compile?
+                    Assembly.LoadFrom(assembly);
+                    PortableExecutableReference metaRef = MetadataReference.CreateFromFile(assembly);
+
+                    references.Add(metaRef);
+                }
+            
             var compilation = CSharpCompilation.Create(
                 assemblyName: Path.GetFileNameWithoutExtension(outputPath),
-                syntaxTrees: syntaxTrees,
                 references: references,
+                syntaxTrees: syntaxTrees,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
 
             EmitResult result;
             using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 result = compilation.Emit(stream);
+
+            
 
             if (!result.Success)
             {

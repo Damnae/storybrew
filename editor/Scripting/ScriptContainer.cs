@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 
 namespace StorybrewEditor.Scripting
@@ -94,7 +95,8 @@ namespace StorybrewEditor.Scripting
             {
                 currentVersion = localTargetVersion;
 
-                if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainer<TScript>));
+                ObjectDisposedException.ThrowIf(disposedValue, this);
+                //if (disposedValue) throw new ObjectDisposedException(nameof(ScriptContainer<TScript>));
 
                 try
                 {
@@ -105,6 +107,7 @@ namespace StorybrewEditor.Scripting
                     }
 
                     var assemblyPath = Path.Combine(CompiledScriptsPath, $"{Guid.NewGuid()}.dll");
+
                     ScriptCompiler.Compile(SourcePaths, assemblyPath, ReferencedAssemblies);
 
                     var contextName = $"{Name} {Id}";
@@ -113,7 +116,9 @@ namespace StorybrewEditor.Scripting
 
                     try
                     {
-                        scriptType = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath).GetType(ScriptTypeName);
+                        Assembly assembly = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+                        
+                        scriptType = assembly.GetType(ScriptTypeName);
                         if (scriptType == null)
                             throw new TypeLoadException($"Type {ScriptTypeName} was not found in assembly");
 
