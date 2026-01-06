@@ -1,19 +1,28 @@
 ﻿using BrewLib.Audio;
+using BrewLib.Graphics;
+using BrewLib.ScreenLayers;
 using BrewLib.Time;
 using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES30;
 using OpenTK.Input;
 using StorybrewCommon.Mapset;
+using StorybrewEditor.ScreenLayers.Util;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface;
 using StorybrewEditor.UserInterface.Components;
 using StorybrewEditor.UserInterface.Drawables;
 using StorybrewEditor.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace StorybrewEditor.ScreenLayers
@@ -47,6 +56,7 @@ namespace StorybrewEditor.ScreenLayers
         private Button mapsetFolderButton;
         private Button saveButton;
         private Button exportButton;
+        private Button screenshotButton;
 
         private Button settingsButton;
         private Button effectsButton;
@@ -195,6 +205,14 @@ namespace StorybrewEditor.ScreenLayers
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
+                    screenshotButton = new Button(WidgetManager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Camera,
+                        Tooltip = "Take a screenshot\nShortcut: F12\n(Shift to hide UI)",
+                        AnchorFrom = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
                     saveButton = new Button(WidgetManager)
                     {
                         StyleName = "icon",
@@ -211,6 +229,7 @@ namespace StorybrewEditor.ScreenLayers
                         AnchorFrom = BoxAlignment.Centre,
                         CanGrow = false,
                     },
+                    
                 },
             });
 
@@ -385,6 +404,11 @@ namespace StorybrewEditor.ScreenLayers
                 else exportProject();
             };
 
+            screenshotButton.OnClick += (sender, e) =>
+            {
+                TakeScreenshot();
+            };
+
             project.OnMapsetPathChanged += project_OnMapsetPathChanged;
             project.OnEffectsContentChanged += project_OnEffectsContentChanged;
             project.OnEffectsStatusChanged += project_OnEffectsStatusChanged;
@@ -392,7 +416,80 @@ namespace StorybrewEditor.ScreenLayers
             if (!project.MapsetPathIsValid)
                 Manager.ShowMessage($"The mapset folder cannot be found.\n{project.MapsetPath}\n\nPlease select a new one.", () => changeMapsetFolder(), true);
         }
+        private void TakeScreenshot()
+        {
 
+            if (GraphicsContext.CurrentContext == null) throw new GraphicsContextMissingException();
+            
+            DateTime now = DateTime.Now;
+
+
+
+            int xsize = Manager.WindowWidth;
+            int ysize = Manager.WindowHeight;
+            Bitmap bitmap = new Bitmap(xsize, ysize);
+            BitmapData bmpData = bitmap.LockBits(new Rectangle(new Point(0, 0), bitmap.Size),
+                ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+
+            //read into bmp buffer
+            GL.ReadPixels(0, 0, xsize, ysize, OpenTK.Graphics.ES30.PixelFormat.Rgb, PixelType.UnsignedByte, bmpData.Scan0);
+
+
+            byte[] resBuffer = new byte[bmpData.Stride * bmpData.Height];
+            Marshal.Copy(bmpData.Scan0, resBuffer, 0, resBuffer.Length);
+
+
+            byte sourceBlue = 0,
+                sourceRed = 0;
+
+
+            //When OpenGL reads pixels into our buffer, it reads in as BGR, not RGB.
+            //This fixes that.
+            for (int k = 0; k < resBuffer.Length; k += 3)
+            {
+                sourceBlue = resBuffer[k];
+                sourceRed = resBuffer[k + 2];
+
+                resBuffer[k] = sourceRed;
+
+                resBuffer[k + 2] = sourceBlue;
+            }
+
+            Marshal.Copy(resBuffer, 0, bmpData.Scan0, resBuffer.Length);
+
+            bitmap.UnlockBits(bmpData);
+            bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+
+            string location = Path.Combine(project.ProjectFolderPath, $"screenshot_{now.Month}-{now.Day}-{now.Hour}-{now.Minute}-{now.Second}.png");
+            bitmap.Save(location);
+
+            Debug.WriteLine($"Screenshot saved to {location}");
+        }
+
+        void OnShiftPress(bool key_up)
+        {
+            
+            bottomLeftLayout.Displayed = key_up;
+            bottomRightLayout.Displayed = key_up;
+            effectConfigUi.Displayed = false;
+            effectsList.Displayed = false;
+            layersList.Displayed = false;
+            settingsMenu.Displayed = false;
+        }
+
+
+        public override bool OnKeyUp(KeyboardKeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.ShiftLeft:
+                case Key.ShiftRight:
+                    OnShiftPress(key_up: true);
+                    return true;
+            }
+            return base.OnKeyUp(e);
+        }
         public override bool OnKeyDown(KeyboardKeyEventArgs e)
         {
             switch (e.Key)
@@ -412,6 +509,14 @@ namespace StorybrewEditor.ScreenLayers
                         if (prevBookmark != 0) timeline.Value = prevBookmark * 0.001f;
                     }
                     else timeline.Scroll(e.Shift ? -4 : -1);
+                    return true;
+                case Key.F12:
+                    TakeScreenshot();
+                    return true;
+                case Key.ShiftLeft:
+                case Key.ShiftRight:
+
+                    OnShiftPress(key_up: false);
                     return true;
             }
 
