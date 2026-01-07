@@ -18,7 +18,7 @@ namespace StorybrewEditor.Mapset
         {
         }
 
-        protected BeatmapLoadingException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected BeatmapLoadingException(SerializationInfo info, StreamingContext context)
         {
         }
     }

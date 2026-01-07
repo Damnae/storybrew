@@ -4,7 +4,9 @@ using OpenTK;
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Storyboarding;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -108,6 +110,7 @@ namespace StorybrewEditor.UserInterface.Components
                 var effect = layer.Effect;
 
                 Widget layerRoot;
+                LinearLayout nameAndDetailLayout;
                 Label nameLabel, detailsLabel;
                 Button diffSpecificButton, showHideButton;
                 layersLayout.Add(layerRoot = new LinearLayout(Manager)
@@ -128,7 +131,7 @@ namespace StorybrewEditor.UserInterface.Components
                             AnchorTo = BoxAlignment.Centre,
                             CanGrow = false,
                         },
-                        new LinearLayout(Manager)
+                        nameAndDetailLayout = new LinearLayout(Manager)
                         {
                             StyleName = "condensed",
                             Children = new Widget[]
@@ -147,6 +150,7 @@ namespace StorybrewEditor.UserInterface.Components
                                     AnchorFrom = BoxAlignment.Left,
                                     AnchorTo = BoxAlignment.Left,
                                 },
+                                
                             },
                         },
                         diffSpecificButton = new Button(Manager)
@@ -233,8 +237,44 @@ namespace StorybrewEditor.UserInterface.Components
         }
 
         private static string getLayerDetails(EditorStoryboardLayer layer, Effect effect)
-            => layer.EstimatedSize > 40 * 1024 ?
+        {
+            string usingData = 
+                                layer.EstimatedSize > 40 * 1024 ?
                 $"using {effect.BaseName} ({StringHelper.ToByteSize(layer.EstimatedSize)})" :
                 $"using {effect.BaseName}";
+
+            //string separator = "\nLayers:\n";
+
+            ////return usingData;
+            //string segmentString = GetSegments(layer);
+
+            //return layer.NamedSegments.Any() ? string.Concat(usingData, separator, segmentString.AsSpan(0, Math.Min(segmentString.Length, 128))) :
+            //    usingData;
+            return usingData;
+
+        }
+
+        private static string GetSegments(EditorStoryboardLayer segment)
+        {
+            
+            if (!segment.NamedSegments.Any()) return String.Empty;
+
+            string separator = new string(':', 2) + ' ';
+            StringBuilder builder = new StringBuilder();
+            foreach (var child in segment.NamedSegments)
+            {
+                
+                builder.AppendLine(separator + child.Identifier);
+
+                ////this check only exists as builder.AppendLine will create extra new lines and we don't like that
+                //if (child.NamedSegments.Any())
+                //    builder.AppendLine(GetSegments(child));
+            }
+
+            return builder.Length > 64 ? string.Concat(builder.ToString().AsSpan(0, 61), "...")
+                : builder.ToString();
+        }
+
+        
     }
 }

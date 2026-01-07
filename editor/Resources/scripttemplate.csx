@@ -6,6 +6,7 @@ using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Storyboarding.Util;
 using StorybrewCommon.Subtitles;
 using StorybrewCommon.Util;
+using StorybrewCommon.Storyboarding.CommandValues;
 using System;
 using System.Collections.Generic;
 using System.Linq;

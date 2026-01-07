@@ -1,6 +1,7 @@
 ﻿using BrewLib.Util;
 using OpenTK;
 using OpenTK.Graphics;
+using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 using StorybrewCommon.Util;
 using System.Diagnostics;
@@ -8,6 +9,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using Tiny;
 
 namespace StorybrewCommon.Subtitles
@@ -62,6 +65,8 @@ namespace StorybrewCommon.Subtitles
         public bool TrimTransparency;
         public bool EffectsOnly;
         public bool Debug;
+
+        public Func<Bitmap, Bitmap> FinalActions = (bmp) => bmp;
     }
 
     public class FontGenerator
@@ -72,6 +77,8 @@ namespace StorybrewCommon.Subtitles
         private readonly string projectDirectory;
         private readonly string assetDirectory;
 
+        private bool generatingAsLightmap = false;
+
         private readonly Dictionary<string, FontTexture> textureCache = new Dictionary<string, FontTexture>();
 
         internal FontGenerator(string directory, FontDescription description, FontEffect[] effects, string projectDirectory, string assetDirectory)
@@ -81,6 +88,25 @@ namespace StorybrewCommon.Subtitles
             this.effects = effects;
             this.projectDirectory = projectDirectory;
             this.assetDirectory = assetDirectory;
+        }
+
+        
+        public void GenerateTexturesAsLightmap()
+        {
+            if (generatingAsLightmap) return;
+            description.FinalActions = BitmapHelper.MakeIntoLightmap;
+
+            //wanted to add this tooltip
+            StoryboardObjectGenerator.Current.Log(
+                                "Tips for generating as lightmap:\n" +
+                                "1. You can get a border around your text by using the FontOutline effect and\n" +
+                                "setting your main text's color to Black.\n" +
+                                "2. You can also get a gradient on the inside of your text by using the FontGradient effect.\n\n" +
+                                
+                                "If your effects aren't loading, delete the folder and reload your script!");
+
+            generatingAsLightmap = true;
+
         }
 
         public FontTexture GetTexture(string text)
@@ -191,14 +217,24 @@ namespace StorybrewCommon.Subtitles
                                 height = trimmedBitmap.Height;
                                 using (var trimGraphics = Graphics.FromImage(trimmedBitmap))
                                     trimGraphics.DrawImage(bitmap, 0, 0, trimBounds, GraphicsUnit.Pixel);
-                                BrewLib.Util.Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
+
+                                FinalTouchesAndSave(trimmedBitmap, bitmapPath, ImageFormat.Png);
+                                //BrewLib.Util.Misc.WithRetries(() => trimmedBitmap.Save(bitmapPath, ImageFormat.Png));
                             }
                         }
-                        else BrewLib.Util.Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
+                        else FinalTouchesAndSave(bitmap, bitmapPath, ImageFormat.Png);
+                        //else BrewLib.Util.Misc.WithRetries(() => bitmap.Save(bitmapPath, ImageFormat.Png));
                     }
                 }
             }
             return new FontTexture(Path.Combine(Directory, filename), offsetX, offsetY, baseWidth, baseHeight, width, height);
+        }
+
+        void FinalTouchesAndSave(Bitmap bitmap, string bitmapPath, ImageFormat format)
+        {
+            Bitmap postProcess = description.FinalActions.Invoke(bitmap);
+
+            BrewLib.Util.Misc.WithRetries((() => postProcess.Save(bitmapPath, format)));
         }
 
         internal void HandleCache(TinyToken cachedFontRoot)

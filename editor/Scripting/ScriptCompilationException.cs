@@ -18,7 +18,7 @@ namespace StorybrewEditor.Scripting
         {
         }
 
-        protected ScriptCompilationException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected ScriptCompilationException(SerializationInfo info, StreamingContext context)
         {
         }
     }

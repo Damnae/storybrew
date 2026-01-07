@@ -13,7 +13,7 @@ namespace StorybrewEditor
     public class Builder
     {
         private static readonly string mainExecutablePath = "StorybrewEditor.exe";
-        private static readonly string[] ignoredPaths = { };
+        private static readonly string[] ignoredPaths = Array.Empty<string>();
 
         public static void Build()
         {

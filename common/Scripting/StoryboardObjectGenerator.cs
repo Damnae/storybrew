@@ -143,6 +143,11 @@ namespace StorybrewCommon.Scripting
         [Description("Changes the result of Random(...) calls.")]
         [Configurable] public int RandomSeed;
 
+        [Group("Misc")]
+        [Description("Documentation and Helpful Tips")]
+        [Configurable] public string Documentation;
+
+
         private Random random;
         public int Random(int minValue, int maxValue) => random.Next(minValue, maxValue);
         public int Random(int maxValue) => random.Next(maxValue);

@@ -240,6 +240,74 @@ namespace StorybrewCommon.Util
             return Rectangle.Intersect(Rectangle.FromLTRB(xMin - 1, yMin - 1, xMax + 2, yMax + 2), new Rectangle(0, 0, source.Width, source.Height));
         }
 
+        /// <summary>
+        /// Converts a bitmap into a representation of a lightmap, where all pixels are converted to an average
+        /// then are made transparent by how close the pixel color is to black.
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
+        public static Bitmap MakeIntoLightmap(Bitmap bmp)
+        {
+
+            BitmapData bmpData = bmp.LockBits(new Rectangle(Point.Empty, bmp.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            //for (int x = 0; x < bmp.Width; x++)
+            //{
+            //    for (int y = 0; y < bmp.Height; y++)
+            //    {
+            //        Color p = bmp.GetPixel(x, y);
+            //        byte avg = p.R;
+            //        //Console.WriteLine(avg);
+
+            //        int opacity = p.A == 0 ? 0 : avg & p.A;
+            //        //Console.WriteLine(avg);
+            //        if (opacity > 255) opacity = 255;
+            //        bmp.SetPixel(x, y, Color.FromArgb(opacity, 0xff, 0xff, 0xff));
+
+
+            //    }
+            //}
+
+            byte[] buffer = new byte[bmpData.Stride * bmpData.Height];
+            Marshal.Copy(bmpData.Scan0, buffer, 0, buffer.Length);
+
+            byte sourceRed, sourceGreen, sourceBlue, sourceAlpha;
+
+            int avg;
+            int nextAlpha;
+            byte maxByte = 0xff;
+            for (int i = 0; i < buffer.Length; i += 4)
+            {
+                sourceRed = buffer[i];
+                sourceGreen = buffer[i + 1];
+                sourceBlue = buffer[i + 2];
+                sourceAlpha = buffer[i + 3];
+
+                avg = sourceRed + sourceGreen + sourceBlue;
+                avg /= 3;
+
+                nextAlpha = (sourceAlpha == 0x0 ?
+                                        0x0 :
+                                        avg & sourceAlpha);
+
+
+                if (nextAlpha > maxByte) nextAlpha = maxByte;
+
+                buffer[i] = maxByte;
+                buffer[i + 1] = maxByte;
+                buffer[i + 2] = maxByte;
+                buffer[i + 3] = (byte)nextAlpha;
+
+            }
+
+
+
+            Marshal.Copy(buffer, 0, bmpData.Scan0, buffer.Length);
+            bmp.UnlockBits(bmpData);
+
+            return bmp;
+
+        }
+
         public class PinnedBitmap : IDisposable
         {
             private GCHandle handle;

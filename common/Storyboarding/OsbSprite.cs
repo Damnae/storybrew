@@ -1,10 +1,13 @@
-﻿using OpenTK;
+﻿using BrewLib.Graphics.Drawables;
+using OpenTK;
 using StorybrewCommon.Mapset;
+using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
 using StorybrewCommon.Storyboarding.Util;
 using StorybrewCommon.Util;
+using System.Transactions;
 
 namespace StorybrewCommon.Storyboarding
 {
@@ -181,6 +184,81 @@ namespace StorybrewCommon.Storyboarding
         {
             initializeDisplayTimelines();
             InitialPosition = DefaultPosition;
+        }
+
+        //necessary delegate so that When<T>'s command can utilize this method to catch all permutations of ____At(time).
+        public delegate T TimeCommandDelegate<T>(double time) where T: CommandValue;
+
+        //threshold for binary search
+        const double TIMESTEP_THRESHOLD = 2.0;
+
+        /// <summary>
+        /// Executes an action when a certain command is within a target (with margin of error).
+        /// </summary>
+        /// <typeparam name="T">Can be any CommandValue.</typeparam>
+        /// <param name="command">The command. This can be <see cref="OpacityAt(double)"/>, <see cref="PositionAt(double)"/>, <see cref="ScaleAt(double)"/>, any command that returns an object
+        /// that implements CommandValue.</param>
+        /// <param name="target">The target value. This must also be a value that can be converted into <typeparamref name="T"/>.</param>
+        /// <param name="actionOnHit">The action that occurs on hit. Argument one is the time that the action hits, and the OsbSprite is this object (callback).</param>
+        /// <param name="marginOfError">The margin of error on the search. This has a default of 0.01 as that is the most consistent margin of error through testing.</param>
+        /// <param name="searchStart">The start of the search. If left not filled, this gets set to <see cref="StartTime"/></param>
+        /// <param name="searchEnd">The end of the search. If left not filled, this gets set to <see cref="EndTime"/></param>
+        public void When<T>(TimeCommandDelegate<T> command, 
+                T target, 
+                Action<double, OsbSprite> actionOnHit,
+                float marginOfError = 0.01f,
+                double searchStart = 0, double searchEnd = 0)
+            where T:CommandValue
+        {
+            if (command.Target != this)
+            {
+                StoryboardObjectGenerator.Current.Log("Improperly formatted search: command must stem from same instance invoking When<> method");
+                return;
+            }
+            if (searchEnd == 0) searchEnd = EndTime;
+            if (searchStart == 0) searchStart = StartTime;
+
+
+            double timestep = (searchEnd - searchStart)*0.5;
+            double time = searchStart;
+            
+            float previousDifference = 10e9f, currentDistance;
+            T currentValue;
+            while (timestep >= TIMESTEP_THRESHOLD)
+            {
+                if (time > searchEnd)
+                {
+                    StoryboardObjectGenerator.Current.Log($"Request for search did not work. Vector never gets within margin of error of " + target.ToString());
+                    return;
+                }
+                currentValue = command.Invoke(time);
+                currentDistance = Math.Abs(currentValue.DistanceFrom(target));
+                
+
+                if (currentDistance < previousDifference)
+                {
+                    if (currentDistance < marginOfError)
+                    {
+                        actionOnHit.Invoke(time, this);
+                        
+                        return;
+                    }
+
+                    else
+                    {
+                        time -= timestep;
+                        timestep *= 0.5;
+                        previousDifference = currentDistance;
+                    }
+                }
+
+                
+                
+
+                time += timestep;
+            }
+
+            actionOnHit.Invoke(time + timestep, this);
         }
 
         public void Move(OsbEasing easing, double startTime, double endTime, CommandPosition startPosition, CommandPosition endPosition) => addCommand(new MoveCommand(easing, startTime, endTime, startPosition, endPosition));

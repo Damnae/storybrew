@@ -4,6 +4,9 @@ using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System.Diagnostics;
+using ManagedBass;
+using System.Collections.Generic;
+using ManagedBass.Fx;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -16,11 +19,15 @@ namespace StorybrewEditor.UserInterface.Components
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
+        //The system's current devices are mapped via int.
+        Dictionary<string, int> deviceMap;
+
         public SettingsMenu(WidgetManager manager, Project project) : base(manager)
         {
             this.project = project;
 
-            Button referencedAssemblyButton, floatingPointTimeButton, helpButton;
+
+            Button referencedAssemblyButton, floatingPointTimeButton, audioHelpButton, helpButton;
             Label dimLabel;
             Slider dimSlider;
 
@@ -77,6 +84,12 @@ namespace StorybrewEditor.UserInterface.Components
                                     },
                                 }
                             },
+                            audioHelpButton = new Button(manager)
+                            {
+                                Text = "Swap Output Device",
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
+                            },
                             floatingPointTimeButton = new Button(manager)
                             {
                                 Text = "Export Time as Floating Point",
@@ -85,7 +98,8 @@ namespace StorybrewEditor.UserInterface.Components
                                 Checkable = true,
                                 Checked = project.ExportSettings.UseFloatForTime,
                                 Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer",
-                            },
+                            }
+                            
                         }
                     }
                 },
@@ -96,6 +110,22 @@ namespace StorybrewEditor.UserInterface.Components
                 FileName = $"https://github.com/{Program.Repository}/wiki",
                 UseShellExecute = true
             });
+            audioHelpButton.OnClick += (sender, e) =>
+            {
+                deviceMap = new Dictionary<string, int>();
+                for (int i = 1; i < Bass.DeviceCount; i++)
+                {
+                    if (Bass.GetDeviceInfo(i, out DeviceInfo info) && info.IsEnabled)
+                    {
+                        deviceMap[info.Name] = i;
+                        Debug.WriteLine($"{info.Name} - {i}");
+                    }
+                }
+                Manager.ScreenLayerManager.ShowContextMenu("Choose output device.", (s) =>
+                {
+                    Program.AudioManager.SwapAudioOutputDevice(deviceMap[s]);
+                }, deviceMap.Keys);
+            };
             referencedAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new ReferencedAssemblyConfig(project));
             dimSlider.OnValueChanged += (sender, e) =>
             {
