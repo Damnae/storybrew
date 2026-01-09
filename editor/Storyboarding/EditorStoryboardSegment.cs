@@ -23,7 +23,7 @@ namespace StorybrewEditor.Storyboarding
         private double endTime;
         public override double EndTime => endTime;
 
-        public override Vector2 Origin { get; set; }
+        public override Vector2 Origin { get; set; } = Vector2.Zero;
         public override Vector2 Position { get; set; }
         public override double Rotation { get; set; }
         public override double Scale { get; set; } = 1f;
@@ -237,11 +237,11 @@ namespace StorybrewEditor.Storyboarding
             displayableBuckets = null;
         }
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform transform)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform localTransform)
         {
-            var localTransform = this.BuildTransform(transform);
+            StoryboardTransform thisTransform = this.BuildTransform(localTransform);
             foreach (var sbo in storyboardObjects)
-                sbo.WriteOsb(writer, exportSettings, osbLayer, localTransform);
+                sbo.WriteOsb(writer, exportSettings, osbLayer, thisTransform);
         }
 
         public int CalculateSize(OsbLayer osbLayer)

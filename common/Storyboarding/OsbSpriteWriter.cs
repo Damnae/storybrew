@@ -1,4 +1,6 @@
-﻿using StorybrewCommon.Storyboarding.Commands;
+﻿using BrewLib.Graphics.Drawables;
+using StorybrewCommon.Scripting;
+using StorybrewCommon.Storyboarding.Commands;
 using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Storyboarding.Display;
 
@@ -18,6 +20,8 @@ namespace StorybrewCommon.Storyboarding
         protected readonly TextWriter TextWriter;
         protected readonly ExportSettings ExportSettings;
         protected readonly OsbLayer OsbLayer;
+
+        const double interpolationTimestep = 30;
 
         public OsbSpriteWriter(OsbSprite osbSprite, AnimatedValue<CommandPosition> moveTimeline,
                                                     AnimatedValue<CommandDecimal> moveXTimeline,
@@ -77,9 +81,34 @@ namespace StorybrewCommon.Storyboarding
 
         private void writeOsbSprite(OsbSprite sprite, StoryboardTransform transform)
         {
+            
             WriteHeader(sprite, transform);
-            foreach (var command in sprite.Commands)
+
+            IEnumerable<ICommand> commands = sprite.Commands;
+            
+            foreach (var command in commands)
                 command.WriteOsb(TextWriter, ExportSettings, transform, 1);
+            
+        }
+
+        private List<ICommand> GetInterpolatedCommands(OsbSprite sprite, double start, IEnumerable<ICommand> commands)
+        {
+            Command<CommandDecimal> lastCommand = null, nextCommand;
+            IEnumerable<MoveXCommand> moveXCommands = commands.OfType<MoveXCommand>();
+            IEnumerable<MoveYCommand> moveYCommands = commands.OfType<MoveYCommand>();
+
+            commands = commands.Where((e) => e is not MoveXCommand && e is not MoveYCommand);
+            
+
+            List<ICommand> filteredSpriteCommands = new List<ICommand>();
+
+            foreach (var command in commands)
+            {
+                filteredSpriteCommands.Add(command);
+            }
+            //filteredSpriteCommands.AddRange(MoveCommand.InterpolateFrom(moveXCommands, moveYCommands));
+
+            return filteredSpriteCommands;
         }
 
         protected virtual void WriteHeader(OsbSprite sprite, StoryboardTransform transform)
@@ -98,7 +127,7 @@ namespace StorybrewCommon.Storyboarding
                 sprite.HasMoveXYCommands ? 
                     transform.ApplyToPositionXY(sprite.InitialPosition) : 
                     transform.ApplyToPosition(sprite.InitialPosition);
-
+            
             if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
                 TextWriter.Write($",{transformedInitialPosition.X.ToString(ExportSettings.NumberFormat)}");
             else TextWriter.Write($",0");

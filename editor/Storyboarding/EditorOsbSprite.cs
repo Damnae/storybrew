@@ -3,6 +3,7 @@ using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Renderers;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Mapset;
@@ -78,13 +79,11 @@ namespace StorybrewEditor.Storyboarding
 
             if (transform != null)
             {
-                if (sprite.HasMoveXYCommands)
-                    position = transform.ApplyToPositionXY(position); 
-                else position = transform.ApplyToPosition(position);
-                if (sprite.HasRotateCommands)
+                position = transform.ApplyToPosition(position); 
+                
+                if (!sprite.LockRotationOnTransform)
                     rotation = transform.ApplyToRotation(rotation);
-                if (sprite.HasScalingCommands)
-                    scale = transform.ApplyToScale(scale);
+                scale = transform.ApplyToScale(scale);
             }
 
             if (frameStats != null)

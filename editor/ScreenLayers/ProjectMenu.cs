@@ -750,13 +750,10 @@ namespace StorybrewEditor.ScreenLayers
 
         private void effectConfigUi_OnResetPlacement(StoryboardSegment segment)
         {
-            var editorSegment = segment.AsEditorSegment();
-            editorSegment.PlacementPosition = Vector2.Zero;
-            editorSegment.PlacementRotation = 0f;
-            editorSegment.PlacementScale = 1f;
-
-            placementUi.Displayed = true;
             placementUi.Segment = segment;
+            placementUi.ResetState();
+            
+            placementUi.Displayed = true;
         }
 
         #region IDisposable Support

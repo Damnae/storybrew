@@ -28,5 +28,50 @@ namespace StorybrewCommon.Storyboarding.Commands
             }
             return this;
         }
+
+        //public static IEnumerable<MoveCommand> InterpolateFrom(IEnumerable<MoveXCommand> xcommands, IEnumerable<MoveYCommand> ycommands)
+        //{
+        //    xcommands = xcommands.OrderBy((e) => e.StartTime);
+        //    ycommands = ycommands.OrderBy((e) => e.StartTime);
+
+            
+        //    double endTime = Math.Max(xcommands.Last().EndTime, ycommands.Last().EndTime);
+
+        //    Command<CommandDecimal> xCommand;
+        //    Command<CommandDecimal> yCommand;
+
+        //    int xIndex = 0, yIndex = 0;
+        //    int xStart, yStart, xEnd, yEnd;
+
+        //    while (xcommands.Any() || ycommands.Any())
+        //    {
+        //        xCommand = xcommands.ElementAtOrDefault(xIndex);
+        //        yCommand = ycommands.ElementAtOrDefault(yIndex);
+
+        //        xStart = (int)xCommand.StartTime;
+        //        xEnd = (int)xCommand.EndTime;
+
+        //        yStart = (int)yCommand.StartTime;
+        //        yEnd = (int)yCommand.EndTime;
+
+        //        //exact match
+        //        if (xStart == yStart && xEnd == yEnd &&
+        //            xCommand.Easing == yCommand.Easing)
+        //        {
+        //            yield return new MoveCommand(
+        //                xCommand.Easing, xCommand.StartTime, xCommand.EndTime,
+        //                new CommandPosition(xCommand.StartValue, yCommand.StartValue), new CommandPosition(xCommand.EndValue, yCommand.EndValue));
+
+        //            xIndex++;
+        //            yIndex++;
+                    
+        //        }
+
+        //        if (xStart > yEnd)
+        //        {
+
+        //        }  
+
+        //}
     }
 }

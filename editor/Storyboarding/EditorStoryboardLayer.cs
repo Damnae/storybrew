@@ -6,6 +6,7 @@ using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -149,7 +150,7 @@ namespace StorybrewEditor.Storyboarding
             if (!Visible)
                 return;
 
-            segment.Draw(drawContext, camera, bounds, opacity, null, Effect.Project, frameStats);
+            segment.Draw(drawContext, camera, bounds, opacity, this.BuildCompleteParentTransform(), Effect.Project, frameStats);
         }
 
         public void PostProcess()
@@ -168,7 +169,7 @@ namespace StorybrewEditor.Storyboarding
         }
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings)
-            => WriteOsb(writer, exportSettings, osbLayer, null);
+            => WriteOsb(writer, exportSettings, osbLayer, InternalSegment.BuildCompleteParentTransform());
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform) 
             => segment.WriteOsb(writer, exportSettings, osbLayer, transform);
@@ -180,6 +181,25 @@ namespace StorybrewEditor.Storyboarding
             DiffSpecific = other.DiffSpecific;
             OsbLayer = other.OsbLayer;
             Visible = other.Visible;
+
+            CopyTransforms(this, other);
+        }
+
+        void CopyTransforms(StoryboardSegment to, StoryboardSegment from)
+        {
+            
+            to.Position = from.Position;
+            to.Rotation = from.Rotation;
+            to.Scale = from.Scale;
+
+            //in theory this is supposed to not be set
+            if (!from.NamedSegments.Any()) return;
+
+            foreach (StoryboardSegment fromSegment in from.NamedSegments)
+            {
+                CopyTransforms(to.GetSegment(fromSegment.Identifier), fromSegment);
+            }
+
         }
 
         public int CompareTo(EditorStoryboardLayer other)

@@ -4,6 +4,7 @@ using BrewLib.Graphics;
 using BrewLib.Graphics.Cameras;
 using BrewLib.Graphics.Textures;
 using BrewLib.Util;
+using ManagedBass;
 using OpenTK;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
@@ -665,6 +666,8 @@ namespace StorybrewEditor.Storyboarding
                     indexRoot.Write(indexPath);
                 }
 
+                Debug.WriteLine("Index root saved!");
+
                 // Write user specific data
                 {
                     var userRoot = new TinyObject
@@ -680,60 +683,11 @@ namespace StorybrewEditor.Storyboarding
                     userRoot.Write(userPath);
                 }
 
+                Debug.WriteLine("User data saved!");
                 // Write each effect
                 foreach (var effect in effects)
                 {
-                    var effectRoot = new TinyObject
-                    {
-                        { "FormatVersion", Version },
-                        { "Name", effect.Name },
-                        { "Script", effect.BaseName },
-                        { "Multithreaded", effect.Multithreaded },
-                    };
-
-                    var configRoot = new TinyObject();
-                    effectRoot.Add("Config", configRoot);
-
-                    foreach (var field in effect.Config.SortedFields)
-                    {
-                        var fieldRoot = new TinyObject
-                        {
-                            { "Type", field.Type.FullName },
-                            { "Value", ObjectSerializer.ToString(field.Type, field.Value)},
-                        };
-                        if (field.DisplayName != field.Name)
-                            fieldRoot.Add("DisplayName", field.DisplayName);
-                        if (!string.IsNullOrWhiteSpace(field.BeginsGroup))
-                            fieldRoot.Add("BeginsGroup", field.BeginsGroup);
-                        configRoot.Add(field.Name, fieldRoot);
-
-                        if ((field.AllowedValues?.Length ?? 0) > 0)
-                        {
-                            var allowedValuesRoot = new TinyObject();
-                            fieldRoot.Add("AllowedValues", allowedValuesRoot);
-
-                            foreach (var allowedValue in field.AllowedValues)
-                                allowedValuesRoot.Add(allowedValue.Name, ObjectSerializer.ToString(field.Type, allowedValue.Value));
-                        }
-                    }
-
-                    var layersRoot = new TinyObject();
-                    effectRoot.Add("Layers", layersRoot);
-
-                    foreach (var layer in LayerManager.Layers.Where(l => l.Effect == effect))
-                    {
-                        var layerRoot = new TinyObject
-                        {
-                            { "Name", layer.Identifier },
-                            { "OsbLayer", layer.OsbLayer },
-                            { "DiffSpecific", layer.DiffSpecific },
-                            { "Visible", layer.Visible },
-                        };
-                        layersRoot.Add(layer.Guid.ToString("N"), layerRoot);
-                    }
-
-                    var effectPath = directoryWriter.GetPath("effect." + effect.Guid.ToString("N") + ".yaml");
-                    effectRoot.Write(effectPath);
+                    WriteEffectTiny(effect, directoryWriter);
                 }
 
                 directoryWriter.Commit(checkPaths: true);
@@ -818,13 +772,25 @@ namespace StorybrewEditor.Storyboarding
                         var layerEffect = effect;
                         var layerGuid = layerProperty.Key;
                         var layerRoot = layerProperty.Value;
-                        layerInserters.Add(layerGuid, () => layerEffect.AddPlaceholder(new EditorStoryboardLayer(layerRoot.Value<string>("Name"), layerEffect)
+
+                        var transformRoot = layerRoot.Value<TinyObject>("Transform");
+                        EditorStoryboardLayer placeholderLayer = null;
+                        layerInserters.Add(layerGuid, () =>
                         {
-                            Guid = Guid.Parse(layerGuid),
-                            OsbLayer = layerRoot.Value<OsbLayer>("OsbLayer"),
-                            DiffSpecific = layerRoot.Value<bool>("DiffSpecific"),
-                            Visible = layerRoot.Value<bool>("Visible"),
-                        }));
+                            layerEffect.AddPlaceholder(placeholderLayer = new EditorStoryboardLayer(layerRoot.Value<string>("Name"), layerEffect)
+                            {
+                                Guid = Guid.Parse(layerGuid),
+                                OsbLayer = layerRoot.Value<OsbLayer>("OsbLayer"),
+                                DiffSpecific = layerRoot.Value<bool>("DiffSpecific"),
+                                Visible = layerRoot.Value<bool>("Visible")
+                            });
+
+                            Cascade(placeholderLayer, transformRoot);
+                        }
+
+                        );
+
+                        
                     }
                 }
 
@@ -847,6 +813,131 @@ namespace StorybrewEditor.Storyboarding
                     insertLayer();
                 }
             }
+        }
+
+        void Cascade(StoryboardSegment segment, TinyObject currentToken)
+        {
+            segment.Position = VectorFromString(currentToken.Value<string>("Offset"));
+            segment.Rotation = currentToken.Value<float>("Rotation");
+            segment.Scale = currentToken.Value<float>("Scale");
+
+            TinyArray potentialTokens = currentToken.Value<TinyArray>("Children");
+            if (potentialTokens == null || potentialTokens.Count == 0) return;
+
+
+            foreach (TinyToken token in potentialTokens)
+            {
+                TinyObject obj = (TinyObject)token;
+                StoryboardSegment nextSegment = segment.GetSegment(obj.Value<string>("Name"));
+                Cascade(nextSegment, obj);
+            }
+            
+        }
+
+        /// <summary>
+        /// Writes a tiny object for an effect to a file.
+        /// </summary>
+        /// <param name="effect"></param>
+        /// <param name="directoryWriter"></param>
+        void WriteEffectTiny(Effect effect, SafeDirectoryWriter directoryWriter)
+        {
+            var effectRoot = new TinyObject
+                    {
+                        { "FormatVersion", Version },
+                        { "Name", effect.Name },
+                        { "Script", effect.BaseName },
+                        { "Multithreaded", effect.Multithreaded },
+                    };
+
+            var configRoot = new TinyObject();
+            effectRoot.Add("Config", configRoot);
+
+            foreach (var field in effect.Config.SortedFields)
+            {
+                var fieldRoot = new TinyObject
+                        {
+                            { "Type", field.Type.FullName },
+                            { "Value", ObjectSerializer.ToString(field.Type, field.Value)},
+                        };
+                if (field.DisplayName != field.Name)
+                    fieldRoot.Add("DisplayName", field.DisplayName);
+                if (!string.IsNullOrWhiteSpace(field.BeginsGroup))
+                    fieldRoot.Add("BeginsGroup", field.BeginsGroup);
+                configRoot.Add(field.Name, fieldRoot);
+
+                if ((field.AllowedValues?.Length ?? 0) > 0)
+                {
+                    var allowedValuesRoot = new TinyObject();
+                    fieldRoot.Add("AllowedValues", allowedValuesRoot);
+
+                    foreach (var allowedValue in field.AllowedValues)
+                        allowedValuesRoot.Add(allowedValue.Name, ObjectSerializer.ToString(field.Type, allowedValue.Value));
+                }
+            }
+
+            var layersRoot = new TinyObject();
+            effectRoot.Add("Layers", layersRoot);
+
+            foreach (var layer in LayerManager.Layers.Where(l => l.Effect == effect))
+            {
+                //Debug.Assert(childTinyObject != null);
+                var layerRoot =  GetLayerTiny(layer);
+
+                layersRoot.Add(layer.Guid.ToString("N"), layerRoot);
+            }
+
+            var effectPath = directoryWriter.GetPath("effect." + effect.Guid.ToString("N") + ".yaml");
+            effectRoot.Write(effectPath);
+
+        }
+
+        TinyObject GetLayerTiny(EditorStoryboardLayer layer)
+        {
+            return new TinyObject
+                        {
+                            { "Name", layer.Identifier },
+                            { "OsbLayer", layer.OsbLayer },
+                            { "DiffSpecific", layer.DiffSpecific },
+                            { "Visible", layer.Visible },
+                            {"Transform", GetChildSegmentTiny(layer) ?? new TinyObject() }
+                        };
+
+        }
+        TinyObject GetChildSegmentTiny(StoryboardSegment segment)
+        {
+
+            List<TinyObject> children = new List<TinyObject>();
+            foreach (StoryboardSegment child in segment.NamedSegments)
+            {
+                children.Add(GetChildSegmentTiny(child));
+            }
+            return 
+            new TinyObject
+            {
+                {"Name", segment.Identifier },
+                {"Offset", segment.Position.ToString() },
+                {"Rotation", segment.Rotation },
+                {"Scale", segment.Scale },
+                {"Children", children}
+            };
+        }
+
+
+        Vector2 VectorFromString(string value)
+        {
+            string[] spl = value.Split(',', StringSplitOptions.TrimEntries);
+            foreach (string s in spl) Debug.WriteLine(s);
+
+            bool leftNegative, rightNegative;
+            
+            //i had to do it this way because Single.Parse was getting mad at me
+            string leftValue = spl[0].Substring((leftNegative = (spl[0][1] == '-')) ? 2 : 1, spl[0].Length - (leftNegative ? 2 : 1));
+            string rightValue = spl[1].Substring((rightNegative = spl[1][0] == '-') ? 1 : 0, spl[1].Length - (rightNegative ? 2 : 1));
+
+            Vector2 res = new Vector2((leftNegative ? -1 : 1) * float.Parse(leftValue, System.Globalization.NumberStyles.AllowDecimalPoint), (rightNegative ? -1 : 1) * float.Parse(rightValue, System.Globalization.NumberStyles.AllowDecimalPoint));
+
+            Debug.WriteLine(res);
+            return res;    
         }
 
         public static Project Create(string projectFolderName, string mapsetPath, bool withCommonScripts, ResourceContainer resourceContainer)

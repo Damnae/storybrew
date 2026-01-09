@@ -42,5 +42,10 @@
 
         public static implicit operator bool(CommandParameter obj)
             => obj.Type != ParameterType.None;
+
+        public override bool Equals(object obj)
+        {
+            return obj is CommandParameter p && p == this;
+        }
     }
 }

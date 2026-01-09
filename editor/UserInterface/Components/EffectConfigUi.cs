@@ -57,6 +57,7 @@ namespace StorybrewEditor.UserInterface.Components
         public event Action<StoryboardSegment> OnSegmentSelected;
 
         public event Action<StoryboardSegment> OnStartPlacement;
+       
         public event Action<StoryboardSegment> OnResetPlacement;
         
         public EffectConfigUi(WidgetManager manager) : base(manager)
@@ -208,6 +209,14 @@ namespace StorybrewEditor.UserInterface.Components
                 AnchorFrom = BoxAlignment.Centre,
                 AnchorTo = BoxAlignment.Centre,
             });
+
+            configFieldsLayout.Add(new Label(Manager)
+            {
+                StyleName = "listItem",
+                Text = "- W: Move\n- E: Scale\n- R: Rotate\n- CTRL + Z: Undo\n- CTRL + Shift + Z OR CTRL + Y: Redo\n\nNOTE: Move X / Y Commands do not export properly at the moment.",
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
+            });
             foreach (var layer in effect.Project.LayerManager.Layers.Where(l => l.Effect == effect))
                 buildSegmentEditor(layer);
         }
@@ -216,6 +225,7 @@ namespace StorybrewEditor.UserInterface.Components
         {
             Widget segmentWidget;
             Button editButton;
+            Button resetButton;
             configFieldsLayout.Add(segmentWidget = new LinearLayout(Manager)
             {
                 AnchorFrom = BoxAlignment.Centre,
@@ -228,7 +238,16 @@ namespace StorybrewEditor.UserInterface.Components
                     {
                         StyleName = "icon",
                         Icon = IconFont.Arrows,
-                        Tooltip = "Move",
+                        Tooltip = "Edit Transform",
+                        AnchorFrom = BoxAlignment.Centre,
+                        AnchorTo = BoxAlignment.Centre,
+                        CanGrow = false,
+                    },
+                    resetButton = new Button(Manager)
+                    {
+                        StyleName = "icon",
+                        Icon = IconFont.Undo,
+                        Tooltip = "Reset Transform",
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
                         CanGrow = false,
@@ -239,7 +258,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Text = new string(' ', depth * 2) + (string.IsNullOrWhiteSpace(segment.Identifier) ? "(Unnamed)": segment.Identifier),
                         AnchorFrom = BoxAlignment.TopLeft,
                         AnchorTo = BoxAlignment.TopLeft,
-                        Tooltip = $"Segment {segment.Identifier}",
+                        Tooltip = $"Segment - {segment.Identifier}",
                     },
                 },
             });
@@ -262,12 +281,16 @@ namespace StorybrewEditor.UserInterface.Components
                 handledClick = false;
             };
 
+            resetButton.OnClick += (sender, e) =>
+            {
+                OnResetPlacement?.Invoke(segment);
+            };
             editButton.OnClick += (sender, e) =>
             {
-                if (e == OpenTK.Input.MouseButton.Left)
-                    OnStartPlacement?.Invoke(segment);
-                else if (e == OpenTK.Input.MouseButton.Right)
-                    OnResetPlacement?.Invoke(segment);
+                //if (e == OpenTK.Input.MouseButton.Left)
+                OnStartPlacement?.Invoke(segment);
+                //else if (e == OpenTK.Input.MouseButton.Right)
+                //    OnResetPlacement?.Invoke(segment);
             };
 
             foreach (var childSegment in segment.NamedSegments)

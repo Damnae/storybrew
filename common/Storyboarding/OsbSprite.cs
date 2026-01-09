@@ -77,6 +77,7 @@ namespace StorybrewCommon.Storyboarding
         public bool HasScalingCommands => scaleTimeline.HasCommands || scaleVecTimeline.HasCommands;
         public bool HasMoveXYCommands => moveXTimeline.HasCommands || moveYTimeline.HasCommands;
 
+        public bool LockRotationOnTransform { get; set; } = false;
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
         {
@@ -340,6 +341,30 @@ namespace StorybrewCommon.Storyboarding
         {
             if (CommandCount == 0)
                 return;
+            //set up defaults for the timeline
+            if (transform != null)
+            {
+                //if no default has been set for these commands, make sure to add one
+                if (transform.Rotates && !rotateTimeline.HasCommands && !LockRotationOnTransform)
+                {
+                    Rotate(StartTime, 0);
+                }
+
+                if (transform.Scales &&
+                    (!scaleTimeline.HasCommands &&
+                    scaleVecTimeline.HasCommands))
+                {
+                    Scale(StartTime, ScaleAt(StartTime).X);
+                }
+
+                if (transform.Translates &&
+                    (!moveTimeline.HasCommands &&
+                    !moveXTimeline.HasCommands &&
+                    !moveYTimeline.HasCommands))
+                {
+                    Move(StartTime, DefaultPosition);
+                }
+            }
 
             var osbSpriteWriter = OsbWriterFactory.CreateWriter(this, moveTimeline,
                                                                       moveXTimeline,
