@@ -128,7 +128,7 @@ namespace StorybrewEditor.ScreenLayers
                 openProjectButton.Disabled = true;
 
                 Trace.WriteLine($".NET SDK {RuntimeEnvironment.GetSystemVersion()} not found at {sdkPath},\n from {RuntimeEnvironment.GetRuntimeDirectory()}");
-                Manager.ShowMessage($".NET SDK 8.0.8 x86 (or more recent) is required, do you want to install it?",
+                Manager.ShowMessage($".NET SDK 8.0.8 x64 (or more recent) is required, do you want to install it?",
                     () => Process.Start(new ProcessStartInfo() { FileName = "https://dotnet.microsoft.com/en-us/download/dotnet/8.0", UseShellExecute = true }), true);
             }
 

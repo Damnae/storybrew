@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>StorybrewEditor</RootNamespace>
     <AssemblyName>StorybrewEditor</AssemblyName>
-    <PlatformTarget>x86</PlatformTarget>  <!-- to support the BASS library-->
+    <PlatformTarget>x64</PlatformTarget>  <!-- required by the x64 BASS libraries -->
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>True</UseWindowsForms>
@@ -36,6 +36,22 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="OpenTK" Version="2.0.0" />
+    <PackageReference Include="ppy.osu.Framework.NativeLibs"
+                      Version="2025.806.0-nativelibs"
+                      GeneratePathProperty="true"
+                      ExcludeAssets="runtime;native"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(Pkgppy_osu_Framework_NativeLibs)\runtimes\win-x64\native\bass.dll"
+          Link="bass.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(Pkgppy_osu_Framework_NativeLibs)\runtimes\win-x64\native\bass_fx.dll"
+          Link="bass_fx.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
