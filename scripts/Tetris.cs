@@ -218,7 +218,8 @@ namespace StorybrewScripts
         private Vector2 transform(Vector2 position)
         {
             position = new Vector2(position.X - GridWidth * CellSize * 0.5f, position.Y - GridHeight * CellSize);
-            return Vector2.Transform(position, Quaternion.FromEulerAngles((float)(Rotation / 180 * Math.PI), 0, 0)) + Offset;
+            // OpenTK 3 uses X/Y/Z Euler ordering, so a 2D rotation is around Z.
+            return Vector2.Transform(position, Quaternion.FromEulerAngles(0, 0, (float)(Rotation / 180 * Math.PI))) + Offset;
         }
 
         private void shuffle(int[] array)
