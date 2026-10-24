@@ -13,7 +13,7 @@
     <Title>storybrew editor</Title>
     <Copyright>Copyright © Damnae 2024</Copyright>
     <Product>storybrew editor</Product>
-    <AssemblyVersion>1.97.*</AssemblyVersion>
+    <AssemblyVersion>1.98.*</AssemblyVersion>
     <Nullable>disable</Nullable>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
